@@ -44,7 +44,7 @@
           <a class="button secondary" href="#features" data-i18n="heroExplore">了解当前版本</a>
         </div>
         <div class="hero-meta" aria-label="Release summary">
-          <span>Windows</span><span>Electron + Python</span><span data-i18n="heroLanguage">中文 / 日本語 / English</span>
+          <span data-i18n="heroPlatforms">Windows · Linux / macOS 源码启动</span><span>Electron + Python</span><span data-i18n="heroLanguage">中文 / 日本語 / English</span>
         </div>
       </div>
     </section>
@@ -190,12 +190,12 @@
           <li><span>1</span><div><strong data-i18n="installStep1Title">下载源码</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载源码包，或使用 Git 与 Git LFS 克隆仓库。</p></div></li>
           <li><span>2</span><div><strong data-i18n="installStep2Title">放入资源包</strong><p data-i18n="installStep2Body">下载 ZZ-Assets-v1.zip，将其中的 asserts 文件夹放到项目根目录；最终应能看到 asserts/images、asserts/audio 等目录。</p></div></li>
           <li><span>3</span><div><strong data-i18n="installStep3Title">安装依赖</strong><p data-i18n="installStep3Body">安装 Python 3.10+ 与 Node.js 20+，先安装 Python 运行依赖，再运行 npm install。</p></div></li>
-          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">双击 launch-electron.cmd；也可以运行 npm run electron:dev。</p></div></li>
+          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">Windows 使用 .cmd，Linux 使用 .sh，macOS 使用 .command；也可以运行 npm run electron:dev。</p></div></li>
         </ol>
         <aside class="requirements">
           <h3 data-i18n="requirementsTitle">运行要求</h3>
           <dl>
-            <div><dt data-i18n="reqOs">系统</dt><dd>Windows 10 / 11</dd></div>
+            <div><dt data-i18n="reqOs">系统</dt><dd data-i18n="reqOsBody">Windows 10/11；Linux/macOS 源码启动（实验支持）</dd></div>
             <div><dt>Python</dt><dd>3.10+</dd></div>
             <div><dt>Node.js</dt><dd>20+</dd></div>
             <div><dt data-i18n="reqGpu">显卡</dt><dd data-i18n="reqGpuBody">游玩不要求；本地训练需要 NVIDIA GPU / CUDA</dd></div>

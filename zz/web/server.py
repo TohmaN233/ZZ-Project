@@ -45,6 +45,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STATIC_DIR = Path(__file__).with_name("static")
 DOCS_DIR = PROJECT_ROOT / "docs" / "rules"
 HOME_IMAGE = PROJECT_ROOT / "image.png"
+APP_ICON = PROJECT_ROOT / "electron" / "icon.png"
 ZZ_ICON = PROJECT_ROOT / "asserts" / "images" / "clean_graph" / "基本素材" / "各种小素材" / "zzicon.png"
 HOME_THEME_VIDEO = PROJECT_ROOT / "asserts" / "video" / "OP02.mp4"
 DEV_MODE_PASSWORD_ENV = "ZZ_DEV_MODE_PASSWORD"
@@ -749,6 +750,9 @@ class ZenonzardHandler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/image.png":
             self._send_file(HOME_IMAGE)
+            return
+        if parsed.path == "/icon.png":
+            self._send_file(APP_ICON)
             return
         if parsed.path == "/zzicon.png":
             self._send_file(ZZ_ICON)

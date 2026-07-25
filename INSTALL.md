@@ -5,6 +5,7 @@
 ## 1. 系统要求
 
 - Windows 10 或 Windows 11
+- Linux 或 macOS 可从源码启动，目前属于实验支持，尚不提供打包安装程序
 - Python 3.10 或更高版本
 - Node.js 20 或更高版本
 - Git LFS（仅在使用 `git clone` 时需要）
@@ -54,7 +55,9 @@ ZZ-Project/
 ├─ data/
 ├─ electron/
 ├─ zz/
-└─ launch-electron.cmd
+├─ launch-electron.cmd
+├─ launch-electron.sh
+└─ launch-electron.command
 ```
 
 发布页面会列出资源包大小和 SHA-256。下载后可以验证：
@@ -67,17 +70,37 @@ Get-FileHash .\ZZ-Assets-v1.zip -Algorithm SHA256
 
 ## 5. 启动桌面客户端
 
-双击：
+Windows 双击或在 PowerShell 运行：
 
 ```text
 launch-electron.cmd
 ```
 
-或者在 PowerShell 运行：
+Linux 在终端运行：
+
+```bash
+./launch-electron.sh
+```
+
+macOS 在终端运行，也可以双击 `.command` 文件：
+
+```bash
+./launch-electron.command
+```
+
+Linux/macOS 启动器会优先使用 `python3`，也可以提前设置 `ZZ_PYTHON` 指定解释器。若下载工具移除了执行权限，先运行：
+
+```bash
+chmod +x launch-electron.sh launch-electron.command
+```
+
+所有平台也都可以直接运行：
 
 ```powershell
 npm run electron:dev
 ```
+
+桌面客户端启动后会自动读取 GitHub 最新 Release。仅在发现更高版本时显示更新提示；网络检查失败不会阻止离线游玩，诊断信息会写入 Electron 日志。原生 `Help` 菜单提供项目发布页与最新 Release 入口。
 
 首次进入后可以在 `Setting` 中切换中文、日本语、English 和对战 BGM。
 

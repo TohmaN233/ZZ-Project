@@ -61,6 +61,7 @@ let bgmError = null;
 let homeThemeTimer = null;
 let homeThemeActive = false;
 let homeThemeVideoError = null;
+let applicationUpdate = { status: "idle", currentVersion: null, latestVersion: null, error: null };
 let sfxContext = null;
 let publicRevealQueue = [];
 let activePublicReveal = null;
@@ -244,6 +245,9 @@ const UI_TEXT = {
     setting: "Setting",
     exit: "Exit",
     comingSoon: "占位",
+    updateAvailable: "发现新版本 {version}",
+    updateCurrent: "当前版本 {version}",
+    viewRelease: "查看更新",
     startGame: "开始游戏",
     launchMode: "模式",
     modeHumanAi: "人机对战",
@@ -495,6 +499,9 @@ const UI_TEXT = {
     setting: "Setting",
     exit: "Exit",
     comingSoon: "準備中",
+    updateAvailable: "新しいバージョン {version} があります",
+    updateCurrent: "現在のバージョン {version}",
+    viewRelease: "更新を見る",
     startGame: "対戦開始",
     launchMode: "モード",
     modeHumanAi: "対AI",
@@ -722,6 +729,9 @@ const UI_TEXT = {
     setting: "Setting",
     exit: "Exit",
     comingSoon: "Placeholder",
+    updateAvailable: "Version {version} is available",
+    updateCurrent: "Current version {version}",
+    viewRelease: "View update",
     startGame: "Start Game",
     launchMode: "Mode",
     modeHumanAi: "Human vs AI",
@@ -5968,7 +5978,7 @@ function renderShellHeader(title = "ZENONZARD") {
       <div class="brand">
         ${logo
           ? `<img class="brand-logo" src="${esc(logo)}" alt="${esc(title)}">`
-          : `<img class="brand-icon" src="/zzicon.png" alt="" aria-hidden="true"><strong>${esc(title)}</strong>`}
+          : `<img class="brand-icon" src="/icon.png" alt="" aria-hidden="true"><strong>${esc(title)}</strong>`}
         <div class="meta"></div>
       </div>
       <div></div>
@@ -5989,6 +5999,34 @@ function renderShellHeader(title = "ZENONZARD") {
   `;
 }
 
+function renderApplicationUpdateNotice() {
+  if (applicationUpdate.status !== "available") return "";
+  return `
+    <aside class="home-update-notice" role="status">
+      <div>
+        <strong>${esc(t("updateAvailable", { version: applicationUpdate.latestVersion }))}</strong>
+        <span>${esc(t("updateCurrent", { version: applicationUpdate.currentVersion }))}</span>
+      </div>
+      <button type="button" data-open-release>${esc(t("viewRelease"))} ↗</button>
+    </aside>
+  `;
+}
+
+async function loadApplicationUpdate() {
+  const result = await ZZApi.desktop.checkForUpdates();
+  applicationUpdate = result && typeof result === "object" ? result : { status: "unavailable" };
+  if (applicationUpdate.status === "error") {
+    console.warn(`Application update check failed: ${applicationUpdate.error || "unknown error"}`);
+  }
+  if (appView === "home") render();
+  return applicationUpdate;
+}
+
+async function openApplicationRelease() {
+  const result = await ZZApi.desktop.openReleasePage();
+  if (!result || result.ok !== true) console.warn("GitHub release page is unavailable outside the desktop client.");
+}
+
 function renderHome(error = null) {
   return `
     ${renderShellHeader()}
@@ -5996,10 +6034,12 @@ function renderHome(error = null) {
       ${error ? `<div class="error">${esc(error.message || error)}</div>` : ""}
       <section class="home-menu-hero" aria-label="ZENONZARD">
         <div class="home-menu-copy">
-          <img class="home-menu-icon" src="/zzicon.png" alt="">
+          <img class="home-menu-icon" src="/icon.png" alt="">
           <h1>ZENONZARD</h1>
         </div>
-        <div class="home-menu-actions">
+        <div class="home-menu-rail">
+          ${renderApplicationUpdateNotice()}
+          <div class="home-menu-actions">
           <button class="home-menu-button placeholder" disabled>
             <strong>${esc(t("storyMode"))}</strong>
             <span>${esc(t("comingSoon"))}</span>
@@ -6023,7 +6063,8 @@ function renderHome(error = null) {
           <button class="home-menu-button exit" data-exit-app>
             <strong>${esc(t("exit"))}</strong>
           </button>
-          ${state ? `<button class="home-menu-button" data-view="duel"><strong>${esc(t("continueDuel"))}</strong></button>` : ""}
+            ${state ? `<button class="home-menu-button" data-view="duel"><strong>${esc(t("continueDuel"))}</strong></button>` : ""}
+          </div>
         </div>
       </section>
     </main>
@@ -7698,6 +7739,11 @@ app.addEventListener("click", async (event) => {
     exitApp();
     return;
   }
+  if (event.target.closest("[data-open-release]")) {
+    event.preventDefault();
+    openApplicationRelease();
+    return;
+  }
   if (event.target.closest("[data-online-connect]")) {
     event.preventDefault();
     connectOnlineServer();
@@ -8367,6 +8413,7 @@ function bootApp(initialView = "home") {
     loadSettings(),
     loadCatalog(),
     initMultiplayerBridge(),
+    loadApplicationUpdate(),
   ]).then((result) => {
     if (!parseCodemanReplayHash()) render();
     return result;

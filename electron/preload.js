@@ -10,6 +10,8 @@ contextBridge.exposeInMainWorld("zzDesktop", {
   selectAssetRoot: () => ipcRenderer.invoke("assets:selectRoot"),
   selectDeckRoot: () => ipcRenderer.invoke("decks:selectRoot"),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
+  checkForUpdates: () => ipcRenderer.invoke("app:checkForUpdates"),
+  openReleasePage: () => ipcRenderer.invoke("app:openReleasePage"),
   quit: () => ipcRenderer.invoke("app:quit"),
 });
 

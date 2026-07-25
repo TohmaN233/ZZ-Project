@@ -16,6 +16,8 @@
 - **Online Game**：支持局域网与个人服务器联机。
 - **三语界面**：中文、日本語、English。
 - **BGM 设置**：完整资源包提供 ZZ 角色歌曲。
+- **版本检查**：桌面客户端启动时检查 GitHub 最新 Release；发现新版本后可直接打开发布页。
+- **跨平台启动**：Windows 使用 `.cmd`，Linux 使用 `.sh`，macOS 使用 `.command`。Linux/macOS 当前为源码启动的实验支持。
 
 Story Mode 还没有开发。长期目标是设计由 Agent 自动与用户交互的游戏，对应实现 GAL 前端，并吸收 SillyTavern 相关社群在角色、世界书与长期互动方面积累的经验，构建个人专属的、与自己的 Codeman 一起经历的 ZZ 体验。
 
@@ -34,10 +36,19 @@ python -m pip install -r requirements-runtime.txt
 npm install
 ```
 
-随后将资源包中的 `asserts/` 放到仓库根目录，并运行：
+随后将资源包中的 `asserts/` 放到仓库根目录，并按平台运行：
 
 ```powershell
+# Windows
 .\launch-electron.cmd
+```
+
+```bash
+# Linux
+./launch-electron.sh
+
+# macOS
+./launch-electron.command
 ```
 
 ## 内容边界

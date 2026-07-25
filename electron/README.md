@@ -18,6 +18,12 @@ Then start the desktop client:
 npm run electron:dev
 ```
 
+Platform launchers are also available at the project root:
+
+- Windows: `launch-electron.cmd`
+- Linux: `launch-electron.sh`
+- macOS: `launch-electron.command`
+
 Useful environment variables:
 
 ```powershell
@@ -51,6 +57,11 @@ The preload exposes `window.zzDesktop` with narrow helpers only:
 - `startServer`, `stopServer`, `serverStatus`
 - `openFolder`, `openPath`
 - `selectAssetRoot`, `selectDeckRoot`
-- `getVersion`
+- `getVersion`, `checkForUpdates`, `openReleasePage`
+
+The main process performs the GitHub Release request through Electron's network
+stack, owns the fixed external URLs, installs the native Help menu, and applies
+`electron/icon.png` to desktop windows. Renderer code never receives a general
+external-URL opener.
 
 Game rules and match state still go through the Python `/api/...` JSON contract.

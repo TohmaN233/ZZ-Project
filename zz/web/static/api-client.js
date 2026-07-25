@@ -35,6 +35,12 @@
     openReplayWindow: (payload) => window.zzDesktop && window.zzDesktop.openReplayWindow
       ? window.zzDesktop.openReplayWindow(payload)
       : Promise.resolve({ ok: false, unavailable: true }),
+    checkForUpdates: () => window.zzDesktop && window.zzDesktop.checkForUpdates
+      ? window.zzDesktop.checkForUpdates()
+      : Promise.resolve({ status: "unavailable" }),
+    openReleasePage: () => window.zzDesktop && window.zzDesktop.openReleasePage
+      ? window.zzDesktop.openReleasePage()
+      : Promise.resolve({ ok: false, unavailable: true }),
     quit: () => window.zzDesktop && window.zzDesktop.quit
       ? window.zzDesktop.quit()
       : Promise.resolve({ ok: false, unavailable: true }),

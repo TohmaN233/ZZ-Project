@@ -27,6 +27,11 @@ if not exist "package.json" (
   exit /b 1
 )
 
+if /I "%~1"=="--check" (
+  echo Launcher check passed.
+  exit /b 0
+)
+
 echo Closing previous Zenonzard Electron windows, if any...
 for /f "usebackq delims=" %%P in (`powershell -NoProfile -ExecutionPolicy Bypass -Command "$target = (Join-Path (Get-Location) 'node_modules\electron\dist\electron.exe'); Get-Process electron -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $target } | ForEach-Object { $_.Id }"`) do (
   taskkill /PID %%P /T /F >nul 2>nul
@@ -42,11 +47,6 @@ if not exist "node_modules\.bin\electron.cmd" (
     pause
     exit /b 1
   )
-)
-
-if /I "%~1"=="--check" (
-  echo Launcher check passed.
-  exit /b 0
 )
 
 echo Launching desktop client...

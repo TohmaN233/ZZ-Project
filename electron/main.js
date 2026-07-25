@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog, ipcMain, session, shell } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain, Menu, net, session, shell } = require("electron");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs/promises");
 const http = require("node:http");
@@ -6,6 +6,11 @@ const path = require("node:path");
 const { createAdaptiveWebSocketClass } = require("./adaptive-websocket");
 const { LanManager } = require("./lan-manager");
 const { MultiplayerDesktopClient } = require("./multiplayer-client");
+const {
+  checkLatestRelease,
+  LATEST_RELEASE_URL,
+  PROJECT_WEBSITE_URL,
+} = require("./update-checker");
 
 let mainWindow = null;
 let serverProcess = null;
@@ -29,11 +34,52 @@ let multiplayerReconnectTimer = null;
 const multiplayerReconnectDelayMs = 1000;
 let shutdownPrepared = false;
 let shutdownPromise = null;
+let updateCheckPromise = null;
+let updateStatus = { status: "idle", currentVersion: null };
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 function projectRoot() {
   return path.resolve(__dirname, "..");
+}
+
+function applicationIconPath() {
+  return path.join(app.getAppPath(), "electron", "icon.png");
+}
+
+function openHelpUrl(url, label) {
+  shell.openExternal(url).catch((error) => {
+    appendLog(`Opening ${label} failed: ${error.message || error}`);
+  });
+}
+
+function installApplicationMenu() {
+  const template = [];
+  if (process.platform === "darwin") {
+    template.push({
+      label: app.name,
+      submenu: [{ role: "about" }, { type: "separator" }, { role: "quit" }],
+    });
+  }
+  template.push(
+    { role: "fileMenu" },
+    { role: "viewMenu" },
+    { role: "windowMenu" },
+    {
+      role: "help",
+      submenu: [
+        {
+          label: "项目发布页 / Project Page",
+          click: () => openHelpUrl(PROJECT_WEBSITE_URL, "project page"),
+        },
+        {
+          label: "最新版本 / Latest Release",
+          click: () => openHelpUrl(LATEST_RELEASE_URL, "latest release"),
+        },
+      ],
+    },
+  );
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
 function defaultPort() {
@@ -60,6 +106,31 @@ function statusSnapshot() {
     pid: serverProcess ? serverProcess.pid : null,
     log: [...serverLog],
   };
+}
+
+async function checkForApplicationUpdate() {
+  if (updateStatus.status === "current" || updateStatus.status === "available") return { ...updateStatus };
+  if (updateCheckPromise) return updateCheckPromise;
+  const currentVersion = app.getVersion();
+  updateStatus = { status: "checking", currentVersion };
+  updateCheckPromise = checkLatestRelease({
+    currentVersion,
+    fetchImpl: (url, options) => net.fetch(url, options),
+  }).then((result) => {
+    updateStatus = result;
+    appendLog(result.status === "available"
+      ? `Application update available: ${result.currentVersion} -> ${result.latestVersion}`
+      : `Application update check complete: ${result.currentVersion} is current`);
+    return { ...updateStatus };
+  }).catch((error) => {
+    const message = error && error.message ? error.message : String(error);
+    updateStatus = { status: "error", currentVersion, error: message };
+    appendLog(`Application update check failed: ${message}`);
+    return { ...updateStatus };
+  }).finally(() => {
+    updateCheckPromise = null;
+  });
+  return updateCheckPromise;
 }
 
 function multiplayerSnapshot() {
@@ -334,6 +405,7 @@ function createReplayWindow(url) {
     minWidth: 1180,
     minHeight: 760,
     backgroundColor: "#05090c",
+    icon: applicationIconPath(),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -359,6 +431,7 @@ async function createWindow() {
     height: 900,
     minWidth: 980,
     minHeight: 680,
+    icon: applicationIconPath(),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -426,6 +499,15 @@ function registerIpc() {
   ipcMain.handle("app:getVersion", async (_event) => {
     assertTrustedSender(_event);
     return app.getVersion();
+  });
+  ipcMain.handle("app:checkForUpdates", async (_event) => {
+    assertTrustedSender(_event);
+    return checkForApplicationUpdate();
+  });
+  ipcMain.handle("app:openReleasePage", async (_event) => {
+    assertTrustedSender(_event);
+    await shell.openExternal(LATEST_RELEASE_URL);
+    return { ok: true };
   });
   ipcMain.handle("app:quit", async (_event) => {
     assertTrustedSender(_event);
@@ -521,6 +603,8 @@ function registerIpc() {
 }
 
 app.whenReady().then(async () => {
+  installApplicationMenu();
+  if (process.platform === "darwin" && app.dock) app.dock.setIcon(applicationIconPath());
   multiplayerRecoveryPath = path.join(app.getPath("userData"), "multiplayer-recovery.json");
   const shouldReconnect = await restoreMultiplayerRecovery();
   registerIpc();

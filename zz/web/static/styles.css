@@ -5692,7 +5692,48 @@ button.action-art-button:focus-visible {
 .home-menu-actions {
   display: grid;
   gap: 9px;
+}
+
+.home-menu-rail {
+  min-width: 0;
+  display: grid;
   align-self: center;
+  gap: 12px;
+}
+
+.home-update-notice {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 223, 128, 0.48);
+  background: rgba(20, 17, 8, 0.88);
+}
+
+.home-update-notice div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.home-update-notice strong {
+  color: var(--gold);
+  font-size: 14px;
+}
+
+.home-update-notice span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.home-update-notice button {
+  min-height: 38px;
+  padding: 7px 10px;
+  border-color: rgba(255, 223, 128, 0.38);
+  color: var(--gold);
+  white-space: nowrap;
 }
 
 .home-menu-button {
@@ -6441,6 +6482,21 @@ button.action-art-button:focus-visible {
     max-width: calc(100vw - 36px);
     min-width: 0;
     justify-self: stretch;
+  }
+
+  .home-menu-rail {
+    width: 100%;
+    max-width: calc(100vw - 36px);
+    min-width: 0;
+    justify-self: stretch;
+  }
+
+  .home-update-notice {
+    grid-template-columns: 1fr;
+  }
+
+  .home-update-notice button {
+    width: 100%;
   }
 
   .home-menu-button {
