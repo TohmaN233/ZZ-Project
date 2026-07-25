@@ -12,7 +12,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_ASSET_ROOT = PROJECT_ROOT / "asserts"
 DEFAULT_OFFICIAL_CARDLIST = PROJECT_ROOT / "data" / "official_cardlist.tsv"
 DEFAULT_CLEAN_GRAPH_ROOT = PROJECT_ROOT / "asserts" / "images" / "clean_graph"
-LOCAL_BATTLE_SFX_AUDIO_ROOT = PROJECT_ROOT / "asserts" / "audio" / "battle_sfx"
 LEGACY_CLEAN_GRAPH_ROOT = PROJECT_ROOT / "data" / "apk_images" / "clean_graph"
 LEGACY_BATTLE_SFX_AUDIO_ROOT = PROJECT_ROOT / "data" / "audio" / "battle_sfx"
 OFFICIAL_CARD_IMAGE_HOST = "www.aicarddass.com"
@@ -20,25 +19,27 @@ OFFICIAL_CARD_IMAGE_PATH_PREFIX = "/zenonzard/images/cardlist/cards/"
 OFFICIAL_CARD_IMAGE_EN_PATH_PREFIX = "/zenonzard/en/images/cardlist/cards/"
 
 FORCE_IMAGE_NAMES = {
-    "force_e": ["恶 .png", "恶.png", "悪.png"],
-    "force_kon": ["混.png"],
-    "force_kai": ["凯.png", "凱.png"],
-    "force_so": ["双.png", "雙.png"],
-    "force_sei": ["圣.png", "聖.png"],
-    "force_chi": ["知.png"],
-    "force_li": ["丽.png", "麗.png"],
-    "force_sho": ["翔.png"],
-    "force_so2": ["苏.png", "甦.png"],
-    "force_rin": ["轮.png", "輪.png"],
+    asset_id: [f"{asset_id}.png"]
+    for asset_id in (
+        "force_e",
+        "force_kon",
+        "force_kai",
+        "force_so",
+        "force_sei",
+        "force_chi",
+        "force_li",
+        "force_sho",
+        "force_so2",
+        "force_rin",
+    )
 }
 
 CARD_COLOR_DIRS = ["RED", "YELLOW", "WHITE", "GREEN", "BLUE", "PURPLE", "COLORLESS"]
 PLAYMAT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
 PLAYMAT_EXCLUDED_STEMS = {"contact_sheet"}
 CHARACTER_PORTRAIT_DIR = "codeman_portraits"
-SELECTABLE_CHARACTER_ROLES = {"codeman", "guest_character"}
 HOME_GUIDE_CHARACTER_ID = "home_guide_operator"
-HOME_GUIDE_CHARACTER_FILES = ("Operator.png",)
+HOME_GUIDE_CHARACTER_FILES = ("operator.png",)
 KOUHOU_AI_MINA_CHARACTER_ID = "kouhou_ai_mina"
 KOUHOU_AI_MINA_CHARACTER_FILES = (f"{CHARACTER_PORTRAIT_DIR}/mina.png",)
 
@@ -51,29 +52,8 @@ TOKEN_IMAGE_NAMES = {
 }
 
 AUDIO_NAMES = {
-    f"bgm_{index:02d}": [Path("SUNRISE Music") / "ELEMENTS [Disc 1]" / filename]
-    for index, filename in enumerate((
-        "01 Da La Doubt.wav",
-        "02 WakeUp.wav",
-        "03 It's so beautiful.wav",
-        "04 Black & White.wav",
-        "05 Angel's mission.wav",
-        "06 I do L I love U.wav",
-        "07 排他的メランコリー.wav",
-        "08 Black Thief.wav",
-        "09 ワンダーランドパレード.wav",
-        "10 ス・リ・ル.wav",
-        "11 knife_the_blossom.wav",
-        "12 ドラマティックミステリー.wav",
-        "13 Colorful World.wav",
-        "14 Let's Get Started.wav",
-        "15 STAND UP!.wav",
-        "16 battaglia.wav",
-        "17 Lazy Daily.wav",
-        "18 dreamy maze.wav",
-        "19 Double.wav",
-        "20 MaGIC x NuMBER.wav",
-    ), start=1)
+    f"bgm_{index:02d}": [Path("audio") / "bgm" / f"bgm_{index:02d}.wav"]
+    for index in range(1, 21)
 }
 
 BATTLE_SFX_AUDIO_NAMES = {
@@ -142,15 +122,17 @@ class AssetIndex:
         if value:
             path = Path(value).expanduser().resolve()
             return path if path.exists() else None
-        if DEFAULT_CLEAN_GRAPH_ROOT.exists():
-            return DEFAULT_CLEAN_GRAPH_ROOT.resolve()
+        if self.root is not None:
+            path = self.root / "images" / "clean_graph"
+            if path.exists():
+                return path.resolve()
         if LEGACY_CLEAN_GRAPH_ROOT.exists():
             return LEGACY_CLEAN_GRAPH_ROOT.resolve()
         return None
 
     def _build_manifest(self) -> None:
         assert self.root is not None
-        self._add_if_exists("card_back", self.root / "卡垫卡背" / "XGT01_000_F.png")
+        self._add_if_exists("card_back", self.root / "card_back" / "XGT01_000_F.png")
         force_dir = self.root / "ZENONZARD_CARDLIST" / "FORCE"
         for asset_id, names in FORCE_IMAGE_NAMES.items():
             for name in names:
@@ -182,8 +164,13 @@ class AssetIndex:
                     break
 
     def _build_local_audio_manifest(self) -> None:
+        if self.root is not None:
+            audio_root = self.root / "audio" / "battle_sfx"
+            for audio_id, relative_name in BATTLE_SFX_AUDIO_NAMES.items():
+                if self._add_audio_if_exists(audio_id, audio_root / relative_name):
+                    continue
         for audio_id, relative_name in BATTLE_SFX_AUDIO_NAMES.items():
-            if self._add_audio_if_exists(audio_id, LOCAL_BATTLE_SFX_AUDIO_ROOT / relative_name):
+            if audio_id in self._audio_manifest:
                 continue
             self._add_audio_if_exists(audio_id, LEGACY_BATTLE_SFX_AUDIO_ROOT / relative_name)
 
@@ -195,7 +182,7 @@ class AssetIndex:
 
     def _build_ui_manifest(self) -> None:
         assert self.clean_graph_root is not None
-        ui_base = self.clean_graph_root / "基本素材"
+        ui_base = self.clean_graph_root / "ui"
         manifest_path = ui_base / "ui_manifest.json"
         data = self._load_json(manifest_path)
         if not isinstance(data, dict):
@@ -211,7 +198,7 @@ class AssetIndex:
 
     def _build_playmat_manifest(self) -> None:
         assert self.clean_graph_root is not None
-        playmat_base = self.clean_graph_root / "卡垫"
+        playmat_base = self.clean_graph_root / "playmats"
         data = self._load_json(playmat_base / "manifest.json")
         registered_paths: set[Path] = set()
         if isinstance(data, list):
@@ -241,7 +228,7 @@ class AssetIndex:
 
     def _build_character_manifest(self) -> None:
         assert self.clean_graph_root is not None
-        chara_base = self.clean_graph_root / "chara"
+        chara_base = self.clean_graph_root / "characters"
         data = self._load_json(chara_base / "characters.json")
         if isinstance(data, dict):
             characters = data.get("characters")
@@ -255,40 +242,8 @@ class AssetIndex:
                         continue
                     if not isinstance(assets, dict):
                         continue
-                    role = str(character.get("role") or "").strip()
-                    is_selectable_character = role in SELECTABLE_CHARACTER_ROLES
-                    portrait_registered = False
                     for kind, relative_path in assets.items():
-                        if is_selectable_character and kind == "portrait":
-                            continue
-                        registered = self._register_character_asset(chara_base, character_id, kind, relative_path)
-                        if kind == "portrait" and registered:
-                            portrait_registered = True
-                    if not portrait_registered:
-                        if is_selectable_character:
-                            portrait_registered = self._register_mapped_character_portrait(
-                                chara_base,
-                                character_id,
-                                assets,
-                            )
-                    if not portrait_registered and not is_selectable_character:
-                        fallback_kinds = ("local_apk_image", "official_image")
-                        for fallback_kind in fallback_kinds:
-                            fallback_path = assets.get(fallback_kind)
-                            if self._register_character_asset(chara_base, character_id, "portrait", fallback_path):
-                                break
-            unmatched_assets = data.get("unmatched_local_assets")
-            if isinstance(unmatched_assets, list):
-                for entry in unmatched_assets:
-                    if not isinstance(entry, dict):
-                        continue
-                    relative_path = entry.get("file")
-                    note = entry.get("note", "")
-                    if not isinstance(relative_path, str) or "group/event" not in str(note):
-                        continue
-                    explicit_id = entry.get("id")
-                    group_id = explicit_id if isinstance(explicit_id, str) and explicit_id else f"group_{Path(relative_path).stem}"
-                    self._register_character_asset(chara_base, group_id, "image", relative_path)
+                        self._register_character_asset(chara_base, character_id, kind, relative_path)
         self._register_home_guide_character_asset(chara_base)
         self._register_kouhou_ai_mina_character_asset(chara_base)
 
@@ -335,23 +290,6 @@ class AssetIndex:
         for filename in KOUHOU_AI_MINA_CHARACTER_FILES:
             if self._register_character_asset(chara_base, KOUHOU_AI_MINA_CHARACTER_ID, "portrait", filename):
                 return
-
-    def _register_mapped_character_portrait(self, chara_base: Path, character_id: str, assets: dict[object, object]) -> bool:
-        candidates = [f"{CHARACTER_PORTRAIT_DIR}/{character_id}.png"]
-        for kind in ("local_apk_image", "official_image"):
-            filename = self._relative_filename(assets.get(kind))
-            if filename:
-                candidates.append(f"{CHARACTER_PORTRAIT_DIR}/{filename}")
-        for relative_path in dict.fromkeys(candidates):
-            if self._register_character_asset(chara_base, character_id, "portrait", relative_path):
-                return True
-        return False
-
-    def _relative_filename(self, relative_path: object) -> str | None:
-        if not isinstance(relative_path, str) or urlparse(relative_path).scheme:
-            return None
-        name = Path(relative_path).name
-        return name if name else None
 
     def _register_character_asset(self, base: Path, character_id: str, kind: str, relative_path: object) -> bool:
         if not isinstance(character_id, str) or not self._safe_asset_id(character_id):
@@ -418,7 +356,6 @@ class AssetIndex:
             for root in (
                 self.root,
                 self.clean_graph_root,
-                LOCAL_BATTLE_SFX_AUDIO_ROOT,
                 LEGACY_BATTLE_SFX_AUDIO_ROOT,
             )
             if root is not None

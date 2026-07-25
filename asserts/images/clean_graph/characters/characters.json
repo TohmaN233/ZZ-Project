@@ -6,7 +6,7 @@
     "zenonzard_character_page_en": "https://www.aicarddass.com/zenonzard/en/#character",
     "battle_spirits_reference": "https://www.battlespirits.com/product/booster/booster-bsc50.php"
   },
-  "default_asset_policy": "Use official_image when present; fall back to local_apk_image for guest characters or unavailable official art.",
+  "default_asset_policy": "Use the bundled portrait in the ASCII-only codeman_portraits directory.",
   "characters": [
     {
       "id": "codeman_01_ash_claude",
@@ -32,14 +32,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_01_ash_claude.png",
-        "official_background": "official/codeman_01_ash_claude_bg.png",
-        "official_thumbnail": "official/codeman_01_ash_claude_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_01.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_01_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_01_thumnail.png",
-        "local_apk_image": "chara_18_blue_uniform_gunner.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_01_ash_claude.png"
       },
       "name_zh": "阿修·克劳德",
       "catchphrase_zh": "不屈的子弹"
@@ -68,14 +61,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_02_eilietta_lash.png",
-        "official_background": "official/codeman_02_eilietta_lash_bg.png",
-        "official_thumbnail": "official/codeman_02_eilietta_lash_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_02.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_02_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_02_thumnail.png",
-        "local_apk_image": "chara_17_blue_white_operator.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_02_eilietta_lash.png"
       },
       "name_zh": "艾莉艾塔·拉什",
       "catchphrase_zh": "慈爱的回路"
@@ -104,17 +90,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_03_nonoin_nillon.png",
-        "official_background": "official/codeman_03_nonoin_nillon_bg.png",
-        "official_thumbnail": "official/codeman_03_nonoin_nillon_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_03.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_03_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_03_thumnail.png",
-        "local_apk_image": "chara_16_blonde_idol.png",
-        "local_apk_match_confidence": "high",
-        "local_apk_alternates": [
-          "chara_19_blonde_idol_large.png"
-        ]
+        "portrait": "codeman_portraits/codeman_03_nonoin_nillon.png"
       },
       "name_zh": "诺诺因·尼尔昂",
       "catchphrase_zh": "恋爱的点火装置"
@@ -143,14 +119,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_04_hinaria_darkend.png",
-        "official_background": "official/codeman_04_hinaria_darkend_bg.png",
-        "official_thumbnail": "official/codeman_04_hinaria_darkend_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_04.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_04_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_04_thumnail.png",
-        "local_apk_image": "chara_04_hooded_witch.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_04_hinaria_darkend.png"
       },
       "name_zh": "希娜莉亚·达肯德",
       "catchphrase_zh": "真人类登出"
@@ -179,14 +148,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_05_ranburn_tidal.png",
-        "official_background": "official/codeman_05_ranburn_tidal_bg.png",
-        "official_thumbnail": "official/codeman_05_ranburn_tidal_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_05.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_05_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_05_thumnail.png",
-        "local_apk_image": "chara_08_red_black_fighter.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_05_ranburn_tidal.png"
       },
       "name_zh": "兰伯恩·泰达尔",
       "catchphrase_zh": "邪道的正义"
@@ -215,14 +177,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_06_leites_wondercall.png",
-        "official_background": "official/codeman_06_leites_wondercall_bg.png",
-        "official_thumbnail": "official/codeman_06_leites_wondercall_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_06.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_06_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_06_thumnail.png",
-        "local_apk_image": "chara_01_rabbit_mascot.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_06_leites_wondercall.png"
       },
       "name_zh": "雷茨·旺德考尔",
       "catchphrase_zh": "逐梦之兔"
@@ -251,14 +206,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_07_medilla_barani.png",
-        "official_background": "official/codeman_07_medilla_barani_bg.png",
-        "official_thumbnail": "official/codeman_07_medilla_barani_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_07.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_07_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_07_thumnail.png",
-        "local_apk_image": "chara_10_purple_showgirl.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_07_medilla_barani.png"
       },
       "name_zh": "梅迪拉·巴拉尼",
       "catchphrase_zh": "魅惑的赌徒"
@@ -287,14 +235,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_08_yorusuke_yorraiha.png",
-        "official_background": "official/codeman_08_yorusuke_yorraiha_bg.png",
-        "official_thumbnail": "official/codeman_08_yorusuke_yorraiha_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_08.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_08_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_08_thumnail.png",
-        "local_apk_image": "chara_06_orange_hair_gentleman.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_08_yorusuke_yorraiha.png"
       },
       "name_zh": "夜瑠介·与雷破",
       "catchphrase_zh": "狂悦的倾奇者"
@@ -323,14 +264,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_09_charlotte_seems.png",
-        "official_background": "official/codeman_09_charlotte_seems_bg.png",
-        "official_thumbnail": "official/codeman_09_charlotte_seems_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_09.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_09_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_09_thumnail.png",
-        "local_apk_image": "chara_09_pink_hair_pilot.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_09_charlotte_seems.png"
       },
       "name_zh": "夏洛特·西姆斯",
       "catchphrase_zh": "名侦探西姆斯"
@@ -359,14 +293,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_10_youkili_rindou.png",
-        "official_background": "official/codeman_10_youkili_rindou_bg.png",
-        "official_thumbnail": "official/codeman_10_youkili_rindou_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_10.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_10_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_10_thumnail.png",
-        "local_apk_image": "chara_11_paper_wing_scholar.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_10_youkili_rindou.png"
       },
       "name_zh": "悠琪莉·龙胆",
       "catchphrase_zh": "纵横无尽的 G 笔"
@@ -395,14 +322,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_11_ur_d.png",
-        "official_background": "official/codeman_11_ur_d_bg.png",
-        "official_thumbnail": "official/codeman_11_ur_d_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_11.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_11_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_11_thumnail.png",
-        "local_apk_image": "chara_03_neon_android.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_11_ur_d.png"
       },
       "name_zh": "UR-D",
       "catchphrase_zh": "热情的超级救援者"
@@ -431,14 +351,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_12_kyiran_kutchram.png",
-        "official_background": "official/codeman_12_kyiran_kutchram_bg.png",
-        "official_thumbnail": "official/codeman_12_kyiran_kutchram_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_12.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_12_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_12_thumnail.png",
-        "local_apk_image": "chara_07_blue_hair_kicker.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_12_kyiran_kutchram.png"
       },
       "name_zh": "琪兰·卡奇拉姆",
       "catchphrase_zh": "灵魂的求道者"
@@ -467,14 +380,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_13_hughtlom_aubreykahn.png",
-        "official_background": "official/codeman_13_hughtlom_aubreykahn_bg.png",
-        "official_thumbnail": "official/codeman_13_hughtlom_aubreykahn_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_13.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_13_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_13_thumnail.png",
-        "local_apk_image": "chara_14_green_suit_gentleman.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_13_hughtlom_aubreykahn.png"
       },
       "name_zh": "休特拉姆·奥布里坎",
       "catchphrase_zh": "完美先生"
@@ -503,14 +409,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_14_finserra_lauracef.png",
-        "official_background": "official/codeman_14_finserra_lauracef_bg.png",
-        "official_thumbnail": "official/codeman_14_finserra_lauracef_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_14.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_14_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_14_thumnail.png",
-        "local_apk_image": "chara_12_green_maid.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_14_finserra_lauracef.png"
       },
       "name_zh": "芬塞拉·洛拉塞夫",
       "catchphrase_zh": "懒惰的随从"
@@ -539,14 +438,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_15_pimota_unknown.png",
-        "official_background": "official/codeman_15_pimota_unknown_bg.png",
-        "official_thumbnail": "official/codeman_15_pimota_unknown_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_15.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_15_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_15_thumnail.png",
-        "local_apk_image": "chara_20_mini_steampunk_maid.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/codeman_15_pimota_unknown.png"
       },
       "name_zh": "皮莫塔·安诺恩",
       "catchphrase_zh": "身份不明"
@@ -575,15 +467,7 @@
         "en": "https://www.aicarddass.com/zenonzard/en/#character"
       },
       "assets": {
-        "official_image": "official/codeman_16_rowill_devira_lewill_devira.png",
-        "official_background": "official/codeman_16_rowill_devira_lewill_devira_bg.png",
-        "official_thumbnail": "official/codeman_16_rowill_devira_lewill_devira_thumb.png",
-        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_16.png",
-        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_16_bg.png",
-        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_16_thumnail.png",
-        "local_apk_image": "chara_05_white_hair_scythe.png",
-        "local_apk_match_confidence": "medium",
-        "mapping_note": "Official character entry is the Rowill/Lewill pair; current APK cutout folder only has one obvious matching twin-side sprite."
+        "portrait": "codeman_portraits/codeman_16_rowill_devira_lewill_devira.png"
       },
       "name_zh": "拉维尔·德维拉 / 雷维尔·德维拉",
       "catchphrase_zh": "破坏与创造"
@@ -598,8 +482,7 @@
       "profile_note": "Battle Spirits guest character requested by user.",
       "reference_url": "https://www.battlespirits.com/product/booster/booster-bsc50.php",
       "assets": {
-        "local_apk_image": "chara_13_red_protagonist.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/battle_spirits_bashin_dan.png"
       },
       "catchphrase_zh": ""
     },
@@ -613,40 +496,9 @@
       "profile_note": "Battle Spirits guest character requested by user. The Japanese spelling follows Battle Spirits official product text.",
       "reference_url": "https://www.battlespirits.com/product/booster/booster-bsc50.php",
       "assets": {
-        "local_apk_image": "chara_15_purple_schoolgirl.png",
-        "local_apk_match_confidence": "high"
+        "portrait": "codeman_portraits/battle_spirits_shinomiya_mai.png"
       },
       "catchphrase_zh": ""
-    }
-  ],
-  "unmatched_local_assets": [
-    {
-      "file": "chara_21_newyear_group.png",
-      "note": "group/event artwork, not an individual character profile"
-    },
-    {
-      "file": "chara_22_halloween_group.png",
-      "note": "group/event artwork, not an individual character profile"
-    },
-    {
-      "file": "chara_23_all_stars_group.png",
-      "note": "group/event artwork, not an individual character profile"
-    },
-    {
-      "file": "chara_24_christmas_group.png",
-      "note": "group/event artwork, not an individual character profile"
-    },
-    {
-      "file": "Operator.png",
-      "note": "manual/duplicate imported asset kept as miscellaneous"
-    },
-    {
-      "file": "Sprite_1_Sprite_1.png",
-      "note": "manual/duplicate imported asset kept as miscellaneous"
-    },
-    {
-      "file": "特别.png",
-      "note": "manual/duplicate imported asset kept as miscellaneous"
     }
   ]
 }

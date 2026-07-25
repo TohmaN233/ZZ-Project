@@ -7,7 +7,7 @@ from typing import Any
 from zz.web.assets import AssetIndex, DEFAULT_CLEAN_GRAPH_ROOT
 
 
-DEFAULT_CHARACTERS_PATH = DEFAULT_CLEAN_GRAPH_ROOT / "chara" / "characters.json"
+DEFAULT_CHARACTERS_PATH = DEFAULT_CLEAN_GRAPH_ROOT / "characters" / "characters.json"
 SELECTABLE_CHARACTER_ROLES = {"codeman", "guest_character"}
 HOME_GUIDE_CHARACTER_ID = "home_guide_operator"
 KOUHOU_AI_MINA_CHARACTER_ID = "kouhou_ai_mina"
@@ -56,7 +56,7 @@ def _character_asset_url(asset_index: AssetIndex, character_id: str, *kinds: str
 def character_catalog(asset_index: AssetIndex) -> list[dict[str, Any]]:
     characters: list[dict[str, Any]] = []
     character_path = (
-        asset_index.clean_graph_root / "chara" / "characters.json"
+        asset_index.clean_graph_root / "characters" / "characters.json"
         if asset_index.clean_graph_root is not None
         else DEFAULT_CHARACTERS_PATH
     )

@@ -29,7 +29,7 @@ AI 相关代码由 Codex 协助编写，并参考了 [sbl1996/ygo-agent](https:/
 
 ## 安装
 
-源码与大型美术资源分开发布。[下载完整资源包（ZZ-Assets-v1.zip）](https://drive.google.com/file/d/1Nsa2dPwuDrpE40P3hWx-OAqbOrAonGZI/view?usp=sharing)。完整步骤、目录结构和常见问题见 [INSTALL.md](INSTALL.md)。最短流程：
+源码与大型美术资源分开发布。[下载完整资源包（ZZ-Assets-v1.zip）](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)。完整步骤、目录结构和常见问题见 [INSTALL.md](INSTALL.md)。最短流程：
 
 ```powershell
 python -m pip install -r requirements-runtime.txt

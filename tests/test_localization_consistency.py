@@ -65,7 +65,7 @@ def test_packaged_translations_are_available_without_external_workspace_files() 
 
 def test_selectable_characters_have_names_in_all_three_languages() -> None:
     manifest = json.loads((
-        ROOT / "asserts" / "images" / "clean_graph" / "chara" / "characters.json"
+        ROOT / "asserts" / "images" / "clean_graph" / "characters" / "characters.json"
     ).read_text(encoding="utf-8"))
     selectable = [
         row for row in manifest["characters"]

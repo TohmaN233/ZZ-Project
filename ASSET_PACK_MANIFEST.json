@@ -1,22 +1,21 @@
 {
   "kind": "zz_external_asset_pack_v1",
   "archive": "ZZ-Assets-v1.zip",
-  "archiveBytes": 1577695351,
-  "sha256": "A8C45445672033D15385E0ABA33E1B86822F5EAA825AC1676C1F0C70508676D9",
-  "sourceFileCount": 2779,
-  "sourceBytes": 1606440314,
+  "archiveBytes": 917038889,
+  "sha256": "A9E93A67FAD1BEBCDE4B790D0EE3C2C7F351191ECBAB1658FEF688E46260F5D8",
+  "sourceFileCount": 486,
+  "sourceBytes": 943275216,
   "extractTo": ".",
   "expectedRoot": "asserts",
   "topLevelContents": [
     "asserts/ZENONZARD_CARDLIST",
-    "asserts/SUNRISE Music",
-    "asserts/卡垫卡背",
-    "asserts/images",
     "asserts/audio",
+    "asserts/card_back",
+    "asserts/images",
     "asserts/video"
   ],
   "distribution": {
-    "url": "https://drive.google.com/file/d/1Nsa2dPwuDrpE40P3hWx-OAqbOrAonGZI/view?usp=sharing",
+    "url": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing",
     "note": "Hosted on Google Drive."
   }
 }

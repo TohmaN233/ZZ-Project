@@ -2,7 +2,7 @@
 
 const RELEASE_CONFIG = {
   repoUrl: "https://github.com/TohmaN233/ZZ-Project",
-  assetPackUrl: "https://drive.google.com/file/d/1Nsa2dPwuDrpE40P3hWx-OAqbOrAonGZI/view?usp=sharing",
+  assetPackUrl: "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing",
 };
 
 const copy = {

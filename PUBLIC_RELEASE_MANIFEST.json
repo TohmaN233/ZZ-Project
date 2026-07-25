@@ -11,7 +11,7 @@
   ],
   "externalAssetPack": {
     "archive": "ZZ-Assets-v1.zip",
-    "extractTo": "asserts/",
+    "extractTo": ".",
     "manifest": "ASSET_PACK_MANIFEST.json"
   },
   "runtimeModels": [

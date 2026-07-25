@@ -23,13 +23,13 @@
 ## 下载组成
 
 1. GitHub 仓库 / Source Code：程序、测试、文档与当前默认模型。
-2. [`ZZ-Assets-v1.zip`](https://drive.google.com/file/d/1Nsa2dPwuDrpE40P3hWx-OAqbOrAonGZI/view?usp=sharing)：卡图、角色、卡垫、视频、音效与 BGM。
+2. [`ZZ-Assets-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：卡图、角色、卡垫、视频、音效与 BGM。
 
 资源包校验：
 
 ```text
-Bytes: 1577695351
-SHA-256: A8C45445672033D15385E0ABA33E1B86822F5EAA825AC1676C1F0C70508676D9
+Bytes: 917038889
+SHA-256: A9E93A67FAD1BEBCDE4B790D0EE3C2C7F351191ECBAB1658FEF688E46260F5D8
 ```
 
 详细步骤见 [INSTALL.md](INSTALL.md)。

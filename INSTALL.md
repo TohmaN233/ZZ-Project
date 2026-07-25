@@ -1,6 +1,6 @@
 # 安装说明
 
-当前发布把 **源码与默认模型** 放在 GitHub，把约 1.5 GB 的 **卡图、角色图、卡垫、视频与 BGM** 放在独立资源包中。两部分都准备好后，桌面客户端才能显示完整内容。
+当前发布把 **源码与默认模型** 放在 GitHub，把约 900 MB 的 **卡图、角色图、卡垫、视频与 BGM** 放在独立资源包中。两部分都准备好后，桌面客户端才能显示完整内容。
 
 ## 1. 系统要求
 
@@ -41,16 +41,21 @@ npm install
 
 ## 4. 安装完整资源包
 
-[从 Google Drive 下载 `ZZ-Assets-v1.zip`](https://drive.google.com/file/d/1Nsa2dPwuDrpE40P3hWx-OAqbOrAonGZI/view?usp=sharing)，在项目根目录解压。正确结构如下：
+[从 Google Drive 下载 `ZZ-Assets-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)，在项目根目录解压。正确结构如下：
 
 ```text
 ZZ-Project/
 ├─ asserts/
 │  ├─ ZENONZARD_CARDLIST/
-│  ├─ SUNRISE Music/
-│  ├─ 卡垫卡背/
-│  ├─ images/
 │  ├─ audio/
+│  │  ├─ battle_sfx/
+│  │  └─ bgm/
+│  ├─ card_back/
+│  ├─ images/
+│  │  └─ clean_graph/
+│  │     ├─ characters/
+│  │     ├─ playmats/
+│  │     └─ ui/
 │  └─ video/
 ├─ data/
 ├─ electron/
@@ -59,6 +64,8 @@ ZZ-Project/
 ├─ launch-electron.sh
 └─ launch-electron.command
 ```
+
+资源包中的目录名与程序引用路径全部使用 ASCII 英文字符，避免不同系统区域设置导致的路径乱码。
 
 发布页面会列出资源包大小和 SHA-256。下载后可以验证：
 
