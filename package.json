@@ -1,0 +1,30 @@
+{
+  "name": "zenonzard-offline-project",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Unofficial ZENONZARD offline desktop client with replay, AI training, and multiplayer.",
+  "main": "electron/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "electron:dev": "electron .",
+    "electron:start": "electron .",
+    "electron:build-main": "esbuild electron/main.js --bundle --platform=node --format=cjs --outfile=dist/electron/main.cjs --external:electron",
+    "test:multiplayer-electron": "node --test tests/electron_multiplayer_client.test.js tests/electron_lan_manager.test.js tests/electron_adaptive_websocket.test.js",
+    "check:brain-manifest": "repo-harness run check-brain-manifest",
+    "check:context-files": "repo-harness run check-context-files",
+    "check:deploy-sql": "repo-harness run check-deploy-sql-order",
+    "check:architecture-sync": "repo-harness run check-architecture-sync",
+    "check:task-sync": "repo-harness run check-task-sync",
+    "check:task-workflow": "repo-harness run check-task-workflow --strict",
+    "sync:brain-docs": "repo-harness run sync-brain-docs --all"
+  },
+  "devDependencies": {
+    "electron": "^39.0.0",
+    "esbuild": "^0.25.0",
+    "wait-on": "^8.0.0"
+  },
+  "dependencies": {
+    "https-proxy-agent": "^7.0.6",
+    "ws": "^8.21.1"
+  }
+}

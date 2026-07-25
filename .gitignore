@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+data/settings/settings.json
+data/codeman_ai/
+data/ai_challenges/
+*.log
+.env
+.env.*
+!.env.example
+

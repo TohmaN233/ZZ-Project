@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ZENONZARD Offline Project：卡组构筑、单机对战、AI、回放训练与联机对战。">
+  <meta name="theme-color" content="#07100f">
+  <title>ZENONZARD Offline Project</title>
+  <link rel="icon" href="assets/zzicon.webp">
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="skip">跳到正文</a>
+
+  <header class="site-header" data-header>
+    <a class="brand" href="#top" aria-label="ZENONZARD Offline Project">
+      <img src="assets/zzicon.webp" alt="" width="36" height="36">
+      <span>ZZ Offline</span>
+    </a>
+    <nav class="desktop-nav" aria-label="Primary">
+      <a href="#features" data-i18n="navFeatures">功能</a>
+      <a href="#ai" data-i18n="navAi">AI 与 Codeman</a>
+      <a href="#install" data-i18n="navInstall">安装</a>
+      <a href="#roadmap" data-i18n="navRoadmap">未来计划</a>
+    </nav>
+    <div class="language-switch" role="group" aria-label="Language">
+      <button type="button" data-lang="zh" aria-pressed="true">中</button>
+      <button type="button" data-lang="ja" aria-pressed="false">日</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <img class="hero-bg" src="assets/battle.webp" alt="ZENONZARD 对战界面">
+      <div class="hero-shade"></div>
+      <div class="hero-content">
+        <p class="eyebrow" data-i18n="heroEyebrow">非官方 · 单机优先 · 持续开发</p>
+        <h1 id="hero-title">ZENONZARD<br><span>Offline Project</span></h1>
+        <p class="hero-copy" data-i18n="heroCopy">在现代桌面环境中重新体验 ZZ：构筑卡组、与三档 AI 对战、回看牌局，也可以通过局域网或个人服务器联机。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#install" data-i18n="heroInstall">查看安装方法</a>
+          <a class="button secondary" href="#features" data-i18n="heroExplore">了解当前版本</a>
+        </div>
+        <div class="hero-meta" aria-label="Release summary">
+          <span>Windows</span><span>Electron + Python</span><span data-i18n="heroLanguage">中文 / 日本語 / English</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="release-strip" aria-label="Release status">
+      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + PC01</span></div>
+      <div><strong data-i18n="statusTwoTitle">对战方式</strong><span data-i18n="statusTwoBody">单机 / 局域网 / 在线</span></div>
+      <div><strong data-i18n="statusThreeTitle">AI 档位</strong><span data-i18n="statusThreeBody">Greedy + 两档 RL</span></div>
+      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">首个公开版本</span></div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="featuresEyebrow">Game Lobby</p>
+        <h2 data-i18n="featuresTitle">组卡到开局皆在游戏大厅</h2>
+        <p data-i18n="featuresLead">选择双方卡组、Codeman、卡垫与 AI 难度，然后进入你想要的对战方式。当前版本以完整的单机流程为核心。</p>
+      </div>
+
+      <div class="mode-showcase">
+        <div class="screen-frame">
+          <div class="screen-bar"><i></i><i></i><i></i><span>Game Lobby</span></div>
+          <img src="assets/lobby.webp" alt="Game Lobby 界面" loading="lazy">
+        </div>
+        <div class="mode-panel">
+          <div class="segmented" role="tablist" aria-label="Battle modes">
+            <button type="button" role="tab" aria-selected="true" data-mode="human" data-i18n="modeHumanTab">人 VS AI</button>
+            <button type="button" role="tab" aria-selected="false" data-mode="god" data-i18n="modeGodTab">神视点</button>
+            <button type="button" role="tab" aria-selected="false" data-mode="aivai">AI VS AI</button>
+          </div>
+          <div class="mode-copy" data-mode-copy>
+            <span class="mode-index">01</span>
+            <h3 data-i18n="modeHumanTitle">普通人机对战</h3>
+            <p data-i18n="modeHumanBody">你控制一方，另一方由所选难度的 AI 与 Codeman 配置驱动。这是最接近普通游玩的一种模式。</p>
+          </div>
+          <ul class="feature-checks">
+            <li data-i18n="featureDeck">创建、保存与编辑卡组</li>
+            <li data-i18n="featureProfile">分别选择双方 Codeman 与卡垫</li>
+            <li data-i18n="featureSides">指定先后手与玩家所在侧</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <article><span>01</span><h3 data-i18n="featureBattleTitle">卡牌对战</h3><p data-i18n="featureBattleBody">完整处理 Mana、移动权、Force、Flash、战斗、触发与目标选择等核心流程。</p></article>
+        <article><span>02</span><h3 data-i18n="featureDeckTitle">卡组制作</h3><p data-i18n="featureDeckBody">搜索卡池、检查张数与 Force 配置，并保存为大厅可直接选择的卡组。</p></article>
+        <article><span>03</span><h3 data-i18n="featureReplayTitle">Replay</h3><p data-i18n="featureReplayBody">保存最近对局并按事件回看；训练结果可以关联回放，寻找输局中的其他路线。</p></article>
+        <article><span>04</span><h3 data-i18n="featureOnlineTitle">Online</h3><p data-i18n="featureOnlineBody">支持同一局域网直连，也支持通过项目维护者的个人服务器建立房间。</p></article>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="ai">
+      <div class="ai-layout">
+        <div class="section-heading compact">
+          <p class="eyebrow" data-i18n="aiEyebrow">AI & Codeman</p>
+          <h2 data-i18n="aiTitle">三档离线AI对手</h2>
+          <p data-i18n="aiLead">Easy 是 Greedy CPU；Medium 与 High 使用强化学习训练出的策略。训练规模有限，因此现阶段的定位是可玩的研究与娱乐功能，而不是高水平竞技对手。</p>
+        </div>
+        <div class="difficulty-lab">
+          <div class="difficulty-tabs" role="tablist" aria-label="AI difficulty">
+            <button type="button" role="tab" aria-selected="true" data-difficulty="easy"><span>01</span><strong>Easy</strong><small>Greedy CPU</small></button>
+            <button type="button" role="tab" aria-selected="false" data-difficulty="medium"><span>02</span><strong>Medium</strong><small>RL baseline</small></button>
+            <button type="button" role="tab" aria-selected="false" data-difficulty="high"><span>03</span><strong>High</strong><small>RL actor</small></button>
+          </div>
+          <div class="difficulty-detail" data-difficulty-copy>
+            <p class="label" data-i18n="difficultyLabel">当前说明</p>
+            <h3 data-i18n="easyTitle">Greedy CPU</h3>
+            <p data-i18n="easyBody">不加载训练模型，依据合法行动与人工启发式权重选择当前看来最有利的动作，运行快，也最容易理解。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="truth-note">
+        <strong data-i18n="truthTitle">关于 AI 水平的诚实说明</strong>
+        <p data-i18n="truthBody">作者拥有统计学学位，但没有修读强化学习课程，研究方向也与此无关；模型训练规模同样不大。当前 AI 与 ZENONZARD 正式运营时期万代使用的 AI 仍有明显差距。相关实现由 Codex 协助编写，并参考了 ygo-agent 的公开方法与工程结构。</p>
+        <a href="https://github.com/sbl1996/ygo-agent" target="_blank" rel="noreferrer">ygo-agent ↗</a>
+      </div>
+
+      <div class="codeman-flow">
+        <div class="codeman-art"><img src="assets/codemen.webp" alt="ZENONZARD Codeman" loading="lazy"></div>
+        <div class="flow-copy">
+          <p class="eyebrow">CODEMAN MEMORY</p>
+          <h2 data-i18n="codemanTitle">每个 Codeman 都有自己的近期对战记忆</h2>
+          <p data-i18n="codemanBody">对局结束后，系统会在本机保存该 Codeman 最近的一部分战斗记录与回放。若你为某个 Codeman 进行了专门训练，并生成了它自己的 .pt 模型，选择这个对手时会优先加载该专属模型；没有专属模型时则使用公开默认模型。</p>
+          <div class="flow-line" aria-label="Codeman model flow">
+            <span data-i18n="flowBattle">完成对局</span><b>→</b><span data-i18n="flowMemory">近期记忆</span><b>→</b><span data-i18n="flowTrain">可选训练</span><b>→</b><span>.pt</span>
+          </div>
+          <p class="assistant-note" data-i18n="advisorBody">对战时点击自己的 Codeman，可以让 AI 对当前选择给出建议。由于模型能力有限，这更像一个可观察的娱乐助手，而不是可靠教练。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section screenshots" aria-labelledby="screens-title">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="screensEyebrow">Actual UI</p>
+        <h2 id="screens-title" data-i18n="screensTitle">完整ZZ体验：目前卡池PC01</h2>
+      </div>
+      <div class="screen-stage">
+        <img src="assets/battle.webp" alt="ZENONZARD 对战画面" loading="lazy">
+        <div><span data-i18n="screenBattleLabel">实机对战界面</span><strong data-i18n="screenBattleTitle">双方区域、手牌、Force、阶段与提示都在同一张桌面上</strong></div>
+      </div>
+      <div class="mini-screens">
+        <figure><img src="assets/home.webp" alt="ZENONZARD 首页" loading="lazy"><figcaption data-i18n="screenHome">首页与功能入口</figcaption></figure>
+        <figure><img src="assets/lobby.webp" alt="ZENONZARD 大厅" loading="lazy"><figcaption data-i18n="screenLobby">卡组、模式与 Codeman 配置</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="section split-band">
+      <article>
+        <p class="eyebrow">REPLAY & TRAINING</p>
+        <h2 data-i18n="replayTitle">把自己的牌局变成可回看的训练材料</h2>
+        <p data-i18n="replayBody">如果本机具备 NVIDIA GPU 与可用的 CUDA 环境，可以基于自己的对战记录运行本地训练。它仍是实验性的娱乐功能：一次输局也许能在 Replay 中发现另一个选择，但系统不会保证找到必胜解。</p>
+        <a class="text-link" href="https://github.com/TohmaN233/ZZ-Project/blob/main/INSTALL.md" data-i18n="replayLink">查看训练环境说明 →</a>
+      </article>
+      <article>
+        <p class="eyebrow">ONLINE GAME</p>
+        <h2 data-i18n="onlineTitle">局域网直连，或通过个人服务器联网</h2>
+        <p data-i18n="onlineBody">Online Game 支持同一局域网内开房，也支持项目维护者的个人服务器。服务器位于加拿大，其他地区的稳定性未经充分验证；中国大陆通常需要代理才能稳定连接。</p>
+        <a class="text-link" href="ONLINE.md" data-i18n="onlineLink">查看联机说明 →</a>
+      </article>
+    </section>
+
+    <section class="section content-status">
+      <div class="status-copy">
+        <p class="eyebrow" data-i18n="contentEyebrow">CONTENT STATUS</p>
+        <h2 data-i18n="contentTitle">当前内容边界</h2>
+      </div>
+      <div class="status-list">
+        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">目前包含基本卡与 PC01，之后会逐步更新，直至补全卡池。</p></div>
+        <div><strong data-i18n="testingTitle">测试</strong><p data-i18n="testingBody">个人项目无法覆盖足够多的组合测试，当前版本可能仍有小型规则或界面问题。</p></div>
+        <div><strong data-i18n="englishTitle">英文版</strong><p data-i18n="englishBody">英文版卡图直接使用官网链接，已知有图和卡没对齐的现象。英语圈的用户若能提供卡图资源和英文文本，此问题能轻易解决。</p></div>
+        <div><strong data-i18n="musicTitle">BGM</strong><p data-i18n="musicBody">基础设置中可选择对战 BGM；完整资源包包含 ZZ 各角色歌曲。</p></div>
+      </div>
+    </section>
+
+    <section class="section install" id="install">
+      <div class="section-heading">
+        <p class="eyebrow" data-i18n="installEyebrow">INSTALLATION</p>
+        <h2 data-i18n="installTitle">代码与大型美术资源分开下载</h2>
+        <p data-i18n="installLead">GitHub 仓库保存源码、桌面客户端和当前默认模型；卡图、角色图、视频与音乐放在独立资源包中。解压到正确位置后即可启动。</p>
+      </div>
+      <div class="install-grid">
+        <ol class="steps">
+          <li><span>1</span><div><strong data-i18n="installStep1Title">下载源码</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载源码包，或使用 Git 与 Git LFS 克隆仓库。</p></div></li>
+          <li><span>2</span><div><strong data-i18n="installStep2Title">放入资源包</strong><p data-i18n="installStep2Body">下载 ZZ-Assets-v1.zip，将其中的 asserts 文件夹放到项目根目录；最终应能看到 asserts/images、asserts/audio 等目录。</p></div></li>
+          <li><span>3</span><div><strong data-i18n="installStep3Title">安装依赖</strong><p data-i18n="installStep3Body">安装 Python 3.10+ 与 Node.js 20+，先安装 Python 运行依赖，再运行 npm install。</p></div></li>
+          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">双击 launch-electron.cmd；也可以运行 npm run electron:dev。</p></div></li>
+        </ol>
+        <aside class="requirements">
+          <h3 data-i18n="requirementsTitle">运行要求</h3>
+          <dl>
+            <div><dt data-i18n="reqOs">系统</dt><dd>Windows 10 / 11</dd></div>
+            <div><dt>Python</dt><dd>3.10+</dd></div>
+            <div><dt>Node.js</dt><dd>20+</dd></div>
+            <div><dt data-i18n="reqGpu">显卡</dt><dd data-i18n="reqGpuBody">游玩不要求；本地训练需要 NVIDIA GPU / CUDA</dd></div>
+          </dl>
+          <div class="download-actions">
+            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project" data-i18n="downloadCode">打开 GitHub 仓库</a>
+            <a class="button secondary" data-asset-link href="https://drive.google.com/file/d/1Nsa2dPwuDrpE40P3hWx-OAqbOrAonGZI/view?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">下载完整资源包</a>
+          </div>
+          <p class="hash-note"><code>ZZ-Assets-v1.zip</code><br><span data-i18n="hashNote">文件大小与 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。</span></p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section roadmap" id="roadmap">
+      <div class="roadmap-number">NEXT</div>
+      <div>
+        <p class="eyebrow">STORY MODE</p>
+        <h2 data-i18n="storyTitle">下一阶段：每位玩家自己的故事与前端</h2>
+        <p data-i18n="storyBody">Story Mode 目前尚未开发。长期目标是设计由 Agent 自动与用户交互的游戏，对应实现 GAL 前端，并吸收 SillyTavern 相关社群在角色、世界书与长期互动方面积累的经验，构建个人专属的、与自己的 Codeman 一起经历的 ZZ 体验。</p>
+        <p class="roadmap-caveat" data-i18n="storyCaveat">这是未来目标，不代表第一版已经提供生成式剧情功能。</p>
+      </div>
+    </section>
+
+    <section class="section contribute">
+      <div>
+        <p class="eyebrow" data-i18n="contributeEyebrow">CONTRIBUTE</p>
+        <h2 data-i18n="contributeTitle">欢迎懂强化学习、卡牌资料或本地化的朋友加入</h2>
+      </div>
+      <div>
+        <p data-i18n="contributeBody">尤其希望有强化学习经验的贡献者一起研究：是否能训练出真正适合离线运行的 ZZ AI。英文卡图、卡牌译文、规则测试与 Bug 报告同样重要。</p>
+        <div class="contribute-actions">
+          <a class="button primary" data-issues-link href="https://github.com/TohmaN233/ZZ-Project/issues" data-i18n="reportIssue">提交 Issue</a>
+          <a class="button secondary" data-discussions-link href="https://github.com/TohmaN233/ZZ-Project/discussions" data-i18n="joinDiscussion">参与讨论</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div><strong>ZENONZARD Offline Project</strong><p data-i18n="footerUnofficial">非官方、非商业的粉丝开发与研究项目。</p></div>
+    <p data-i18n="footerRights">ZENONZARD 名称、角色、卡图、音乐与相关素材的权利归各自权利方所有。本项目与 BANDAI / STRAIGHT EDGE / SUNRISE 无隶属或授权关系。</p>
+    <a href="#top" data-i18n="backTop">返回顶部 ↑</a>
+  </footer>
+</body>
+</html>

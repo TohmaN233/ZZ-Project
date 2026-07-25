@@ -1,0 +1,4 @@
+numpy>=1.26
+torch>=2.2
+websockets>=16,<17
+

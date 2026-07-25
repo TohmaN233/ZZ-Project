@@ -1,0 +1,652 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-05-20T15:04:06+00:00",
+  "sources": {
+    "zenonzard_character_page_ja": "https://www.aicarddass.com/zenonzard/#character",
+    "zenonzard_character_page_en": "https://www.aicarddass.com/zenonzard/en/#character",
+    "battle_spirits_reference": "https://www.battlespirits.com/product/booster/booster-bsc50.php"
+  },
+  "default_asset_policy": "Use official_image when present; fall back to local_apk_image for guest characters or unavailable official art.",
+  "characters": [
+    {
+      "id": "codeman_01_ash_claude",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "01",
+      "color": "#6b22ff",
+      "name_ja": "アッシュ・クロード",
+      "name_en": "Ash Claude",
+      "catchphrase_ja": "不屈の弾丸",
+      "catchphrase_en": "Steadfast Bullet",
+      "ruby_ja": null,
+      "voice_actor_ja": "梅原裕一郎",
+      "voice_actor_en": "Yūichirō Umehara",
+      "origin_ja": "警備プログラム",
+      "origin_en": "Security Defense Program",
+      "ai_type_ja": "警察AI",
+      "ai_type_en": "Police AI",
+      "profile_ja": "良く言えば真面目、悪く言えば融通が利かない性格。自らの中に確たる正義を有しており、そこに反するものには一切容赦しない。世界を明確に白と黒に分割して見ている。",
+      "profile_en": "Dedicated to his work with an unyielding personality. This codeman possesses a strong sense of justice and shows no mercy to those who go against the law. He tends to view the world in black and white.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_01_ash_claude.png",
+        "official_background": "official/codeman_01_ash_claude_bg.png",
+        "official_thumbnail": "official/codeman_01_ash_claude_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_01.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_01_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_01_thumnail.png",
+        "local_apk_image": "chara_18_blue_uniform_gunner.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "阿修·克劳德",
+      "catchphrase_zh": "不屈的子弹"
+    },
+    {
+      "id": "codeman_02_eilietta_lash",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "02",
+      "color": "#58fff9",
+      "name_ja": "アイリエッタ・ラッシュ",
+      "name_en": "Eilietta Lash",
+      "catchphrase_ja": "慈愛の回路",
+      "catchphrase_en": "Surge of Compassion",
+      "ruby_ja": null,
+      "voice_actor_ja": "早見沙織",
+      "voice_actor_en": "Saori Hayami",
+      "origin_ja": "医療プログラム",
+      "origin_en": "Medical Care Program",
+      "ai_type_ja": "看護師AI",
+      "ai_type_en": "Nurse AI",
+      "profile_ja": "常に冷静沈着な性格。医療分野における見識が広く、看護師としての対応は迅速かつ的確。実直すぎる傾向があり、冗談などは通じないという一面も。",
+      "profile_en": "Always calm and collected, Eiletta has extensive knowledge of the medical field and is an efficient nurse. She is the straightforward type in which jokes often go over her head.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_02_eilietta_lash.png",
+        "official_background": "official/codeman_02_eilietta_lash_bg.png",
+        "official_thumbnail": "official/codeman_02_eilietta_lash_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_02.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_02_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_02_thumnail.png",
+        "local_apk_image": "chara_17_blue_white_operator.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "艾莉艾塔·拉什",
+      "catchphrase_zh": "慈爱的回路"
+    },
+    {
+      "id": "codeman_03_nonoin_nillon",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "03",
+      "color": "#ff207e",
+      "name_ja": "ノノイン・ニルオン",
+      "name_en": "Nonoin Nillon",
+      "catchphrase_ja": "恋の発火装置",
+      "catchphrase_en": "Love Ignitor",
+      "ruby_ja": "< ラブ・イグニッション >",
+      "voice_actor_ja": "近藤玲奈",
+      "voice_actor_en": "Reina Kondō",
+      "origin_ja": "楽曲制作プログラム",
+      "origin_en": "Music Composition Program",
+      "ai_type_ja": "アイドルAI",
+      "ai_type_en": "Idol AI",
+      "profile_ja": "明るく元気な性格。楽曲制作を放り出し、アイドルとして再出発を果たした。古今東西のアイドルを徹底研究しており、言葉の端々に時代錯誤感が滲み出ることも。",
+      "profile_en": "Bright and full of energy. She tossed aside music composition to start fresh as an idol, and cultivated herself to appeals to all ages and cultures. Her speech comes across as old-fashioned at times.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_03_nonoin_nillon.png",
+        "official_background": "official/codeman_03_nonoin_nillon_bg.png",
+        "official_thumbnail": "official/codeman_03_nonoin_nillon_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_03.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_03_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_03_thumnail.png",
+        "local_apk_image": "chara_16_blonde_idol.png",
+        "local_apk_match_confidence": "high",
+        "local_apk_alternates": [
+          "chara_19_blonde_idol_large.png"
+        ]
+      },
+      "name_zh": "诺诺因·尼尔昂",
+      "catchphrase_zh": "恋爱的点火装置"
+    },
+    {
+      "id": "codeman_04_hinaria_darkend",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "04",
+      "color": "#e63eff",
+      "name_ja": "ヒナリア・ダーケンド",
+      "name_en": "Hinaria Darkend",
+      "catchphrase_ja": "真人間ログアウト",
+      "catchphrase_en": "Cyberspace Citizen",
+      "ruby_ja": null,
+      "voice_actor_ja": "高橋李依",
+      "voice_actor_en": "Rie Takahashi",
+      "origin_ja": "不明",
+      "origin_en": "Unknown",
+      "ai_type_ja": "ニートAI",
+      "ai_type_en": "NEET AI",
+      "profile_ja": "引き篭もりのオンラインゲーム中毒。独り言が多く、性格は正に怠惰。出身プログラム、製作者が共に不明であり、その能力、特性においても謎が多い。",
+      "profile_en": "A shut-in addicted to online gaming. She has a lackluster personlity and often talks to herself. It is unclear what kind of program she is or who made her. Putting aside her abilities and characteristics, many mysteries remain regarding this codeman.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_04_hinaria_darkend.png",
+        "official_background": "official/codeman_04_hinaria_darkend_bg.png",
+        "official_thumbnail": "official/codeman_04_hinaria_darkend_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_04.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_04_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_04_thumnail.png",
+        "local_apk_image": "chara_04_hooded_witch.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "希娜莉亚·达肯德",
+      "catchphrase_zh": "真人类登出"
+    },
+    {
+      "id": "codeman_05_ranburn_tidal",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "05",
+      "color": "#aa2b2b",
+      "name_ja": "ランバーン・タイダル",
+      "name_en": "Ranburn Tidal",
+      "catchphrase_ja": "外道の正義",
+      "catchphrase_en": "Walker Of The Unorthodox Path",
+      "ruby_ja": null,
+      "voice_actor_ja": "中井和哉",
+      "voice_actor_en": "Kazuya Nakai",
+      "origin_ja": "防犯プログラム",
+      "origin_en": "Crime Prevention Program",
+      "ai_type_ja": "盗賊AI",
+      "ai_type_en": "Thief AI",
+      "profile_ja": "ぶっきらぼうで粗野な性格。元の出身プログラムの特性上有していた膨大な犯罪知識をもって犯罪者側へと身を転じた。その行動理念、目的は一切不明。",
+      "profile_en": "Blunt and rough. He is well-versed in criminology due to his origin program. With this extensive knowledge, he turned to the ways of the criminal. His ideology and raison d'etre are completely unknown.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_05_ranburn_tidal.png",
+        "official_background": "official/codeman_05_ranburn_tidal_bg.png",
+        "official_thumbnail": "official/codeman_05_ranburn_tidal_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_05.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_05_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_05_thumnail.png",
+        "local_apk_image": "chara_08_red_black_fighter.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "兰伯恩·泰达尔",
+      "catchphrase_zh": "邪道的正义"
+    },
+    {
+      "id": "codeman_06_leites_wondercall",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "06",
+      "color": "#ff8fde",
+      "name_ja": "レイチ・ワンダーコール",
+      "name_en": "Leites Wondercall",
+      "catchphrase_ja": "夢見るウサギ",
+      "catchphrase_en": "Wishful Rabbit",
+      "ruby_ja": null,
+      "voice_actor_ja": "上坂すみれ",
+      "voice_actor_en": "Sumire Uesaka",
+      "origin_ja": "アミューズメント施設管理プログラム",
+      "origin_en": "Amusement Park Management Program",
+      "ai_type_ja": "着ぐるみAI",
+      "ai_type_en": "Costume AI",
+      "profile_ja": "とにかく人を楽しませたいという情熱に溢れた性格。夢のテーマパーク『ワンダードリームランド』の支配人兼、マスコット。中の人などいない。",
+      "profile_en": "Filled with an overwhelming desire to make others happy. Acts as both the manager and mascot of the whimsical amusement park \"Wonder Dreamland.\" There is no one inside the costume.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_06_leites_wondercall.png",
+        "official_background": "official/codeman_06_leites_wondercall_bg.png",
+        "official_thumbnail": "official/codeman_06_leites_wondercall_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_06.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_06_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_06_thumnail.png",
+        "local_apk_image": "chara_01_rabbit_mascot.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "雷茨·旺德考尔",
+      "catchphrase_zh": "逐梦之兔"
+    },
+    {
+      "id": "codeman_07_medilla_barani",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "07",
+      "color": "#a05aa0",
+      "name_ja": "メディーラ・バラーニ",
+      "name_en": "Medilla Barani",
+      "catchphrase_ja": "魅惑の勝負師",
+      "catchphrase_en": "Mesmerizing Gambler",
+      "ruby_ja": "< ギャンブラー >",
+      "voice_actor_ja": "日笠陽子",
+      "voice_actor_en": "Yōko Hikasa",
+      "origin_ja": "確率計算プログラム",
+      "origin_en": "Statistics Calculation Program",
+      "ai_type_ja": "ディーラーAI",
+      "ai_type_en": "Card Dealer AI",
+      "profile_ja": "全ての事象を確率計算に落とし込み、ギャンブルとして捉えることが可能。しかし、本人はそれを良しとしていないような面も。人脈が広く、様々な情報に通じている。",
+      "profile_en": "Able to break down the probability of all outcomes in any given situation, which comes in handy for gambling. She doesn't always know if that's a good thing, though. She has a lot of personal connections, making her privy to a wealth of information.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_07_medilla_barani.png",
+        "official_background": "official/codeman_07_medilla_barani_bg.png",
+        "official_thumbnail": "official/codeman_07_medilla_barani_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_07.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_07_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_07_thumnail.png",
+        "local_apk_image": "chara_10_purple_showgirl.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "梅迪拉·巴拉尼",
+      "catchphrase_zh": "魅惑的赌徒"
+    },
+    {
+      "id": "codeman_08_yorusuke_yorraiha",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "08",
+      "color": "#ff8200",
+      "name_ja": "ヨルスケ・ヨーライハ\n＜与雷破夜瑠介＞",
+      "name_en": "Yorusuke Yorraiha",
+      "catchphrase_ja": "狂悦の傾奇者",
+      "catchphrase_en": "Lively Eccentric",
+      "ruby_ja": null,
+      "voice_actor_ja": "立花慎之介",
+      "voice_actor_en": "Shinnosuke Tachibana",
+      "origin_ja": "エンタメ系プログラム",
+      "origin_en": "Entertainment Program",
+      "ai_type_ja": "芸人AI",
+      "ai_type_en": "Entertainer AI",
+      "profile_ja": "物腰が柔らかく社交的で、世界的にも“傾奇者”エンターテイナーとして人気がある。だが、その腹の内は伺い知れず、人を食ったような言動をすることもしばしば。",
+      "profile_en": "An extroverted and carefree entertainer famous the world over for being an \"eccentric.\" His true nature is a mystery, and often times his words or actions betray a more sinister nature.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_08_yorusuke_yorraiha.png",
+        "official_background": "official/codeman_08_yorusuke_yorraiha_bg.png",
+        "official_thumbnail": "official/codeman_08_yorusuke_yorraiha_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_08.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_08_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_08_thumnail.png",
+        "local_apk_image": "chara_06_orange_hair_gentleman.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "夜瑠介·与雷破",
+      "catchphrase_zh": "狂悦的倾奇者"
+    },
+    {
+      "id": "codeman_09_charlotte_seems",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "09",
+      "color": "#ff9677",
+      "name_ja": "シャーロット・シームズ",
+      "name_en": "Charlotte Seems",
+      "catchphrase_ja": "名探偵シームズ",
+      "catchphrase_en": "The Great Detective",
+      "ruby_ja": null,
+      "voice_actor_ja": "M・A・O",
+      "voice_actor_en": "M・A・O",
+      "origin_ja": "調査プログラム",
+      "origin_en": "Investigation Program",
+      "ai_type_ja": "探偵AI",
+      "ai_type_en": "Detective AI",
+      "profile_ja": "類まれな観察眼、推理力を擁する名探偵。好奇心旺盛で陽気な性格だが、実のところ、全てを疑うストイックさを持ち合わせる。他者との距離感が非常に近い。",
+      "profile_en": "A famous detective with a keen eye and strong deductive reasoning abilities. Despite appearing to have a bright personality brimming with curiosity, she\\s actually quite stoic and views the world with suspicion. She doesn/t seem to understand personal space.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_09_charlotte_seems.png",
+        "official_background": "official/codeman_09_charlotte_seems_bg.png",
+        "official_thumbnail": "official/codeman_09_charlotte_seems_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_09.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_09_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_09_thumnail.png",
+        "local_apk_image": "chara_09_pink_hair_pilot.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "夏洛特·西姆斯",
+      "catchphrase_zh": "名侦探西姆斯"
+    },
+    {
+      "id": "codeman_10_youkili_rindou",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "10",
+      "color": "#f9cb24",
+      "name_ja": "ユーキリ・竜胆",
+      "name_en": "Youkili Rindou",
+      "catchphrase_ja": "縦横無尽のGペン",
+      "catchphrase_en": "Free-As-The-Wind Creative",
+      "ruby_ja": null,
+      "voice_actor_ja": "山下大輝",
+      "voice_actor_en": "Daiki Yamashita",
+      "origin_ja": "コミック制作プログラム",
+      "origin_en": "Comic Creation Program",
+      "ai_type_ja": "漫画家AI",
+      "ai_type_en": "Comic Book Artist AI",
+      "profile_ja": "描けないジャンルはないとまで言われる天才肌の漫画家。態度は尊大だが、根は真面目で素直。何やら大人の女性が苦手らしい……？",
+      "profile_en": "A gifted comic book artist with creativity that knows no bounds. He may appear pompous but is actually dedicated and docile. For some reason, he has trouble interacting with females.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_10_youkili_rindou.png",
+        "official_background": "official/codeman_10_youkili_rindou_bg.png",
+        "official_thumbnail": "official/codeman_10_youkili_rindou_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_10.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_10_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_10_thumnail.png",
+        "local_apk_image": "chara_11_paper_wing_scholar.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "悠琪莉·龙胆",
+      "catchphrase_zh": "纵横无尽的 G 笔"
+    },
+    {
+      "id": "codeman_11_ur_d",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "11",
+      "color": "#28ff5a",
+      "name_ja": "UR-D ＜ウル・ドゥ＞",
+      "name_en": "UR-D",
+      "catchphrase_ja": "熱情のスーパーレスキュー",
+      "catchphrase_en": "Supercharged Rescuer",
+      "ruby_ja": null,
+      "voice_actor_ja": "杉田智和",
+      "voice_actor_en": "Tomokazu Sugita",
+      "origin_ja": "レスキュープログラム",
+      "origin_en": "Rescue Program",
+      "ai_type_ja": "レスキューAI",
+      "ai_type_en": "Rescue AI",
+      "profile_ja": "人々の救助に特化したコードマン。その対象は『助けを求める人すべて』と、災害現場だけに留まらない。街の平和に懸ける思いは世界広しといえど並ぶ者なし。",
+      "profile_en": "A Codeman who specializes in saving people. As this applies to \"all those who seek help,\" his rescues are not limited to sites of disaster. His desire to protect the city is unmatched.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_11_ur_d.png",
+        "official_background": "official/codeman_11_ur_d_bg.png",
+        "official_thumbnail": "official/codeman_11_ur_d_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_11.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_11_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_11_thumnail.png",
+        "local_apk_image": "chara_03_neon_android.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "UR-D",
+      "catchphrase_zh": "热情的超级救援者"
+    },
+    {
+      "id": "codeman_12_kyiran_kutchram",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "12",
+      "color": "#96e6ff",
+      "name_ja": "キィラン・カッチラム",
+      "name_en": "Kyiran Kutchram",
+      "catchphrase_ja": "魂の求道者",
+      "catchphrase_en": "Seeker of Heart",
+      "ruby_ja": null,
+      "voice_actor_ja": "黒沢ともよ",
+      "voice_actor_en": "Tomoyo Kurosawa",
+      "origin_ja": "アスリート養成プログラム",
+      "origin_en": "Athlete Training Program",
+      "ai_type_ja": "武闘家AI",
+      "ai_type_en": "Martial Artist AI",
+      "profile_ja": "とにかく、まっすぐ強さを求める武闘家コードマン。ある敗北を境に、本当の強さは『魂』に宿るのではと考え始める。実は少女趣味があるとの噂も……",
+      "profile_en": "A martial artist codeman who seeks strength above all else. After a particular loss, she started to think that true strength comes from having \"heart.\" Rumor has it her interests don't match her hard exterior.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_12_kyiran_kutchram.png",
+        "official_background": "official/codeman_12_kyiran_kutchram_bg.png",
+        "official_thumbnail": "official/codeman_12_kyiran_kutchram_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_12.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_12_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_12_thumnail.png",
+        "local_apk_image": "chara_07_blue_hair_kicker.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "琪兰·卡奇拉姆",
+      "catchphrase_zh": "灵魂的求道者"
+    },
+    {
+      "id": "codeman_13_hughtlom_aubreykahn",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "13",
+      "color": "#82aa01",
+      "name_ja": "ヒュートラム・オブリカーン",
+      "name_en": "Hughtlom Aubreykahn",
+      "catchphrase_ja": "Mr.パーフェクト",
+      "catchphrase_en": "Mr. Perfectionist",
+      "ruby_ja": null,
+      "voice_actor_ja": "藤原啓治",
+      "voice_actor_en": "Keiji Fujiwara",
+      "origin_ja": "服飾プログラム",
+      "origin_en": "Apparel Program",
+      "ai_type_ja": "仕立て屋AI",
+      "ai_type_en": "Tailor AI",
+      "profile_ja": "無駄を嫌い、常に美を追求する完璧主義者。自他ともに厳しい性格は、経営者としても発揮され、彼の経営するアパレル企業は今やグローバルと呼ばれる規模に。",
+      "profile_en": "A perfectionist who seeks beauty in all things and hates waste. His strict personality is unmatched, making him a great manager. Apparel companies under his control are now known the world over.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_13_hughtlom_aubreykahn.png",
+        "official_background": "official/codeman_13_hughtlom_aubreykahn_bg.png",
+        "official_thumbnail": "official/codeman_13_hughtlom_aubreykahn_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_13.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_13_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_13_thumnail.png",
+        "local_apk_image": "chara_14_green_suit_gentleman.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "休特拉姆·奥布里坎",
+      "catchphrase_zh": "完美先生"
+    },
+    {
+      "id": "codeman_14_finserra_lauracef",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "14",
+      "color": "#d2ff3b",
+      "name_ja": "フィンセラ・ロラセフ",
+      "name_en": "Finserra Lauracef",
+      "catchphrase_ja": "怠惰な従者",
+      "catchphrase_en": "Finserra Lauracef",
+      "ruby_ja": null,
+      "voice_actor_ja": "小松未可子",
+      "voice_actor_en": "Mikako Komatsu",
+      "origin_ja": "環境管理プログラム",
+      "origin_en": "Housekeeping Program",
+      "ai_type_ja": "メイドAI",
+      "ai_type_en": "Maid AI",
+      "profile_ja": "流しのメイドとして数々のご主人様に仕えてきたプロフェッショナル。とはいえ、なぜか家事全般はまったく行わない……どころか、雇い主に押し付けるという話も。",
+      "profile_en": "A \"maid in passing\" who has worked for a number of different masters. Yet for some reason, she never does any housework... In fact, some say she forces her employers to do it.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_14_finserra_lauracef.png",
+        "official_background": "official/codeman_14_finserra_lauracef_bg.png",
+        "official_thumbnail": "official/codeman_14_finserra_lauracef_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_14.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_14_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_14_thumnail.png",
+        "local_apk_image": "chara_12_green_maid.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "芬塞拉·洛拉塞夫",
+      "catchphrase_zh": "懒惰的随从"
+    },
+    {
+      "id": "codeman_15_pimota_unknown",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "15",
+      "color": "#008cff",
+      "name_ja": "ピモタ・アンノウン",
+      "name_en": "Pimota Unknown",
+      "catchphrase_ja": "正体不明",
+      "catchphrase_en": "Origins Unknown",
+      "ruby_ja": "< アンノウン >",
+      "voice_actor_ja": "福山潤",
+      "voice_actor_en": "Jun Fukuyama",
+      "origin_ja": "???",
+      "origin_en": "???",
+      "ai_type_ja": "マスコットAI",
+      "ai_type_en": "Mascot AI",
+      "profile_ja": "出身を含め一切が不明のコードマン。本人の言によれば“記憶喪失”とのこと。可愛い見た目に、自らのルーツを一生懸命に探す一途さも相まって、かなりの人気者。",
+      "profile_en": "All things regarding this codeman are unknown, including their origin. Claims to suffer from amnesia. Popular due to their adorable appearance and earnest nature, especially in their search to discover their roots.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_15_pimota_unknown.png",
+        "official_background": "official/codeman_15_pimota_unknown_bg.png",
+        "official_thumbnail": "official/codeman_15_pimota_unknown_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_15.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_15_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_15_thumnail.png",
+        "local_apk_image": "chara_20_mini_steampunk_maid.png",
+        "local_apk_match_confidence": "high"
+      },
+      "name_zh": "皮莫塔·安诺恩",
+      "catchphrase_zh": "身份不明"
+    },
+    {
+      "id": "codeman_16_rowill_devira_lewill_devira",
+      "source_series": "ZENONZARD",
+      "role": "codeman",
+      "official_number": "16",
+      "color": "#99a9c0",
+      "name_ja": "ラヴィル・デヴィラ /\nレヴィル・デヴィラ",
+      "name_en": "Rowill Devira /\nLewill Devira",
+      "catchphrase_ja": "SCRAP & BUILD",
+      "catchphrase_en": "Builder & Demolisher",
+      "ruby_ja": null,
+      "voice_actor_ja": "田村睦心",
+      "voice_actor_en": "Mutsumi Tamura",
+      "origin_ja": "設計プログラム",
+      "origin_en": "Design Program",
+      "ai_type_ja": "建築家AI",
+      "ai_type_en": "Architect AI",
+      "profile_ja": "設計から解体まで請け負う世界最高峰の建築家として名を馳せている。大人しい性格であるにも関わらず、なぜか現場でのトラブルが絶えないらしい。",
+      "profile_en": "A world-renowned architect program that handles everything from design to demolition. Despite their mature personality, their troubles on-site seem never-ending.",
+      "source_urls": {
+        "ja": "https://www.aicarddass.com/zenonzard/#character",
+        "en": "https://www.aicarddass.com/zenonzard/en/#character"
+      },
+      "assets": {
+        "official_image": "official/codeman_16_rowill_devira_lewill_devira.png",
+        "official_background": "official/codeman_16_rowill_devira_lewill_devira_bg.png",
+        "official_thumbnail": "official/codeman_16_rowill_devira_lewill_devira_thumb.png",
+        "official_image_url": "https://www.aicarddass.com/zenonzard/images/world/chara_16.png",
+        "official_background_url": "https://www.aicarddass.com/zenonzard/images/world/chara_16_bg.png",
+        "official_thumbnail_url": "https://www.aicarddass.com/zenonzard/images/world/chara_16_thumnail.png",
+        "local_apk_image": "chara_05_white_hair_scythe.png",
+        "local_apk_match_confidence": "medium",
+        "mapping_note": "Official character entry is the Rowill/Lewill pair; current APK cutout folder only has one obvious matching twin-side sprite."
+      },
+      "name_zh": "拉维尔·德维拉 / 雷维尔·德维拉",
+      "catchphrase_zh": "破坏与创造"
+    },
+    {
+      "id": "battle_spirits_bashin_dan",
+      "source_series": "Battle Spirits Brave / Saga Brave",
+      "role": "guest_character",
+      "name_ja": "馬神 弾",
+      "name_zh": "马神弹",
+      "name_en": "Bashin Dan",
+      "profile_note": "Battle Spirits guest character requested by user.",
+      "reference_url": "https://www.battlespirits.com/product/booster/booster-bsc50.php",
+      "assets": {
+        "local_apk_image": "chara_13_red_protagonist.png",
+        "local_apk_match_confidence": "high"
+      },
+      "catchphrase_zh": ""
+    },
+    {
+      "id": "battle_spirits_shinomiya_mai",
+      "source_series": "Battle Spirits Brave / Saga Brave",
+      "role": "guest_character",
+      "name_ja": "紫乃宮 まゐ",
+      "name_zh": "紫乃宫麻衣",
+      "name_en": "Mai Shinomiya",
+      "profile_note": "Battle Spirits guest character requested by user. The Japanese spelling follows Battle Spirits official product text.",
+      "reference_url": "https://www.battlespirits.com/product/booster/booster-bsc50.php",
+      "assets": {
+        "local_apk_image": "chara_15_purple_schoolgirl.png",
+        "local_apk_match_confidence": "high"
+      },
+      "catchphrase_zh": ""
+    }
+  ],
+  "unmatched_local_assets": [
+    {
+      "file": "chara_21_newyear_group.png",
+      "note": "group/event artwork, not an individual character profile"
+    },
+    {
+      "file": "chara_22_halloween_group.png",
+      "note": "group/event artwork, not an individual character profile"
+    },
+    {
+      "file": "chara_23_all_stars_group.png",
+      "note": "group/event artwork, not an individual character profile"
+    },
+    {
+      "file": "chara_24_christmas_group.png",
+      "note": "group/event artwork, not an individual character profile"
+    },
+    {
+      "file": "Operator.png",
+      "note": "manual/duplicate imported asset kept as miscellaneous"
+    },
+    {
+      "file": "Sprite_1_Sprite_1.png",
+      "note": "manual/duplicate imported asset kept as miscellaneous"
+    },
+    {
+      "file": "特别.png",
+      "note": "manual/duplicate imported asset kept as miscellaneous"
+    }
+  ]
+}

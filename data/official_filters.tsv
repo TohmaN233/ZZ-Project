@@ -1,0 +1,144 @@
+group	name	value	label	order	pack_order
+cardtype	cardtype	ベース・ミニオン	ベース・ミニオン	1	
+cardtype	cardtype	フィールド・ミニオン	フィールド・ミニオン	2	
+cardtype	cardtype	マジック	マジック	3	
+cardtype	cardtype	ミニオン・トークン	ミニオン・トークン	4	
+attribute	attribute[1]	赤	赤	1	
+attribute	attribute[2]	黄	黄	2	
+attribute	attribute[3]	白	白	3	
+attribute	attribute[4]	緑	緑	4	
+attribute	attribute[5]	青	青	5	
+attribute	attribute[6]	紫	紫	6	
+attribute	attribute[7]	無色	無色	7	
+reality	reality[1]	L	L	1	
+reality	reality[2]	E	E	2	
+reality	reality[3]	R	R	3	
+reality	reality[4]	C	C	4	
+reality	reality[5]	Basic	Basic	5	
+cost	cost[1]	0	0	1	
+cost	cost[2]	1	1	2	
+cost	cost[3]	2	2	3	
+cost	cost[4]	3	3	4	
+cost	cost[5]	4	4	5	
+cost	cost[6]	5	5	6	
+cost	cost[7]	6	6	7	
+cost	cost[8]	7	7	8	
+cost	cost[9]	8	8	9	
+cost	cost[10]	9+	9+	10	
+series	series	PC:06 HELIX	PC:06 HELIX	1	1
+series	series	PC:05 GLORY	PC:05 GLORY	2	2
+series	series	EX:04 HEROIC_MASQUERADE	EX:04 HEROIC_MASQUERADE	3	3
+series	series	EX:04 KAMEN RIDER	EX:04 KAMEN RIDER	4	4
+series	series	EX:03 Battle Spirits	EX:03 Battle Spirits	5	5
+series	series	PC:04 FORBIDDEN	PC:04 FORBIDDEN	6	6
+series	series	EX:02 幻影の剣士	EX:02 幻影の剣士	7	7
+series	series	PC:03 EVOLVE	PC:03 EVOLVE	8	8
+series	series	EXCODE:02C	EXCODE:02C SAO	9	9
+series	series	PC:02R DIVINE	PC:02R DIVINE	10	10
+series	series	PC:02 CONTRACT	PC:02 CONTRACT	11	11
+series	series	PC:01R BEYOND	PC:01R BEYOND	12	12
+series	series	EX:01 魔術都市の9戦士	EX:01 魔術都市の9戦士	13	13
+series	series	PC:01 AWAKEN	PC:01 AWAKEN	14	14
+series	series	ベーシック	ベーシック	15	15
+series	series	CAMPAIGN	CAMPAIGN	16	16
+race	race	BS	BS	1	
+race	race	アーティスト	アーティスト	2	
+race	race	アームズ	アームズ	3	
+race	race	アイテム	アイテム	4	
+race	race	アヴィアン	アヴィアン	5	
+race	race	アルカナ	アルカナ	6	
+race	race	アンデッド	アンデッド	7	
+race	race	アンドロイド	アンドロイド	8	
+race	race	ウイング	ウイング	9	
+race	race	エヴォーカー	エヴォーカー	10	
+race	race	エルフ	エルフ	11	
+race	race	エンジェル	エンジェル	12	
+race	race	仮面	仮面	13	
+race	race	ガーディアン	ガーディアン	14	
+race	race	カードバトラー	カードバトラー	15	
+race	race	キマイラ	キマイラ	16	
+race	race	黒の剣士	黒の剣士	17	
+race	race	コア	コア	18	
+race	race	ゴブリン	ゴブリン	19	
+race	race	ゴレイム	ゴレイム	20	
+race	race	シーワーム	シーワーム	21	
+race	race	ジャイアント	ジャイアント	22	
+race	race	ジュエリスト	ジュエリスト	23	
+race	race	スケルトン	スケルトン	24	
+race	race	スプライト	スプライト	25	
+race	race	絶剣	絶剣	26	
+race	race	閃光	閃光	27	
+race	race	セントール	セントール	28	
+race	race	ソード	ソード	29	
+race	race	ソルジャー	ソルジャー	30	
+race	race	ダイナソー	ダイナソー	31	
+race	race	ツリーフォーク	ツリーフォーク	32	
+race	race	デーモン	デーモン	33	
+race	race	デミゴッド	デミゴッド	34	
+race	race	トライブ	トライブ	35	
+race	race	ドラゴニュート	ドラゴニュート	36	
+race	race	ドラゴン	ドラゴン	37	
+race	race	ドワーフ	ドワーフ	38	
+race	race	ニンフ	ニンフ	39	
+race	race	ハンター	ハンター	40	
+race	race	ビースト	ビースト	41	
+race	race	ヒューマノイド	ヒューマノイド	42	
+race	race	氷剣	氷剣	43	
+race	race	ファイブスター	ファイブスター	44	
+race	race	フェニックス	フェニックス	45	
+race	race	マーフォーク	マーフォーク	46	
+race	race	モルフェオ	モルフェオ	47	
+race	race	モンスター	モンスター	48	
+race	race	ラット	ラット	49	
+race	race	レギオン	レギオン	50	
+race	race	光導	光導	51	
+effect	effect	襲撃	襲撃	1	
+effect	effect	飛来	飛来	2	
+effect	effect	再起	再起	3	
+effect	effect	貫通	貫通	4	
+effect	effect	潜入	潜入	5	
+effect	effect	奪命	奪命	6	
+effect	effect	連携	連携	7	
+effect	effect	加護	加護	8	
+effect	effect	変形	変形	9	
+effect	effect	大変身	大変身	10	
+effect	effect	スイッチ	スイッチ	11	
+effect	effect	進化	進化	12	
+effect	effect	コスト軽減	コスト軽減	13	
+effect_timing	effect_timing	メイン	メイン	1	
+effect_timing	effect_timing	フラッシュ	フラッシュ	2	
+effect_timing	effect_timing	メイン/フラッシュ	メイン/フラッシュ	3	
+effect_timing	effect_timing	自分のターン	自分のターン	4	
+effect_timing	effect_timing	自分のマナフェイズ	自分のマナフェイズ	5	
+effect_timing	effect_timing	自分のターン終了時	自分のターン終了時	6	
+effect_timing	effect_timing	アタック時	アタック時	7	
+effect_timing	effect_timing	アタック時＆ブロック時	アタック時 & ブロック時	8	
+effect_timing	effect_timing	アタック時＆破壊時	アタック時 & 破壊時	9	
+effect_timing	effect_timing	アタック時＆変身時	アタック時 & 変身時	10	
+effect_timing	effect_timing	相手のターン	相手のターン	11	
+effect_timing	effect_timing	召喚時	召喚時	12	
+effect_timing	effect_timing	召喚時＆自分のターン開始時	召喚時 & 自分のターン開始時	13	
+effect_timing	effect_timing	召喚時＆破壊時	召喚時 & 破壊時	14	
+effect_timing	effect_timing	召喚時＆加護時	召喚時 & 加護時	15	
+effect_timing	effect_timing	召喚時＆変身時	召喚時 & 変身時	16	
+effect_timing	effect_timing	召喚時＆進撃時	召喚時 & 進撃時	17	
+effect_timing	effect_timing	常時	常時	18	
+effect_timing	effect_timing	進撃時	進撃時	19	
+effect_timing	effect_timing	配置時	配置時	20	
+effect_timing	effect_timing	後退時	後退時	21	
+effect_timing	effect_timing	破壊時	破壊時	22	
+effect_timing	effect_timing	破壊時＆変身時	破壊時 & 変身時	23	
+effect_timing	effect_timing	加護時	加護時	24	
+effect_timing	effect_timing	加護時＆破壊時	加護時 & 破壊時	25	
+effect_timing	effect_timing	加護時＆変身時	加護時 & 変身時	26	
+effect_timing	effect_timing	変形時	変形時	27	
+effect_timing	effect_timing	変身時	変身時	28	
+conditions	conditions	デッキ	デッキ	1	
+conditions	conditions	ベース	ベース	2	
+conditions	conditions	トラッシュ	トラッシュ	3	
+conditions	conditions	付与能力	付与能力	4	
+dp	dp[1]	0	0	1	
+dp	dp[2]	1	1	2	
+dp	dp[3]	2	2	3	
+dp	dp[4]	3	3	4	
+dp	dp[5]	4	4	5	

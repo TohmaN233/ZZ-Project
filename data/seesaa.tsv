@@ -1,0 +1,983 @@
+name_jp	cost	bp	dp	ability_jp	url	source
+「さまよえる骨」リシャール	2(紫1)	100	1	"奪命
+【加護時】
+このターン中、自分のプレイヤーに「相手のミニオンが破壊されるたび、自分はカードを1枚引く。」を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%a4%b5%a4%de%a4%e8%a4%a8%a4%eb%b9%fc%a1%d7%a5%ea%a5%b7%a5%e3%a1%bc%a5%eb%a1%d5	seesaa
+「オリジンズ02」アロンダイ	9(赤3)	800	2	"【召喚時】
+「S・ゴレイム・トークン」（赤・ゴレイム・コスト1・BP100/DP1）2体を出すことができる。
+【アタック時】
+プレイヤーにアタックした場合、このターン中、自分のミニオンがブロックされるたび、相手のプレイヤーに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%a5%aa%a5%ea%a5%b8%a5%f3%a5%ba02%a1%d7%a5%a2%a5%ed%a5%f3%a5%c0%a5%a4%a1%d5	seesaa
+「ソリスト」ローズパガニーニ	8(青3)	700	2	"【自分のターン】
+自分の種族「マーフォーク」を持つミニオン全てに[潜入]を与える。
+【後退時】
+自分はカードを2枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%a5%bd%a5%ea%a5%b9%a5%c8%a1%d7%a5%ed%a1%bc%a5%ba%a5%d1%a5%ac%a5%cb%a1%bc%a5%cb%a1%d5	seesaa
+「ベルカント」ピンクスカラ	5(青2)	500	2	"【自分のターン】
+他の自分のミニオンがダメージを与えるたび、自分はカードを1枚引く。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%a5%d9%a5%eb%a5%ab%a5%f3%a5%c8%a1%d7%a5%d4%a5%f3%a5%af%a5%b9%a5%ab%a5%e9%a1%d5	seesaa
+「マエストロ」ジェイドカラヤン	5(青2)	500	1	"【常時】
+自分がマジックを使用するたび、「マーフォーク・トークン」（青・マーフォーク・コスト2BP200/DP1）1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%a5%de%a5%a8%a5%b9%a5%c8%a5%ed%a1%d7%a5%b8%a5%a7%a5%a4%a5%c9%a5%ab%a5%e9%a5%e4%a5%f3%a1%d5	seesaa
+「愛花」アルルーナ	7(緑2)	600	2	"【召喚時】
+相手のミニオン2体をレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b0%a6%b2%d6%a1%d7%a5%a2%a5%eb%a5%eb%a1%bc%a5%ca%a1%d5	seesaa
+「悪の鼠騎士」イーブ	4	400	1	"【召喚時】
+自分が「悪のフォース”サイクロプス”」を選んでいる場合、自分の手札にある本来のコストが2以下のフィールド・ミニオンカード1枚を出すことができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b0%ad%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%a4%a1%bc%a5%d6%a1%d5	seesaa
+「悪夢」ハイドラ	8	700	1	"【自分のターン終了時】
+「ドラゴン・トークン」1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b0%ad%cc%b4%a1%d7%a5%cf%a5%a4%a5%c9%a5%e9%a1%d5	seesaa
+「暗黒騎士団長」イザーク	5(紫2)	500	2	"【相手のターン】
+自分のミニオンが持つ[奪命]は相手のターンにも発揮する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b0%c5%b9%f5%b5%b3%bb%ce%c3%c4%c4%b9%a1%d7%a5%a4%a5%b6%a1%bc%a5%af%a1%d5	seesaa
+「稲妻」マーガス	6(赤2)	600	2	"【召喚時】
+自分のミニオンカードでない無色マナ1つを破壊する。そうした場合、このターン中、相手のミニオン1体はブロックできない。
+【自分のターン】
+自分のマナが1つ入れ替えによる破棄以外で減るたび、赤マナ1つをレスト状態でベースに置く。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b0%f0%ba%ca%a1%d7%a5%de%a1%bc%a5%ac%a5%b9%a1%d5	seesaa
+「運命の図柄を描く者」ラケシス	9	500	1	"【召喚時】
+相手のプレイヤーのライフと自分のフォース1つのライフを交換する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%bf%cc%bf%a4%ce%bf%de%ca%c1%a4%f2%c9%c1%a4%af%bc%d4%a1%d7%a5%e9%a5%b1%a5%b7%a5%b9%a1%d5	seesaa
+「雲精」フィード	-	300	0	加護：黄	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%c0%c0%ba%a1%d7%a5%d5%a5%a3%a1%bc%a5%c9%a1%d5	seesaa
+「影疾走」バヤガン	5(緑2)	400	2	"貫通
+【加護時】
+このターン中、このミニオンに[襲撃]と[再起]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%c6%bc%c0%c1%f6%a1%d7%a5%d0%a5%e4%a5%ac%a5%f3%a1%d5	seesaa
+「影精」プルシャ	-	100	1	"加護：紫+コスト4以上
+《付与能力》[奪命]"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%c6%c0%ba%a1%d7%a5%d7%a5%eb%a5%b7%a5%e3%a1%d5	seesaa
+「英雄」エラー・ド・ネジェル	5	600	1	"【召喚時】
+相手のコスト8以上のミニオン全てを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%d1%cd%ba%a1%d7%a5%a8%a5%e9%a1%bc%a1%a6%a5%c9%a1%a6%a5%cd%a5%b8%a5%a7%a5%eb%a1%d5	seesaa
+「炎精」ファイアリィ	-	100	1	"加護：赤+コスト4以上
+《付与能力》【アタック時】
+このミニオンがブロックされるたび、ブロックしているミニオンにBP-200を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%ea%c0%ba%a1%d7%a5%d5%a5%a1%a5%a4%a5%a2%a5%ea%a5%a3%a1%d5	seesaa
+「炎魔」バルドロード	7	700	2	"【召喚時】
+相手のBP1200以下のミニオン1体を破壊する。自分のフォース全てに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b1%ea%cb%e2%a1%d7%a5%d0%a5%eb%a5%c9%a5%ed%a1%bc%a5%c9%a1%d5	seesaa
+「黄金の果樹」ユグドラウォーカー	12	1000	3	"【自分のターン】
+自分の手札にあるこのカードのフリーコストは、お互いの破壊されたフォース1つ毎に3減らされる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b2%ab%b6%e2%a4%ce%b2%cc%bc%f9%a1%d7%a5%e6%a5%b0%a5%c9%a5%e9%a5%a6%a5%a9%a1%bc%a5%ab%a1%bc%a1%d5	seesaa
+「快楽の奇術師」アズール	5(青5)	600	2	"【自分のターン】
+このミニオンはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b2%f7%b3%da%a4%ce%b4%f1%bd%d1%bb%d5%a1%d7%a5%a2%a5%ba%a1%bc%a5%eb%a1%d5	seesaa
+「凱の鼠騎士」ヴィクソン	4	400	2	"【相手のターン終了時】
+自分が「凱のフォース”ミノタウロス”」を選んでいる場合、このターンに自分のプレイヤーがダメージを受けていないなら、このミニオンにBP+200を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b3%ae%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%f4%a5%a3%a5%af%a5%bd%a5%f3%a1%d5	seesaa
+「顎砕の竜巫女」ソフィア	3(青1)	400	1	"【自分のターン】
+自分の種族「ドラゴン」を持つ、青または無色のミニオンカードが出るたび、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b3%dc%ba%d5%a4%ce%ce%b5%d6%e0%bd%f7%a1%d7%a5%bd%a5%d5%a5%a3%a5%a2%a1%d5	seesaa
+「顎砕公」ゲレロフォン	9(青3)	900	3	"【召喚時】＆【自分のターン開始時】
+このターン、次に使用する自分の青のマジックカードのコストを0にする。
+【自分のターン】
+このミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b3%dc%ba%d5%b8%f8%a1%d7%a5%b2%a5%ec%a5%ed%a5%d5%a5%a9%a5%f3%a1%d5	seesaa
+「祈祷者」ゼクスシュバンツ	9(白3)	1100	2	"【アタック時】
+相手のミニオン1体を選択できる。そうした場合、そのミニオンをアクティブにして、そのバトル中に必ずブロックさせる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b5%a7%c5%f8%bc%d4%a1%d7%a5%bc%a5%af%a5%b9%a5%b7%a5%e5%a5%d0%a5%f3%a5%c4%a1%d5	seesaa
+「記憶を覗く者」メモリア	8	800	2	"【召喚時】
+全フォースの中から1つを選択する。このミニオンにそのフォースの固有能力を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b5%ad%b2%b1%a4%f2%c7%c1%a4%af%bc%d4%a1%d7%a5%e1%a5%e2%a5%ea%a5%a2%a1%d5	seesaa
+「鬼武者」リュウドウ	6(黄2)	500	2	"【アタック時】
+このミニオンはBPに関係なくバトルに勝利する。
+【召喚時】
+このターン中、他の自分のミニオン1体に「【常時】このミニオンはBPに関係なくバトルに勝利する。」を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b5%b4%c9%f0%bc%d4%a1%d7%a5%ea%a5%e5%a5%a6%a5%c9%a5%a6%a1%d5	seesaa
+「偽神の探索者」ジヌティーヌ	6(紫2)	700	1	"【アタック時】
+他の自分のミニオン1体を破壊できる。そうした場合、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b5%b6%bf%c0%a4%ce%c3%b5%ba%f7%bc%d4%a1%d7%a5%b8%a5%cc%a5%c6%a5%a3%a1%bc%a5%cc%a1%d5	seesaa
+「弓精」アキュレー	-	200	1	加護：コスト4以上	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b5%dd%c0%ba%a1%d7%a5%a2%a5%ad%a5%e5%a5%ec%a1%bc%a1%d5	seesaa
+「空精」クリスカ	-	200	0	"加護：コスト4以上
+《ベース》【配置時】
+自分のデッキを上から4枚見て、その中の種族「ドラゴン」を持つフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b6%f5%c0%ba%a1%d7%a5%af%a5%ea%a5%b9%a5%ab%a1%d5	seesaa
+「五幻獣」麒麟	10	600	1	"【召喚時】
+相手のプレイヤーにXダメージを与える。Xは自分の種族「ビースト」/「ファイブスター」を持つミニオンの数と同じとする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b8%de%b8%b8%bd%c3%a1%d7%f3%ca%ce%db%a1%d5	seesaa
+「紅の鼠騎士」スカーレット	2	200	1	"【召喚時】
+自分の[加護]が付与されているミニオンがいるか、自分のベースに［加護］を持つマナがある場合、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b9%c8%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%b9%a5%ab%a1%bc%a5%ec%a5%c3%a5%c8%a1%d5	seesaa
+「剛腕無敵の将」チョウヒ	4(黄2)	500	1	"【常時】
+レスト状態であるこのミニオンが自分の効果で選択されるたび、ターンに1回、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%b9%e4%cf%d3%cc%b5%c5%a8%a4%ce%be%ad%a1%d7%a5%c1%a5%e7%a5%a6%a5%d2%a1%d5	seesaa
+「混の鼠騎士」ミクス	4	400	1	"【召喚時】
+自分が「混のフォース”キマイラ”」を選んでいる場合、無色マナ1つをレスト状態で置く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%ba%ae%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%df%a5%af%a5%b9%a1%d5	seesaa
+「砂精」サンディー	-	200	0	"加護：条件なし
+《付与能力》[再起]"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%ba%bd%c0%ba%a1%d7%a5%b5%a5%f3%a5%c7%a5%a3%a1%bc%a1%d5	seesaa
+「三頭の騎士」アリュシナシオン	7(紫3)	600	3	"【破壊時】
+「S・アリュシナシオン・トークン」3体を出すことができる。
+【後退時】
+相手のミニオン1体にBP-400を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%b0%c6%ac%a4%ce%b5%b3%bb%ce%a1%d7%a5%a2%a5%ea%a5%e5%a5%b7%a5%ca%a5%b7%a5%aa%a5%f3%a1%d5	seesaa
+「思惑を砕く者」キスカ	7(紫2)	600	2	"【召喚時】
+自分のデッキを上から5枚破棄する。
+【自分のターン】
+自分のデッキからカードが破棄されるたび、その中に【破壊時】効果をもつ紫のカードが複数あったとき、その効果を発揮させる。該当するカードが複数あったとき、最初の効果のみが発揮される。この効果は重複しない。（破棄されたカードの効果はトラッシュで発揮し、ミニオンの効果としては扱わない。）"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%d7%cf%c7%a4%f2%ba%d5%a4%af%bc%d4%a1%d7%a5%ad%a5%b9%a5%ab%a1%d5	seesaa
+「死滅の竜巫女」フランチェスカ	4(紫2)	400	1	"【召喚時】
+自分のトラッシュにある種族「ドラゴン」を持つ、紫または無色のフィールド・ミニオンカード1枚を手札に戻すことができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%e0%cc%c7%a4%ce%ce%b5%d6%e0%bd%f7%a1%d7%a5%d5%a5%e9%a5%f3%a5%c1%a5%a7%a5%b9%a5%ab%a1%d5	seesaa
+「死滅公」スカルボーン	9(紫3)	800	3	"【召喚時】
+相手のミニオン1体を破壊する。この効果で破壊したミニオンのコスト分、自分のデッキを上から破棄する。
+【自分のターン】
+このミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%e0%cc%c7%b8%f8%a1%d7%a5%b9%a5%ab%a5%eb%a5%dc%a1%bc%a5%f3%a1%d5	seesaa
+「死霊の子爵」オッドアイ	7(紫3)	500	2	"【破壊時】
+相手のミニオン1体と相手のフォース1つを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%e0%ce%ee%a4%ce%bb%d2%bc%df%a1%d7%a5%aa%a5%c3%a5%c9%a5%a2%a5%a4%a1%d5	seesaa
+「慈しみを降らす者」ゴールドウェザー	6(青2)	500	2	"【召喚時】
+自分の手札にある青のフィールド・ミニオンカード1枚を、レスト状態で置くことができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%fc%a4%b7%a4%df%a4%f2%b9%df%a4%e9%a4%b9%bc%d4%a1%d7%a5%b4%a1%bc%a5%eb%a5%c9%a5%a6%a5%a7%a5%b6%a1%bc%a1%d5	seesaa
+「時を一巡させる者」エンリコ	7	600	2	"【召喚時】
+お互いは手札を全て破棄する。その後、お互いはカードを5枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%fe%a4%f2%b0%ec%bd%e4%a4%b5%a4%bb%a4%eb%bc%d4%a1%d7%a5%a8%a5%f3%a5%ea%a5%b3%a1%d5	seesaa
+「時精」クロノラ	-	100	1	"加護：白+コスト4以上
+《付与能力》【常時】
+このミニオンがコスト3以下のミニオンとのバトルに勝利するたび、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bb%fe%c0%ba%a1%d7%a5%af%a5%ed%a5%ce%a5%e9%a1%d5	seesaa
+「種精」ピットボック	-	300	0	加護：緑	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bc%ef%c0%ba%a1%d7%a5%d4%a5%c3%a5%c8%a5%dc%a5%c3%a5%af%a1%d5	seesaa
+「酒場の看板娘」カレン	7	700	2	"【アタック時】
+自分のプレイヤーを1回復する。
+【常時】
+フォースが破壊されるたび、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bc%f2%be%ec%a4%ce%b4%c7%c8%c4%cc%bc%a1%d7%a5%ab%a5%ec%a5%f3%a1%d5	seesaa
+「樹精」グリーフィ	-	100	1	"加護：緑+コスト4以上
+《付与能力》【アタック時】
+相手のフォース1つをレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bc%f9%c0%ba%a1%d7%a5%b0%a5%ea%a1%bc%a5%d5%a5%a3%a1%d5	seesaa
+「沼精」ロッツ	-	300	0	加護：紫	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%be%c2%c0%ba%a1%d7%a5%ed%a5%c3%a5%c4%a1%d5	seesaa
+「深海の主」アレシャンド	8(青3)	800	2	"【召喚時】
+自分のミニオンであるマナを3つまで、アクティブ状態でフィールドに移動させる。
+【アタック時】
+相手のミニオン1体をレスト状態でベースに移動させる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%bc%b3%a4%a4%ce%bc%e7%a1%d7%a5%a2%a5%ec%a5%b7%a5%e3%a5%f3%a5%c9%a1%d5	seesaa
+「真実を映し出す者」ヤヌサス	4(赤2)	400	1	"【召喚時】
+他のトークンでないミニオン1体と同じカード1枚を手札に加える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%bf%bc%c2%a4%f2%b1%c7%a4%b7%bd%d0%a4%b9%bc%d4%a1%d7%a5%e4%a5%cc%a5%b5%a5%b9%a1%d5	seesaa
+「神餐の担い手」ジューリオ	4(青2)	600	1	"【常時】
+他の自分の青のミニオンまたは自分の青のマナが移動するたび、それを移動先でアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%c0%bb%c1%a4%ce%c3%b4%a4%a4%bc%ea%a1%d7%a5%b8%a5%e5%a1%bc%a5%ea%a5%aa%a1%d5	seesaa
+「神樹の守り手」ミリュイ	4(緑2)	600	1	"【常時】
+自分がレストする能力によって対象を選ぶ場合、その対象の数を+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%c0%bc%f9%a4%ce%bc%e9%a4%ea%bc%ea%a1%d7%a5%df%a5%ea%a5%e5%a5%a4%a1%d5	seesaa
+「身も心も縛る者」ザイレン	6(黄2)	500	2	"飛来
+【召喚時】
+次の相手のターン終了時まで、相手のミニオン1体はアタックもブロックも移動もできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%c8%a4%e2%bf%b4%a4%e2%c7%fb%a4%eb%bc%d4%a1%d7%a5%b6%a5%a4%a5%ec%a5%f3%a1%d5	seesaa
+「針を進める者」クロノリオンヌ	6	500	2	"【常時】
+自分の手札にある有色のカードのフリーコストを、自分のフォース1つ毎に1減らす。
+【常時】
+無色のフィールド・ミニオンカードのフリーコストを1増やす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%cb%a4%f2%bf%ca%a4%e1%a4%eb%bc%d4%a1%d7%a5%af%a5%ed%a5%ce%a5%ea%a5%aa%a5%f3%a5%cc%a1%d5	seesaa
+「水の女王」ナイアス	7(青2)	600	2	"【召喚時】
+相手のコスト4以下のミニオン2体をレスト状態でベースに移動させる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%bf%e5%a4%ce%bd%f7%b2%a6%a1%d7%a5%ca%a5%a4%a5%a2%a5%b9%a1%d5	seesaa
+「聖の鼠騎士」ホリィ	5	500	1	"【自分のターン終了時】
+自分が「聖のフォース”スフィンクス”」を選んでいる場合、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c0%bb%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%db%a5%ea%a5%a3%a1%d5	seesaa
+「石精」ロックバイス	-	300	0	加護：赤	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c0%d0%c0%ba%a1%d7%a5%ed%a5%c3%a5%af%a5%d0%a5%a4%a5%b9%a1%d5	seesaa
+「赤髭」ブラッド・ヒュージー	6(赤3)	600	2	"【アタック時】
+このターン中、相手のミニオン1体をBP-300する。
+【後退時】
+「S・ゴレイム・トークン」2体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c0%d6%c9%a6%a1%d7%a5%d6%a5%e9%a5%c3%a5%c9%a1%a6%a5%d2%a5%e5%a1%bc%a5%b8%a1%bc%a1%d5	seesaa
+「雪精」ホワイトスノウ	-	300	0	加護：白	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c0%e3%c0%ba%a1%d7%a5%db%a5%ef%a5%a4%a5%c8%a5%b9%a5%ce%a5%a6%a1%d5	seesaa
+「千年杉」ヤクーツォーク	9(緑3)	1300	4	"貫通
+【相手のターン】
+自分のプレイヤーに与えられるダメージを1軽減する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c0%e9%c7%af%bf%f9%a1%d7%a5%e4%a5%af%a1%bc%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+「双の鼠騎士」ツイン	3	200	1	"【自分のターン】
+自分が「双のフォース”オルトロス”」を選んでいる場合、自分の手札にあるこのカードのフリーコストは2減らされる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c1%d0%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%c4%a5%a4%a5%f3%a1%d5	seesaa
+「双星に謳う者」ティルト＆ウェルト	5	400	2	"【自分のターン】
+自分のミニオンの【召喚時】効果は2回発揮する。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c1%d0%c0%b1%a4%cb%eb%f0%a4%a6%bc%d4%a1%d7%a5%c6%a5%a3%a5%eb%a5%c8%a1%f5%a5%a6%a5%a7%a5%eb%a5%c8%a1%d5	seesaa
+「双龍頭領」アオバ	9(黄3)	800	2	"【召喚時】
+自分のデッキを上から2枚見て、その中のフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。
+【常時】
+他の自分のミニオンがフィールドに出るたび、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c1%d0%ce%b6%c6%ac%ce%ce%a1%d7%a5%a2%a5%aa%a5%d0%a1%d5	seesaa
+「太陽の竜巫女」クロエ	3(緑1)	300	1	"《ベース》
+このマナで種族「ドラゴン」を持つ、緑または無色のフィールド・ミニオンカードのコストを支払うとき、緑コスト2マナ分支払える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c2%c0%cd%db%a4%ce%ce%b5%d6%e0%bd%f7%a1%d7%a5%af%a5%ed%a5%a8%a1%d5	seesaa
+「太陽公」ハトト＝ラキア	9(緑3)	1000	3	"【相手のターン】
+相手のミニオンはフィールドに出るときにレスト状態で出る。
+【自分のターン】
+このミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c2%c0%cd%db%b8%f8%a1%d7%a5%cf%a5%c8%a5%c8%a1%e1%a5%e9%a5%ad%a5%a2%a1%d5	seesaa
+「大公爵」アシュテロト	6(紫2)	500	2	"【召喚時】
+自分のトラッシュにある、コスト3以下のフィールド・ミニオンカード1枚を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c2%e7%b8%f8%bc%df%a1%d7%a5%a2%a5%b7%a5%e5%a5%c6%a5%ed%a5%c8%a1%d5	seesaa
+「知の鼠騎士」ウィズダム	3	200	1	"【召喚時】
+自分が「知のフォース”ケイローン”」を選んでいる場合、自分のデッキを上から2枚見て、その中のカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c3%ce%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%a6%a5%a3%a5%ba%a5%c0%a5%e0%a1%d5	seesaa
+「知の探究者」ダビド	6(青2)	600	2	"【召喚時】
+自分のデッキを上から3枚見て、その中のマジックカード全てを公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c3%ce%a4%ce%c3%b5%b5%e6%bc%d4%a1%d7%a5%c0%a5%d3%a5%c9%a1%d5	seesaa
+「駐アグマ大使」モノノベ	5(黄2)	500	2	"【常時】
+自分の手札にあるミニオンカードのフリーコストを1減らす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c3%f3%a5%a2%a5%b0%a5%de%c2%e7%bb%c8%a1%d7%a5%e2%a5%ce%a5%ce%a5%d9%a1%d5	seesaa
+「長雷槍」カルナール	7	700	2	"襲撃
+再起"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c4%b9%cd%eb%c1%e4%a1%d7%a5%ab%a5%eb%a5%ca%a1%bc%a5%eb%a1%d5	seesaa
+「鉄塊」トリケラ・ライノス	4	500	1	再起	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c5%b4%b2%f4%a1%d7%a5%c8%a5%ea%a5%b1%a5%e9%a1%a6%a5%e9%a5%a4%a5%ce%a5%b9%a1%d5	seesaa
+「鉄壁の作り手」リヤーボ	6(緑2)	800	2	"【常時】
+自分のプレイヤーのライフが7以上である場合、このミニオンは襲撃と貫通と再起を持つ。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c5%b4%ca%c9%a4%ce%ba%ee%a4%ea%bc%ea%a1%d7%a5%ea%a5%e4%a1%bc%a5%dc%a1%d5	seesaa
+「鉄腕の大君」グレイグ・スマッシャー	3(赤3)	300	2	"【常時】
+他の自分のトークンでないミニオン1体毎に、このミニオンをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c5%b4%cf%d3%a4%ce%c2%e7%b7%af%a1%d7%a5%b0%a5%ec%a5%a4%a5%b0%a1%a6%a5%b9%a5%de%a5%c3%a5%b7%a5%e3%a1%bc%a1%d5	seesaa
+「天知」プラトーナ	3	300	1	"【召喚時】
+自分の手札を好きな枚数破棄する。その後、同じ枚数のカードを引く。破棄したカードをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c5%b7%c3%ce%a1%d7%a5%d7%a5%e9%a5%c8%a1%bc%a5%ca%a1%d5	seesaa
+「導きの乙姫」マリーサ	3(青1)	400	1	"連携：青
+【自分のターン】
+他の自分の青のミニオンがダメージを与えるたび、そのミニオンにDP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%b3%a4%ad%a4%ce%b2%b5%c9%b1%a1%d7%a5%de%a5%ea%a1%bc%a5%b5%a1%d5	seesaa
+「導きの機婦人」オードリー	3(白1)	400	1	"連携：白
+【常時】
+他の自分の白のミニオン全てに[再起]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%b3%a4%ad%a4%ce%b5%a1%c9%d8%bf%cd%a1%d7%a5%aa%a1%bc%a5%c9%a5%ea%a1%bc%a1%d5	seesaa
+「導きの女王」キャサリン	3(紫1)	400	1	"連携：紫
+【自分のターン】
+他の自分の紫のミニオンが与えるDPによるダメージでフォースが破壊されるたび、自分の無色マナ1つを置き、自分はカードを1枚引く。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%b3%a4%ad%a4%ce%bd%f7%b2%a6%a1%d7%a5%ad%a5%e3%a5%b5%a5%ea%a5%f3%a1%d5	seesaa
+「導きの戦乙女」ブリジット	3(緑1)	400	1	"連携：緑
+【自分のターン】
+他の自分のコスト5以上の緑のミニオンがフィールドに出るたび、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%b3%a4%ad%a4%ce%c0%ef%b2%b5%bd%f7%a1%d7%a5%d6%a5%ea%a5%b8%a5%c3%a5%c8%a1%d5	seesaa
+「導きの天女」アンジェラ	3(黄1)	400	1	"連携：黄
+【常時】
+他の自分の黄のミニオンがフィールドに出るたび、このターン中、自分のミニオン全てをBP+100する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%b3%a4%ad%a4%ce%c5%b7%bd%f7%a1%d7%a5%a2%a5%f3%a5%b8%a5%a7%a5%e9%a1%d5	seesaa
+「導きの竜姫」ダイアナ	3(赤1)	400	1	"連携：赤
+【自分のターン】
+他の自分の赤のミニオン全てをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%b3%a4%ad%a4%ce%ce%b5%c9%b1%a1%d7%a5%c0%a5%a4%a5%a2%a5%ca%a1%d5	seesaa
+「那由他に届く者」ヘルデューク	6(白2)	600	2	"【アタック時】＆【ブロック時】
+自分のフォース1つをレストできる。そうした場合、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%e1%cd%b3%c2%be%a4%cb%c6%cf%a4%af%bc%d4%a1%d7%a5%d8%a5%eb%a5%c7%a5%e5%a1%bc%a5%af%a1%d5	seesaa
+「二艘槍」ハーゲン	7	400	2	"【召喚時】
+このターン中、このミニオンをBP+300する。
+【アタック時】
+ターンに1回、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c6%f3%e7%db%c1%e4%a1%d7%a5%cf%a1%bc%a5%b2%a5%f3%a1%d5	seesaa
+「波精」ヴルーヴェ	-	100	1	"加護：青+コスト4以上
+《付与能力》【アタック時】
+自分の移動権を1増やす"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c7%c8%c0%ba%a1%d7%a5%f4%a5%eb%a1%bc%a5%f4%a5%a7%a1%d5	seesaa
+「爆焔の竜巫女」ジェーン	3(赤1)	400	1	"【自分のターン】
+自分の種族「ドラゴン」を持つ、赤または無色のミニオン全てに[襲撃]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c7%fa%b1%eb%a4%ce%ce%b5%d6%e0%bd%f7%a1%d7%a5%b8%a5%a7%a1%bc%a5%f3%a1%d5	seesaa
+「爆焔公」マグマファング	9(赤3)	900	3	"【アタック時】
+相手のBP500以下のミニオン1体を破壊する。そうした場合、「ドラゴン・トークン」1体を出す。
+【自分のターン】
+このミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c7%fa%b1%eb%b8%f8%a1%d7%a5%de%a5%b0%a5%de%a5%d5%a5%a1%a5%f3%a5%b0%a1%d5	seesaa
+「箱を抱く者」パンドリア	3	300	1	"【召喚時】
+自分はデッキの中からベース・ミニオンカード1枚を公開して手札に加えることができる。そうした場合、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c8%a2%a4%f2%ca%fa%a4%af%bc%d4%a1%d7%a5%d1%a5%f3%a5%c9%a5%ea%a5%a2%a1%d5	seesaa
+「反射の巨人」クリスタル・ベイル	9	900	3	"再起
+【常時】
+このミニオンは相手のミニオンとマジックの効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c8%bf%bc%cd%a4%ce%b5%f0%bf%cd%a1%d7%a5%af%a5%ea%a5%b9%a5%bf%a5%eb%a1%a6%a5%d9%a5%a4%a5%eb%a1%d5	seesaa
+「扉を開く者」アルカス	6	600	2	"【後退時】
+自分の手札にある本来のコストが6以下のフィールド・ミニオンカード1枚を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c8%e2%a4%f2%b3%ab%a4%af%bc%d4%a1%d7%a5%a2%a5%eb%a5%ab%a5%b9%a1%d5	seesaa
+「秘術の御使い」アマリリア	7(緑3)	700	2	"【アタック時】
+相手のミニオン1体か相手のフォース1つをレストする。
+【後退時】
+自分の緑マナ2つをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c8%eb%bd%d1%a4%ce%b8%e6%bb%c8%a4%a4%a1%d7%a5%a2%a5%de%a5%ea%a5%ea%a5%a2%a1%d5	seesaa
+「百獣」ヴァイスレーベ	8(白3)	1000	2	"【自分のターン】
+自分のミニオンがアタックするたび、相手は必ずブロックする。
+【自分のターン】
+このミニオンがバトルに勝利するたび、相手のプレイヤーと相手のフォース全てに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c9%b4%bd%c3%a1%d7%a5%f4%a5%a1%a5%a4%a5%b9%a5%ec%a1%bc%a5%d9%a1%d5	seesaa
+「氷原の竜巫女」マチルダ	3(白1)	400	1	"【自分のターン】
+自分の種族「ドラゴン」を持つ、白または無色のミニオンカードがバトルに勝利するたび、相手のプレイヤーに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c9%b9%b8%b6%a4%ce%ce%b5%d6%e0%bd%f7%a1%d7%a5%de%a5%c1%a5%eb%a5%c0%a1%d5	seesaa
+「氷原公」フリーレン	9(白3)	1000	3	"【アタック時】
+このミニオンがダメージを与えたとき、相手の最もコストの低いミニオン全てを除外する。
+【自分のターン】
+このミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c9%b9%b8%b6%b8%f8%a1%d7%a5%d5%a5%ea%a1%bc%a5%ec%a5%f3%a1%d5	seesaa
+「風の乗り手」シルヴィー	6(緑2)	600	2	"【召喚時】
+自分の種族「ニンフ」を持つマナ全てをアクティブにする。
+【自分のターン】
+自分の[加護]を受けているミニオンがアタックするたび、相手のミニオン1体をレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%c9%f7%a4%ce%be%e8%a4%ea%bc%ea%a1%d7%a5%b7%a5%eb%a5%f4%a5%a3%a1%bc%a1%d5	seesaa
+「泡精」バルボラ	-	300	0	加護：青	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cb%a2%c0%ba%a1%d7%a5%d0%a5%eb%a5%dc%a5%e9%a1%d5	seesaa
+「豊穣をもたらす者」ヴァンジャン	5(緑2)	500	2	"【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。
+《ベース》
+このマナで緑のカードのコストを支払うとき、緑コスト3マナ分支払える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cb%ad%be%f7%a4%f2%a4%e2%a4%bf%a4%e9%a4%b9%bc%d4%a1%d7%a5%f4%a5%a1%a5%f3%a5%b8%a5%e3%a5%f3%a1%d5	seesaa
+「暴食」ギュスターヴ	6(紫2)	300	3	"【召喚時】
+お互いのトラッシュにあるフィールド・ミニオンカード1枚毎に、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cb%bd%bf%a9%a1%d7%a5%ae%a5%e5%a5%b9%a5%bf%a1%bc%a5%f4%a1%d5	seesaa
+「暴竜」グラン＝レックス	4(赤2)	500	2	"襲撃
+【召喚時】
+自分のミニオンカードでない無色マナ1つを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cb%bd%ce%b5%a1%d7%a5%b0%a5%e9%a5%f3%a1%e1%a5%ec%a5%c3%a5%af%a5%b9%a1%d5	seesaa
+「魔犬」ケルベロス・クリムゾン	6	800	2	"【自分のターン】
+このミニオンが相手のプレイヤーにダメージを与えるたび、相手のフォース全てに2ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cb%e2%b8%a4%a1%d7%a5%b1%a5%eb%a5%d9%a5%ed%a5%b9%a1%a6%a5%af%a5%ea%a5%e0%a5%be%a5%f3%a1%d5	seesaa
+「魔術の巨人」マジクル・ベイル	7	800	2	"【召喚時】
+このターン終了時、自分のマナ全てをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cb%e2%bd%d1%a4%ce%b5%f0%bf%cd%a1%d7%a5%de%a5%b8%a5%af%a5%eb%a1%a6%a5%d9%a5%a4%a5%eb%a1%d5	seesaa
+「盲目の風読み」メリエルナ	2(緑1)	300	0	"【召喚時】
+自分の手札にある緑のベース・ミニオンカードを1枚を、レスト状態で置くことができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cc%d5%cc%dc%a4%ce%c9%f7%c6%c9%a4%df%a1%d7%a5%e1%a5%ea%a5%a8%a5%eb%a5%ca%a1%d5	seesaa
+「勇気奮わす者」ウォレス	6	600	2	"【常時】
+他の自分のミニオン全てをBP+100/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cd%a6%b5%a4%ca%b3%a4%ef%a4%b9%bc%d4%a1%d7%a5%a6%a5%a9%a5%ec%a5%b9%a1%d5	seesaa
+「憂鬱の魔王」ベールフェゴル	8(紫3)	800	2	"【常時】
+相手の手札にあるフィールド・ミニオンカードのフリーコストを1増やす。
+【アタック時】
+自分のトラッシュにある、「「憂鬱の魔王」ベールフェゴル」以外の紫のフィールド・ミニオンカード1枚を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cd%ab%dd%b5%a4%ce%cb%e2%b2%a6%a1%d7%a5%d9%a1%bc%a5%eb%a5%d5%a5%a7%a5%b4%a5%eb%a1%d5	seesaa
+「雷鳴の竜巫女」セリカ	4(黄2)	400	1	"【召喚時】
+自分はデッキの中から種族「ドラゴン」を持つ、黄またはコスト9以上のフィールド・ミニオンカード1枚を公開して手札に加えることができる。そうした場合、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cd%eb%cc%c4%a4%ce%ce%b5%d6%e0%bd%f7%a1%d7%a5%bb%a5%ea%a5%ab%a1%d5	seesaa
+「雷鳴公」デンサイ	9(黄3)	900	3	"【召喚時】
+相手のミニオン1体をデッキの上に戻す。
+【自分のターン】
+このミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%cd%eb%cc%c4%b8%f8%a1%d7%a5%c7%a5%f3%a5%b5%a5%a4%a1%d5	seesaa
+「輪の鼠騎士」リング	3	300	1	"【アタック時】＆【ブロック時】
+自分が「輪のフォース”ウロボロス”」を選んでいる場合、このターン中、このミニオンをBP+300する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%ce%d8%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%ea%a5%f3%a5%b0%a1%d5	seesaa
+「煌精」サンライト	-	100	1	"加護：黄+コスト4以上
+《付与能力》【常時】
+他の自分のミニオンがフィールドに出るたび、このターン中、このミニオンをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%df%ea%c0%ba%a1%d7%a5%b5%a5%f3%a5%e9%a5%a4%a5%c8%a1%d5	seesaa
+「甦の鼠騎士」リザ	5	500	2	"【相手のターン】
+自分が「甦のフォース”フェニックス”」を選んでいる場合、自分がカードを使用するたび、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%e1%b4%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%ea%a5%b6%a1%d5	seesaa
+「翔の鼠騎士」フライト	2	300	1	"【常時】
+自分が「翔のフォース”ペガサス”」を選んでいる場合、このミニオンはベースに移動するとき、アクティブ状態で移動する。
+《ベース》
+自分が「翔のフォース”ペガサス”」を選んでいる場合、このマナはフィールドに移動するとき、アクティブ状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a1%d6%e6%c6%a4%ce%c1%cd%b5%b3%bb%ce%a1%d7%a5%d5%a5%e9%a5%a4%a5%c8%a1%d5	seesaa
+いたずらインプ	5(紫1)	600	2	奪命	https://seesaawiki.jp/zenonzard/d/%a1%d4%a4%a4%a4%bf%a4%ba%a4%e9%a5%a4%a5%f3%a5%d7%a1%d5	seesaa
+アイスベアード	8(白2)	700	2	"【アタック時】
+自分の白マナが4つ以上ある場合、自分のミニオン全てにBP+100を付与する。
+【常時】
+このミニオンは、相手のマジックの効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%a4%a5%b9%a5%d9%a5%a2%a1%bc%a5%c9%a1%d5	seesaa
+アイゼンクロコ	1(白1)	100	0	"【常時】
+自分の破壊されたフォース1つ毎に、このミニオンをBP+200/DP+1する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%a4%a5%bc%a5%f3%a5%af%a5%ed%a5%b3%a1%d5	seesaa
+アガリック・トータス	3	200	1	奪命	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%ac%a5%ea%a5%c3%a5%af%a1%a6%a5%c8%a1%bc%a5%bf%a5%b9%a1%d5	seesaa
+アクアコブラ	5(青2)	500	1	"潜入
+【常時】
+自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%af%a5%a2%a5%b3%a5%d6%a5%e9%a1%d5	seesaa
+アクアサーペント	6(青2)	600	2	"【アタック時】
+このミニオンがダメージを与えるたび、自分のマナ2つをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%af%a5%a2%a5%b5%a1%bc%a5%da%a5%f3%a5%c8%a1%d5	seesaa
+アグマの鉱夫	-	300	1	"《デッキ》
+このカードは何枚でもデッキに入れられる。
+【常時】
+このミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%b0%a5%de%a4%ce%b9%db%c9%d7%a1%d5	seesaa
+アグマの守護者	-	100	1	"【常時】
+このミニオンはブロックできない。
+《ベース》【自分のターン終了時】
+このマナをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%b0%a5%de%a4%ce%bc%e9%b8%ee%bc%d4%a1%d5	seesaa
+アシッド・ドラゴン	4	500	1	"【常時】
+自分のプレイヤーにダメージを与えられるたび、このミニオンにDP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%b7%a5%c3%a5%c9%a1%a6%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+アジャクツォーク	8(緑1)	900	4	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%b8%a5%e3%a5%af%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+アッシュブリンガー	2(紫2)	700	2	"【常時】
+相手のフォースが1つ以上ある場合、このミニオンはアタックもブロックも移動もできない。
+【常時】
+他の自分のミニオンがフォースにアタックするたび、このバトル中、そのミニオンをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%c3%a5%b7%a5%e5%a5%d6%a5%ea%a5%f3%a5%ac%a1%bc%a1%d5	seesaa
+アニマ	2(緑1)			"【メイン】
+自分はデッキの中から緑の種族「ニンフ」を持つベース・ミニオンカード1枚を、レスト状態でベースに置く。その後、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%cb%a5%de%a1%d5	seesaa
+アパウルツォーク	3(緑1)	300	1	"【アタック時】
+相手のコスト4以下のミニオン1体をレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%d1%a5%a6%a5%eb%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+アルダープ	4(黄2)	300	1	"飛来
+【常時】
+自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%eb%a5%c0%a1%bc%a5%d7%a1%d5	seesaa
+アン・テ・ロウフェ	3(紫1)	300	1	"【召喚時】
+他の自分のミニオン1体を破壊する。そうした場合、このミニオンにBP+200/DP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%f3%a1%a6%a5%c6%a1%a6%a5%ed%a5%a6%a5%d5%a5%a7%a1%d5	seesaa
+アンドロイドの銃士	-	300	1	"【常時】
+このミニオンはブロックできない。
+【配置時】
+相手のミニオン1体を対象に選ぶことができる。このターン中、そのミニオンは必ずブロックする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%f3%a5%c9%a5%ed%a5%a4%a5%c9%a4%ce%bd%c6%bb%ce%a1%d5	seesaa
+アヴィアンの忍者	-	300	1	"【常時】
+このミニオンはブロックできない。
+【配置時】
+このターン中、自分のミニオン全てをBP+100する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a2%a5%f4%a5%a3%a5%a2%a5%f3%a4%ce%c7%a6%bc%d4%a1%d5	seesaa
+イーグルランサー	4(黄2)	400	1	"【召喚時】
+相手のBP400以下のミニオン1体を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a4%a1%bc%a5%b0%a5%eb%a5%e9%a5%f3%a5%b5%a1%bc%a1%d5	seesaa
+ウィル・オー・ウィスプ	3	200	1	"【破壊時】
+無色マナ1つを置く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a3%a5%eb%a1%a6%a5%aa%a1%bc%a1%a6%a5%a6%a5%a3%a5%b9%a5%d7%a1%d5	seesaa
+ウォークライ	3(黄1)			"【メイン】/【フラッシュ】
+ミニオン1体をアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%af%a5%e9%a5%a4%a1%d5	seesaa
+ウォーター・シューター	3	300	1	"【召喚時】
+相手のDP0のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%bf%a1%bc%a1%a6%a5%b7%a5%e5%a1%bc%a5%bf%a1%bc%a1%d5	seesaa
+ウォードスネーク	7(青2)	500	2	潜入	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%c9%a5%b9%a5%cd%a1%bc%a5%af%a1%d5	seesaa
+ウォードバイソン	3(青1)	400	1	"【アタック時】
+このミニオンがダメージを与えるたび、自分のマナ1つをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%c9%a5%d0%a5%a4%a5%bd%a5%f3%a1%d5	seesaa
+ウォードバイパー	2(青1)	200	1	"【後退時】
+自分の手札が4枚以下である場合、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%c9%a5%d0%a5%a4%a5%d1%a1%bc%a1%d5	seesaa
+ウォールオブエアー	2(緑1)			"【フラッシュ】
+このターン中、自分のプレイヤーに与えられるダメージを1軽減する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%eb%a5%aa%a5%d6%a5%a8%a5%a2%a1%bc%a1%d5	seesaa
+ウォールクラッシャー	8(紫2)	700	2	"【アタック時】
+自分の紫マナが4つ以上ある場合、相手のコスト4以下のミニオン1体を破壊する。
+【常時】
+相手の破壊されたフォース1つ毎に、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%a9%a1%bc%a5%eb%a5%af%a5%e9%a5%c3%a5%b7%a5%e3%a1%bc%a1%d5	seesaa
+ウンディーネ	1(青1)	200	0	"【自分のターン】
+このターンに自分がマジックを使用している場合、このミニオンをDP+1する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a6%a5%f3%a5%c7%a5%a3%a1%bc%a5%cd%a1%d5	seesaa
+エアレイド	2(黄1)			"【フラッシュ】
+相手のミニオン1体にBP-200を付与する。このターンに自分がミニオンを召喚している場合、代わりにBP-400を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%a2%a5%ec%a5%a4%a5%c9%a1%d5	seesaa
+エオラプトル	2(赤1)	100	1	"【アタック時】
+このターン中、このミニオンをBP+300する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%aa%a5%e9%a5%d7%a5%c8%a5%eb%a1%d5	seesaa
+エクス＝キャノン	6(白3)			"【フラッシュ】
+相手のミニオン1体を除外する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%af%a5%b9%a1%e1%a5%ad%a5%e3%a5%ce%a5%f3%a1%d5	seesaa
+エクスプテラ	7(赤2)	800	2	襲撃	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%af%a5%b9%a5%d7%a5%c6%a5%e9%a1%d5	seesaa
+エメラルド・ドラゴン	6	700	2	貫通	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%e1%a5%e9%a5%eb%a5%c9%a1%a6%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+エルフの剣士	-	300	1	"【常時】
+このミニオンはブロックできない。
+【配置時】
+自分の[貫通]を持つミニオン1体にBP+100/DP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%eb%a5%d5%a4%ce%b7%f5%bb%ce%a1%d5	seesaa
+エレキタマス	4	500	1	"【アタック時】
+相手のBP200以下のミニオン全てを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%ec%a5%ad%a5%bf%a5%de%a5%b9%a1%d5	seesaa
+エレファントタートル	8(黄2)	800	2	"【召喚時】
+このターン中、自分のミニオン1体をBP+300/DP+1する。
+【アタック時】
+自分の黄マナが4つ以上ある場合、相手のコスト4以下のミニオン1体を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%ec%a5%d5%a5%a1%a5%f3%a5%c8%a5%bf%a1%bc%a5%c8%a5%eb%a1%d5	seesaa
+エンジェルバニー	2(黄1)	200	1	"【後退時】
+自分のコスト6以上の黄のミニオン1体をアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%a8%a5%f3%a5%b8%a5%a7%a5%eb%a5%d0%a5%cb%a1%bc%a1%d5	seesaa
+オットルーボ	4(緑2)	500	2	貫通	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%aa%a5%c3%a5%c8%a5%eb%a1%bc%a5%dc%a1%d5	seesaa
+オブシディアン・ドラゴン	4	400	2	"【常時】
+他の自分の種族「ドラゴン」を持つミニオン全てをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%aa%a5%d6%a5%b7%a5%c7%a5%a3%a5%a2%a5%f3%a1%a6%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+オプションパーツ	4(白1)			"【メイン】
+自分の白のミニオン全てにBP+200を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%aa%a5%d7%a5%b7%a5%e7%a5%f3%a5%d1%a1%bc%a5%c4%a1%d5	seesaa
+オルサラーニョ	7(緑2)	700	3	貫通	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%aa%a5%eb%a5%b5%a5%e9%a1%bc%a5%cb%a5%e7%a1%d5	seesaa
+カナタナの守護者	-	100	1	"【常時】
+このミニオンはブロックできない。
+《ベース》【自分のターン終了時】
+このマナをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%ca%a5%bf%a5%ca%a4%ce%bc%e9%b8%ee%bc%d4%a1%d5	seesaa
+カナタナの神官	-	300	1	"《デッキ》
+このカードは何枚でもデッキに入れられる。
+【常時】
+このミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%ca%a5%bf%a5%ca%a4%ce%bf%c0%b4%b1%a1%d5	seesaa
+カノーネン・ティーゲル	6(白2)	600	2	"【召喚時】
+相手のミニオン1体を選択する。そのミニオンをアクティブにして、このターン中、そのミニオンは必ずブロックする。
+【自分のターン】
+このミニオンがバトルに勝利するたび、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%ce%a1%bc%a5%cd%a5%f3%a1%a6%a5%c6%a5%a3%a1%bc%a5%b2%a5%eb%a1%d5	seesaa
+カマイタチ	6(黄2)	500	1	"飛来
+【召喚時】
+このターン中、他の自分のミニオン1体をBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%de%a5%a4%a5%bf%a5%c1%a1%d5	seesaa
+カラス天狗シグレ	3(黄1)	300	1	飛来	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%e9%a5%b9%c5%b7%b6%e9%a5%b7%a5%b0%a5%ec%a1%d5	seesaa
+カワウソ親父	1(黄1)	200	0	"【召喚時】
+自分のミニオン1体にBP+100を付与する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%ef%a5%a6%a5%bd%bf%c6%c9%e3%a1%d5	seesaa
+カンフー・モンク・モンキー	4(黄2)	400	1	"【召喚時】
+このターン中、自分のミニオン1体をBP+200して[再起]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ab%a5%f3%a5%d5%a1%bc%a1%a6%a5%e2%a5%f3%a5%af%a1%a6%a5%e2%a5%f3%a5%ad%a1%bc%a1%d5	seesaa
+ガイオ・センチピード	6	700	2	"【自分のターン】
+自分の種族「デミゴッド」を持つミニオンがいる場合、自分の手札にあるこのカードのフリーコストは3減らされる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ac%a5%a4%a5%aa%a1%a6%a5%bb%a5%f3%a5%c1%a5%d4%a1%bc%a5%c9%a1%d5	seesaa
+ガルガンチュア・イーグル	7	700	2	飛来	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ac%a5%eb%a5%ac%a5%f3%a5%c1%a5%e5%a5%a2%a1%a6%a5%a4%a1%bc%a5%b0%a5%eb%a1%d5	seesaa
+キマイラの旋風	2(黄1)			"【フラッシュ】
+コスト4以下のミニオン1体を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ad%a5%de%a5%a4%a5%e9%a4%ce%c0%fb%c9%f7%a1%d5	seesaa
+キャンセラ―ピューマ	5	600	2	"【常時】
+相手がマジックを使用するたび、このミニオンにBP+100/DP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ad%a5%e3%a5%f3%a5%bb%a5%e9%a1%bd%a5%d4%a5%e5%a1%bc%a5%de%a1%d5	seesaa
+キューブロップ	4(紫2)	300	2	"奪命
+【常時】
+自分の種族「デミゴッド」を持つミニオンがいる場合BP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ad%a5%e5%a1%bc%a5%d6%a5%ed%a5%c3%a5%d7%a1%d5	seesaa
+キルコマンド	2(白1)			"【メイン】/【フラッシュ】
+このターン中、自分の種族「ソルジャー」を持つミニオン1体はBPに関係なくバトルに勝利する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ad%a5%eb%a5%b3%a5%de%a5%f3%a5%c9%a1%d5	seesaa
+キルジャガード	5(白1)	500	2	"【常時】
+このミニオンがバトルに勝利するたび、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ad%a5%eb%a5%b8%a5%e3%a5%ac%a1%bc%a5%c9%a1%d5	seesaa
+ギガ・サイクロプス	8	800	3	"【自分のターン】
+このミニオンはコスト3以下のミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ae%a5%ac%a1%a6%a5%b5%a5%a4%a5%af%a5%ed%a5%d7%a5%b9%a1%d5	seesaa
+ギリーボア	6	500	2	"襲撃
+【召喚時】
+自分のプレイヤーか自分のフォース1つを1回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ae%a5%ea%a1%bc%a5%dc%a5%a2%a1%d5	seesaa
+ギンゴウツォーク	6(緑2)	700	2	"貫通
+【常時】
+自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ae%a5%f3%a5%b4%a5%a6%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+クリムゾンメイル	3(紫2)	300	1	"奪命
+【アタック時】
+フォースにアタックした場合、このバトル中、このミニオンをDP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%af%a5%ea%a5%e0%a5%be%a5%f3%a5%e1%a5%a4%a5%eb%a1%d5	seesaa
+クレイメイションズフレイム	5(赤2)			"【メイン】/【フラッシュ】
+相手のミニオン1体にBP-500を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%af%a5%ec%a5%a4%a5%e1%a5%a4%a5%b7%a5%e7%a5%f3%a5%ba%a5%d5%a5%ec%a5%a4%a5%e0%a1%d5	seesaa
+グラヴィティ	2(赤1)			"【メイン】/【フラッシュ】
+このターン中、相手のミニオン1体をBP-300する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b0%a5%e9%a5%f4%a5%a3%a5%c6%a5%a3%a1%d5	seesaa
+グリーンミミック	2	300	1	"【常時】
+お互いの手札にある種族「デミゴッド」を持つフィールド・ミニオンカードのフリーコストを2増やす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b0%a5%ea%a1%bc%a5%f3%a5%df%a5%df%a5%c3%a5%af%a1%d5	seesaa
+グレー・ブロッブ	3	100	0	"【破壊時】
+相手のミニオン・トークンを全て破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b0%a5%ec%a1%bc%a1%a6%a5%d6%a5%ed%a5%c3%a5%d6%a1%d5	seesaa
+グレイブローバー	4(紫1)	400	2	"《トラッシュ》
+自分のトラッシュからこのカードを手札に戻す場合、このミニオンを出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b0%a5%ec%a5%a4%a5%d6%a5%ed%a1%bc%a5%d0%a1%bc%a1%d5	seesaa
+ケットシー	5(黄1)	600	1	"【召喚時】
+自分のコスト4以下のミニオン1体をアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b1%a5%c3%a5%c8%a5%b7%a1%bc%a1%d5	seesaa
+ゲイル・マウス	3	300	1	襲撃	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b2%a5%a4%a5%eb%a1%a6%a5%de%a5%a6%a5%b9%a1%d5	seesaa
+コウモリの攪乱	2(赤1)			"【メイン】
+このターン中、相手のプレイヤーと相手のフォースは回復できず、ダメージを軽減できない。自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b3%a5%a6%a5%e2%a5%ea%a4%ce%d9%f8%cd%f0%a1%d5	seesaa
+コントロールカレント	2(青1)			"【フラッシュ】
+このターン中、ミニオン1体をBP+300する。そのミニオンが種族「マーフォーク」を持つミニオンである場合、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b3%a5%f3%a5%c8%a5%ed%a1%bc%a5%eb%a5%ab%a5%ec%a5%f3%a5%c8%a1%d5	seesaa
+ゴールデンシール	8(青2)	800	2	"潜入
+【アタック時】
+自分の青マナが4つ以上ある場合、相手のコスト6以上のミニオン1体をレスト状態でベースに移動させる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a1%bc%a5%eb%a5%c7%a5%f3%a5%b7%a1%bc%a5%eb%a1%d5	seesaa
+ゴブリン・アサシン	5	400	2	奪命	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%d6%a5%ea%a5%f3%a1%a6%a5%a2%a5%b5%a5%b7%a5%f3%a1%d5	seesaa
+ゴブリンズ・クイーン	3	200	1	"【召喚時】
+自分はデッキの中から、「ゴブリンズ・クイーン」以外の種族「ゴブリン」を持つミニオンカード1枚を公開して手札に加えることができる。そうした場合、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%d6%a5%ea%a5%f3%a5%ba%a1%a6%a5%af%a5%a4%a1%bc%a5%f3%a1%d5	seesaa
+ゴブリンソルジャー	2	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%d6%a5%ea%a5%f3%a5%bd%a5%eb%a5%b8%a5%e3%a1%bc%a1%d5	seesaa
+ゴライアス・ボアイーター	2	300	1	"【常時】
+自分のプレイヤーのライフが3以下である場合、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%e9%a5%a4%a5%a2%a5%b9%a1%a6%a5%dc%a5%a2%a5%a4%a1%bc%a5%bf%a1%bc%a1%d5	seesaa
+ゴルゴンシャーマン	7	500	2	"【自分のターン終了時】
+種族「モンスター」を持たないミニオン全てにBP-200を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%eb%a5%b4%a5%f3%a5%b7%a5%e3%a1%bc%a5%de%a5%f3%a1%d5	seesaa
+ゴレイム「タイプ：アイアンハンマー」	3(赤2)	400	1	"【アタック時】
+プレイヤーにアタックした場合、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%a2%a5%a4%a5%a2%a5%f3%a5%cf%a5%f3%a5%de%a1%bc%a1%d7%a1%d5	seesaa
+ゴレイム「タイプ：キャノン」	7(赤2)	700	2	"【召喚時】
+このターン中、相手のミニオン2体をBP-400する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%ad%a5%e3%a5%ce%a5%f3%a1%d7%a1%d5	seesaa
+ゴレイム「タイプ：ショベル」	3(赤1)	300	1	"【後退時】
+「S・ゴレイム・トークン」1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%b7%a5%e7%a5%d9%a5%eb%a1%d7%a1%d5	seesaa
+ゴレイム「タイプ：ソーサー」	3(赤1)	200	1	"【召喚時】
+「S・ゴレイム・トークン」（赤・ゴレイム・コスト1・BP100/DP1）1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%bd%a1%bc%a5%b5%a1%bc%a1%d7%a1%d5	seesaa
+ゴレイム「タイプ：ディガー」	1(赤1)	100	0	"【召喚時】
+自分のミニオンカードでない無色マナ1つを破壊できる。そうした場合、自分はカードを1枚引く。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%c7%a5%a3%a5%ac%a1%bc%a1%d7%a1%d5	seesaa
+ゴレイム「タイプ：ドリル」	2(赤1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%c9%a5%ea%a5%eb%a1%d7%a1%d5	seesaa
+ゴレイム「タイプ：ピッケル」	6(赤2)	300	1	"【召喚時】
+「S・ゴレイム・トークン」（赤・ゴレイム・コスト1・BP100/DP1）2体を出す。
+【自分のターン】
+お互いに他の種族「ゴレイム」を持つミニオン全てをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%a1%d6%a5%bf%a5%a4%a5%d7%a1%a7%a5%d4%a5%c3%a5%b1%a5%eb%a1%d7%a1%d5	seesaa
+ゴレイム部隊召集	5(赤2)			"【メイン】/【フラッシュ】
+「S・ゴレイム・トークン」（赤・ゴレイム・コスト1・BP100/DP1）2体を出す。
+このターン中、自分の種族「ゴレイム」を持つミニオン全てをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b4%a5%ec%a5%a4%a5%e0%c9%f4%c2%e2%be%a4%bd%b8%a1%d5	seesaa
+サテライトビーム	5(白2)			"【メイン】
+相手のコスト3以下のミニオン全てを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b5%a5%c6%a5%e9%a5%a4%a5%c8%a5%d3%a1%bc%a5%e0%a1%d5	seesaa
+サファイア・ドラゴン	5	500	1	"【自分のターン】
+このミニオンは有色のミニオンにはブロックされない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b5%a5%d5%a5%a1%a5%a4%a5%a2%a1%a6%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+サプライズドポータル	3(青1)			"【メイン】/【フラッシュ】
+自分のミニオンであるマナ1つを、フィールドにアクティブ状態で移動させる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b5%a5%d7%a5%e9%a5%a4%a5%ba%a5%c9%a5%dd%a1%bc%a5%bf%a5%eb%a1%d5	seesaa
+サプライズドマジック	2(青1)			"【フラッシュ】
+このターン中、相手のコスト4以下のミニオン全ての本来の数値をDP-1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b5%a5%d7%a5%e9%a5%a4%a5%ba%a5%c9%a5%de%a5%b8%a5%c3%a5%af%a1%d5	seesaa
+サンフィスト	1(黄1)			"【メイン】/【フラッシュ】
+このターン中、相手の手札にあるマジックカードのフリーコストを3増やす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b5%a5%f3%a5%d5%a5%a3%a5%b9%a5%c8%a1%d5	seesaa
+ザ・シング	5(紫1)	700	2	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b6%a1%a6%a5%b7%a5%f3%a5%b0%a1%d5	seesaa
+シェイプシフト	3(赤2)			"【メイン】
+自分のコスト3以下の赤のミニオン1体と同じミニオン1体を出す。（【召喚時】効果は発動しない。）"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b7%a5%a7%a5%a4%a5%d7%a5%b7%a5%d5%a5%c8%a1%d5	seesaa
+シャドウハンド	3(紫1)	300	1	"【常時】
+相手の破壊されたフォース1つ毎に、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b7%a5%e3%a5%c9%a5%a6%a5%cf%a5%f3%a5%c9%a1%d5	seesaa
+シルバーヘッドクロウ	2(紫1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b7%a5%eb%a5%d0%a1%bc%a5%d8%a5%c3%a5%c9%a5%af%a5%ed%a5%a6%a1%d5	seesaa
+ジャックナイフスワロウ	1(黄1)	100	0	"【自分のターン】
+このターンに他の自分の黄または無色のミニオンを召喚している場合、このミニオンをDP+1する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b8%a5%e3%a5%c3%a5%af%a5%ca%a5%a4%a5%d5%a5%b9%a5%ef%a5%ed%a5%a6%a1%d5	seesaa
+スケルトンの獄吏	-	300	1	"【常時】
+このミニオンはブロックできない。
+【配置時】
+自分は、相手の破壊されたフォース1つ毎に1枚カードを引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%b1%a5%eb%a5%c8%a5%f3%a4%ce%b9%f6%cd%f9%a1%d5	seesaa
+スティール・センチピード	4	400	1	"【アタック時】
+このミニオンがダメージを与えるたび、そのダメージ分、自分のプレイヤーを回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%c6%a5%a3%a1%bc%a5%eb%a1%a6%a5%bb%a5%f3%a5%c1%a5%d4%a1%bc%a5%c9%a1%d5	seesaa
+スノーラット	1(白1)	200	0	"【召喚時】
+自分のフォース1つを1回復する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%ce%a1%bc%a5%e9%a5%c3%a5%c8%a1%d5	seesaa
+スパイクオクトパス	6	900	2	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%d1%a5%a4%a5%af%a5%aa%a5%af%a5%c8%a5%d1%a5%b9%a1%d5	seesaa
+スパイクトード	2	400	0	"【常時】
+お互いのプレイヤーに与えられる、コスト3以下のミニオンからのDPによるダメージを1軽減する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%d1%a5%a4%a5%af%a5%c8%a1%bc%a5%c9%a1%d5	seesaa
+スパイクリザード	1(赤1)	100	1	"【常時】
+自分のミニオンが2体以下である場合、このミニオンはアタックできない。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%d1%a5%a4%a5%af%a5%ea%a5%b6%a1%bc%a5%c9%a1%d5	seesaa
+スプリング・バイソン	5	500	1	襲撃	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%d7%a5%ea%a5%f3%a5%b0%a1%a6%a5%d0%a5%a4%a5%bd%a5%f3%a1%d5	seesaa
+スペルゲイザー・ヴォルフ	5	400	1	"【常時】
+自分がマジックを使用するたび、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%da%a5%eb%a5%b2%a5%a4%a5%b6%a1%bc%a1%a6%a5%f4%a5%a9%a5%eb%a5%d5%a1%d5	seesaa
+スライム・ブロック・トークン	1	300	0	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%e9%a5%a4%a5%e0%a1%a6%a5%d6%a5%ed%a5%c3%a5%af%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+スレイビートル	4	400	1	"【相手のターン】
+自分のフォース全ては、相手の効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%b9%a5%ec%a5%a4%a5%d3%a1%bc%a5%c8%a5%eb%a1%d5	seesaa
+セントールの狩人	-	300	1	"【配置時】
+相手のコスト4以下のミニオン1体をレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bb%a5%f3%a5%c8%a1%bc%a5%eb%a4%ce%bc%ed%bf%cd%a1%d5	seesaa
+ソードサウルス	8(赤2)	800	2	"襲撃
+【召喚時】
+自分の赤マナが4つ以上ある場合、このターン中、相手のミニオン1体をBP-600する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bd%a1%bc%a5%c9%a5%b5%a5%a6%a5%eb%a5%b9%a1%d5	seesaa
+ソニックウェイブ	3(青1)			"【メイン】/【フラッシュ】
+相手のミニオン1体にBP-200と本来の数値にDP-1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bd%a5%cb%a5%c3%a5%af%a5%a6%a5%a7%a5%a4%a5%d6%a1%d5	seesaa
+ゾーンディフェンス	2(白1)			"【フラッシュ】
+相手のターンである場合、自分のミニオン全てと自分のフォース全てをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%be%a1%bc%a5%f3%a5%c7%a5%a3%a5%d5%a5%a7%a5%f3%a5%b9%a1%d5	seesaa
+タイダルウェイブ	3(青1)			"【フラッシュ】
+相手のミニオン1体をレスト状態でベースに移動させる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bf%a5%a4%a5%c0%a5%eb%a5%a6%a5%a7%a5%a4%a5%d6%a1%d5	seesaa
+タイムリープ	7(黄3)			"【メイン】
+全てのミニオンを持ち主の手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bf%a5%a4%a5%e0%a5%ea%a1%bc%a5%d7%a1%d5	seesaa
+タナトスの守護者	-	100	1	"【常時】
+このミニオンはブロックできない。
+《ベース》【自分のターン終了時】
+このマナをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bf%a5%ca%a5%c8%a5%b9%a4%ce%bc%e9%b8%ee%bc%d4%a1%d5	seesaa
+タナトスの亡者	-	300	1	"《デッキ》
+このカードは何枚でもデッキに入れられる。
+【常時】
+このミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%bf%a5%ca%a5%c8%a5%b9%a4%ce%cb%b4%bc%d4%a1%d5	seesaa
+ダルティチェロンテ	5(緑2)	500	2	"貫通
+【自分のターン】
+他の自分の[貫通]を持つミニオン全てをBP+100/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c0%a5%eb%a5%c6%a5%a3%a5%c1%a5%a7%a5%ed%a5%f3%a5%c6%a1%d5	seesaa
+ダンシング・カトラス	2	100	1	"【相手のターン】
+このミニオンをBP+400する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c0%a5%f3%a5%b7%a5%f3%a5%b0%a1%a6%a5%ab%a5%c8%a5%e9%a5%b9%a1%d5	seesaa
+チータイラ	4(黄1)	400	1	飛来	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c1%a1%bc%a5%bf%a5%a4%a5%e9%a1%d5	seesaa
+チャルチャルシオ	4	400	2	"【常時】
+このミニオンは、相手のマジックの効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c1%a5%e3%a5%eb%a5%c1%a5%e3%a5%eb%a5%b7%a5%aa%a1%d5	seesaa
+ツーヘッドグリフォン	7(黄2)	700	2	"【召喚時】
+相手のミニオン1体を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c4%a1%bc%a5%d8%a5%c3%a5%c9%a5%b0%a5%ea%a5%d5%a5%a9%a5%f3%a1%d5	seesaa
+ツインテール・シザース	5	500	2	"【召喚時】
+自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c4%a5%a4%a5%f3%a5%c6%a1%bc%a5%eb%a1%a6%a5%b7%a5%b6%a1%bc%a5%b9%a1%d5	seesaa
+ツインテールキャット	2(紫1)	200	1	奪命	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c4%a5%a4%a5%f3%a5%c6%a1%bc%a5%eb%a5%ad%a5%e3%a5%c3%a5%c8%a1%d5	seesaa
+ツパ＝チョカ	1(緑1)	200	0	"【加護時】
+このミニオンにDP+1を付与する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c4%a5%d1%a1%e1%a5%c1%a5%e7%a5%ab%a1%d5	seesaa
+テンタクル・エンタングル	8(緑3)			"自分のコスト7以上の緑のミニオンがいる場合、自分の手札にあるこのカードのフリーコストは0になる。
+【メイン】
+相手のミニオン全てをレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c6%a5%f3%a5%bf%a5%af%a5%eb%a1%a6%a5%a8%a5%f3%a5%bf%a5%f3%a5%b0%a5%eb%a1%d5	seesaa
+デーモンズテラー	6(紫2)			"このカードは自分の種族「デーモン」を持つミニオンがいないとき使用できない。
+【フラッシュ】
+このターン中、相手のミニオン全てはアタックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c7%a1%bc%a5%e2%a5%f3%a5%ba%a5%c6%a5%e9%a1%bc%a1%d5	seesaa
+ディメンジョナルクラック	4(白2)			"【メイン】
+自分のミニオン全てにBP+100を付与する。このターン中、自分のミニオンがバトルに勝利するたび、相手のプレイヤーに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c7%a5%a3%a5%e1%a5%f3%a5%b8%a5%e7%a5%ca%a5%eb%a5%af%a5%e9%a5%c3%a5%af%a1%d5	seesaa
+デストラクション	5(紫2)			"【メイン】/【フラッシュ】
+ミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c7%a5%b9%a5%c8%a5%e9%a5%af%a5%b7%a5%e7%a5%f3%a1%d5	seesaa
+デメテーの守護者	-	100	1	"【常時】
+このミニオンはブロックできない。
+《ベース》【自分のターン終了時】
+このマナをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c7%a5%e1%a5%c6%a1%bc%a4%ce%bc%e9%b8%ee%bc%d4%a1%d5	seesaa
+デメテーの村娘	-	300	1	"《デッキ》
+このカードは何枚でもデッキに入れられる。
+【常時】
+このミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c7%a5%e1%a5%c6%a1%bc%a4%ce%c2%bc%cc%bc%a1%d5	seesaa
+トータスマウス	2(青1)	200	1	"【召喚時】
+お互いはカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c8%a1%bc%a5%bf%a5%b9%a5%de%a5%a6%a5%b9%a1%d5	seesaa
+トーンダウン	2(緑1)			"【フラッシュ】
+このターン中、相手のミニオン1体のDPを0にする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c8%a1%bc%a5%f3%a5%c0%a5%a6%a5%f3%a1%d5	seesaa
+トゥハンサピ	3(緑1)	200	1	"【常時】
+このミニオンには条件を無視して[加護]を付与させることができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c8%a5%a5%a5%cf%a5%f3%a5%b5%a5%d4%a1%d5	seesaa
+トライホーンウォールラス	2(青1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c8%a5%e9%a5%a4%a5%db%a1%bc%a5%f3%a5%a6%a5%a9%a1%bc%a5%eb%a5%e9%a5%b9%a1%d5	seesaa
+トルネードブロウ	3(黄1)			"【フラッシュ】
+このターン中、自分のプレイヤーに「自分のプレイヤーか自分のフォースにダメージが与えられるたび、そのミニオンを手札に戻す。」を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c8%a5%eb%a5%cd%a1%bc%a5%c9%a5%d6%a5%ed%a5%a6%a1%d5	seesaa
+トレーサードーベル	2(白2)	300	1	"【アタック時】
+相手は必ずブロックする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c8%a5%ec%a1%bc%a5%b5%a1%bc%a5%c9%a1%bc%a5%d9%a5%eb%a1%d5	seesaa
+ドゥームドロード	3(紫1)			"【メイン】/【フラッシュ】
+相手のミニオン1体にBP-200を付与する。そうした場合、自分の紫のミニオン全てにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%a5%a1%bc%a5%e0%a5%c9%a5%ed%a1%bc%a5%c9%a1%d5	seesaa
+ドラゴン・オブ・フォーシル	8(赤3)			"【メイン】
+自分のミニオンカードでない無色マナ1つを破壊する。そうした場合、自分のデッキを上から3枚見て、その中の種族「ドラゴン」を持つ、赤または無色のフィールド・ミニオンカード1枚を出す。（【召喚時】効果は発揮しない。）残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%a6%a5%aa%a5%d6%a1%a6%a5%d5%a5%a9%a1%bc%a5%b7%a5%eb%a1%d5	seesaa
+ドラゴン・トークン	4	500	2	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+ドラゴン・プリースト	3	100	0	"【破壊時】
+「ドラゴン・トークン」1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%a6%a5%d7%a5%ea%a1%bc%a5%b9%a5%c8%a1%d5	seesaa
+ドラゴン「火」・トークン	1	300	0	"【常時】
+このミニオンはフォースにアタックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%d6%b2%d0%a1%d7%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+ドラゴン「水」・トークン	3	400	1	"【常時】
+このミニオンはフォースにアタックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%d6%bf%e5%a1%d7%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+ドラゴン「風」・トークン	4	500	2	"【常時】
+このミニオンはフォースにアタックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%d6%c9%f7%a1%d7%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+ドラゴン「雷」・トークン	5	700	2	"【常時】
+このミニオンはフォースにアタックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%b4%a5%f3%a1%d6%cd%eb%a1%d7%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+ドランゲール	3	300	1	"【常時】
+自分の手札にある種族「ドラゴン」を持つミニオンカードのフリーコストを1減らす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%e9%a5%f3%a5%b2%a1%bc%a5%eb%a1%d5	seesaa
+ドワーフ・ウォーハンマー部隊	5(赤1)	500	1	"襲撃
+【加護時】
+「S・ゴレイム・トークン」1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%ef%a1%bc%a5%d5%a1%a6%a5%a6%a5%a9%a1%bc%a5%cf%a5%f3%a5%de%a1%bc%c9%f4%c2%e2%a1%d5	seesaa
+ドワーフの闘士	-	300	1	"【常時】
+このミニオンはブロックできない。
+【配置時】
+このターン中に自分が次に召喚する赤のミニオンに[襲撃]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%c9%a5%ef%a1%bc%a5%d5%a4%ce%c6%ae%bb%ce%a1%d5	seesaa
+ハーミットホルンクラブ	3	500	2	"【召喚時】
+このミニオンをレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a1%bc%a5%df%a5%c3%a5%c8%a5%db%a5%eb%a5%f3%a5%af%a5%e9%a5%d6%a1%d5	seesaa
+ハイプレッシャー	2(赤1)			"【メイン】/【フラッシュ】
+このターン中、ミニオン1体をBP+300して[襲撃]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a5%a4%a5%d7%a5%ec%a5%c3%a5%b7%a5%e3%a1%bc%a1%d5	seesaa
+ハウリング・ダイアー	4	400	1	"【常時】
+他の自分のミニオン全てをBP+100する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a5%a6%a5%ea%a5%f3%a5%b0%a1%a6%a5%c0%a5%a4%a5%a2%a1%bc%a1%d5	seesaa
+ハウリングボイス	5(青2)			"【フラッシュ】
+相手のBP500以下のミニオン1体をレスト状態でベースに移動させる。または相手のプレイヤーに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a5%a6%a5%ea%a5%f3%a5%b0%a5%dc%a5%a4%a5%b9%a1%d5	seesaa
+ハナルマジロ	2	200	1	再起	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a5%ca%a5%eb%a5%de%a5%b8%a5%ed%a1%d5	seesaa
+ハンマー・ベア	3(黄1)	500	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a5%f3%a5%de%a1%bc%a1%a6%a5%d9%a5%a2%a1%d5	seesaa
+ハンマーヘッドビー	-	500	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%cf%a5%f3%a5%de%a1%bc%a5%d8%a5%c3%a5%c9%a5%d3%a1%bc%a1%d5	seesaa
+バインディングアイヴィ	1(緑1)			"【メイン】/【フラッシュ】
+ミニオン1体かフォース1つをレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d0%a5%a4%a5%f3%a5%c7%a5%a3%a5%f3%a5%b0%a5%a2%a5%a4%a5%f4%a5%a3%a1%d5	seesaa
+バインディングローズ	4(緑2)			"【メイン】/【フラッシュ】
+ミニオンまたはフォースを2つまでレストする。自分のターンである場合、それらは次の相手のスタンバイフェイズ終了時までアクティブにならない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d0%a5%a4%a5%f3%a5%c7%a5%a3%a5%f3%a5%b0%a5%ed%a1%bc%a5%ba%a1%d5	seesaa
+バッドトーク	1(紫1)			"【メイン】
+自分のデッキを上から3枚破棄する。その後、自分のトラッシュにある、コスト3以下のミニオンカード1枚を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d0%a5%c3%a5%c9%a5%c8%a1%bc%a5%af%a1%d5	seesaa
+バリチャルグオ	3(緑1)	400	1	"【相手のターン】
+自分のプレイヤーがコスト5以下の相手のミニオンにアタックされるたび、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d0%a5%ea%a5%c1%a5%e3%a5%eb%a5%b0%a5%aa%a1%d5	seesaa
+バンシー	4(紫2)	300	1	"【破壊時】
+相手のコスト4以下のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d0%a5%f3%a5%b7%a1%bc%a1%d5	seesaa
+バンド・オブ・ブラックスケイル	4(青2)	400	1	"《ベース》【後退時】
+相手のコスト5以下のミニオン1体をレスト状態でベースに移動させる。（この効果はマナの効果として発揮する。）"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d0%a5%f3%a5%c9%a1%a6%a5%aa%a5%d6%a1%a6%a5%d6%a5%e9%a5%c3%a5%af%a5%b9%a5%b1%a5%a4%a5%eb%a1%d5	seesaa
+パラライズボール	2(赤1)			"【メイン】/【フラッシュ】
+相手のBP500以上のミニオン1体を選択する。このターン中、そのミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d1%a5%e9%a5%e9%a5%a4%a5%ba%a5%dc%a1%bc%a5%eb%a1%d5	seesaa
+パワー・オブ・サン	6(黄3)			"【メイン】/【フラッシュ】
+このターン中、自分のミニオン1体をBP+400/DP+2する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d1%a5%ef%a1%bc%a1%a6%a5%aa%a5%d6%a1%a6%a5%b5%a5%f3%a1%d5	seesaa
+パワーアップル	3(緑2)			"【メイン】/【フラッシュ】
+このターン中、ミニオン1体をBP+300/DP+1して[貫通]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d1%a5%ef%a1%bc%a5%a2%a5%c3%a5%d7%a5%eb%a1%d5	seesaa
+パンデミック	8(紫3)			"【メイン】
+全てのミニオンを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d1%a5%f3%a5%c7%a5%df%a5%c3%a5%af%a1%d5	seesaa
+ヒーリング・シープ	3	300	1	"【召喚時】
+自分のプレイヤーを1回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d2%a1%bc%a5%ea%a5%f3%a5%b0%a1%a6%a5%b7%a1%bc%a5%d7%a1%d5	seesaa
+ヒーリング	1(緑1)			"【メイン】/【フラッシュ】
+自分のプレイヤーを1回復する。自分の種族「ツリーフォーク」を持つミニオンがいる場合、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d2%a1%bc%a5%ea%a5%f3%a5%b0%a1%d5	seesaa
+ヒドゥンヴォルフ	4	300	2	"【召喚時】
+相手のミニオン1体毎に、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d2%a5%c9%a5%a5%a5%f3%a5%f4%a5%a9%a5%eb%a5%d5%a1%d5	seesaa
+ビームスマッシャー	3(白2)			"【メイン】/【フラッシュ】
+コスト5以上のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d3%a1%bc%a5%e0%a5%b9%a5%de%a5%c3%a5%b7%a5%e3%a1%bc%a1%d5	seesaa
+ファーツォーク	5(緑2)	500	2	"【召喚時】
+相手のミニオン1体をレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a1%a1%bc%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+ファイアーバット	4(赤2)	400	1	"【召喚時】
+このターン中、相手のミニオン1体をBP-300する。
+（BP0になったミニオンは破壊される。）"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a1%a5%a4%a5%a2%a1%bc%a5%d0%a5%c3%a5%c8%a1%d5	seesaa
+ファイアービートル	2(赤1)	200	1	襲撃	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a1%a5%a4%a5%a2%a1%bc%a5%d3%a1%bc%a5%c8%a5%eb%a1%d5	seesaa
+ファイアリザード	2(赤1)	200	1	"【自分のターン】
+他の自分の「ファイアリザード」1体毎に、このミニオンをBP+300する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a1%a5%a4%a5%a2%a5%ea%a5%b6%a1%bc%a5%c9%a1%d5	seesaa
+ファンカリアス	4	400	2	"【召喚時】
+自分のプレイヤーか自分のフォース1つを1回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a1%a5%f3%a5%ab%a5%ea%a5%a2%a5%b9%a1%d5	seesaa
+フェニックスの雛	3(黄1)	200	1	"【召喚時】
+自分のデッキを上から2枚見て、その中のフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a7%a5%cb%a5%c3%a5%af%a5%b9%a4%ce%bf%f7%a1%d5	seesaa
+フォーリングロック	1(緑1)			"【メイン】
+レスト状態であるBP400以下のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a9%a1%bc%a5%ea%a5%f3%a5%b0%a5%ed%a5%c3%a5%af%a1%d5	seesaa
+フォレストガード	3(緑2)			"【メイン】/【フラッシュ】
+相手のレスト状態であるミニオン1体にBP-500を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%a9%a5%ec%a5%b9%a5%c8%a5%ac%a1%bc%a5%c9%a1%d5	seesaa
+フライング・クロース	5	300	1	潜入	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%e9%a5%a4%a5%f3%a5%b0%a1%a6%a5%af%a5%ed%a1%bc%a5%b9%a1%d5	seesaa
+フレイムカーマン	2(赤1)	300	1	"【アタック時】
+プレイヤーにアタックした場合、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d5%a5%ec%a5%a4%a5%e0%a5%ab%a1%bc%a5%de%a5%f3%a1%d5	seesaa
+ブラック・フレイム	6	400	2	"潜入
+【常時】
+他に自分のミニオンがいない場合、このミニオンは相手の効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d6%a5%e9%a5%c3%a5%af%a1%a6%a5%d5%a5%ec%a5%a4%a5%e0%a1%d5	seesaa
+ブラックジャガード	6(白2)	700	2	"【自分のターン】
+このミニオンがバトルに勝利するたび、このミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d6%a5%e9%a5%c3%a5%af%a5%b8%a5%e3%a5%ac%a1%bc%a5%c9%a1%d5	seesaa
+ブリーチング	3(赤1)			"【メイン】/【フラッシュ】
+相手のミニオン1体にBP-300を付与する。そのミニオンが種族「ドラゴン」を持つ場合、代わりにBP-600を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d6%a5%ea%a1%bc%a5%c1%a5%f3%a5%b0%a1%d5	seesaa
+ブレイブ・ドラマー	6	800	1	"【アタック時】
+このバトル中、他の自分のミニオン1体毎に、このミニオンをDP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d6%a5%ec%a5%a4%a5%d6%a1%a6%a5%c9%a5%e9%a5%de%a1%bc%a1%d5	seesaa
+ブロッブウォール	5	500	0	"【召喚時】
+「スライム・ブロック・トークン」（無色・モンスター・コスト1・BP300/DP0）1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d6%a5%ed%a5%c3%a5%d6%a5%a6%a5%a9%a1%bc%a5%eb%a1%d5	seesaa
+プテラノックス	6(赤1)	700	3	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d7%a5%c6%a5%e9%a5%ce%a5%c3%a5%af%a5%b9%a1%d5	seesaa
+ベテランゴブリン	3	300	1	"【召喚時】
+相手のミニオン1体にBP-200を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%d9%a5%c6%a5%e9%a5%f3%a5%b4%a5%d6%a5%ea%a5%f3%a1%d5	seesaa
+ペルチャルシー	3(緑1)	300	1	"【常時】
+自分の緑マナが4つ以上ある場合、このミニオンをBP+200/DP+1する。
+【相手のターン】
+自分のプレイヤーか自分のフォースに与えられる無色のミニオンからのダメージを1軽減する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%da%a5%eb%a5%c1%a5%e3%a5%eb%a5%b7%a1%bc%a1%d5	seesaa
+ペンタゴナ音楽隊「チェロ」	5(青2)	500	2	"【召喚時】
+自分のトラッシュにある、コスト4以下のマジックカード1枚を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%da%a5%f3%a5%bf%a5%b4%a5%ca%b2%bb%b3%da%c2%e2%a1%d6%a5%c1%a5%a7%a5%ed%a1%d7%a1%d5	seesaa
+ペンタゴナ音楽隊「チューバ」	2(青1)	200	1	"【常時】
+自分がマジックを使用するたび、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%da%a5%f3%a5%bf%a5%b4%a5%ca%b2%bb%b3%da%c2%e2%a1%d6%a5%c1%a5%e5%a1%bc%a5%d0%a1%d7%a1%d5	seesaa
+ペンタゴナ音楽隊「ティンパニー」	4(青1)	200	1	"潜入
+【自分のターン】
+このターンに自分が青のマジックを使用している場合、自分の手札にあるこのカードのフリーコストは0になる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%da%a5%f3%a5%bf%a5%b4%a5%ca%b2%bb%b3%da%c2%e2%a1%d6%a5%c6%a5%a3%a5%f3%a5%d1%a5%cb%a1%bc%a1%d7%a1%d5	seesaa
+ペンタゴナ音楽隊「フルート」	2(青1)	300	1	"【常時】
+自分の手札にあるマジックカードのフリーコストを1減らす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%da%a5%f3%a5%bf%a5%b4%a5%ca%b2%bb%b3%da%c2%e2%a1%d6%a5%d5%a5%eb%a1%bc%a5%c8%a1%d7%a1%d5	seesaa
+ペンタゴナ音楽隊「見習組」	1(青1)	200	0	"【召喚時】
+自分のデッキを上から1枚見る。そのカードをデッキの上か下に戻す。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%da%a5%f3%a5%bf%a5%b4%a5%ca%b2%bb%b3%da%c2%e2%a1%d6%b8%ab%bd%ac%c1%c8%a1%d7%a1%d5	seesaa
+ホーリードラゴン	5	400	2	"【破壊時】
+自分のプレイヤーを2回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%db%a1%bc%a5%ea%a1%bc%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+ホーリーフライ	2(白1)	200	1	"【後退時】
+このターン中、自分のミニオン1体は相手のマジックの効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%db%a1%bc%a5%ea%a1%bc%a5%d5%a5%e9%a5%a4%a1%d5	seesaa
+ホワイトフィンドルフィン	3(青1)	200	1	"【召喚時】
+自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%db%a5%ef%a5%a4%a5%c8%a5%d5%a5%a3%a5%f3%a5%c9%a5%eb%a5%d5%a5%a3%a5%f3%a1%d5	seesaa
+ボーンチャリオッツ	5(紫2)	500	2	"【召喚時】
+自分のトラッシュにある、フィールド・ミニオンカード1枚を手札に戻すことができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dc%a1%bc%a5%f3%a5%c1%a5%e3%a5%ea%a5%aa%a5%c3%a5%c4%a1%d5	seesaa
+ボム・ウィスプ	2	100	1	"【破壊時】
+BP300以下のミニオン全てを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dc%a5%e0%a1%a6%a5%a6%a5%a3%a5%b9%a5%d7%a1%d5	seesaa
+ボム・ウォール	4	500	0	"【召喚時】
+相手のBP400以下のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dc%a5%e0%a1%a6%a5%a6%a5%a9%a1%bc%a5%eb%a1%d5	seesaa
+ボンバルーン・ラット	6	700	2	再起	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dc%a5%f3%a5%d0%a5%eb%a1%bc%a5%f3%a1%a6%a5%e9%a5%c3%a5%c8%a1%d5	seesaa
+ポイズンガブ	2(青1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dd%a5%a4%a5%ba%a5%f3%a5%ac%a5%d6%a1%d5	seesaa
+ポセイドの歌い手	-	300	1	"《デッキ》
+このカードは何枚でもデッキに入れられる。
+【常時】
+このミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dd%a5%bb%a5%a4%a5%c9%a4%ce%b2%ce%a4%a4%bc%ea%a1%d5	seesaa
+ポセイドの守護者	-	100	1	"【常時】
+このミニオンはブロックできない。
+《ベース》【自分のターン終了時】
+このマナをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dd%a5%bb%a5%a4%a5%c9%a4%ce%bc%e9%b8%ee%bc%d4%a1%d5	seesaa
+ポリン	1	200	0	"【召喚時】
+自分のベースにミニオンでない無色マナしかない場合、自分はカードを1枚引く。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%dd%a5%ea%a5%f3%a1%d5	seesaa
+マーチャルーカ	2(緑1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a1%bc%a5%c1%a5%e3%a5%eb%a1%bc%a5%ab%a1%d5	seesaa
+マーフォーク・トークン	2	200	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a1%bc%a5%d5%a5%a9%a1%bc%a5%af%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+マーフォークス・マーチ	0			"【メイン】
+自分の青のミニオンがいる場合、自分の移動権を1増やす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a1%bc%a5%d5%a5%a9%a1%bc%a5%af%a5%b9%a1%a6%a5%de%a1%bc%a5%c1%a1%d5	seesaa
+マーメイドの戦士	-	300	1	"【常時】
+このミニオンはブロックできない。
+【配置時】
+自分のミニオン1体をベースに移動できる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a1%bc%a5%e1%a5%a4%a5%c9%a4%ce%c0%ef%bb%ce%a1%d5	seesaa
+マオルブルフ	2(白1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%aa%a5%eb%a5%d6%a5%eb%a5%d5%a1%d5	seesaa
+マキナスの守護者	-	100	1	"【常時】
+このミニオンはブロックできない。
+《ベース》【自分のターン終了時】
+このマナをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%ad%a5%ca%a5%b9%a4%ce%bc%e9%b8%ee%bc%d4%a1%d5	seesaa
+マキナスの住人	-	300	1	"《デッキ》
+このカードは何枚でもデッキに入れられる。
+【常時】
+このミニオンはブロックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%ad%a5%ca%a5%b9%a4%ce%bd%bb%bf%cd%a1%d5	seesaa
+マッドール	1(紫1)	300	1	"【常時】
+このミニオンは、このミニオンのバトル終了時に破壊される。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%c3%a5%c9%a1%bc%a5%eb%a1%d5	seesaa
+マッドジャガード	2	200	1	"【破壊時】
+自分のフォース1つを1回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%c3%a5%c9%a5%b8%a5%e3%a5%ac%a1%bc%a5%c9%a1%d5	seesaa
+マッドピッド	1(紫1)			"【メイン】
+コスト3以下のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%c3%a5%c9%a5%d4%a5%c3%a5%c9%a1%d5	seesaa
+マッドライノ	3(紫1)	300	1	"【後退時】
+相手のミニオン1体にBP-200を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%de%a5%c3%a5%c9%a5%e9%a5%a4%a5%ce%a1%d5	seesaa
+ミーアプリースト	2(黄1)	200	1	"【召喚時】
+このターン中、自分のミニオン1体をBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%df%a1%bc%a5%a2%a5%d7%a5%ea%a1%bc%a5%b9%a5%c8%a1%d5	seesaa
+ミーアマジシャン	2(黄1)	300	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%df%a1%bc%a5%a2%a5%de%a5%b8%a5%b7%a5%e3%a5%f3%a1%d5	seesaa
+ミッシングフォッグ	4(紫2)			"【メイン】
+コスト3以下のミニオン全てを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%df%a5%c3%a5%b7%a5%f3%a5%b0%a5%d5%a5%a9%a5%c3%a5%b0%a1%d5	seesaa
+ミュルミュール	1(紫1)	100	0	"【破壊時】
+自分の紫のミニオン1体にBP+100を付与する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%df%a5%e5%a5%eb%a5%df%a5%e5%a1%bc%a5%eb%a1%d5	seesaa
+ムービングシールド	3(白1)			"【フラッシュ】
+相手のアタックしているミニオンのアタック対象を変更する。自分のフォースが無い場合、代わりに自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e0%a1%bc%a5%d3%a5%f3%a5%b0%a5%b7%a1%bc%a5%eb%a5%c9%a1%d5	seesaa
+メイジコブラ	2	200	0	"【破壊時】
+自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e1%a5%a4%a5%b8%a5%b3%a5%d6%a5%e9%a1%d5	seesaa
+メイプルツォーク	8(緑2)	900	2	"【アタック時】
+相手のコスト4以下のミニオン全てをレストする。
+【自分のターン終了時】
+自分の緑マナが4つ以上ある場合、自分のプレイヤーを1回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e1%a5%a4%a5%d7%a5%eb%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+メイルシュトローム	10(青5)			"【メイン】
+「ドラゴン「火」・トークン」1体と「ドラゴン「水」・トークン」1体と「ドラゴン「風」・トークン」1体と「ドラゴン「雷」・トークン」1体を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e1%a5%a4%a5%eb%a5%b7%a5%e5%a5%c8%a5%ed%a1%bc%a5%e0%a1%d5	seesaa
+メガトンハンマー	4(赤1)			"【メイン】/【フラッシュ】
+このターン中、相手ミニオン1体をBP-600する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e1%a5%ac%a5%c8%a5%f3%a5%cf%a5%f3%a5%de%a1%bc%a1%d5	seesaa
+メガロサウルス	3	500	1	-	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e1%a5%ac%a5%ed%a5%b5%a5%a6%a5%eb%a5%b9%a1%d5	seesaa
+モーホークザウラー	5(赤2)	400	2	"襲撃
+【常時】
+自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a1%bc%a5%db%a1%bc%a5%af%a5%b6%a5%a6%a5%e9%a1%bc%a1%d5	seesaa
+モノアイドラゴン	5	500	1	"【召喚時】
+相手の【破壊時】を持つミニオン1体を除外する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%ce%a5%a2%a5%a4%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+モルド	4	400	2	"【常時】
+他の自分のミニオンが破壊されるたび、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%eb%a5%c9%a1%d5	seesaa
+モルフェオ「スカーレル」	3(緑1)	300	1	"【自分のマナフェイズ】
+自分の「デメテーの村娘」が置かれるたび、自分はカードを1枚引く。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%eb%a5%d5%a5%a7%a5%aa%a1%d6%a5%b9%a5%ab%a1%bc%a5%ec%a5%eb%a1%d7%a1%d5	seesaa
+モルフェオ「トイプー」	5(緑2)	500	2	"【召喚時】
+自分はデッキから「デメテーの村娘」1枚を、レスト状態で置くことができる。その後、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%eb%a5%d5%a5%a7%a5%aa%a1%d6%a5%c8%a5%a4%a5%d7%a1%bc%a1%d7%a1%d5	seesaa
+モルフェオ「パピリオ」	4(緑2)	500	1	"【常時】
+自分のデッキまたは手札から種族「ニンフ」を持つマナが置かれるたび、相手のレスト状態であるミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%eb%a5%d5%a5%a7%a5%aa%a1%d6%a5%d1%a5%d4%a5%ea%a5%aa%a1%d7%a1%d5	seesaa
+モルフェオ「ラビィ」	1(緑1)	200	0	"【常時】
+自分の「デメテーの村娘」が置かれるたび、自分のプレイヤーを1回復する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%eb%a5%d5%a5%a7%a5%aa%a1%d6%a5%e9%a5%d3%a5%a3%a1%d7%a1%d5	seesaa
+モンスター・ブック	4	400	1	"【召喚時】
+自分のデッキを上から3枚見て、その中のフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e2%a5%f3%a5%b9%a5%bf%a1%bc%a1%a6%a5%d6%a5%c3%a5%af%a1%d5	seesaa
+ヤミーカクタス	3	300	1	"【召喚時】
+自分はデッキの中からコスト2のマジックカード1枚を公開して手札に加える。そうした場合、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e4%a5%df%a1%bc%a5%ab%a5%af%a5%bf%a5%b9%a1%d5	seesaa
+ユリーカのワルツ	3(青1)			"【メイン】
+自分はカードを2枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e6%a5%ea%a1%bc%a5%ab%a4%ce%a5%ef%a5%eb%a5%c4%a1%d5	seesaa
+ラスカル・インプ	2(紫1)	200	1	"【破壊時】
+このターン中、相手のミニオン1体をBP-200して、本来の数値をDP-1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e9%a5%b9%a5%ab%a5%eb%a1%a6%a5%a4%a5%f3%a5%d7%a1%d5	seesaa
+ラヴァイソン	5	700	2	-	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%e9%a5%f4%a5%a1%a5%a4%a5%bd%a5%f3%a1%d5	seesaa
+リアクティブシールド	2(白1)			"【メイン】/【フラッシュ】
+このターン中、ミニオン1体をBP+300する。
+相手ターン中である場合、そのミニオンをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%a2%a5%af%a5%c6%a5%a3%a5%d6%a5%b7%a1%bc%a5%eb%a5%c9%a1%d5	seesaa
+リアニメート	3(紫1)			"【フラッシュ】
+自分のトラッシュにある、コスト4以下のフィールド・ミニオンカード1枚を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%a2%a5%cb%a5%e1%a1%bc%a5%c8%a1%d5	seesaa
+リインカーネーション	7(紫2)			"【メイン】
+自分のトラッシュにあるフィールド・ミニオンカード1枚を出す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%a4%a5%f3%a5%ab%a1%bc%a5%cd%a1%bc%a5%b7%a5%e7%a5%f3%a1%d5	seesaa
+リカオニードル	3(白2)	400	1	"再起
+【常時】
+自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%ab%a5%aa%a5%cb%a1%bc%a5%c9%a5%eb%a1%d5	seesaa
+リターニング	2(紫1)			"【メイン】
+自分のトラッシュにある、種族「デーモン」を持つミニオンカードを2枚まで手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%bf%a1%bc%a5%cb%a5%f3%a5%b0%a1%d5	seesaa
+リトル・プランク	3	300	1	"【召喚時】
+自分のミニオンでない無色マナ1つを好きな色1つに変更する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%c8%a5%eb%a1%a6%a5%d7%a5%e9%a5%f3%a5%af%a1%d5	seesaa
+リファイン	3(白1)			"【メイン】/【フラッシュ】
+自分のフォース全てを1回復する。このターン中、自分のフォースに与えられるダメージを1軽減する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%d5%a5%a1%a5%a4%a5%f3%a1%d5	seesaa
+リプレイス	2(白1)			"【メイン】
+自分はカードを2枚引く。その後、自分の手札1枚を破棄する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%d7%a5%ec%a5%a4%a5%b9%a1%d5	seesaa
+リボルバーコンドル	6	500	2	"【召喚時】
+相手に1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%dc%a5%eb%a5%d0%a1%bc%a5%b3%a5%f3%a5%c9%a5%eb%a1%d5	seesaa
+リワインドウインド	4(黄2)			"【メイン】/【フラッシュ】
+ミニオン1体を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%ef%a5%a4%a5%f3%a5%c9%a5%a6%a5%a4%a5%f3%a5%c9%a1%d5	seesaa
+リングラプター	2(白1)	300	1	"【常時】
+このミニオンは、相手のマジックの効果で選択できない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ea%a5%f3%a5%b0%a5%e9%a5%d7%a5%bf%a1%bc%a1%d5	seesaa
+レインボージェリー	5(青2)	400	1	"潜入
+【加護時】
+自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ec%a5%a4%a5%f3%a5%dc%a1%bc%a5%b8%a5%a7%a5%ea%a1%bc%a1%d5	seesaa
+レイヴン・キャット	3(黄1)	400	1	"【常時】
+他の自分のミニオンがフィールドに出るたび、このターン中、このミニオンをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ec%a5%a4%a5%f4%a5%f3%a1%a6%a5%ad%a5%e3%a5%c3%a5%c8%a1%d5	seesaa
+レブレーション	1(黄1)			"【メイン】
+自分のデッキを上から3枚見て、その中のフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ec%a5%d6%a5%ec%a1%bc%a5%b7%a5%e7%a5%f3%a1%d5	seesaa
+ローレルツォーク	2(緑1)	200	1	"【後退時】
+自分の緑マナ1つをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ed%a1%bc%a5%ec%a5%eb%a5%c4%a5%a9%a1%bc%a5%af%a1%d5	seesaa
+ロックイーター	4	500	2	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ed%a5%c3%a5%af%a5%a4%a1%bc%a5%bf%a1%bc%a1%d5	seesaa
+ロックオン	1(白1)			"【メイン】
+このターン中、種族「ハンター」を持つミニオンがアタックするたび、相手は必ずブロックする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ed%a5%c3%a5%af%a5%aa%a5%f3%a1%d5	seesaa
+ワイズ・ドラマー	5	600	2	"【召喚時】
+自分の手札にあるベース・ミニオンカード1枚を破棄できる。そうした場合、自分はカードを2枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%ef%a5%a4%a5%ba%a1%a6%a5%c9%a5%e9%a5%de%a1%bc%a1%d5	seesaa
+ヴァイオレントストリーム	2(青1)			"【フラッシュ】
+相手のコスト4以下のミニオン1体をレスト状態でベースに移動させる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%f4%a5%a1%a5%a4%a5%aa%a5%ec%a5%f3%a5%c8%a5%b9%a5%c8%a5%ea%a1%bc%a5%e0%a1%d5	seesaa
+ヴェローシュラプトル	3(赤1)	300	1	"襲撃
+【自分のターン】
+他の自分のミニオン全てをBP+100する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%a5%f4%a5%a7%a5%ed%a1%bc%a5%b7%a5%e5%a5%e9%a5%d7%a5%c8%a5%eb%a1%d5	seesaa
+悪のフォース”サイクロプス”	-			"自分のターン中、自分のミニオン全てをBP+100する。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b0%ad%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%b5%a5%a4%a5%af%a5%ed%a5%d7%a5%b9%a1%c9%a1%d5	seesaa
+怨念の生霊	2(紫1)			"【メイン】/【フラッシュ】
+このターン中、ミニオン1体をBP+300して[奪命]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b1%e5%c7%b0%a4%ce%c0%b8%ce%ee%a1%d5	seesaa
+炎龍ヘルファイアー	9	800	2	"【召喚時】
+BP500以下のミニオン全てを破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b1%ea%ce%b6%a5%d8%a5%eb%a5%d5%a5%a1%a5%a4%a5%a2%a1%bc%a1%d5	seesaa
+臆病じゃない金鶏	1	200	0	"【常時】
+自分のフォースが全て破壊されている場合、このミニオンをDP+1する。
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b2%b2%c9%c2%a4%b8%a4%e3%a4%ca%a4%a4%b6%e2%b7%dc%a1%d5	seesaa
+凱のフォース”ミノタウロス”	-			"自分のプレイヤーに与えられるミニオンからのDPによるダメージを1軽減する。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b3%ae%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%df%a5%ce%a5%bf%a5%a6%a5%ed%a5%b9%a1%c9%a1%d5	seesaa
+革命のシンフォニー	4(青2)			"【メイン】
+このターン中、自分のミニオン1体はブロックされない。そのミニオンが種族「シーワーム」を持つミニオンである場合、このカードを手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b3%d7%cc%bf%a4%ce%a5%b7%a5%f3%a5%d5%a5%a9%a5%cb%a1%bc%a1%d5	seesaa
+騎兵隊長「百手読み」サムズ	4(赤1)	500	1	"【自分のターン】
+自分の[襲撃]を持つミニオン全てをDP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b5%b3%ca%bc%c2%e2%c4%b9%a1%d6%c9%b4%bc%ea%c6%c9%a4%df%a1%d7%a5%b5%a5%e0%a5%ba%a1%d5	seesaa
+鬼火	3	200	1	"【召喚時】
+このターン中、他のミニオン1体をBP+300する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b5%b4%b2%d0%a1%d5	seesaa
+強化札	3(黄2)			"【メイン】/【フラッシュ】
+自分のミニオン1体にBP+200/DP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b6%af%b2%bd%bb%a5%a1%d5	seesaa
+強欲のタタラ	6(黄2)	600	2	"【破壊時】
+相手のミニオン1体を手札に戻す。
+【後退時】
+自分の黄のミニオン1体をアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b6%af%cd%df%a4%ce%a5%bf%a5%bf%a5%e9%a1%d5	seesaa
+緊急採掘命令	1(赤1)			"【メイン】
+自分のミニオンでない無色マナ1つを破壊する。そうした場合、自分はカードを2枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b6%db%b5%de%ba%ce%b7%a1%cc%bf%ce%e1%a1%d5	seesaa
+九神龍「天」リジェネレイト	10	1000	2	"飛来
+【召喚時】
+自分の有色マナ全てをアクティブにする。自分の「九神龍「天」リジェネレイト」の効果はターンに1回だけ発揮する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b6%e5%bf%c0%ce%b6%a1%d6%c5%b7%a1%d7%a5%ea%a5%b8%a5%a7%a5%cd%a5%ec%a5%a4%a5%c8%a1%d5	seesaa
+九神龍「闘」アラバスター	10	1200	3	"襲撃
+【アタック時】
+相手のプレイヤーに3ダメージを与える。
+このダメージは相手のフォース1つ毎に1軽減される。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b6%e5%bf%c0%ce%b6%a1%d6%c6%ae%a1%d7%a5%a2%a5%e9%a5%d0%a5%b9%a5%bf%a1%bc%a1%d5	seesaa
+交換の壺	3(紫1)			"【メイン】/【フラッシュ】
+自分のミニオン1体を破壊する。そうした場合、自分はカードを2枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b8%f2%b4%b9%a4%ce%d4%e4%a1%d5	seesaa
+幸運のドリンキング・バニー	5	500	2	"【召喚時】
+自分のプレイヤーと自分のフォース全てを1回復する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b9%ac%b1%bf%a4%ce%a5%c9%a5%ea%a5%f3%a5%ad%a5%f3%a5%b0%a1%a6%a5%d0%a5%cb%a1%bc%a1%d5	seesaa
+荒野の旅人	1	100	0	"【召喚時】
+自分はデッキの中から下記のうちカード1枚を公開して手札に加えることができる。そうした場合、自分のデッキをシャッフルする。
+「アグマの鉱夫」「カナタナの神官」「マキナスの住人」「デメテーの村娘」「ポセイドの歌い手」「タナトスの亡者」
+【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b9%d3%cc%ee%a4%ce%ce%b9%bf%cd%a1%d5	seesaa
+告死獣ヌエ	7	600	2	"【召喚時】
+相手のBP500以下のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%b9%f0%bb%e0%bd%c3%a5%cc%a5%a8%a1%d5	seesaa
+混のフォース”キマイラ”	-			"自分のターン中、自分の無色マナでフィールド・ミニオンのコストを支払う場合、全ての色のマナとして支払うことができる。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%ba%ae%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%ad%a5%de%a5%a4%a5%e9%a1%c9%a1%d5	seesaa
+災厄竜ダスカース	8	800	2	"【自分のターン】
+自分の手札にあるこのカードのフリーコストは、お互いのミニオン1体毎に1減らされる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%ba%d2%cc%f1%ce%b5%a5%c0%a5%b9%a5%ab%a1%bc%a5%b9%a1%d5	seesaa
+三ヵ国連合参謀長ダイスラー	4(白2)	500	1	"【相手のターン】
+相手のコスト5以下のミニオンは、自分のフォースにアタックできない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bb%b0%a5%f5%b9%f1%cf%a2%b9%e7%bb%b2%cb%c5%c4%b9%a5%c0%a5%a4%a5%b9%a5%e9%a1%bc%a1%d5	seesaa
+三ヵ国連合司令官バンクガイズ	5(赤2)	500	2	"【自分のターン】
+自分のコスト3以下のミニオン全てに[襲撃]を与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bb%b0%a5%f5%b9%f1%cf%a2%b9%e7%bb%ca%ce%e1%b4%b1%a5%d0%a5%f3%a5%af%a5%ac%a5%a4%a5%ba%a1%d5	seesaa
+三ヵ国連合執政官アソウギ	4(黄1)	400	1	"【常時】
+自分の[飛来]を持つミニオンがフィールドに出るたび、このターン中、そのミニオンをBP+300/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bb%b0%a5%f5%b9%f1%cf%a2%b9%e7%bc%b9%c0%af%b4%b1%a5%a2%a5%bd%a5%a6%a5%ae%a1%d5	seesaa
+指揮型ロイド・ゲルト（ドームシールド装備Ver.）	5(白2)	500	2	"【召喚時】
+相手のミニオン1体を選択する。そのミニオンをアクティブにして、このターン中、そのミニオンは必ずブロックする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bb%d8%b4%f8%b7%bf%a5%ed%a5%a4%a5%c9%a1%a6%a5%b2%a5%eb%a5%c8%a1%ca%a5%c9%a1%bc%a5%e0%a5%b7%a1%bc%a5%eb%a5%c9%c1%f5%c8%f7Ver%2e%a1%cb%a1%d5	seesaa
+祝福を授けるピクシー	3	200	0	"【常時】
+自分のプレイヤーにダメージを与えられるたび、自分はカードを1枚引く。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bd%cb%ca%a1%a4%f2%bc%f8%a4%b1%a4%eb%a5%d4%a5%af%a5%b7%a1%bc%a1%d5	seesaa
+瞬身のハヤテ	4(黄2)	500	1	"【自分のターン】
+このターンに自分がコスト5以上のミニオンを召喚している場合、自分の手札にあるこのカードのコストは0になる。
+【自分のターン終了時】
+他に自分のミニオンがいる場合、このミニオンを手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bd%d6%bf%c8%a4%ce%a5%cf%a5%e4%a5%c6%a1%d5	seesaa
+盾持ちゴブリン	1	300	0	"【常時】
+このミニオンはベースに移動するとき、レスト状態で移動する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bd%e2%bb%fd%a4%c1%a5%b4%a5%d6%a5%ea%a5%f3%a1%d5	seesaa
+召集の法螺貝	5(黄2)			"【メイン】
+自分はカードを2枚引く。このターン終了時、自分のマナ全てをアクティブにする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%be%a4%bd%b8%a4%ce%cb%a1%cd%e6%b3%ad%a1%d5	seesaa
+酔いどれインプ	2(紫1)	200	1	"【破壊時】
+相手のフォース1つに1ダメージを与える。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%bf%ec%a4%a4%a4%c9%a4%ec%a5%a4%a5%f3%a5%d7%a1%d5	seesaa
+聖のフォース”スフィンクス”	-			"相手のターン中、自分のコスト5以下のミニオン全ては、相手のミニオンの効果で選択できない。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c0%bb%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%b9%a5%d5%a5%a3%a5%f3%a5%af%a5%b9%a1%c9%a1%d5	seesaa
+斥候パルパンサー	2	200	1	"【アタック時】
+このターン中、自分のミニオン全てをBP+100する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c0%cd%b8%f5%a5%d1%a5%eb%a5%d1%a5%f3%a5%b5%a1%bc%a1%d5	seesaa
+戦闘型ロイド・シュバイン	7(白3)	700	2	"【常時】
+このミニオンがバトルに勝利するたび、相手のミニオン1体をレストする。
+【後退時】
+このターン中、自分のミニオン全ては相手のマジックの効果の対象に選べない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c0%ef%c6%ae%b7%bf%a5%ed%a5%a4%a5%c9%a1%a6%a5%b7%a5%e5%a5%d0%a5%a4%a5%f3%a1%d5	seesaa
+戦闘型ロイド・ベルダMk4（双剣装備Ver.）	6(白3)	700	2	"【常時】
+自分のフォース1つ毎に、このミニオンをBP+100/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c0%ef%c6%ae%b7%bf%a5%ed%a5%a4%a5%c9%a1%a6%a5%d9%a5%eb%a5%c0Mk4%a1%ca%c1%d0%b7%f5%c1%f5%c8%f7Ver%2e%a1%cb%a1%d5	seesaa
+狙撃型ロイド・イワン	5(白2)	500	2	"再起
+【加護時】
+このミニオンに「【アタック時】相手は必ずブロックする。」を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c1%c0%b7%e2%b7%bf%a5%ed%a5%a4%a5%c9%a1%a6%a5%a4%a5%ef%a5%f3%a1%d5	seesaa
+双のフォース”オルトロス”	-			"自分のコスト5以上のミニオン全てをDP+1する。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c1%d0%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%aa%a5%eb%a5%c8%a5%ed%a5%b9%a1%c9%a1%d5	seesaa
+増加装甲装着	1(赤1)			"【メイン】/【フラッシュ】
+自分のミニオン1体に、自分のミニオン・トークン1体毎にBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c1%fd%b2%c3%c1%f5%b9%c3%c1%f5%c3%e5%a1%d5	seesaa
+知のフォース”ケイローン”	-			"自分の手札にあるマジックカードのフリーコストを2減らす。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c3%ce%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%b1%a5%a4%a5%ed%a1%bc%a5%f3%a1%c9%a1%d5	seesaa
+地の天使ウリエル	8	800	2	"【召喚時】
+自分の手札が4枚になるようにカードを引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c3%cf%a4%ce%c5%b7%bb%c8%a5%a6%a5%ea%a5%a8%a5%eb%a1%d5	seesaa
+天翼ミルキー	5(黄2)	400	2	"飛来
+【加護時】
+このミニオンに「【破壊時】このミニオンを手札に戻す。」を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c5%b7%cd%e3%a5%df%a5%eb%a5%ad%a1%bc%a1%d5	seesaa
+導きの紋章	4(緑2)			"【メイン】
+自分はデッキの中から「デメテーの村娘」を2枚まで、レスト状態で置く。その後、自分のデッキをシャッフルする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c6%b3%a4%ad%a4%ce%cc%e6%be%cf%a1%d5	seesaa
+不意打ち	2(黄1)			"【フラッシュ】
+このターン中、ミニオン1体をBP+300する。他のミニオン1体を手札に戻すことができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c9%d4%b0%d5%c2%c7%a4%c1%a1%d5	seesaa
+復讐のドラゴン	9	900	3	"【召喚時】
+自分の破壊されたフォース1つ毎に、相手のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%c9%fc%bd%b2%a4%ce%a5%c9%a5%e9%a5%b4%a5%f3%a1%d5	seesaa
+碧の秘術書	1(青1)			"【メイン】
+自分のデッキを上から4枚見て、その中のマジックカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%ca%cb%a4%ce%c8%eb%bd%d1%bd%f1%a1%d5	seesaa
+暴風竜ストームギラ	6	500	1	"飛来
+【召喚時】
+相手のBP400以下のミニオン1体をレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cb%bd%c9%f7%ce%b5%a5%b9%a5%c8%a1%bc%a5%e0%a5%ae%a5%e9%a1%d5	seesaa
+魔術都市の住人	-	300	1	"【配置時】
+このマナをレストする。自分のトラッシュにある、コスト3以下のマジックカード1枚を手札に戻す。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cb%e2%bd%d1%c5%d4%bb%d4%a4%ce%bd%bb%bf%cd%a1%d5	seesaa
+魔竜騎士ダストライド	5	500	2	"【召喚時】＆【自分のターン開始時】
+自分の移動権を1増やす。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cb%e2%ce%b5%b5%b3%bb%ce%a5%c0%a5%b9%a5%c8%a5%e9%a5%a4%a5%c9%a1%d5	seesaa
+魔力喰い	4	400	1	"【自分のターン】
+このターンに自分が本来のコストが4以上のマジックを使用している場合、自分の手札にあるこのカードのコストは0になる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cb%e2%ce%cf%b6%f4%a4%a4%a1%d5	seesaa
+密林王ブラックサーベルジャガー	4	500	1	"【自分のターン】
+自分の[加護]を持つマナ全ては、レスト状態でも付与することができる。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cc%a9%ce%d3%b2%a6%a5%d6%a5%e9%a5%c3%a5%af%a5%b5%a1%bc%a5%d9%a5%eb%a5%b8%a5%e3%a5%ac%a1%bc%a1%d5	seesaa
+眠れる森の誘い	3(緑2)			"【メイン】/【フラッシュ】
+相手のミニオン1体と相手のフォース全てをレストする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cc%b2%a4%ec%a4%eb%bf%b9%a4%ce%cd%b6%a4%a4%a1%d5	seesaa
+雷龍ライトニングフォール	4	600	1	"【召喚時】
+相手の無色のミニオン1体を破壊する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%cd%eb%ce%b6%a5%e9%a5%a4%a5%c8%a5%cb%a5%f3%a5%b0%a5%d5%a5%a9%a1%bc%a5%eb%a1%d5	seesaa
+輪のフォース”ウロボロス”	-			"自分のターン終了時、自分のトークンでないミニオン全てをアクティブにする。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%ce%d8%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%a6%a5%ed%a5%dc%a5%ed%a5%b9%a1%c9%a1%d5	seesaa
+練気獣エルサウル	3	300	1	"【常時】
+自分の破壊されたフォース1つ毎に、このミニオンをBP+200/DP+1する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%ce%fd%b5%a4%bd%c3%a5%a8%a5%eb%a5%b5%a5%a6%a5%eb%a1%d5	seesaa
+咆竜ブラスティオス	7	1000	3	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4%d2%f6%ce%b5%a5%d6%a5%e9%a5%b9%a5%c6%a5%a3%a5%aa%a5%b9%a1%d5	seesaa
+殲滅試験型ロイド・アポステル	4(白2)	400	1	"【相手のターン】
+このミニオンは相手の効果で選択できない。
+【常時】
+自分の白のミニオンがバトルに勝利するたび、このミニオンにBP+100/DP+1を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%dd%d3%cc%c7%bb%ee%b8%b3%b7%bf%a5%ed%a5%a4%a5%c9%a1%a6%a5%a2%a5%dd%a5%b9%a5%c6%a5%eb%a1%d5	seesaa
+猩猩	5(黄2)	500	2	"【常時】
+他の自分のミニオンがフィールドに出るたび、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%e0%cf%e0%cf%a1%d5	seesaa
+甦のフォース”フェニックス”	-			"自分のターン終了時、自分のマナ全てをアクティブにする。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%e1%b4%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%d5%a5%a7%a5%cb%a5%c3%a5%af%a5%b9%a1%c9%a1%d5	seesaa
+翔のフォース”ペガサス”	-			"自分のターン開始時、自分のマナが4つ以上である場合、移動権を1増やす。
+【破壊時】
+自分はデッキの中からベース・ミニオンカードを1枚置き、デッキをシャッフルする。その後、自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d4%e6%c6%a4%ce%a5%d5%a5%a9%a1%bc%a5%b9%a1%c9%a5%da%a5%ac%a5%b5%a5%b9%a1%c9%a1%d5	seesaa
+1カラットラット	-	300	1	"【配置時】
+自分はカードを1枚引く。"	https://seesaawiki.jp/zenonzard/d/%a1%d41%a5%ab%a5%e9%a5%c3%a5%c8%a5%e9%a5%c3%a5%c8%a1%d5	seesaa
+D-08アックスバイター	6(白2)	600	3	"【常時】
+自分のミニオンがバトルに勝利するたび、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4D%2d08%a5%a2%a5%c3%a5%af%a5%b9%a5%d0%a5%a4%a5%bf%a1%bc%a1%d5	seesaa
+D-13ホーリークエイド	4(白2)	400	1	"再起
+【相手のターン】
+自分のミニオン全てをBP+200する。この効果は重複しない。"	https://seesaawiki.jp/zenonzard/d/%a1%d4D%2d13%a5%db%a1%bc%a5%ea%a1%bc%a5%af%a5%a8%a5%a4%a5%c9%a1%d5	seesaa
+R-A3ランドザイム	6(白2)	700	2	再起	https://seesaawiki.jp/zenonzard/d/%a1%d4R%2dA3%a5%e9%a5%f3%a5%c9%a5%b6%a5%a4%a5%e0%a1%d5	seesaa
+R-A4ヴォーギン	4(白1)	500	2	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4R%2dA4%a5%f4%a5%a9%a1%bc%a5%ae%a5%f3%a1%d5	seesaa
+R-A6フォーゲルバイン	4(白2)	500	1	"【アタック時】
+相手は必ずブロックする。"	https://seesaawiki.jp/zenonzard/d/%a1%d4R%2dA6%a5%d5%a5%a9%a1%bc%a5%b2%a5%eb%a5%d0%a5%a4%a5%f3%a1%d5	seesaa
+R-A7ラハルコフ	3(白1)	300	1	"【相手のターン】
+自分のフォースが相手のミニオンにアタックされるたび、このミニオンにBP+100を付与する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4R%2dA7%a5%e9%a5%cf%a5%eb%a5%b3%a5%d5%a1%d5	seesaa
+R-B7クラビオン	3(白1)	200	1	"【常時】
+自分のフォース1つ毎に、このミニオンをBP+200する。"	https://seesaawiki.jp/zenonzard/d/%a1%d4R%2dB7%a5%af%a5%e9%a5%d3%a5%aa%a5%f3%a1%d5	seesaa
+S・アリュシナシオン・トークン	2	200	1	奪命	https://seesaawiki.jp/zenonzard/d/%a1%d4S%a1%a6%a5%a2%a5%ea%a5%e5%a5%b7%a5%ca%a5%b7%a5%aa%a5%f3%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa
+S・ゴレイム・トークン	1	100	1	（効果なし）	https://seesaawiki.jp/zenonzard/d/%a1%d4S%a1%a6%a5%b4%a5%ec%a5%a4%a5%e0%a1%a6%a5%c8%a1%bc%a5%af%a5%f3%a1%d5	seesaa

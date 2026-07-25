@@ -1,0 +1,524 @@
+from __future__ import annotations
+
+import csv
+import json
+import os
+import re
+from pathlib import Path
+from urllib.parse import quote, urlparse
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_ASSET_ROOT = PROJECT_ROOT / "asserts"
+DEFAULT_OFFICIAL_CARDLIST = PROJECT_ROOT / "data" / "official_cardlist.tsv"
+DEFAULT_CLEAN_GRAPH_ROOT = PROJECT_ROOT / "asserts" / "images" / "clean_graph"
+LOCAL_BATTLE_SFX_AUDIO_ROOT = PROJECT_ROOT / "asserts" / "audio" / "battle_sfx"
+LEGACY_CLEAN_GRAPH_ROOT = PROJECT_ROOT / "data" / "apk_images" / "clean_graph"
+LEGACY_BATTLE_SFX_AUDIO_ROOT = PROJECT_ROOT / "data" / "audio" / "battle_sfx"
+OFFICIAL_CARD_IMAGE_HOST = "www.aicarddass.com"
+OFFICIAL_CARD_IMAGE_PATH_PREFIX = "/zenonzard/images/cardlist/cards/"
+OFFICIAL_CARD_IMAGE_EN_PATH_PREFIX = "/zenonzard/en/images/cardlist/cards/"
+
+FORCE_IMAGE_NAMES = {
+    "force_e": ["恶 .png", "恶.png", "悪.png"],
+    "force_kon": ["混.png"],
+    "force_kai": ["凯.png", "凱.png"],
+    "force_so": ["双.png", "雙.png"],
+    "force_sei": ["圣.png", "聖.png"],
+    "force_chi": ["知.png"],
+    "force_li": ["丽.png", "麗.png"],
+    "force_sho": ["翔.png"],
+    "force_so2": ["苏.png", "甦.png"],
+    "force_rin": ["轮.png", "輪.png"],
+}
+
+CARD_COLOR_DIRS = ["RED", "YELLOW", "WHITE", "GREEN", "BLUE", "PURPLE", "COLORLESS"]
+PLAYMAT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
+PLAYMAT_EXCLUDED_STEMS = {"contact_sheet"}
+CHARACTER_PORTRAIT_DIR = "codeman_portraits"
+SELECTABLE_CHARACTER_ROLES = {"codeman", "guest_character"}
+HOME_GUIDE_CHARACTER_ID = "home_guide_operator"
+HOME_GUIDE_CHARACTER_FILES = ("Operator.png",)
+KOUHOU_AI_MINA_CHARACTER_ID = "kouhou_ai_mina"
+KOUHOU_AI_MINA_CHARACTER_FILES = (f"{CHARACTER_PORTRAIT_DIR}/mina.png",)
+
+CARD_IMAGE_NAMES: dict[str, list[str]] = {}
+
+TOKEN_IMAGE_NAMES = {
+    "s_golem_token": ["red_01_04_00_00.png"],
+    "merfolk_token": ["blue_02_04_00_00.png"],
+    "slime_block_token": ["colorless_01_04_00_00.png"],
+}
+
+AUDIO_NAMES = {
+    f"bgm_{index:02d}": [Path("SUNRISE Music") / "ELEMENTS [Disc 1]" / filename]
+    for index, filename in enumerate((
+        "01 Da La Doubt.wav",
+        "02 WakeUp.wav",
+        "03 It's so beautiful.wav",
+        "04 Black & White.wav",
+        "05 Angel's mission.wav",
+        "06 I do L I love U.wav",
+        "07 排他的メランコリー.wav",
+        "08 Black Thief.wav",
+        "09 ワンダーランドパレード.wav",
+        "10 ス・リ・ル.wav",
+        "11 knife_the_blossom.wav",
+        "12 ドラマティックミステリー.wav",
+        "13 Colorful World.wav",
+        "14 Let's Get Started.wav",
+        "15 STAND UP!.wav",
+        "16 battaglia.wav",
+        "17 Lazy Daily.wav",
+        "18 dreamy maze.wav",
+        "19 Double.wav",
+        "20 MaGIC x NuMBER.wav",
+    ), start=1)
+}
+
+BATTLE_SFX_AUDIO_NAMES = {
+    "sfx_heal": "heal.wav",
+    "sfx_force_damage": "force_damage.wav",
+    "sfx_player_damage": "player_damage.wav",
+    "sfx_base_minion_place": "base_minion_place.wav",
+    "sfx_minion_summon": "minion_summon.wav",
+    "sfx_minion_rest": "minion_rest.wav",
+    "sfx_minion_clash": "minion_clash.wav",
+    "sfx_draw_card": "draw_card.wav",
+    "sfx_shuffle": "shuffle.wav",
+}
+
+
+def resolve_asset_root(value: str | os.PathLike | None = None) -> Path | None:
+    if value:
+        return Path(value).expanduser().resolve()
+    env_value = os.environ.get("ZENONZARD_ASSET_ROOT")
+    if env_value:
+        return Path(env_value).expanduser().resolve()
+    if DEFAULT_ASSET_ROOT.exists():
+        return DEFAULT_ASSET_ROOT.resolve()
+    return None
+
+
+def resolve_official_cardlist(value: str | os.PathLike | None = None) -> Path | None:
+    if value:
+        path = Path(value).expanduser().resolve()
+        return path if path.exists() else None
+    env_value = os.environ.get("ZENONZARD_OFFICIAL_CARDLIST")
+    if env_value:
+        path = Path(env_value).expanduser().resolve()
+        return path if path.exists() else None
+    if DEFAULT_OFFICIAL_CARDLIST.exists():
+        return DEFAULT_OFFICIAL_CARDLIST.resolve()
+    return None
+
+
+class AssetIndex:
+    def __init__(
+        self,
+        root: str | os.PathLike | None,
+        official_cardlist_path: str | os.PathLike | None = None,
+        clean_graph_root: str | os.PathLike | None = None,
+    ):
+        self.root = resolve_asset_root(root)
+        self.clean_graph_root = self._resolve_clean_graph_root(clean_graph_root)
+        self._manifest: dict[str, Path] = {}
+        self._audio_manifest: dict[str, Path] = {}
+        self._official_urls: dict[str, str] = {}
+        self._ui_asset_ids: set[str] = set()
+        self._playmat_asset_ids: set[str] = set()
+        self._playmat_catalog: list[dict[str, object]] = []
+        self._character_asset_ids: set[str] = set()
+        if self.root is not None:
+            self._build_manifest()
+        self._build_local_audio_manifest()
+        if self.clean_graph_root is not None:
+            self._build_clean_graph_manifest()
+        official_cardlist = resolve_official_cardlist(official_cardlist_path)
+        if official_cardlist is not None:
+            self._build_official_urls(official_cardlist)
+
+    def _resolve_clean_graph_root(self, value: str | os.PathLike | None) -> Path | None:
+        if value:
+            path = Path(value).expanduser().resolve()
+            return path if path.exists() else None
+        if DEFAULT_CLEAN_GRAPH_ROOT.exists():
+            return DEFAULT_CLEAN_GRAPH_ROOT.resolve()
+        if LEGACY_CLEAN_GRAPH_ROOT.exists():
+            return LEGACY_CLEAN_GRAPH_ROOT.resolve()
+        return None
+
+    def _build_manifest(self) -> None:
+        assert self.root is not None
+        self._add_if_exists("card_back", self.root / "卡垫卡背" / "XGT01_000_F.png")
+        force_dir = self.root / "ZENONZARD_CARDLIST" / "FORCE"
+        for asset_id, names in FORCE_IMAGE_NAMES.items():
+            for name in names:
+                if self._add_if_exists(asset_id, force_dir / name):
+                    break
+        card_root = self.root / "ZENONZARD_CARDLIST"
+        for color_dir_name in CARD_COLOR_DIRS:
+            color_dir = card_root / color_dir_name
+            if not color_dir.is_dir():
+                continue
+            for path in color_dir.glob("*.png"):
+                self._add_if_exists(path.stem, path)
+        token_dir = card_root / "tokens"
+        if token_dir.is_dir():
+            for path in token_dir.glob("*.png"):
+                self._add_if_exists(path.stem, path)
+            for asset_id, names in TOKEN_IMAGE_NAMES.items():
+                for name in names:
+                    if self._add_if_exists(asset_id, token_dir / name):
+                        break
+        red_dir = card_root / "RED"
+        for asset_id, names in CARD_IMAGE_NAMES.items():
+            for name in names:
+                if self._add_if_exists(asset_id, red_dir / name):
+                    break
+        for audio_id, names in AUDIO_NAMES.items():
+            for name in names:
+                if self._add_audio_if_exists(audio_id, self.root / name):
+                    break
+
+    def _build_local_audio_manifest(self) -> None:
+        for audio_id, relative_name in BATTLE_SFX_AUDIO_NAMES.items():
+            if self._add_audio_if_exists(audio_id, LOCAL_BATTLE_SFX_AUDIO_ROOT / relative_name):
+                continue
+            self._add_audio_if_exists(audio_id, LEGACY_BATTLE_SFX_AUDIO_ROOT / relative_name)
+
+    def _build_clean_graph_manifest(self) -> None:
+        assert self.clean_graph_root is not None
+        self._build_ui_manifest()
+        self._build_playmat_manifest()
+        self._build_character_manifest()
+
+    def _build_ui_manifest(self) -> None:
+        assert self.clean_graph_root is not None
+        ui_base = self.clean_graph_root / "基本素材"
+        manifest_path = ui_base / "ui_manifest.json"
+        data = self._load_json(manifest_path)
+        if not isinstance(data, dict):
+            return
+        assets = data.get("assets")
+        items = assets.items() if isinstance(assets, dict) else ()
+        for asset_id, relative_path in items:
+            if not isinstance(asset_id, str) or not isinstance(relative_path, str):
+                continue
+            path = self._resolve_clean_graph_path(ui_base, relative_path)
+            if path is not None and self._add_clean_graph_asset(asset_id, path):
+                self._ui_asset_ids.add(asset_id)
+
+    def _build_playmat_manifest(self) -> None:
+        assert self.clean_graph_root is not None
+        playmat_base = self.clean_graph_root / "卡垫"
+        data = self._load_json(playmat_base / "manifest.json")
+        registered_paths: set[Path] = set()
+        if isinstance(data, list):
+            for entry in data:
+                if not isinstance(entry, dict):
+                    continue
+                filename = entry.get("file")
+                if not isinstance(filename, str):
+                    continue
+                path = self._resolve_clean_graph_path(playmat_base, filename)
+                if path is None:
+                    continue
+                explicit_id = entry.get("id")
+                asset_id = explicit_id if isinstance(explicit_id, str) and explicit_id else path.stem
+                if self._register_playmat_asset(asset_id, path, entry.get("width"), entry.get("height")):
+                    registered_paths.add(path.resolve())
+        if playmat_base.is_dir():
+            for path in sorted(playmat_base.iterdir(), key=lambda item: item.name.lower()):
+                if not self._is_discoverable_playmat_file(path):
+                    continue
+                resolved = path.resolve()
+                if resolved in registered_paths:
+                    continue
+                asset_id = self._unique_playmat_asset_id(self._playmat_asset_id(path))
+                self._register_playmat_asset(asset_id, path, None, None)
+        self._playmat_catalog.sort(key=lambda item: str(item["id"]))
+
+    def _build_character_manifest(self) -> None:
+        assert self.clean_graph_root is not None
+        chara_base = self.clean_graph_root / "chara"
+        data = self._load_json(chara_base / "characters.json")
+        if isinstance(data, dict):
+            characters = data.get("characters")
+            if isinstance(characters, list):
+                for character in characters:
+                    if not isinstance(character, dict):
+                        continue
+                    character_id = character.get("id")
+                    assets = character.get("assets")
+                    if not isinstance(character_id, str) or not self._safe_asset_id(character_id):
+                        continue
+                    if not isinstance(assets, dict):
+                        continue
+                    role = str(character.get("role") or "").strip()
+                    is_selectable_character = role in SELECTABLE_CHARACTER_ROLES
+                    portrait_registered = False
+                    for kind, relative_path in assets.items():
+                        if is_selectable_character and kind == "portrait":
+                            continue
+                        registered = self._register_character_asset(chara_base, character_id, kind, relative_path)
+                        if kind == "portrait" and registered:
+                            portrait_registered = True
+                    if not portrait_registered:
+                        if is_selectable_character:
+                            portrait_registered = self._register_mapped_character_portrait(
+                                chara_base,
+                                character_id,
+                                assets,
+                            )
+                    if not portrait_registered and not is_selectable_character:
+                        fallback_kinds = ("local_apk_image", "official_image")
+                        for fallback_kind in fallback_kinds:
+                            fallback_path = assets.get(fallback_kind)
+                            if self._register_character_asset(chara_base, character_id, "portrait", fallback_path):
+                                break
+            unmatched_assets = data.get("unmatched_local_assets")
+            if isinstance(unmatched_assets, list):
+                for entry in unmatched_assets:
+                    if not isinstance(entry, dict):
+                        continue
+                    relative_path = entry.get("file")
+                    note = entry.get("note", "")
+                    if not isinstance(relative_path, str) or "group/event" not in str(note):
+                        continue
+                    explicit_id = entry.get("id")
+                    group_id = explicit_id if isinstance(explicit_id, str) and explicit_id else f"group_{Path(relative_path).stem}"
+                    self._register_character_asset(chara_base, group_id, "image", relative_path)
+        self._register_home_guide_character_asset(chara_base)
+        self._register_kouhou_ai_mina_character_asset(chara_base)
+
+    def _register_playmat_asset(self, asset_id: str, path: Path, width: object, height: object) -> bool:
+        if self._add_clean_graph_asset(asset_id, path):
+            self._playmat_asset_ids.add(asset_id)
+            self._playmat_catalog.append({
+                "id": asset_id,
+                "file": path.name,
+                "width": width,
+                "height": height,
+                "assetUrl": self.asset_url(asset_id),
+            })
+            return True
+        return False
+
+    def _is_discoverable_playmat_file(self, path: Path) -> bool:
+        return (
+            path.is_file()
+            and path.suffix.lower() in PLAYMAT_IMAGE_SUFFIXES
+            and path.stem.lower() not in PLAYMAT_EXCLUDED_STEMS
+        )
+
+    def _playmat_asset_id(self, path: Path) -> str:
+        slug = re.sub(r"[^\w]+", "_", path.stem, flags=re.UNICODE).strip("_").lower()
+        if not slug:
+            slug = "image"
+        return slug if slug.startswith("playmat_") else f"playmat_{slug}"
+
+    def _unique_playmat_asset_id(self, asset_id: str) -> str:
+        if asset_id not in self._manifest and asset_id not in self._playmat_asset_ids:
+            return asset_id
+        suffix = 2
+        while f"{asset_id}_{suffix}" in self._manifest or f"{asset_id}_{suffix}" in self._playmat_asset_ids:
+            suffix += 1
+        return f"{asset_id}_{suffix}"
+
+    def _register_home_guide_character_asset(self, chara_base: Path) -> None:
+        for filename in HOME_GUIDE_CHARACTER_FILES:
+            if self._register_character_asset(chara_base, HOME_GUIDE_CHARACTER_ID, "portrait", filename):
+                return
+
+    def _register_kouhou_ai_mina_character_asset(self, chara_base: Path) -> None:
+        for filename in KOUHOU_AI_MINA_CHARACTER_FILES:
+            if self._register_character_asset(chara_base, KOUHOU_AI_MINA_CHARACTER_ID, "portrait", filename):
+                return
+
+    def _register_mapped_character_portrait(self, chara_base: Path, character_id: str, assets: dict[object, object]) -> bool:
+        candidates = [f"{CHARACTER_PORTRAIT_DIR}/{character_id}.png"]
+        for kind in ("local_apk_image", "official_image"):
+            filename = self._relative_filename(assets.get(kind))
+            if filename:
+                candidates.append(f"{CHARACTER_PORTRAIT_DIR}/{filename}")
+        for relative_path in dict.fromkeys(candidates):
+            if self._register_character_asset(chara_base, character_id, "portrait", relative_path):
+                return True
+        return False
+
+    def _relative_filename(self, relative_path: object) -> str | None:
+        if not isinstance(relative_path, str) or urlparse(relative_path).scheme:
+            return None
+        name = Path(relative_path).name
+        return name if name else None
+
+    def _register_character_asset(self, base: Path, character_id: str, kind: str, relative_path: object) -> bool:
+        if not isinstance(character_id, str) or not self._safe_asset_id(character_id):
+            return False
+        if not isinstance(kind, str) or not self._safe_asset_id(kind):
+            return False
+        if not isinstance(relative_path, str) or urlparse(relative_path).scheme:
+            return False
+        asset_id = self._character_asset_id(character_id, kind)
+        path = self._resolve_clean_graph_path(base, relative_path)
+        if path is None or not self._add_clean_graph_asset(asset_id, path):
+            return False
+        self._character_asset_ids.add(asset_id)
+        return True
+
+    def _load_json(self, path: Path) -> object | None:
+        if not path.exists():
+            return None
+        with path.open("r", encoding="utf-8") as handle:
+            return json.load(handle)
+
+    def _resolve_clean_graph_path(self, base: Path, relative_path: str) -> Path | None:
+        if self.clean_graph_root is None:
+            return None
+        path = Path(relative_path)
+        if path.is_absolute():
+            return None
+        resolved = (base / path).resolve()
+        try:
+            resolved.relative_to(self.clean_graph_root)
+        except ValueError:
+            return None
+        return resolved
+
+    def _add_if_exists(self, asset_id: str, path: Path) -> bool:
+        if path.exists() and self._is_under_root(path):
+            self._manifest[asset_id] = path.resolve()
+            return True
+        return False
+
+    def _add_clean_graph_asset(self, asset_id: str, path: Path) -> bool:
+        if not self._safe_asset_id(asset_id) or asset_id in self._manifest:
+            return False
+        return self._add_if_exists(asset_id, path)
+
+    def _add_audio_if_exists(self, audio_id: str, path: Path) -> bool:
+        if path.exists() and self._is_under_root(path):
+            self._audio_manifest[audio_id] = path.resolve()
+            return True
+        return False
+
+    def _build_official_urls(self, path: Path) -> None:
+        with path.open("r", encoding="utf-8-sig", newline="") as handle:
+            reader = csv.DictReader(handle, delimiter="\t")
+            for row in reader:
+                asset_id = (row.get("image_id") or "").strip()
+                url = (row.get("official_image_url_jp") or "").strip()
+                if self._safe_asset_id(asset_id) and self._is_official_card_image_url(url):
+                    self._official_urls[asset_id] = url
+
+    def _is_under_root(self, path: Path) -> bool:
+        roots = [
+            root
+            for root in (
+                self.root,
+                self.clean_graph_root,
+                LOCAL_BATTLE_SFX_AUDIO_ROOT,
+                LEGACY_BATTLE_SFX_AUDIO_ROOT,
+            )
+            if root is not None
+        ]
+        try:
+            resolved = path.resolve()
+        except OSError:
+            return False
+        for root in roots:
+            try:
+                resolved.relative_to(root)
+            except ValueError:
+                continue
+            return True
+        return False
+
+    def resolve_asset_id(self, asset_id: str) -> Path | None:
+        if not self._safe_asset_id(asset_id):
+            return None
+        path = self._manifest.get(asset_id)
+        if path is None or not self._is_under_root(path):
+            return None
+        return path
+
+    def asset_url(self, asset_id: str | None) -> str | None:
+        if not asset_id or not self._safe_asset_id(asset_id):
+            return None
+        if self.resolve_asset_id(asset_id) is not None:
+            return f"/assets/{quote(asset_id)}"
+        return self._official_urls.get(asset_id)
+
+    def asset_url_en(self, asset_id: str | None) -> str | None:
+        if not asset_id or not self._safe_asset_id(asset_id):
+            return None
+        return self._english_official_card_url(self._official_urls.get(asset_id))
+
+    def ui_asset_url(self, asset_id: str | None) -> str | None:
+        if not asset_id or asset_id not in self._ui_asset_ids:
+            return None
+        return self.asset_url(asset_id)
+
+    def ui_asset_catalog(self) -> dict[str, str]:
+        return {
+            asset_id: url
+            for asset_id in sorted(self._ui_asset_ids)
+            if (url := self.ui_asset_url(asset_id)) is not None
+        }
+
+    def playmat_url(self, playmat_id: str | None) -> str | None:
+        if not playmat_id or playmat_id not in self._playmat_asset_ids:
+            return None
+        return self.asset_url(playmat_id)
+
+    def playmat_catalog(self) -> list[dict[str, object]]:
+        return [dict(item) for item in self._playmat_catalog]
+
+    def character_asset_url(self, character_id: str | None, kind: str = "official_image") -> str | None:
+        if not character_id or not self._safe_asset_id(character_id) or not self._safe_asset_id(kind):
+            return None
+        asset_id = self._character_asset_id(character_id, kind)
+        if asset_id not in self._character_asset_ids:
+            return None
+        return self.asset_url(asset_id)
+
+    def resolve_audio_id(self, audio_id: str) -> Path | None:
+        if not self._safe_asset_id(audio_id):
+            return None
+        path = self._audio_manifest.get(audio_id)
+        if path is None or not self._is_under_root(path):
+            return None
+        return path
+
+    def audio_url(self, audio_id: str | None) -> str | None:
+        if not audio_id or not self._safe_asset_id(audio_id):
+            return None
+        if self.resolve_audio_id(audio_id) is None:
+            return None
+        return f"/audio/{quote(audio_id)}"
+
+    def _safe_asset_id(self, asset_id: str) -> bool:
+        return bool(asset_id) and "/" not in asset_id and "\\" not in asset_id and ".." not in asset_id
+
+    def _character_asset_id(self, character_id: str, kind: str) -> str:
+        return f"character:{character_id}:{kind}"
+
+    def _is_official_card_image_url(self, url: str) -> bool:
+        if not url:
+            return False
+        parsed = urlparse(url)
+        return (
+            parsed.scheme == "https"
+            and parsed.netloc == OFFICIAL_CARD_IMAGE_HOST
+            and parsed.path.startswith(OFFICIAL_CARD_IMAGE_PATH_PREFIX)
+            and parsed.path.endswith(".png")
+            and ".." not in parsed.path
+        )
+
+    def _english_official_card_url(self, url: str | None) -> str | None:
+        if not url or not self._is_official_card_image_url(url):
+            return None
+        parsed = urlparse(url)
+        path = parsed.path.replace(OFFICIAL_CARD_IMAGE_PATH_PREFIX, OFFICIAL_CARD_IMAGE_EN_PATH_PREFIX, 1)
+        return parsed._replace(path=path).geturl()

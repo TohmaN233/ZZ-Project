@@ -1,0 +1,53 @@
+{
+  "kind": "zz_public_release_manifest_v1",
+  "sourceWorkspace": "clean_runtime_release_v2",
+  "includedSurfaces": [
+    "Python rules engine and card content",
+    "Electron and browser frontend",
+    "deck builder, battle, replay, training entrypoints, LAN and online multiplayer",
+    "current runtime AI models",
+    "focused tests, rulebooks and deployment examples",
+    "GitHub Pages release site"
+  ],
+  "externalAssetPack": {
+    "archive": "ZZ-Assets-v1.zip",
+    "extractTo": "asserts/",
+    "manifest": "ASSET_PACK_MANIFEST.json"
+  },
+  "runtimeModels": [
+    {
+      "role": "high_current_rl_actor",
+      "path": "local_ai_training/retained_mainline_20260630/cycle470_actor.json",
+      "bytes": 12826602,
+      "sha256": "3A60E592B89E388351DCD1725C9C050A11B018C3E7B65E84CE2243AF2A8EC57F"
+    },
+    {
+      "role": "medium_rl_baseline",
+      "path": "local_ai_training/retained_mainline_20260630/deep_baseline_best_greedy.pt",
+      "bytes": 16784773,
+      "sha256": "A441B39A823108DF11240BFE0D9CF226800D5C950E6BC564F38A6BE6872EA882"
+    },
+    {
+      "role": "codeman_public_deep_fallback",
+      "path": "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt",
+      "bytes": 16784773,
+      "sha256": "A441B39A823108DF11240BFE0D9CF226800D5C950E6BC564F38A6BE6872EA882"
+    },
+    {
+      "role": "public_normal_fallback",
+      "path": "data/ai_training/quality_tactical_latest/best_league.json",
+      "bytes": 2740,
+      "sha256": "000FCB4C3687CE8663B5F2D530C4076639E9C7BB0B09570E65E4D13BDAE28ECF"
+    }
+  ],
+  "intentionallyExcluded": [
+    ".codebase-mastery and all self-study courseware",
+    "project_memory and private development records",
+    "design_bundle",
+    "data/codeman_ai memories, traces, candidates, reports and champion models",
+    "data/ai_challenges generated traces",
+    "non-current local training runs and experiment outputs",
+    "local settings, caches, node_modules and git history",
+    "large media assets stored in the external asset pack"
+  ]
+}
