@@ -22,8 +22,15 @@
 
 ## 下载组成
 
-1. GitHub 仓库 / Source Code：程序、测试、文档与当前默认模型。
+1. [`ZZ-Project-v0.1.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.1.0/ZZ-Project-v0.1.0-source.zip)：当前 `main` 的程序、测试、文档与默认模型。
 2. [`ZZ-Assets-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：卡图、角色、卡垫、视频、音效与 BGM。
+
+源码包校验：
+
+```text
+Bytes: 37077447
+SHA-256: 7D1DDF839A4C050A1FCAA9D52503CD76608583CC1AF9C485CD7E9A5665423609
+```
 
 资源包校验：
 
