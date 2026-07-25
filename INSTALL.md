@@ -14,7 +14,10 @@
 
 ## 2. 下载源码
 
-推荐从 GitHub Releases 下载源码压缩包。开发者也可以使用：
+推荐从 GitHub Releases 下载明确标注的
+[`ZZ-Project-v0.1.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.1.0/ZZ-Project-v0.1.0-source.zip)。
+该附件包含当前 `main` 的实际默认模型；不要使用页面底部由旧版 tag 自动生成的
+`Source code` 压缩包。开发者也可以使用：
 
 ```powershell
 git lfs install
