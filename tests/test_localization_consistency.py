@@ -4,6 +4,7 @@ import re
 import json
 from pathlib import Path
 
+from zz.forces import F_CYCLOPS
 from zz.web.localization import card_translations, force_translations
 from zz.web.server import RULEBOOK_FILES
 
@@ -61,6 +62,25 @@ def test_packaged_translations_are_available_without_external_workspace_files() 
     assert len(forces) == 10
     assert all(row.get("name_zh") and row.get("ability_zh") for row in forces.values())
     assert all(row.get("name_en") and row.get("ability_en") for row in forces.values())
+
+
+def test_cyclops_uses_100_bp_in_code_translations_and_all_rulebooks() -> None:
+    force = force_translations()["force_e"]
+    assert "+100" in F_CYCLOPS.ability_jp
+    assert "+200" not in F_CYCLOPS.ability_jp
+    assert "+100" in force["ability_zh"]
+    assert "+100" in force["ability_en"]
+    assert "+200" not in force["ability_zh"]
+    assert "+200" not in force["ability_en"]
+
+    for filename in RULEBOOK_FILES.values():
+        text = (RULES_ROOT / filename).read_text(encoding="utf-8")
+        cyclops_line = next(
+            line for line in text.splitlines()
+            if "Cyclops" in line or "サイクロプス" in line
+        )
+        assert "+100" in cyclops_line
+        assert "+200" not in cyclops_line
 
 
 def test_selectable_characters_have_names_in_all_three_languages() -> None:

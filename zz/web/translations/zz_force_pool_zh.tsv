@@ -1,5 +1,5 @@
 force_id	name_zh	name_en	ability_zh	ability_en
-force_e	恶之 Force "独眼巨人"	Force of Evil "Cyclops"	【常时】自己的所有 Minion BP+200。	[CONTINUOUS] All of your Minions get +200 BP.
+force_e	恶之 Force "独眼巨人"	Force of Evil "Cyclops"	【常时】自己的所有 Minion BP+100。	[CONTINUOUS] All of your Minions get +100 BP.
 force_kon	混之 Force "奇美拉"	Force of Chaos "Chimera"	【自己的回合】自己的无色 Mana 在支付 Field Minion 费用时视为所有颜色。	[YOUR TURN] Your colorless Mana counts as every color when paying the cost of a Field Minion.
 force_kai	凯之 Force "弥诺陶洛斯"	Force of Triumph "Minotaur"	【常时】对手 Minion 对自己玩家造成的伤害 -1。	[CONTINUOUS] Damage dealt to you by opposing Minions is reduced by 1.
 force_so	双之 Force "双头犬"	Force of Twins "Orthrus"	【常时】自己的所有费用 5 以上 Minion DP+1。	[CONTINUOUS] All of your Minions with cost 5 or more get +1 DP.

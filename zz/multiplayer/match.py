@@ -25,7 +25,7 @@ from zz.multiplayer.views import build_player_view, player_for_id, player_id_for
 from zz.web.session import GameSession
 
 
-RULES_VERSION = "0.0.1"
+RULES_VERSION = "0.0.2"
 
 
 @dataclass(frozen=True)

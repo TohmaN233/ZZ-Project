@@ -44,14 +44,10 @@ def _search_bminion_shuffle_draw(fi: "ForceInstance", state: "GameState", ctx: "
             break
 
 
-# ---- HR1 toggle -----------------------------------------------------
-
-from zz.house_rules import HR1_CYCLOPS_BP_DELTA
-
-
 # ---- 10 Force passives ----------------------------------------------
 
 _MINION_TYPES = (CardType.F_MINION, CardType.B_MINION)
+CYCLOPS_BP_DELTA = 100
 
 
 def _force_can_exert(fi: "ForceInstance") -> bool:
@@ -59,12 +55,12 @@ def _force_can_exert(fi: "ForceInstance") -> bool:
 
 
 def _passive_cyclops(fi: "ForceInstance", engine: "Engine") -> None:
-    """悪 サイクロプス: 自分のミニオン全て BP+HR1_CYCLOPS_BP_DELTA (Minion only — not tokens/Magic)"""
+    """悪 サイクロプス: 自分のミニオン全て BP+100 (Minion only — not tokens/Magic)"""
     def modifier_fn(ci: "CardInstance", state):
         if (_force_can_exert(fi)
             and ci.owner is fi.owner
             and ci.card.type in _MINION_TYPES):
-            return HR1_CYCLOPS_BP_DELTA, 0
+            return CYCLOPS_BP_DELTA, 0
         return 0, 0
     modifier_fn._force_iid = id(fi)
     engine._passive_modifiers.append(("force_passive", modifier_fn))
@@ -207,7 +203,7 @@ F_CYCLOPS = Force(
     id="force_e", name_jp='悪のフォース "サイクロプス"',
     initial_life=2, passive=_passive_cyclops,
     on_destroy=_search_bminion_shuffle_draw,
-    ability_jp="【常時】\n自分のミニオン全てをBP+200する。\n" + FORCE_DESTROY_TEXT_JP,
+    ability_jp="【常時】\n自分のミニオン全てをBP+100する。\n" + FORCE_DESTROY_TEXT_JP,
 )
 
 F_CHIMERA = Force(

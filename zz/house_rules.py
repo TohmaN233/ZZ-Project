@@ -1,10 +1,7 @@
 """House rules used by the MVP.
 
-HR1: Cyclops BP delta — default 200, set to 100 to disable.
 HR2: 後攻 mana color swap (applied in engine.legal_actions when streak >= 2).
 """
-
-HR1_CYCLOPS_BP_DELTA = 200   # default ON (user's house rule)
 
 
 def apply_swap_mana_color(engine, base_card_iid: int, new_color):

@@ -160,7 +160,7 @@ Then shuffle your deck and draw one card.
 
 | Force | Starting life | Ability summary |
 | --- | ---: | --- |
-| Force of Evil "Cyclops" | 2 | [CONTINUOUS] All of your Minions get +200 BP. |
+| Force of Evil "Cyclops" | 2 | [CONTINUOUS] All of your Minions get +100 BP. |
 | Force of Chaos "Chimera" | 3 | [YOUR TURN] Your colorless Mana counts as every color when paying the cost of a Field Minion. |
 | Force of Triumph "Minotaur" | 4 | [CONTINUOUS] Damage dealt to you by opposing Minions is reduced by 1. |
 | Force of Twins "Orthrus" | 3 | [CONTINUOUS] Your Minions with cost 5 or more get +1 DP. |
