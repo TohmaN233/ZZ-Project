@@ -8,4 +8,4 @@ force_chi	知之 Force "凯隆"	Force of Wisdom "Chiron"	【常时】自己手�
 force_li	丽之 Force "塞壬"	Force of Beauty "Siren"	【自己的回合】每当自己的 Minion Mana 移动到 Field 时，将 1 个无色 Mana 以疲劳状态放置到 Base。	[YOUR TURN] Whenever one of your Minion Mana moves to the Field, place one rested colorless Mana in your Base.
 force_sho	翔之 Force "飞马"	Force of Flight "Pegasus"	【自己的回合开始时】若自己的 Mana 为 4 个以上，本回合移动权 +1。	[START OF YOUR TURN] If you have 4 or more Mana, gain 1 additional movement for this turn.
 force_so2	苏之 Force "凤凰"	Force of Revival "Phoenix"	【自己的回合结束时】将自己的所有 Mana 变为激活状态。	[END OF YOUR TURN] Activate all of your Mana.
-force_rin	轮之 Force "衔尾蛇"	Force of the Cycle "Ouroboros"	【自己的回合结束时】将自己的所有 Minion 变为激活状态。	[END OF YOUR TURN] Activate all of your Minions.
+force_rin	轮之 Force "衔尾蛇"	Ouroboros - Force of Eternity	【自己的回合结束时】将自己的所有非 Token Minion 变为激活状态。	[END OF YOUR TURN] Activate all of your non-token Minions.

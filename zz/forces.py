@@ -188,7 +188,7 @@ def _passive_ouroboros(fi: "ForceInstance", engine: "Engine") -> None:
         if not _force_can_exert(fi) or engine.state.active is not fi.owner:
             return
         for ci in fi.owner.field:
-            if ci.card.type is not CardType.MANA_TOKEN:
+            if not ci.card.is_token:
                 ci.rested = False
     at_turn_end._force_iid = id(fi)
     engine._passive_modifiers.append(("turn_end_hook", at_turn_end))
@@ -270,7 +270,7 @@ F_OUROBOROS = Force(
     id="force_rin", name_jp='輪のフォース "ウロボロス"',
     initial_life=2, passive=_passive_ouroboros,
     on_destroy=_search_bminion_shuffle_draw,
-    ability_jp="【自分のターン終了時】\n自分のミニオン全てをアクティブにする。\n" + FORCE_DESTROY_TEXT_JP,
+    ability_jp="【自分のターン終了時】\n自分のトークンでないミニオン全てをアクティブにする。\n" + FORCE_DESTROY_TEXT_JP,
 )
 
 

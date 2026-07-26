@@ -169,4 +169,4 @@ Then shuffle your deck and draw one card.
 | Force of Beauty "Siren" | 2 | [YOUR TURN] Whenever one of your Minion Mana moves to the Field, place one rested colorless Mana in your Base. |
 | Force of Flight "Pegasus" | 3 | [START OF YOUR TURN] If you have 4 or more Mana, gain 1 additional movement for this turn. |
 | Force of Revival "Phoenix" | 3 | [END OF YOUR TURN] Activate all of your Mana. |
-| Force of the Cycle "Ouroboros" | 2 | [END OF YOUR TURN] Activate all of your Minions. |
+| Ouroboros - Force of Eternity | 2 | [END OF YOUR TURN] Activate all of your non-token Minions. |
