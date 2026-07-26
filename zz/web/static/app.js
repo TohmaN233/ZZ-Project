@@ -8422,7 +8422,10 @@ function bootApp(initialView = "home") {
 }
 
 function loadState() {
-  return api("/api/state");
+  return api("/api/state").then((payload) => {
+    if (state && state.mode === "ai-vs-ai" && !state.gameOver) startAuto();
+    return payload;
+  });
 }
 
 window.ZZApp = {

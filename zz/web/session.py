@@ -165,16 +165,25 @@ class GameSession:
         self._opponent_profile = normalize_profile(opponent_profile)
         self.ai_policies = []
         if mode in {"human-vs-ai", "ai-vs-ai"}:
+            opponent_policy = (
+                self._policy_for_player_profile(
+                    self._opponent_profile,
+                    seed=seed + 2,
+                    default_kind="deep",
+                )
+                if mode == "ai-vs-ai"
+                else self._policy_for_opponent_profile(
+                    self._opponent_profile,
+                    seed=seed + 2,
+                )
+            )
             self.ai_policies = [
                 self._policy_for_player_profile(
                     self._player_profile,
                     seed=seed + 1,
                     default_kind="deep",
                 ),
-                self._policy_for_opponent_profile(
-                    self._opponent_profile,
-                    seed=seed + 2,
-                ),
+                opponent_policy,
             ]
         self.prompt: dict | None = None
         self._options: dict[str, Any] = {}
