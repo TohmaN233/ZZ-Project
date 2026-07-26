@@ -5978,7 +5978,7 @@ function renderShellHeader(title = "ZENONZARD") {
       <div class="brand">
         ${logo
           ? `<img class="brand-logo" src="${esc(logo)}" alt="${esc(title)}">`
-          : `<img class="brand-icon" src="/icon.png" alt="" aria-hidden="true"><strong>${esc(title)}</strong>`}
+          : `<strong>${esc(title)}</strong>`}
         <div class="meta"></div>
       </div>
       <div></div>
@@ -6028,13 +6028,14 @@ async function openApplicationRelease() {
 }
 
 function renderHome(error = null) {
+  const homeLogo = uiAssetUrl("logo_zzicon");
   return `
     ${renderShellHeader()}
     <main class="home-menu-screen">
       ${error ? `<div class="error">${esc(error.message || error)}</div>` : ""}
       <section class="home-menu-hero" aria-label="ZENONZARD">
         <div class="home-menu-copy">
-          <img class="home-menu-icon" src="/icon.png" alt="">
+          ${homeLogo ? `<img class="home-menu-icon" src="${esc(homeLogo)}" alt="ZENONZARD">` : ""}
           <h1>ZENONZARD</h1>
         </div>
         <div class="home-menu-rail">
