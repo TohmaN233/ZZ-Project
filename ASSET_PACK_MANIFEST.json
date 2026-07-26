@@ -1,10 +1,10 @@
 {
   "kind": "zz_external_asset_pack_v1",
   "archive": "ZZ-Assets-v1.zip",
-  "archiveBytes": 917050279,
-  "sha256": "330B60B7DEA71321D1E0557AEC7F747337B6215D0AAF55E1A4506E890C564D52",
+  "archiveBytes": 916958059,
+  "sha256": "E0BDF4B5BDC9B90D69E7D0EAAABE9F92AE37D49ED075E11471BDC93DD0FF28A8",
   "sourceFileCount": 487,
-  "sourceBytes": 943286584,
+  "sourceBytes": 943434563,
   "extractTo": ".",
   "expectedRoot": "asserts",
   "topLevelContents": [
