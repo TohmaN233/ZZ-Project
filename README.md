@@ -1,5 +1,7 @@
 # ZENONZARD Offline Project
 
+[简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
+
 一个非官方、非商业的 ZENONZARD 桌面端复现与 AI 实验项目。
 
 [项目介绍网页](https://tohman233.github.io/ZZ-Project/) · [安装说明](INSTALL.md) · [联机说明](docs/ONLINE.md) · [中文规则书](docs/rules/zz_rulebook_zh.md)

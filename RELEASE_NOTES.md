@@ -22,21 +22,14 @@
 
 ## 下载组成
 
-1. [`ZZ-Project-v0.1.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.1.0/ZZ-Project-v0.1.0-source.zip)：当前 `main` 的程序、测试、文档与默认模型。
+1. [`ZZ-Project-v0.1.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.1.0/ZZ-Project-v0.1.0-source.zip)：v0.1.0 发布快照的程序、测试、文档与默认模型。
 2. [`ZZ-Assets-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：卡图、角色、卡垫、视频、音效与 BGM。
-
-源码包校验：
-
-```text
-Bytes: 37077447
-SHA-256: 7D1DDF839A4C050A1FCAA9D52503CD76608583CC1AF9C485CD7E9A5665423609
-```
 
 资源包校验：
 
 ```text
-Bytes: 917038889
-SHA-256: A9E93A67FAD1BEBCDE4B790D0EE3C2C7F351191ECBAB1658FEF688E46260F5D8
+Bytes: 917050279
+SHA-256: 330B60B7DEA71321D1E0557AEC7F747337B6215D0AAF55E1A4506E890C564D52
 ```
 
 详细步骤见 [INSTALL.md](INSTALL.md)。

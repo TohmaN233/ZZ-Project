@@ -72,6 +72,7 @@ class CleanReleaseAssetTests(unittest.TestCase):
             {path.name for path in ui_root.iterdir()},
             {"ui_manifest.json", *ui_manifest["assets"].values()},
         )
+        self.assertEqual(ui_manifest["assets"]["logo_zzicon"], "logo_zzicon.png")
         self.assertEqual(set(self.index.ui_asset_catalog()), set(ui_manifest["assets"]))
 
         playmat_root = ASSET_ROOT / "images" / "clean_graph" / "playmats"
