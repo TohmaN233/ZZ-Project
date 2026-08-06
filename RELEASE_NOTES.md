@@ -19,6 +19,8 @@
   profiles, and playmat profiles.
 - The desktop home background `image.png` is included in the program packages;
   the large `asserts/` media pack remains a separate download.
+- The Windows installer explicitly excludes `asserts/`; updating the EXE does
+  not replace the separately downloaded asset directory.
 
 ## Known limitations
 

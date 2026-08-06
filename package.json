@@ -46,7 +46,8 @@
       "docs/rules/**/*",
       "image.png",
       "package.json",
-      "node_modules/**/*"
+      "node_modules/**/*",
+      "!asserts{,/**/*}"
     ],
     "extraResources": [
       {

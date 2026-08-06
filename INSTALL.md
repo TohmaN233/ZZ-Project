@@ -52,7 +52,8 @@ extract them with 7-Zip, and place the resulting directory beside
 
 The installer keeps `image.png` inside the application resources and the
 frozen server bundle; it is already included and does not need to be copied by
-the player.
+the player. The installer package explicitly excludes `asserts/`; installing
+a newer EXE does not replace the separately downloaded asset directory.
 
 English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes

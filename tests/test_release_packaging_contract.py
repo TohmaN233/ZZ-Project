@@ -16,6 +16,13 @@ class ReleasePackagingContractTests(unittest.TestCase):
 
         package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertIn("image.png", package["build"]["files"])
+        self.assertIn("!asserts{,/**/*}", package["build"]["files"])
+        self.assertTrue(
+            all("asserts" not in pattern or pattern == "!asserts{,/**/*}"
+                for pattern in package["build"]["files"])
+        )
+        main = (PROJECT_ROOT / "electron" / "main.js").read_text(encoding="utf-8")
+        self.assertIn('path.join(path.dirname(process.execPath), "asserts")', main)
         windows_builder = (PROJECT_ROOT / "packaging" / "build_windows_package.py").read_text(
             encoding="utf-8"
         )
