@@ -56,6 +56,10 @@ function packagedAssetRoot() {
   return path.join(path.dirname(process.execPath), "asserts");
 }
 
+function packagedDeckRoot() {
+  return path.join(process.resourcesPath, "data", "decks");
+}
+
 function packagedUserDataRoot() {
   return path.join(app.getPath("userData"), "game-data");
 }
@@ -315,7 +319,7 @@ function waitForHttp(url, timeoutMs = 15000) {
 function pythonArgs(port) {
   const args = app.isPackaged
     ? ["--host", "127.0.0.1", "--port", String(port), "--asset-root", packagedAssetRoot(),
-      "--user-data-root", packagedUserDataRoot()]
+      "--user-data-root", packagedUserDataRoot(), "--bundled-deck-root", packagedDeckRoot()]
     : ["-m", "zz.web.server", "--host", "127.0.0.1", "--port", String(port)];
   if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
   return args;

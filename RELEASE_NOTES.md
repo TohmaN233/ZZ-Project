@@ -21,6 +21,9 @@
   the large `asserts/` media pack remains a separate download.
 - The Windows installer explicitly excludes `asserts/`; updating the EXE does
   not replace the separately downloaded asset directory.
+- Default sample decks are installed as `resources/data/decks/`, outside the
+  executable. Saved decks live under the per-user `game-data/decks/` folder.
+  Private Codeman memory, training traces, and challenge data are excluded.
 
 ## Known limitations
 
@@ -43,9 +46,9 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, current runtime
    models, the desktop home background, and the top-bar BGM selector. Size:
-   `205198653` bytes.
+   `205083731` bytes.
    SHA-256:
-   `90234A31F980DFC5DFAFE44163FA419C4D8A2B8D5EAF9962A251E4144C2A59A4`.
+   `C152C69D61089FF18E0565538C832E6787F66BC415A0F645445624595619D914`.
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,

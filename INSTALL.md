@@ -55,14 +55,20 @@ frozen server bundle; it is already included and does not need to be copied by
 the player. The installer package explicitly excludes `asserts/`; installing
 a newer EXE does not replace the separately downloaded asset directory.
 
+The installer may include the default sample decks as a separate
+`resources/data/decks/` folder, never inside `ZZ-Project.exe`. Saved and edited
+decks are stored in the per-user `game-data/decks/` directory, outside the
+application files, so application updates do not replace them. Private
+`data/codeman_ai/`, training traces, and challenge data are not packaged.
+
 English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `205198653` bytes.
+Installer size: `205083731` bytes.
 
 Installer SHA-256:
-`90234A31F980DFC5DFAFE44163FA419C4D8A2B8D5EAF9962A251E4144C2A59A4`.
+`C152C69D61089FF18E0565538C832E6787F66BC415A0F645445624595619D914`.
 
 ## 4. Linux portable bundle
 

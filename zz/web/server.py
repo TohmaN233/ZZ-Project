@@ -37,6 +37,7 @@ from zz.web.debug_tools import (
 )
 from zz.web.catalog import catalog_dto
 from zz.web.deck_store import DeckStore
+from zz.web.assets import resolve_asset_root
 from zz.web.settings_store import SettingsStore, normalize_ai_difficulty
 from zz.web.session import GameSession
 
@@ -45,7 +46,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 STATIC_DIR = Path(__file__).with_name("static")
 DOCS_DIR = PROJECT_ROOT / "docs" / "rules"
 HOME_IMAGE = PROJECT_ROOT / "image.png"
-HOME_THEME_VIDEO = PROJECT_ROOT / "asserts" / "video" / "OP02.mp4"
 DEV_MODE_PASSWORD_ENV = "ZZ_DEV_MODE_PASSWORD"
 RULEBOOK_FILES = {
     "zh": "zz_rulebook_zh.md",
@@ -115,6 +115,10 @@ class ServerState:
 
     def ai_data_root_path(self) -> Path:
         return Path(self.ai_data_root) if self.ai_data_root is not None else DEFAULT_DATA_ROOT
+
+    def theme_video_path(self) -> Path:
+        asset_root = resolve_asset_root(self.asset_root)
+        return (asset_root / "video" / "OP02.mp4") if asset_root else PROJECT_ROOT / "asserts" / "video" / "OP02.mp4"
 
     def _recipe_from_payload(self, payload: dict, key: str) -> dict[str, int] | None:
         raw = payload.get(key)
@@ -782,7 +786,7 @@ class ZenonzardHandler(BaseHTTPRequestHandler):
             self._send_file(HOME_IMAGE)
             return
         if parsed.path == "/theme/op02.mp4":
-            self._send_file(HOME_THEME_VIDEO)
+            self._send_file(self.app.theme_video_path())
             return
         if parsed.path == "/rules" or parsed.path.startswith("/rules/"):
             lang = parsed.path.rsplit("/", 1)[-1] if parsed.path != "/rules" else "zh"
@@ -901,13 +905,18 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--mode", choices=["human-vs-ai", "ai-vs-ai", "god"], default="human-vs-ai")
     parser.add_argument("--asset-root", default=None)
     parser.add_argument("--user-data-root", default=None)
+    parser.add_argument("--bundled-deck-root", default=None)
     parser.add_argument("--dev-mode", action="store_true")
     args = parser.parse_args(argv)
     user_data_root = Path(args.user_data_root).expanduser().resolve() if args.user_data_root else None
     if user_data_root is not None:
         for name in ("decks", "settings", "codeman_ai", "ai_challenges"):
             (user_data_root / name).mkdir(parents=True, exist_ok=True)
-        bundled_decks = PROJECT_ROOT / "data" / "decks"
+        bundled_decks = (
+            Path(args.bundled_deck_root).expanduser().resolve()
+            if args.bundled_deck_root
+            else PROJECT_ROOT / "data" / "decks"
+        )
         user_decks = user_data_root / "decks"
         if bundled_decks.is_dir() and not any(user_decks.glob("*.json")):
             for source in bundled_decks.glob("*.json"):

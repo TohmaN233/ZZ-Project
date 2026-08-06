@@ -17,6 +17,10 @@ class ReleasePackagingContractTests(unittest.TestCase):
         package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertIn("image.png", package["build"]["files"])
         self.assertIn("!asserts{,/**/*}", package["build"]["files"])
+        self.assertNotIn("data/**/*", package["build"]["files"])
+        self.assertIn({"from": "data/decks", "to": "data/decks"}, package["build"]["extraResources"])
+        self.assertTrue(all("codeman_ai" not in pattern and "ai_challenges" not in pattern
+                            for pattern in package["build"]["files"]))
         self.assertTrue(
             all("asserts" not in pattern or pattern == "!asserts{,/**/*}"
                 for pattern in package["build"]["files"])
@@ -27,6 +31,14 @@ class ReleasePackagingContractTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn('add_data("image.png", ".")', windows_builder)
+        self.assertNotIn('add_data("data", "data")', windows_builder)
+        self.assertIn("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt", windows_builder)
+        self.assertNotIn('add_data("data/decks", "data/decks")', windows_builder)
+
+        server = (PROJECT_ROOT / "zz" / "web" / "server.py").read_text(encoding="utf-8")
+        self.assertIn('parser.add_argument("--bundled-deck-root", default=None)', server)
+        self.assertIn('self._send_file(self.app.theme_video_path())', server)
+        self.assertIn('asset_root / "video" / "OP02.mp4"', server)
 
         manifest = json.loads(
             (PROJECT_ROOT / "PUBLIC_RELEASE_MANIFEST.json").read_text(encoding="utf-8")

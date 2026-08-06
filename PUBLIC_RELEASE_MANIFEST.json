@@ -28,14 +28,16 @@
   ],
   "windowsInstaller": {
     "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
-    "bytes": 205198653,
-    "sha256": "90234A31F980DFC5DFAFE44163FA419C4D8A2B8D5EAF9962A251E4144C2A59A4",
+    "bytes": 205083731,
+    "sha256": "C152C69D61089FF18E0565538C832E6787F66BC415A0F645445624595619D914",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",
       "PC02 rules runtime",
       "current runtime AI models"
     ],
+    "sampleDecks": "separate resources/data/decks directory; saved decks use the per-user game-data/decks directory",
+    "privateData": "data/codeman_ai, training traces, and challenge data are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe"
   },
