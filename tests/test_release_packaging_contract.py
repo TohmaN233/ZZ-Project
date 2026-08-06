@@ -39,8 +39,9 @@ class ReleasePackagingContractTests(unittest.TestCase):
 
         installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
         self.assertIn("!macro customRemoveFiles", installer)
-        self.assertIn('Rename "$INSTDIR\\asserts" "$R9\\asserts"', installer)
-        self.assertIn('Rename "$R9\\asserts" "$INSTDIR\\asserts"', installer)
+        self.assertIn("${If} ${isUpdated}", installer)
+        self.assertIn("Keeping existing installation files during update.", installer)
+        self.assertNotIn("Rename \"$INSTDIR\\asserts\"", installer)
 
         server = (PROJECT_ROOT / "zz" / "web" / "server.py").read_text(encoding="utf-8")
         self.assertIn('parser.add_argument("--bundled-deck-root", default=None)', server)
