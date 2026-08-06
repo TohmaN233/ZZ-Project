@@ -15,7 +15,8 @@
 - Replay review, local training entrypoints, LAN play, and personal-server
   online play.
 - Simplified Chinese, Japanese, and English UI plus a trilingual rulebook.
-- Optional battle BGM, Codeman profiles, and playmat profiles.
+- Optional battle BGM with a persistent top-bar track selector, Codeman
+  profiles, and playmat profiles.
 - The desktop home background `image.png` is included in the program packages;
   the large `asserts/` media pack remains a separate download.
 
@@ -39,15 +40,17 @@
 1. [`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe):
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, current runtime
-   models, and the desktop home background. Size: `205198322` bytes.
+   models, the desktop home background, and the top-bar BGM selector. Size:
+   `205198653` bytes.
    SHA-256:
-   `1D12DC699CB02E62C6AA93A6E4B3DBC20960ABC79CCEB32E342FFFA948E887BE`.
+   `90234A31F980DFC5DFAFE44163FA419C4D8A2B8D5EAF9962A251E4144C2A59A4`.
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
-   Electron, and Python runtime files. Size: `45913484` bytes.
+   Electron, and Python runtime files, including the top-bar BGM selector.
+   Size: `45913697` bytes.
    SHA-256:
-   `3652B109EBAA6F86A7CB41F936818E47EBACA044E3C1A21C1927E021E737EEE7`.
+   `027F60ADE987C38E00EF7452751C8D55A5217B0332A299804236BB137CA487AB`.
 3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.

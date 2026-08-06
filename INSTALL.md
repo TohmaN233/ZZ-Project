@@ -58,10 +58,10 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `205198322` bytes.
+Installer size: `205198653` bytes.
 
 Installer SHA-256:
-`1D12DC699CB02E62C6AA93A6E4B3DBC20960ABC79CCEB32E342FFFA948E887BE`.
+`90234A31F980DFC5DFAFE44163FA419C4D8A2B8D5EAF9962A251E4144C2A59A4`.
 
 ## 4. Linux portable bundle
 
@@ -85,10 +85,10 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `45913484` bytes.
+Bundle size: `45913697` bytes.
 
 Bundle SHA-256:
-`3652B109EBAA6F86A7CB41F936818E47EBACA044E3C1A21C1927E021E737EEE7`.
+`027F60ADE987C38E00EF7452751C8D55A5217B0332A299804236BB137CA487AB`.
 
 ## 5. Source launch and macOS
 
@@ -175,9 +175,9 @@ Get-FileHash .\ZZ-Assets-PC02-English-v1.zip -Algorithm SHA256
 ## 7. Launch and settings
 
 The Windows installer starts from the Start menu or desktop shortcut. Source
-and Linux builds use the launchers above. Once the client is running, Settings
-can switch between Simplified Chinese, Japanese, and English, and can select
-the battle BGM.
+and Linux builds use the launchers above. Once the client is running, the
+persistent top bar or Settings can switch between Simplified Chinese, Japanese,
+and English, select the battle BGM track, and turn BGM on or off.
 
 The application checks GitHub Releases for newer versions. A failed update
 check does not prevent offline play; diagnostics are written to the Electron
