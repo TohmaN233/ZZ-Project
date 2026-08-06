@@ -5,7 +5,7 @@
 ## 1. 系统要求
 
 - Windows 10 或 Windows 11
-- Linux 或 macOS 可从源码启动，目前属于实验支持，尚不提供原生安装程序
+- Linux 提供可下载的 portable `tar.gz` 包；macOS 仍从源码启动，目前都属于实验支持，尚不提供原生系统安装器
 - Windows 安装包用户不需要预装 Python 或 Node.js
 - 源码启动用户需要 Python 3.10 或更高版本、Node.js 20 或更高版本
 - Git LFS（仅在使用 `git clone` 时需要）
@@ -33,6 +33,19 @@ Windows 玩家直接下载并运行 [ZZ-Project-v0.2.0-Windows-Setup.exe](https:
 安装器 SHA-256：`404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667`；文件大小：`197377656` bytes。
 
 ## 3. 下载源码
+
+Linux 玩家推荐下载 [ZZ-Project-v0.2.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz)。这是可直接解压运行的 portable bundle，不需要 npm 预装依赖；首次启动时 `launch-electron.sh` 会在用户缓存目录准备 Node.js、Electron 和 Python runtime。解压后进入目录，先检查再启动：
+
+```bash
+tar -xzf ZZ-Project-v0.2.0-Linux.tar.gz
+cd ZZ-Project-v0.2.0
+./launch-electron.sh --check
+./launch-electron.sh
+```
+
+Linux bundle 不包含大型 `asserts/`，请把资源包解压出的 `asserts/` 放到 bundle 根目录，与 `launch-electron.sh` 同级。需要英文卡图时，再叠加英文 ZIP。
+
+macOS 玩家与开发者使用下面的源码 ZIP：
 
 推荐从 GitHub Releases 下载明确标注的
 [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)。

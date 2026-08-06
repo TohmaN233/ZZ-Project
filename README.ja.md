@@ -19,7 +19,7 @@
 - **3 言語 UI**：简体中文、日本語、English。
 - **BGM 設定**：完全リソースパックには ZENONZARD のキャラクターソングが含まれます。
 - **更新確認**：起動時に GitHub Releases を確認し、新しいバージョンがある場合は公開ページを開けます。
-- **クロスプラットフォーム起動**：Windows はインストーラーとソース用 `.cmd`、Linux/macOS は `.sh` を使用します。今回のリリースでは独立した `.command` launcher を削除しました。
+- **クロスプラットフォーム起動**：Windows はインストーラー、Linux は portable `tar.gz` bundle、macOS と開発者はソース用 `.sh` を使用します。今回のリリースでは独立した `.command` launcher を削除しました。
 
 Story Mode は未実装です。長期目標は、Agent がプレイヤーと自動的に対話し、GAL 形式のフロントエンドを生成する仕組みです。SillyTavern 関連コミュニティのキャラクター、World Info、長期的な交流に関する知見も取り入れ、プレイヤーと自分の Codeman のための個別の ZZ 体験を目指します。
 
@@ -35,7 +35,7 @@ AI 関連コードは Codex の支援を受け、[sbl1996/ygo-agent](https://git
 
 Windows のプレイヤーは [ZZ-Project-v0.2.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe) をダウンロードして実行してください。インストーラーには遊べるデスクトップクライアント、凍結済み Python server、ルールコード、既定モデルが含まれ、Python と Node.js は不要です。大型アセットは別配布のため、[Google Drive のアセットフォルダ](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)から主アセットの 2 つの ZIP volume、`ZZ-Assets-PC02-v1.zip.001` と `ZZ-Assets-PC02-v1.zip.002` を取得してください。`.001` を 7-Zip で開き、得られた `asserts/` をインストール先の `ZZ-Project.exe` と同じ階層へ配置します。英語カード画像が必要な場合は別ファイル `ZZ-Assets-PC02-English-v1.zip` も同じ `asserts/` に展開してください。詳しい手順は [INSTALL.md](INSTALL.md) にあります。
 
-Linux/macOS のプレイヤーと開発者は [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip) を使用し、下記のソースセットアップを行ってください。
+Linux のプレイヤーは [ZZ-Project-v0.2.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz) を展開して `./launch-electron.sh` を実行してください。初回起動時にユーザーキャッシュへランタイムを準備します。macOS のプレイヤーと開発者は [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip) を使用し、下記のソースセットアップを行ってください。
 
 ```powershell
 python -m pip install -r requirements-runtime.txt

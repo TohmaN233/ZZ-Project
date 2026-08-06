@@ -3,6 +3,7 @@
 const RELEASE_CONFIG = {
   projectUrl: "https://github.com/TohmaN233/ZZ-Project",
   programUrl: "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe",
+  linuxBundleUrl: "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz",
   assetPackUrl: "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing",
 };
 
@@ -48,14 +49,14 @@ const copy = {
     englishTitle: "英文版", englishBody: "英文卡图与文本是独立资源包；未覆盖的图仍可能回退到官网 URL。",
     musicTitle: "BGM", musicBody: "基础设置中可选择对战 BGM；完整资源包包含 ZZ 各角色歌曲。",
     thanksTitle: "致谢", thanksBody: "感谢 theFeri 提供 50+ 张高清 playmat 图，以及 Valkyrie 提供英文文本。",
-    installEyebrow: "INSTALLATION", installTitle: "Windows 安装包与大型资源分开下载",
-    installLead: "Windows 安装包已经包含可玩的桌面客户端、冻结后的 Python server 和默认模型；卡图、角色图、视频与音乐仍放在独立资源包中。",
-    installStep1Title: "下载 Windows 安装包", installStep1Body: "从 GitHub Releases 下载 ZZ-Project-v0.2.0-Windows-Setup.exe 并运行；Linux/macOS 和开发者使用源码包。",
+    installEyebrow: "INSTALLATION", installTitle: "Windows 安装包、Linux bundle 与大型资源分开下载",
+    installLead: "Windows 安装包已经包含可玩的桌面客户端、冻结后的 Python server 和默认模型；Linux 提供 portable bundle；卡图、角色图、视频与音乐仍放在独立资源包中。",
+    installStep1Title: "下载对应平台版本", installStep1Body: "Windows 下载并运行 ZZ-Project-v0.2.0-Windows-Setup.exe；Linux 下载 ZZ-Project-v0.2.0-Linux.tar.gz 并运行 launch-electron.sh；macOS 和开发者使用源码包。",
     installStep2Title: "放入资源包", installStep2Body: "从 Google Drive 下载两个主资源 volume，用 7-Zip 打开 .001，并把得到的 asserts/ 放到安装目录，与 ZZ-Project.exe 同级；英文用户再叠加独立英文 ZIP。",
     installStep3Title: "源码版本安装依赖", installStep3Body: "Windows 安装包不需要 Python 或 Node.js；源码启动才需要 Python 3.10+、Node.js 20+ 与 npm install。",
-    installStep4Title: "启动客户端", installStep4Body: "安装包从开始菜单或桌面快捷方式启动；源码版本使用 .cmd、.sh 或 npm run electron:dev。",
-    requirementsTitle: "运行要求", reqOs: "系统", reqOsBody: "Windows 10/11 安装包；Linux/macOS 源码启动（实验支持）", reqPython: "安装包无需；源码需要 3.10+", reqNode: "安装包无需；源码需要 20+", reqGpu: "显卡", reqGpuBody: "游玩不要求；本地训练需要 NVIDIA GPU / CUDA",
-    downloadCode: "下载 Windows 安装包", downloadAssets: "下载资源包（含英文包）", hashNote: "安装包、两个主资源 volume 与英文 ZIP 的大小和 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。",
+    installStep4Title: "启动客户端", installStep4Body: "Windows 安装包从开始菜单或桌面快捷方式启动；Linux bundle 解压后运行 ./launch-electron.sh；源码版本使用 .cmd、.sh 或 npm run electron:dev。",
+    requirementsTitle: "运行要求", reqOs: "系统", reqOsBody: "Windows 10/11 安装包；Linux portable bundle；macOS 源码启动（实验支持）", reqPython: "Windows 安装包无需；Linux bundle 首次启动自备 runtime；源码需要 3.10+", reqNode: "Windows 安装包无需；Linux bundle 首次启动自备 runtime；源码需要 20+", reqGpu: "显卡", reqGpuBody: "游玩不要求；本地训练需要 NVIDIA GPU / CUDA",
+    downloadCode: "下载 Windows 安装包", downloadLinux: "下载 Linux portable 包", downloadAssets: "下载资源包（含英文包）", hashNote: "Windows 安装包、Linux bundle、两个主资源 volume 与英文 ZIP 的大小和 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。",
     storyTitle: "下一阶段：每位玩家自己的故事与前端",
     storyBody: "Story Mode 目前尚未开发。长期目标是设计由 Agent 自动与用户交互的游戏，对应实现 GAL 前端，并吸收 SillyTavern 相关社群在角色、世界书与长期互动方面积累的经验，构建个人专属的、与自己的 Codeman 一起经历的 ZZ 体验。",
     storyCaveat: "这是未来目标，不代表第一版已经提供生成式剧情功能。",
@@ -106,14 +107,14 @@ const copy = {
     englishTitle: "英語版", englishBody: "英語カード画像とテキストは独立アセットパックで配布しています。未収録の画像は公式 URL にフォールバックする場合があります。",
     musicTitle: "BGM", musicBody: "基本設定から対戦 BGM を選択できます。完全版アセットパックには ZZ のキャラクターソングが含まれます。",
     thanksTitle: "謝辞", thanksBody: "50 枚以上の高解像度 playmat 画像を提供してくださった theFeri と、英語テキストを提供してくださった Valkyrie に感謝します。",
-    installEyebrow: "INSTALLATION", installTitle: "Windows インストーラーと大型アセットは別配布",
-    installLead: "Windows インストーラーには遊べるデスクトップクライアント、凍結済み Python server、既定モデルが含まれます。カード画像、キャラクター、動画、音楽は別アセットパックです。",
-    installStep1Title: "Windows インストーラーを取得", installStep1Body: "GitHub Releases から ZZ-Project-v0.2.0-Windows-Setup.exe を取得して実行します。Linux/macOS と開発者はソース版を使用します。",
+    installEyebrow: "INSTALLATION", installTitle: "Windows インストーラー、Linux bundle、大型アセットを別配布",
+    installLead: "Windows インストーラーには遊べるデスクトップクライアント、凍結済み Python server、既定モデルが含まれます。Linux には portable bundle を用意し、カード画像、キャラクター、動画、音楽は別アセットパックです。",
+    installStep1Title: "対応する版を取得", installStep1Body: "Windows は ZZ-Project-v0.2.0-Windows-Setup.exe、Linux は ZZ-Project-v0.2.0-Linux.tar.gz を取得します。macOS と開発者はソース版を使用します。",
     installStep2Title: "アセットを配置", installStep2Body: "Google Drive から主アセットの 2 volume を取得し、7-Zip で .001 を開きます。得られた asserts/ を ZZ-Project.exe と同じ階層へ置き、英語ユーザーは英語 ZIP も重ねて展開します。",
     installStep3Title: "ソース版だけ依存関係を導入", installStep3Body: "Windows インストーラーには Python と Node.js は不要です。ソース起動では Python 3.10+、Node.js 20+、npm install が必要です。",
-    installStep4Title: "クライアントを起動", installStep4Body: "インストーラー版はスタートメニューまたはデスクトップショートカットから起動します。ソース版は .cmd、.sh、または npm run electron:dev を使用します。",
-    requirementsTitle: "動作要件", reqOs: "OS", reqOsBody: "Windows 10/11 インストーラー。Linux/macOS はソース起動の実験対応", reqPython: "インストーラー不要。ソース版は 3.10+", reqNode: "インストーラー不要。ソース版は 20+", reqGpu: "GPU", reqGpuBody: "通常プレイは不要。ローカル学習には NVIDIA GPU / CUDA が必要",
-    downloadCode: "Windows インストーラーをダウンロード", downloadAssets: "アセットをダウンロード（英語版含む）", hashNote: "インストーラー、2 つの主アセット volume、英語 ZIP のサイズと SHA-256 はアセットマニフェストとリリースノートに記載されています。",
+    installStep4Title: "クライアントを起動", installStep4Body: "インストーラー版はスタートメニューまたはデスクトップショートカットから起動します。Linux bundle は展開後に ./launch-electron.sh、ソース版は .cmd、.sh、または npm run electron:dev を使用します。",
+    requirementsTitle: "動作要件", reqOs: "OS", reqOsBody: "Windows 10/11 インストーラー。Linux portable bundle。macOS はソース起動の実験対応", reqPython: "Windows インストーラー不要。Linux bundle は初回起動時に runtime を準備。ソース版は 3.10+", reqNode: "Windows インストーラー不要。Linux bundle は初回起動時に runtime を準備。ソース版は 20+", reqGpu: "GPU", reqGpuBody: "通常プレイは不要。ローカル学習には NVIDIA GPU / CUDA が必要",
+    downloadCode: "Windows インストーラーをダウンロード", downloadLinux: "Linux portable bundle をダウンロード", downloadAssets: "アセットをダウンロード（英語版含む）", hashNote: "Windows インストーラー、Linux bundle、2 つの主アセット volume、英語 ZIP のサイズと SHA-256 はアセットマニフェストとリリースノートに記載されています。",
     storyTitle: "次の段階：プレイヤーごとの物語とフロントエンド",
     storyBody: "Story Mode は未実装です。長期目標は、Agent がユーザーと自動的に交流するゲームと、それに対応する GAL 風フロントエンドを実現することです。SillyTavern 関連コミュニティが蓄積してきたキャラクター、世界設定、長期的な交流の知見を取り入れ、自分の Codeman と共に過ごす、プレイヤー個人専用の ZZ 体験を構築します。",
     storyCaveat: "これは将来目標であり、初回版に生成ストーリー機能が含まれるという意味ではありません。",
@@ -164,14 +165,14 @@ const copy = {
     englishTitle: "English build", englishBody: "English card images and text are distributed in a separate asset pack. Cards not covered locally may still fall back to official URLs.",
     musicTitle: "BGM", musicBody: "Battle BGM can be selected in Settings. The complete asset pack contains ZZ character songs.",
     thanksTitle: "Acknowledgements", thanksBody: "Special thanks to theFeri for 50+ high-resolution playmat images, and to Valkyrie for the English text.",
-    installEyebrow: "INSTALLATION", installTitle: "Windows installer and large media assets are separate downloads",
-    installLead: "The Windows installer contains the playable desktop client, frozen Python server, and default models. Card art, characters, video, and music remain in a separate asset pack.",
-    installStep1Title: "Get the Windows installer", installStep1Body: "Download and run ZZ-Project-v0.2.0-Windows-Setup.exe from GitHub Releases. Linux/macOS players and developers should use the source package.",
+    installEyebrow: "INSTALLATION", installTitle: "Windows installer, Linux bundle, and large media assets are separate downloads",
+    installLead: "The Windows installer contains the playable desktop client, frozen Python server, and default models. Linux has a portable bundle; card art, characters, video, and music remain in a separate asset pack.",
+    installStep1Title: "Get the build for your platform", installStep1Body: "Windows players should run ZZ-Project-v0.2.0-Windows-Setup.exe. Linux players should extract ZZ-Project-v0.2.0-Linux.tar.gz and run launch-electron.sh. macOS players and developers should use the source package.",
     installStep2Title: "Add the assets", installStep2Body: "Download both main asset volumes from Google Drive, open .001 with 7-Zip, and place the resulting asserts/ next to the installed ZZ-Project.exe. English users should also layer the separate English ZIP on top.",
     installStep3Title: "Dependencies for source only", installStep3Body: "The Windows installer needs no Python or Node.js. Source launch requires Python 3.10+, Node.js 20+, and npm install.",
-    installStep4Title: "Launch", installStep4Body: "Launch the installed build from the Start menu or desktop shortcut. Source builds use .cmd, .sh, or npm run electron:dev.",
-    requirementsTitle: "Requirements", reqOs: "OS", reqOsBody: "Windows 10/11 installer; experimental source launch on Linux/macOS", reqPython: "Not needed for installer; 3.10+ for source", reqNode: "Not needed for installer; 20+ for source", reqGpu: "GPU", reqGpuBody: "Not required to play; local training needs an NVIDIA GPU and CUDA",
-    downloadCode: "Download Windows installer", downloadAssets: "Download assets (English pack included)", hashNote: "The installer, two main volumes, and English ZIP sizes and SHA-256 values are recorded in the asset manifest and release notes for integrity checks.",
+    installStep4Title: "Launch", installStep4Body: "Launch the installed Windows build from the Start menu or desktop shortcut. Linux bundles run ./launch-electron.sh after extraction. Source builds use .cmd, .sh, or npm run electron:dev.",
+    requirementsTitle: "Requirements", reqOs: "OS", reqOsBody: "Windows 10/11 installer; Linux portable bundle; experimental source launch on macOS", reqPython: "Not needed for Windows installer; Linux bundle prepares its runtime on first launch; 3.10+ for source", reqNode: "Not needed for Windows installer; Linux bundle prepares its runtime on first launch; 20+ for source", reqGpu: "GPU", reqGpuBody: "Not required to play; local training needs an NVIDIA GPU and CUDA",
+    downloadCode: "Download Windows installer", downloadLinux: "Download Linux portable bundle", downloadAssets: "Download assets (English pack included)", hashNote: "The Windows installer, Linux bundle, two main volumes, and English ZIP sizes and SHA-256 values are recorded in the release manifest and notes for integrity checks.",
     storyTitle: "Next: a personal story and frontend for each player",
     storyBody: "Story Mode is not implemented yet. The long-term goal is to create a game in which an Agent interacts with the user automatically, together with a matching visual-novel-style frontend. It will draw on the SillyTavern community's experience with characters, world books, and long-term interaction to build a personal ZZ experience shared with the player's own Codeman.",
     storyCaveat: "This is a future goal, not a claim that generative story features ship in version one.",
@@ -241,6 +242,7 @@ function renderDifficulty(level) {
 function configureLinks() {
   const projectUrl = RELEASE_CONFIG.projectUrl.replace(/\/$/, "");
   document.querySelectorAll("[data-repo-link]").forEach((link) => { link.href = RELEASE_CONFIG.programUrl; });
+  document.querySelectorAll("[data-linux-link]").forEach((link) => { link.href = RELEASE_CONFIG.linuxBundleUrl; });
   document.querySelectorAll("[data-issues-link]").forEach((link) => { link.href = `${projectUrl}/issues`; });
   document.querySelectorAll("[data-discussions-link]").forEach((link) => { link.href = `${projectUrl}/discussions`; });
   document.querySelectorAll("[data-asset-link]").forEach((link) => {

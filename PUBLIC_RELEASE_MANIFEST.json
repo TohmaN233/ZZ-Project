@@ -30,6 +30,18 @@
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe"
   },
+  "linuxBundle": {
+    "filename": "ZZ-Project-v0.2.0-Linux.tar.gz",
+    "bytes": 42045686,
+    "sha256": "E0D00C2EDEF91FCC30354F0DD23FBE6DD0BE1A7FD6569444A5369E6324B7E50E",
+    "contains": [
+      "portable Linux source/runtime bundle",
+      "launch-electron.sh with private runtime bootstrap"
+    ],
+    "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
+    "asserts": "external asserts directory at the bundle root",
+    "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled"
+  },
   "externalAssetPack": {
     "archive": "ZZ-Assets-PC02-v1.zip",
     "englishArchive": "ZZ-Assets-PC02-English-v1.zip",

@@ -26,9 +26,10 @@
 ## 下载组成
 
 1. [`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe)：可直接安装和游玩的 Windows 桌面版本，包含 Electron 客户端、冻结后的 Python server、PC02 规则运行时和当前默认模型。文件大小 `197377656` bytes，SHA-256 `404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667`。
-2. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)：v0.2.0 发布快照的源码、测试、文档与默认模型，供 Linux/macOS 和开发者使用。
-3. [`ZZ-Assets-PC02-v1.zip.001` 与 `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：主卡图、角色、卡垫、视频、音效与 BGM。两个 volume 都下载后，用 7-Zip 打开 `.001` 解压；Windows 安装包用户把得到的 `asserts/` 放到 `ZZ-Project.exe` 同级。
-4. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：英文卡图、Force 与 Mana 卡面；英语用户将它叠加到主资源包上。
+2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz)：Linux portable bundle。解压后运行 `./launch-electron.sh`，首次启动会在用户缓存目录准备 Node.js、Electron 和 Python runtime；`asserts/` 仍单独放在 bundle 根目录。文件大小 `42045686` bytes，SHA-256 `E0D00C2EDEF91FCC30354F0DD23FBE6DD0BE1A7FD6569444A5369E6324B7E50E`。
+3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)：v0.2.0 发布快照的源码、测试、文档与默认模型，供 macOS 和开发者使用。
+4. [`ZZ-Assets-PC02-v1.zip.001` 与 `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：主卡图、角色、卡垫、视频、音效与 BGM。两个 volume 都下载后，用 7-Zip 打开 `.001` 解压；Windows 安装包用户把得到的 `asserts/` 放到 `ZZ-Project.exe` 同级，Linux bundle 用户放到 bundle 根目录。
+5. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：英文卡图、Force 与 Mana 卡面；英语用户将它叠加到主资源包上。
 
 资源包校验：
 
