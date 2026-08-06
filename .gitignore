@@ -1,13 +1,11 @@
-node_modules/
-dist/
-.pytest_cache/
 __pycache__/
 *.py[cod]
-data/settings/settings.json
-data/codeman_ai/
-data/ai_challenges/
-*.log
-.env
-.env.*
-!.env.example
+.pytest_cache/
+node_modules/
+npm-debug.log*
+local_ai_training/*/
+!local_ai_training/retained_mainline_20260630/
+!local_ai_training/retained_mainline_20260630/**
 
+# Local CodeGraph index.
+.codegraph/

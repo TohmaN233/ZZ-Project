@@ -1,8 +1,8 @@
 {
-  "name": "zenonzard-offline-project",
-  "version": "0.1.0",
+  "name": "zenonzard-clone",
+  "version": "0.2.0",
   "private": true,
-  "description": "Unofficial ZENONZARD offline desktop client with replay, AI training, and multiplayer.",
+  "description": "Local Zenonzard clone and debugging client.",
   "main": "electron/main.js",
   "type": "commonjs",
   "scripts": {

@@ -11,6 +11,9 @@ def main() -> None:
     root = Path.cwd()
     assert (root / "zz").is_dir(), root
     assert (root / "ai_training").is_dir(), root
+    from zz.pc02 import PC02_CARD_IDS
+
+    assert len(PC02_CARD_IDS) == 100
     app = ServerState(seed=123)
     catalog = app.catalog()
     assert catalog.get("cards"), "empty catalog"

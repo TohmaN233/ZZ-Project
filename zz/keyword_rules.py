@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 
 from zz.enums import AreaType, CardType, Keyword
 
@@ -64,6 +64,13 @@ OFFICIAL_KEYWORDS: dict[Keyword, KeywordDefinition] = {
         implemented=False,
         parameter="color",
     ),
+    Keyword.KAGO: KeywordDefinition(
+        Keyword.KAGO,
+        "加護",
+        "Bless",
+        "Attach this active base mana to one eligible field minion by spending one movement right; it grants its BP, DP, and printed granted ability.",
+        parameter="condition",
+    ),
 }
 
 
@@ -94,16 +101,30 @@ def can_attack_player(
     return present_at_turn_start
 
 
-def can_block_attacker(blocker: "CardInstance", attacker: "CardInstance", active: "Player" | None = None) -> bool:
+def can_block_attacker(
+    blocker: "CardInstance",
+    attacker: "CardInstance",
+    active: "Player" | None = None,
+    *,
+    keyword_fn: Callable[["CardInstance", Keyword], bool] | None = None,
+) -> bool:
+    """Apply the shared blocking rules, including continuous keyword grants.
+
+    The standalone helper keeps its printed-keyword behavior by default.  The
+    engine supplies its effective-keyword resolver so card auras (for example,
+    Rose Paganini's turn-long Infiltrate grant) cannot be bypassed by the
+    blocker legality path.
+    """
+    has_effective_keyword = keyword_fn or has_keyword
     if blocker.rested:
         return False
-    if has_keyword(blocker, Keyword.CANNOT_BLOCK):
+    if has_effective_keyword(blocker, Keyword.CANNOT_BLOCK):
         return False
-    if has_keyword(attacker, Keyword.UNBLOCKABLE) or "unblockable" in attacker.flags:
+    if has_effective_keyword(attacker, Keyword.UNBLOCKABLE) or "unblockable" in attacker.flags:
         return False
     if "unblockable_by_cost_at_most_3" in attacker.flags and total_cost(blocker) <= 3:
         return False
-    if has_keyword(attacker, Keyword.SNEAKING):
+    if has_effective_keyword(attacker, Keyword.SNEAKING):
         return total_cost(blocker) == total_cost(attacker)
     return True
 

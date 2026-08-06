@@ -6010,6 +6010,70 @@ def _score_audit_tags(features: dict[str, float]) -> list[str]:
     return tags
 
 
+def semantic_ai_action_rejection_reason(
+    engine: Any,
+    player: Any,
+    action: Action,
+    *,
+    extractor: FeatureExtractor | None = None,
+) -> str | None:
+    """Return the shared semantic-contract violation for a root AI action."""
+    action_features = (extractor or FeatureExtractor()).action_features(engine, player, action)
+    if float(action_features.get("attack_zero_dp_without_attack_payoff", 0.0)) > 0.0:
+        return "zero_dp_attack_without_payoff"
+    if (
+        action.kind == "move_card"
+        and action.payload.get("direction") == "base_to_field"
+        and float(action_features.get("negative_no_effect_resource_spend", 0.0)) > 0.0
+    ):
+        return "no_effect_base_to_field_resource_spend"
+    return None
+
+
+def semantically_admissible_main_actions(
+    engine: Any,
+    player: Any,
+    actions: list[Action],
+    *,
+    extractor: FeatureExtractor | None = None,
+) -> tuple[list[Action], dict[str, Any]]:
+    """Apply the same hard semantic action contract in runtime and training."""
+    feature_extractor = extractor or FeatureExtractor()
+    admissible: list[Action] = []
+    rejected_by_reason: dict[str, int] = {}
+    for action in actions:
+        reason = semantic_ai_action_rejection_reason(
+            engine,
+            player,
+            action,
+            extractor=feature_extractor,
+        )
+        if reason is None:
+            admissible.append(action)
+            continue
+        rejected_by_reason[reason] = rejected_by_reason.get(reason, 0) + 1
+    if not admissible:
+        raise RuntimeError("semantic AI action contract rejected every root action")
+    rejected_count = sum(rejected_by_reason.values())
+    return admissible, {
+        "originalActionCount": len(actions),
+        "admissibleActionCount": len(admissible),
+        "rejectedActionCount": rejected_count,
+        "rejectedByReason": rejected_by_reason,
+    }
+
+
+def _semantic_action_report_metadata(report: Mapping[str, Any] | None) -> dict[str, Any]:
+    if not report:
+        return {}
+    return {
+        "semanticActionOriginalCount": int(report["originalActionCount"]),
+        "semanticActionAdmissibleCount": int(report["admissibleActionCount"]),
+        "semanticActionRejectedCount": int(report["rejectedActionCount"]),
+        "semanticActionRejectedByReason": dict(report["rejectedByReason"]),
+    }
+
+
 class PositionEvaluator:
     def evaluate(self, engine: Any, player: Any) -> float:
         opponent = self._opponent(engine, player)
@@ -11962,6 +12026,7 @@ class DirectActionSetPolicy(LookaheadRLPolicy):
         self._action_set_direct_decision_count = 0
         self._action_set_direct_fallback_count = 0
         self._action_set_direct_error_count = 0
+        self._action_set_semantic_rejection_count = 0
         self._action_set_direct_history: list[dict[str, Any]] = []
         self.current_policy_base_policy = current_policy_base_policy
         self.current_policy_delta_score_weight = float(current_policy_delta_score_weight)
@@ -11976,11 +12041,21 @@ class DirectActionSetPolicy(LookaheadRLPolicy):
             raise RuntimeError("no legal action")
         player = getattr(engine.state, "active", None)
         decision_kind = _root_action_set_decision_kind(engine, legal)
+        semantic_report: dict[str, Any] | None = None
+        if decision_kind == "main":
+            legal, semantic_report = semantically_admissible_main_actions(
+                engine,
+                player,
+                legal,
+                extractor=self.extractor,
+            )
+            self._action_set_semantic_rejection_count += int(semantic_report["rejectedActionCount"])
         selected = self._direct_action_set_choice(
             engine=engine,
             player=player,
             actions=legal,
             decision_kind=decision_kind,
+            metadata_extra=_semantic_action_report_metadata(semantic_report),
         )
         if selected is not None:
             return selected
@@ -12083,6 +12158,7 @@ class DirectActionSetPolicy(LookaheadRLPolicy):
             "actionSetDirectDecisions": int(self._action_set_direct_decision_count),
             "actionSetDirectFallbacks": int(self._action_set_direct_fallback_count),
             "actionSetDirectErrors": int(self._action_set_direct_error_count),
+            "actionSetSemanticRejections": int(self._action_set_semantic_rejection_count),
         }
 
     def _direct_action_set_choice(

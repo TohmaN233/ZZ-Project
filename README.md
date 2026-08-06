@@ -19,7 +19,7 @@
 - **三语界面**：中文、日本語、English。
 - **BGM 设置**：完整资源包提供 ZZ 角色歌曲。
 - **版本检查**：桌面客户端启动时检查 GitHub 最新 Release；发现新版本后可直接打开发布页。
-- **跨平台启动**：Windows 使用 `.cmd`，Linux 使用 `.sh`，macOS 使用 `.command`。Linux/macOS 当前为源码启动的实验支持。
+- **跨平台启动**：Windows 使用 `.cmd`，Linux/macOS 使用 `.sh`。本次发布移除了单独的 `.command` launcher。
 
 Story Mode 还没有开发。长期目标是设计由 Agent 自动与用户交互的游戏，对应实现 GAL 前端，并吸收 SillyTavern 相关社群在角色、世界书与长期互动方面积累的经验，构建个人专属的、与自己的 Codeman 一起经历的 ZZ 体验。
 
@@ -27,11 +27,13 @@ Story Mode 还没有开发。长期目标是设计由 Agent 自动与用户交�
 
 这个项目不会把实验模型包装成强 AI。作者有统计学学位，但没有修过强化学习课程，研究方向也与强化学习无关；个人项目的训练规模同样有限。当前模型与 ZENONZARD 正式运营时期万代使用的 AI 有明显差距，AI 建议也主要是娱乐功能。
 
+特别说明：电脑 AI 的训练数据和训练卡池目前只覆盖 PC01。PC01R、EX01 和 PC02 没有进入这套训练流程，因此不要期待电脑 AI 能正确理解新增卡包；PC02 的规则可玩性不代表 AI 已经学会这些卡。
+
 AI 相关代码由 Codex 协助编写，并参考了 [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent) 的公开方法与工程结构。详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
 ## 安装
 
-源码与大型美术资源分开发布。[下载完整资源包（ZZ-Assets-v1.zip）](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)。完整步骤、目录结构和常见问题见 [INSTALL.md](INSTALL.md)。最短流程：
+程序包与大型美术资源分开发布。先下载 [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)，再从 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing) 下载主资源包的两个 ZIP volumes：`ZZ-Assets-PC02-v1.zip.001` 与 `ZZ-Assets-PC02-v1.zip.002`。两个文件都下载后，用 7-Zip 打开 `.001` 并解压到程序根目录。需要英文卡图的玩家还要下载单独的 `ZZ-Assets-PC02-English-v1.zip`，同样解压到程序根目录。完整步骤、目录结构和常见问题见 [INSTALL.md](INSTALL.md)。最短流程：
 
 ```powershell
 python -m pip install -r requirements-runtime.txt
@@ -49,15 +51,19 @@ npm install
 # Linux
 ./launch-electron.sh
 
-# macOS
-./launch-electron.command
+# macOS (source launch)
+./launch-electron.sh
 ```
 
 ## 内容边界
 
-当前卡池包含基本卡与 PC01，之后会逐步更新，直至补全卡池。个人测试无法覆盖全部卡牌组合，因此可能仍有小型规则或界面 Bug。
+当前卡池包含基本卡、EX01、PC01、PC01R 与 PC02。个人测试无法覆盖全部卡牌组合，因此可能仍有小型规则或界面 Bug。
 
-英文版卡图直接使用官网链接，已知有图和卡没对齐的现象。英语圈的用户若能提供卡图资源和英文文本，此问题能轻易解决。
+英文卡图和英文文本作为独立资源包发布；未覆盖的卡图仍可能回退到官网链接，已知存在图片与卡牌没有对齐的现象。
+
+## 致谢
+
+特别感谢 theFeri 提供的 50+ 张高清 playmat 图，以及 **Valkyrie** 提供的英文文本。
 
 ## 参与项目
 

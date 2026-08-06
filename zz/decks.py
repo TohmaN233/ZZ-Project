@@ -9,6 +9,9 @@ from zz.deckcode0 import (
 )
 import zz.pc01  # noqa: F401 - registers PC:01 cards not already hand-authored
 import zz.basic  # noqa: F401 - registers Basic non-token cards not already hand-authored
+import zz.ex01  # noqa: F401 - registers EX:01 cards
+import zz.pc01r  # noqa: F401 - registers PC:01R cards
+import zz.pc02  # noqa: F401 - registers PC:02 cards
 from zz.forces import ALL_FORCES
 from zz.model import CardInstance, Player
 

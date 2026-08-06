@@ -26,6 +26,7 @@ class AreaType(Enum):
     FORCE  = "force"
     TRASH  = "trash"
     REMOVED = "removed"   # 無色マナ destroyed go here (out of game)
+    BLESSING = "blessing" # Mana attached to a field minion by 加護
 
 
 class Phase(Enum):
@@ -57,7 +58,7 @@ class Keyword(Enum):
     BLESS = auto()
     COST_REDUCTION = auto()
     CANNOT_BLOCK = auto()
-    KAGO = auto()             # 加護 (surfaced from Siren; no Aguma card uses it)
+    KAGO = auto()             # 加護 / Bless attachment
     UNBLOCKABLE = auto()
 
 

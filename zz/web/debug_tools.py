@@ -133,10 +133,11 @@ def _area_can_be_rested(area: AreaType) -> bool:
     return area in (AreaType.FIELD, AreaType.BASE)
 
 
-def _new_instance(card_id: str, owner, area: AreaType, *, rested: bool = False) -> CardInstance:
+def _new_instance(session, card_id: str, owner, area: AreaType, *, rested: bool = False) -> CardInstance:
     ci = CardInstance(
         card=CARD_REGISTRY[card_id],
         owner=owner,
+        iid=session.engine.state.allocate_iid(),
         area=area,
         rested=rested and _area_can_be_rested(area),
     )
@@ -184,7 +185,7 @@ def _first_card(card_type: CardType, *, exclude: str | None = None) -> str:
     return sorted(candidates, key=lambda card: (_total_cost(card), card.id))[0].id
 
 
-def _mana_token(owner, area: AreaType = AreaType.BASE) -> CardInstance:
+def _mana_token(session, owner, area: AreaType = AreaType.BASE) -> CardInstance:
     token_card = Card(
         id="mana_token",
         name_jp="無色マナ",
@@ -192,7 +193,12 @@ def _mana_token(owner, area: AreaType = AreaType.BASE) -> CardInstance:
         type=CardType.MANA_TOKEN,
         mana_color=Color.COLORLESS,
     )
-    ci = CardInstance(card=token_card, owner=owner, area=area)
+    ci = CardInstance(
+        card=token_card,
+        owner=owner,
+        iid=session.engine.state.allocate_iid(),
+        area=area,
+    )
     ci.summoning_sickness = False
     return ci
 
@@ -297,11 +303,11 @@ def add_debug_card_to_zone(
     player = _player_for_side(session, side)
     area = _area_for_zone(zone)
     if card_id == "mana_token":
-        ci = _mana_token(player, area)
+        ci = _mana_token(session, player, area)
     else:
         if card_id not in CARD_REGISTRY or not is_user_deck_card_id(card_id):
             raise ValueError(f"unknown debug card id: {card_id}")
-        ci = _new_instance(card_id, player, area, rested=rested)
+        ci = _new_instance(session, card_id, player, area, rested=rested)
     _validate_card_area(ci, area)
     ci.rested = bool(rested) and _area_can_be_rested(area)
     ci.area = area
@@ -347,10 +353,21 @@ def move_debug_card(session, iid: int, *, zone: str, rested: bool | None = None)
     }
 
 
-def set_debug_card_state(session, iid: int, *, rested: bool | None = None) -> dict[str, Any]:
+def set_debug_card_state(
+        session,
+        iid: int,
+        *,
+        rested: bool | None = None,
+        permanent_bp_modifier: int | None = None,
+        permanent_dp_modifier: int | None = None,
+) -> dict[str, Any]:
     ci = _find_card_instance(session, int(iid))
     if rested is not None:
         ci.rested = bool(rested) and _area_can_be_rested(ci.area)
+    if permanent_bp_modifier is not None:
+        ci.permanent_bp_mod = int(permanent_bp_modifier)
+    if permanent_dp_modifier is not None:
+        ci.permanent_dp_mod = int(permanent_dp_modifier)
     _debug_refresh_session(session)
     return {
         "card": {
@@ -359,6 +376,8 @@ def set_debug_card_state(session, iid: int, *, rested: bool | None = None) -> di
             "side": ci.owner.side.name,
             "zone": ci.area.value,
             "rested": ci.rested,
+            "permanentBpModifier": ci.permanent_bp_mod,
+            "permanentDpModifier": ci.permanent_dp_mod,
         }
     }
 
@@ -384,18 +403,57 @@ def set_debug_life(session, *, side: str, life: int, force_index: int | None = N
     return {"life": target}
 
 
+def set_debug_force_state(
+        session,
+        *,
+        side: str,
+        force_index: int,
+        destroyed: bool,
+        rested: bool | None = None,
+) -> dict[str, Any]:
+    player = _player_for_side(session, side)
+    force = player.forces[int(force_index)]
+    force.destroyed = bool(destroyed)
+    force.rested = bool(destroyed) if rested is None else bool(rested)
+    if force.destroyed:
+        force.life = 0
+    elif force.life <= 0:
+        force.life = force.force.initial_life
+    session.engine.rebind_passive_modifiers()
+    _debug_refresh_session(session)
+    return {
+        "force": {
+            "side": player.side.name,
+            "forceIndex": int(force_index),
+            "forceId": force.force.id,
+            "destroyed": force.destroyed,
+            "rested": force.rested,
+            "life": force.life,
+        }
+    }
+
+
 def setup_debug_fixed_board(
     session,
     *,
     active_side: str = "P1",
     control_both: bool = True,
+    preserve_board: bool = False,
+    step: str = "main",
 ) -> dict[str, Any]:
     state = session.engine.state
     active_player = _player_for_side(session, active_side)
     state.active_idx = state.players.index(active_player)
     state.turn = max(2, state.turn)
-    state.phase = Phase.MAIN
-    state.step = Step.MAIN
+    step_name = str(step or "main").strip().lower()
+    if step_name == "mana":
+        state.phase = Phase.MANA
+        state.step = Step.MANA
+    elif step_name == "main":
+        state.phase = Phase.MAIN
+        state.step = Step.MAIN
+    else:
+        raise ValueError(f"unsupported debug step: {step}")
     state.summoned_this_turn.clear()
     session.debug_control_both = bool(control_both)
     session._attack = None
@@ -404,21 +462,29 @@ def setup_debug_fixed_board(
     session.prompt = None
     session._options = {}
 
-    base_colors = [Color.RED, Color.YELLOW, Color.WHITE, Color.GREEN, Color.BLUE, Color.PURPLE]
-    for player in state.players:
-        player.field.clear()
-        player.base.clear()
-        player.mulligan_done = True
-        player.movement_right_count = 1
-        player.movement_right_total = 1
-        player.colorless_only_streak = 0
-        player.flags.clear()
-        player.base.extend(_new_instance(_base_card_for_color(color), player, AreaType.BASE) for color in base_colors)
-        player.base.extend(_mana_token(player) for _ in range(BASE_CAP - len(player.base)))
-
     opponent = state.players[1 - state.players.index(active_player)]
-    opponent_costs = [1, 3, 5, 7, 9]
-    opponent.field = [_new_instance(_field_card_for_cost(cost), opponent, AreaType.FIELD) for cost in opponent_costs]
+    opponent_costs: list[int] = []
+    if not preserve_board:
+        base_colors = [Color.RED, Color.YELLOW, Color.WHITE, Color.GREEN, Color.BLUE, Color.PURPLE]
+        for player in state.players:
+            player.field.clear()
+            player.base.clear()
+            player.mulligan_done = True
+            player.movement_right_count = 1
+            player.movement_right_total = 1
+            player.colorless_only_streak = 0
+            player.flags.clear()
+            player.base.extend(
+                _new_instance(session, _base_card_for_color(color), player, AreaType.BASE)
+                for color in base_colors
+            )
+            player.base.extend(_mana_token(session, player) for _ in range(BASE_CAP - len(player.base)))
+
+        opponent_costs = [1, 3, 5, 7, 9]
+        opponent.field = [
+            _new_instance(session, _field_card_for_cost(cost), opponent, AreaType.FIELD)
+            for cost in opponent_costs
+        ]
     state.present_at_turn_start = {
         ci.iid
         for player in state.players
@@ -434,22 +500,25 @@ def setup_debug_fixed_board(
             "opponentBaseCount": len(opponent.base),
         },
         "controlBoth": session.debug_control_both,
+        "preserveBoard": bool(preserve_board),
+        "step": state.step.value,
     }
 
 
-def _payable_base_ids(selected: Card, owner) -> list[str]:
+def _payable_base_ids(selected: Card, owner, *, fill_to: int = BASE_CAP) -> list[str]:
     ids: list[str] = []
     for color, amount in selected.cost.items():
         if color is Color.COLORLESS:
             continue
         ids.extend([_base_card_for_color(color)] * amount)
-    while len(ids) < BASE_CAP:
+    while len(ids) < fill_to:
         ids.append(_base_card_for_color(selected.mana_color or Color.COLORLESS))
-    return ids[:BASE_CAP]
+    return ids[:fill_to]
 
 
 def _install_forces_fresh(session, player, force_ids: list[str]) -> None:
-    validate_forces(force_ids)
+    if force_ids:
+        validate_forces(force_ids)
     old_force_iids = {id(fi) for fi in player.forces}
     player.forces = [
         ForceInstance(force=ALL_FORCES[force_id], owner=player, life=ALL_FORCES[force_id].initial_life)
@@ -473,6 +542,8 @@ def setup_debug_lab(
     zone: str = "hand",
     player_forces: list[str] | None = None,
     opponent_forces: list[str] | None = None,
+    compact_board: bool = False,
+    non_minion_mana_only: bool = False,
 ) -> dict[str, Any]:
     if card_id not in CARD_REGISTRY or not is_user_deck_card_id(card_id):
         raise ValueError(f"unknown debug card id: {card_id}")
@@ -507,7 +578,7 @@ def setup_debug_lab(
         player.colorless_only_streak = 0
         player.flags.clear()
 
-    test_card = _new_instance(card_id, p1, AreaType.HAND)
+    test_card = _new_instance(session, card_id, p1, AreaType.HAND)
     if zone == "base":
         test_card.area = AreaType.BASE
         p1.base.append(test_card)
@@ -517,32 +588,44 @@ def setup_debug_lab(
     else:
         p1.hand.append(test_card)
 
-    p1.base.extend(_new_instance(card_id, p1, AreaType.BASE) for card_id in _payable_base_ids(selected, p1))
+    base_fill = _total_cost(selected) if compact_board else BASE_CAP
+    if non_minion_mana_only:
+        p1.base.extend(_mana_token(session, p1) for _ in range(base_fill))
+    else:
+        p1.base.extend(
+            _new_instance(session, card_id, p1, AreaType.BASE)
+            for card_id in _payable_base_ids(selected, p1, fill_to=base_fill)
+        )
     _mark_debug_cooperation_ready(p1, selected)
-    p1.field.extend([
-        _new_instance(_first_card(CardType.F_MINION, exclude=selected.id), p1, AreaType.FIELD),
-        _new_instance(_field_card_for_cost(3), p1, AreaType.FIELD),
-    ])
-    p1.trash.append(_new_instance(_first_card(CardType.MAGIC), p1, AreaType.TRASH))
-    p1.deck.extend([
-        _new_instance(_first_card(CardType.F_MINION, exclude=selected.id), p1, AreaType.DECK),
-        _new_instance(_first_card(CardType.B_MINION), p1, AreaType.DECK),
-    ])
+    opponent_costs: list[int] = []
+    if not compact_board:
+        p1.field.extend([
+            _new_instance(session, _first_card(CardType.F_MINION, exclude=selected.id), p1, AreaType.FIELD),
+            _new_instance(session, _field_card_for_cost(3), p1, AreaType.FIELD),
+        ])
+        p1.trash.append(_new_instance(session, _first_card(CardType.MAGIC), p1, AreaType.TRASH))
+        p1.deck.extend([
+            _new_instance(session, _first_card(CardType.F_MINION, exclude=selected.id), p1, AreaType.DECK),
+            _new_instance(session, _first_card(CardType.B_MINION), p1, AreaType.DECK),
+        ])
 
-    opponent_costs = [1, 3, 5, 7, 9]
-    p2.field = [_new_instance(_field_card_for_cost(cost), p2, AreaType.FIELD) for cost in opponent_costs]
-    p2.base = [
-        _new_instance(_base_card_for_color(color), p2, AreaType.BASE)
-        for color in [Color.RED, Color.YELLOW, Color.WHITE, Color.GREEN, Color.BLUE]
-    ]
-    p2.base.extend(_mana_token(p2) for _ in range(BASE_CAP - len(p2.base)))
-    p2.deck.extend([
-        _new_instance(_first_card(CardType.F_MINION), p2, AreaType.DECK),
-        _new_instance(_first_card(CardType.B_MINION), p2, AreaType.DECK),
-    ])
+        opponent_costs = [1, 3, 5, 7, 9]
+        p2.field = [
+            _new_instance(session, _field_card_for_cost(cost), p2, AreaType.FIELD)
+            for cost in opponent_costs
+        ]
+        p2.base = [
+            _new_instance(session, _base_card_for_color(color), p2, AreaType.BASE)
+            for color in [Color.RED, Color.YELLOW, Color.WHITE, Color.GREEN, Color.BLUE]
+        ]
+        p2.base.extend(_mana_token(session, p2) for _ in range(BASE_CAP - len(p2.base)))
+        p2.deck.extend([
+            _new_instance(session, _first_card(CardType.F_MINION), p2, AreaType.DECK),
+            _new_instance(session, _first_card(CardType.B_MINION), p2, AreaType.DECK),
+        ])
 
-    _install_forces_fresh(session, p1, player_forces or ["force_e", "force_so2"])
-    _install_forces_fresh(session, p2, opponent_forces or ["force_kon", "force_rin"])
+    _install_forces_fresh(session, p1, list(player_forces or []))
+    _install_forces_fresh(session, p2, list(opponent_forces or []))
     p1.life = 10
     p2.life = 10
     state.present_at_turn_start = {ci.iid for player in state.players for ci in player.field + player.base}
@@ -551,10 +634,12 @@ def setup_debug_lab(
     return {
         "selectedCardId": card_id,
         "playPath": "choose_prompt",
+        "compactBoard": bool(compact_board),
         "fixture": {
             "playerBaseCount": len(p1.base),
             "opponentFieldCosts": opponent_costs,
             "opponentBaseCount": len(p2.base),
+            "nonMinionManaOnly": bool(non_minion_mana_only),
         },
     }
 

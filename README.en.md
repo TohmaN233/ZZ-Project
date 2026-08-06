@@ -19,7 +19,7 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an experimenta
 - **Trilingual UI**: Simplified Chinese, Japanese, and English.
 - **BGM settings**: the complete asset pack includes ZENONZARD character songs.
 - **Update checks**: the desktop client checks GitHub Releases at startup and can open the release page when a newer version is available.
-- **Cross-platform launchers**: `.cmd` for Windows, `.sh` for Linux, and `.command` for macOS. Linux and macOS currently have experimental source-launch support.
+- **Cross-platform launchers**: `.cmd` for Windows and `.sh` for Linux/macOS. The separate `.command` launcher was removed from this release.
 
 Story Mode has not been implemented. The long-term goal is an Agent-driven game that interacts with each player and generates a GAL-style frontend. The project also intends to learn from the SillyTavern community's work on characters, World Info, and long-term interaction to create a personal ZZ experience shared with the player's own Codeman.
 
@@ -27,11 +27,13 @@ Story Mode has not been implemented. The long-term goal is an Agent-driven game 
 
 This project does not present its experimental models as strong AI. The author has a statistics degree but has not taken reinforcement-learning courses, and their research is unrelated to reinforcement learning. Training resources are also limited. The current models remain considerably weaker than the AI used during ZENONZARD's official operation, and the in-game suggestions are primarily an entertainment feature.
 
+Important AI note: the computer AI was trained only with the PC01 card pool. PC01R, EX01, and PC02 were not part of that training, so do not expect the computer AI to understand the newer packs reliably. Playable PC02 rules do not mean that the AI has learned those cards.
+
 The AI code was written with assistance from Codex and refers to the public methods and engineering structure of [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
 
 ## Installation
 
-Source code and large visual/audio assets are distributed separately. Download the [complete asset pack (`ZZ-Assets-v1.zip`)](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing). See [INSTALL.md](INSTALL.md) for the full directory layout and troubleshooting steps.
+The program and large visual/audio assets are distributed separately. First download [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip), then download both main-pack ZIP volumes, `ZZ-Assets-PC02-v1.zip.001` and `ZZ-Assets-PC02-v1.zip.002`, from the [Google Drive asset folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing). After downloading both volumes, open `.001` with 7-Zip and extract it into the project root. English users should also download the separate `ZZ-Assets-PC02-English-v1.zip` and extract it into the project root. See [INSTALL.md](INSTALL.md) for the full directory layout and troubleshooting steps.
 
 ```powershell
 python -m pip install -r requirements-runtime.txt
@@ -49,15 +51,19 @@ Place the asset pack's `asserts/` directory in the repository root, then use the
 # Linux
 ./launch-electron.sh
 
-# macOS
-./launch-electron.command
+# macOS (source launch)
+./launch-electron.sh
 ```
 
 ## Current Limitations
 
-The current card pool contains the basic cards and PC01. It will be expanded gradually with the goal of completing the card pool. As a personal project, it has not been tested across every possible card combination, so small rule or interface bugs may remain.
+The current card pool contains the basic cards, EX01, PC01, PC01R, and PC02. As a personal project, it has not been tested across every possible card combination, so small rule or interface bugs may remain.
 
-English card images are loaded directly from official website URLs. Some cards are known to display mismatched images. English-speaking contributors can help resolve this by providing card images and corresponding English text.
+English card images and English text are distributed in a separate asset pack. Cards not covered by the local pack may still fall back to official website URLs, and some image/card mismatches may remain.
+
+## Acknowledgements
+
+Special thanks to theFeri for providing 50+ high-resolution playmat images, and to **Valkyrie** for providing the English text.
 
 ## Contributing
 

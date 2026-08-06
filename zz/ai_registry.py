@@ -115,11 +115,21 @@ def write_codeman_champion(
     data_root_path = Path(data_root) if data_root is not None else DEFAULT_DATA_ROOT
     pointer_path = _codeman_champion_pointer_path(data_root_path, codeman_id)
     pointer_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint = Path(checkpoint_path)
+    serialized_checkpoint = checkpoint.as_posix()
+    if checkpoint.is_absolute():
+        try:
+            serialized_checkpoint = checkpoint.resolve().relative_to(
+                data_root_path.resolve()
+            ).as_posix()
+        except ValueError:
+            serialized_checkpoint = str(checkpoint)
     payload = {
         "schema": 1,
         "codemanId": codeman_id,
         "modelKind": str(model_kind),
-        "checkpointPath": str(Path(checkpoint_path)),
+        "checkpointPath": serialized_checkpoint,
+        "runtimeEnabled": True,
     }
     pointer_path.write_text(json.dumps(payload, ensure_ascii=True, indent=2), encoding="utf-8")
     return pointer_path
@@ -133,6 +143,8 @@ def read_codeman_champion(codeman_id: str, *, data_root: str | Path | None = Non
     try:
         data = json.loads(pointer_path.read_text(encoding="utf-8"))
     except Exception:
+        return None
+    if not _runtime_bool(data.get("runtimeEnabled", True)):
         return None
     checkpoint_path = data.get("checkpointPath")
     if not checkpoint_path:
@@ -331,6 +343,8 @@ def _read_codeman_champion_path(data_root: Path, codeman_id: str | None) -> Path
     try:
         data = json.loads(pointer_path.read_text(encoding="utf-8"))
     except Exception:
+        return None
+    if not _runtime_bool(data.get("runtimeEnabled", True)):
         return None
     raw_path = data.get("checkpointPath")
     if not raw_path:

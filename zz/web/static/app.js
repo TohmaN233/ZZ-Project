@@ -46,6 +46,10 @@ let autoStepInFlight = false;
 let selectedCardIid = null;
 let selectedForceKey = null;
 let pendingChoicePromptId = null;
+let draggingBlessSourceIid = null;
+let pendingBlessDrag = null;
+let blessDragArrow = null;
+let suppressCardDetailUntil = 0;
 let selectedPlayerSide = null;
 let selectedTrashSide = null;
 let mulliganSelectedIids = new Set();
@@ -65,6 +69,7 @@ let applicationUpdate = { status: "idle", currentVersion: null, latestVersion: n
 let sfxContext = null;
 let publicRevealQueue = [];
 let activePublicReveal = null;
+let publicRevealBatchTimer = null;
 let animationEventQueue = [];
 let activeAnimationEvent = null;
 let animationOverlayTimer = null;
@@ -271,8 +276,8 @@ const UI_TEXT = {
     quickHumanAi: "快速人机",
     godView: "上帝视角",
     aiVsAi: "AI vs AI",
-    human: "Human",
-    god: "God",
+    human: "玩家",
+    god: "上帝视角",
     concede: "放弃",
     auto: "自动",
     pause: "暂停",
@@ -284,7 +289,7 @@ const UI_TEXT = {
     redraw: "重新抽卡",
     new: "新开",
     gameOver: "游戏结束",
-    operator: "Operator",
+    operator: "操作者",
     homeGuideName: "广报 AI 米娜",
     homeGuideText: "先确认规则，再选择角色、卡垫和双方卡组。",
     openRulebook: "打开规则书",
@@ -336,12 +341,12 @@ const UI_TEXT = {
     selected: "已选择",
     confirm: "确定",
     publicReveal: "公开",
-    trash: "Trash",
+    trash: "废弃区",
     newestFirst: "新卡在前",
-    life: "Life",
+    life: "生命",
     turn: "回合",
     activeSide: "行动方",
-    log: "Log",
+    log: "日志",
     battleLog: "战斗日志",
     openBattleLog: "打开战斗日志",
     latestLog: "最近记录",
@@ -377,30 +382,38 @@ const UI_TEXT = {
     codemanReplayNoSnapshots: "旧回放没有局面快照。",
     codemanReplayOpenWindow: "新窗口",
     activeEffects: "现有效果",
+    blessingDetails: "加护信息",
+    blessingSource: "{name} 加护",
     activeMana: "激活 {ready} / {total}",
-    battleField: "Battle Field",
+    battleField: "战场",
     noMinions: "无 Minion",
     noCards: "无卡",
     noGlobalActions: "无全局动作",
     manaPhase: "Mana 阶段",
     placeColorlessMana: "配置无色 Mana",
-    effectTargetHint: "在画面中央选择公开卡或效果目标。",
+    effectTargetHint: "在画面中央选择查看的卡牌或效果目标。",
     selectForMulligan: "选入调度",
     revealFromDeck: "从卡组公开",
     revealFromTopCards: "从卡组上方公开",
+    inspectTopCards: "查看卡组上方",
     chooseEffectTarget: "选择效果目标",
     variableTargetNote: "按顺序选择 {min}-{max} 个效果目标，然后按确定。",
     multiTargetNote: "选择 {selected}/{max} 个效果目标，然后按确定。",
-    top4Note: "公开卡组上方 4 张。可以加入手牌的卡会高亮。",
-    top2Note: "公开卡组上方 2 张。可以加入手牌的卡会高亮。",
+    inspectTopCardsNote: "查看卡组上方 {count} 张。可以加入手牌的卡会高亮。",
+    lookTop3MagicNote: "查看卡组上方 3 张，仅选择要公开并加入手牌的魔法卡。",
+    addNoMagicCards: "不加入魔法卡",
     deckBaseNote: "从卡组中选择可选数量的 Base Minion，公开后放入费用区。",
     oneTargetNote: "选择一个效果目标。",
+    deckTopOrBottomNote: "查看自己的卡组顶牌，然后选择放回牌顶或牌底。",
+    deckTopChoice: "放回牌顶",
+    deckBottomChoice: "放回牌底",
     chooseFieldReplacement: "选择场上替换对象",
     fieldReplacementNote: "选择一只己方场上的 Minion 送入 Trash，然后召唤这张卡。",
     fieldReplacementNoteMove: "选择一只己方场上的 Minion 送入 Trash，然后将这张卡移动到战场。",
     chooseBaseReplacement: "选择费用区替换对象",
     baseReplacementNotePlay: "选择一张费用区卡送入 Trash，然后配置这张卡。",
     baseReplacementNoteMove: "选择一张费用区卡送入 Trash，然后移动这张卡。",
+    baseReplacementNoteBlessing: "选择一张费用区卡送入 Trash，然后将加護 Mana 以疲劳状态放回费用区。",
     colorlessReplacementNote: "选择一张费用区卡送入 Trash，然后放置无色 Mana。",
     manaPayment: "支付费用",
     paymentCost: "费用 {cost} · {selected}/{required}",
@@ -411,25 +424,26 @@ const UI_TEXT = {
     replaceWith: "挤掉 {name}",
     moveToField: "移动到战场",
     moveToBase: "移动到费用区",
+    bless: "加护",
     attack: "攻击",
     activateEffect: "发动效果",
     selectAsEffectTarget: "选为效果目标",
     selectAttackTarget: "选为攻击目标",
     block: "阻挡",
     debugFixedBoard: "固定测试场",
-    debugGodControl: "God control",
-    debugForceReplace: "Force replace",
-    debugSetForce: "Set Force",
-    debugSide: "Side",
-    debugZone: "Zone",
-    debugSearchPlaceholder: "card id / name / text",
-    debugReset: "Reset",
+    debugGodControl: "上帝视角控制",
+    debugForceReplace: "替换 Force",
+    debugSetForce: "设置 Force",
+    debugSide: "阵营",
+    debugZone: "区域",
+    debugSearchPlaceholder: "卡牌 ID / 名称 / 文本",
+    debugReset: "重置",
     debugAddMana: "+ Mana",
-    zoneHand: "Hand",
-    zoneBase: "Base",
-    zoneField: "Field",
-    zoneTrash: "Trash",
-    zoneDeck: "Deck",
+    zoneHand: "手牌",
+    zoneBase: "费用区",
+    zoneField: "战场",
+    zoneTrash: "废弃区",
+    zoneDeck: "卡组",
   },
   ja: {
     language: "言語",
@@ -525,20 +539,20 @@ const UI_TEXT = {
     quickHumanAi: "すぐ対戦",
     godView: "神視点",
     aiVsAi: "AI vs AI",
-    human: "Human",
-    god: "God",
+    human: "プレイヤー",
+    god: "神視点",
     concede: "投了",
-    auto: "Auto",
+    auto: "オート",
     pause: "停止",
     run: "実行",
-    step: "Step",
+    step: "ステップ",
     endTurn: "ターン終了",
     pass: "パス",
     keep: "キープ",
     redraw: "引き直し",
     new: "新規",
     gameOver: "ゲーム終了",
-    operator: "Operator",
+    operator: "操作者",
     homeGuideName: "広報AIミーナ",
     homeGuideText: "ルールを確認してから、キャラクター、プレイマット、デッキを選びましょう。",
     openRulebook: "ルールブックを開く",
@@ -559,8 +573,8 @@ const UI_TEXT = {
     playerCodeman: "自分の Codeman",
     opponentCodeman: "相手の Codeman",
     originalAvatar: "標準アバター",
-    player: "Player",
-    opponent: "Opponent",
+    player: "プレイヤー",
+    opponent: "対戦相手",
     diceRollParityRule: "1/3/5: {player}先攻 · 2/4/6: {opponent}先攻",
     playerPlaymat: "自分のプレイマット",
     opponentPlaymat: "相手のプレイマット",
@@ -576,11 +590,11 @@ const UI_TEXT = {
     aiCompleteDeck: "AI補完",
     playGod: "神視点で対戦",
     aiTest: "AIテスト",
-    cards: "Cards",
-    deck: "Deck",
-    forces: "Forces",
-    force: "Force",
-    cost: "Cost",
+    cards: "カード",
+    deck: "デッキ",
+    forces: "フォース",
+    force: "フォース",
+    cost: "コスト",
     search: "検索",
     details: "詳細",
     close: "閉じる",
@@ -590,12 +604,12 @@ const UI_TEXT = {
     selected: "選択中",
     confirm: "決定",
     publicReveal: "公開",
-    trash: "Trash",
+    trash: "トラッシュ",
     newestFirst: "新しい順",
-    life: "Life",
-    turn: "Turn",
-    activeSide: "Active",
-    log: "Log",
+    life: "ライフ",
+    turn: "ターン",
+    activeSide: "アクティブ側",
+    log: "ログ",
     battleLog: "バトルログ",
     openBattleLog: "バトルログを開く",
     latestLog: "最新ログ",
@@ -619,31 +633,39 @@ const UI_TEXT = {
     codemanReplayFrame: "盤面",
     codemanReplayOpenWindow: "別ウィンドウ",
     activeEffects: "適用中の効果",
-    activeMana: "Active {ready} / {total}",
-    battleField: "Battle Field",
+    blessingDetails: "加護情報",
+    blessingSource: "{name} の加護",
+    activeMana: "アクティブ {ready} / {total}",
+    battleField: "バトルフィールド",
     noMinions: "ミニオンなし",
     noCards: "カードなし",
     noGlobalActions: "全体操作なし",
     manaPhase: "マナフェイズ",
     placeColorlessMana: "無色マナを配置",
-    effectTargetHint: "中央の画面で公開カードまたは効果対象を選択してください。",
+    effectTargetHint: "中央の画面で確認したカードまたは効果対象を選択してください。",
     selectForMulligan: "マリガンに選ぶ",
     revealFromDeck: "デッキから公開",
     revealFromTopCards: "上から公開",
+    inspectTopCards: "デッキ上から確認",
     chooseEffectTarget: "効果対象を選択",
     variableTargetNote: "{min}-{max} 個の効果対象を順番に選び、決定してください。",
     multiTargetNote: "{selected}/{max} 個の効果対象を選び、決定してください。",
-    top4Note: "デッキの上から4枚を公開します。手札に加えられるカードが強調表示されます。",
-    top2Note: "デッキの上から2枚を公開します。手札に加えられるカードが強調表示されます。",
+    inspectTopCardsNote: "デッキの上から{count}枚を確認します。手札に加えられるカードが強調表示されます。",
+    lookTop3MagicNote: "デッキの上から3枚を確認し、公開して手札に加えるマジックカードを選択します。",
+    addNoMagicCards: "マジックカードを加えない",
     deckBaseNote: "デッキから任意の数のベース・ミニオンを選び、公開してベースに置きます。",
     oneTargetNote: "効果対象を1つ選択してください。",
+    deckTopOrBottomNote: "自分のデッキの一番上を確認し、デッキの上か下に戻します。",
+    deckTopChoice: "デッキの上に戻す",
+    deckBottomChoice: "デッキの下に戻す",
     chooseFieldReplacement: "フィールドの置き換えを選択",
-    fieldReplacementNote: "自分のフィールドのミニオン1体を Trash に送り、このカードを召喚します。",
-    fieldReplacementNoteMove: "自分のフィールドのミニオン1体を Trash に送り、このカードをフィールドに移動します。",
+    fieldReplacementNote: "自分のフィールドのミニオン1体をトラッシュに送り、このカードを召喚します。",
+    fieldReplacementNoteMove: "自分のフィールドのミニオン1体をトラッシュに送り、このカードをフィールドに移動します。",
     chooseBaseReplacement: "ベースの置き換えを選択",
-    baseReplacementNotePlay: "ベースのカード1枚を Trash に送り、このカードを配置します。",
-    baseReplacementNoteMove: "ベースのカード1枚を Trash に送り、このカードを移動します。",
-    colorlessReplacementNote: "ベースのカード1枚を Trash に送り、無色マナを置きます。",
+    baseReplacementNotePlay: "ベースのカード1枚をトラッシュに送り、このカードを配置します。",
+    baseReplacementNoteMove: "ベースのカード1枚をトラッシュに送り、このカードを移動します。",
+    baseReplacementNoteBlessing: "ベースのカード1枚をトラッシュに送り、加護マナをレスト状態でベースに戻します。",
+    colorlessReplacementNote: "ベースのカード1枚をトラッシュに送り、無色マナを置きます。",
     manaPayment: "マナ支払い",
     paymentCost: "コスト {cost} · {selected}/{required}",
     play: "使用",
@@ -653,20 +675,21 @@ const UI_TEXT = {
     replaceWith: "{name} と置換",
     moveToField: "フィールドへ移動",
     moveToBase: "ベースへ移動",
+    bless: "加護",
     attack: "アタック",
     activateEffect: "効果を発動",
     selectAsEffectTarget: "効果対象に選択",
     selectAttackTarget: "攻撃対象に選択",
     block: "ブロック",
     debugFixedBoard: "固定テスト場",
-    debugGodControl: "God control",
-    debugForceReplace: "Force replace",
-    debugSetForce: "Set Force",
-    debugSide: "Side",
-    debugZone: "Zone",
-    debugSearchPlaceholder: "card id / name / text",
-    debugReset: "Reset",
-    debugAddMana: "+ Mana",
+    debugGodControl: "神視点操作",
+    debugForceReplace: "フォース置換",
+    debugSetForce: "フォース設定",
+    debugSide: "陣営",
+    debugZone: "ゾーン",
+    debugSearchPlaceholder: "カードID / 名前 / テキスト",
+    debugReset: "リセット",
+    debugAddMana: "+ マナ",
     zoneHand: "手札",
     zoneBase: "ベース",
     zoneField: "フィールド",
@@ -861,6 +884,8 @@ const UI_TEXT = {
     codemanReplayNoSnapshots: "This older replay has no board snapshots.",
     codemanReplayOpenWindow: "New window",
     activeEffects: "Active effects",
+    blessingDetails: "Blessings",
+    blessingSource: "Blessed by {name}",
     activeMana: "Active {ready} / {total}",
     battleField: "Battle Field",
     noMinions: "No minions",
@@ -868,23 +893,29 @@ const UI_TEXT = {
     noGlobalActions: "No global actions",
     manaPhase: "Mana phase",
     placeColorlessMana: "Place colorless Mana",
-    effectTargetHint: "Choose revealed cards or effect targets in the center panel.",
+    effectTargetHint: "Choose inspected cards or effect targets in the center panel.",
     selectForMulligan: "Select for mulligan",
     revealFromDeck: "Reveal from deck",
     revealFromTopCards: "Reveal from top cards",
+    inspectTopCards: "Inspect top cards",
     chooseEffectTarget: "Choose effect target",
     variableTargetNote: "Choose {min}-{max} effect targets in order, then confirm.",
     multiTargetNote: "Choose {selected}/{max} effect targets, then confirm.",
-    top4Note: "Reveal the top 4 cards of the deck. Eligible cards are highlighted.",
-    top2Note: "Reveal the top 2 cards of the deck. Eligible cards are highlighted.",
+    inspectTopCardsNote: "Inspect the top {count} cards of the deck. Eligible cards are highlighted.",
+    lookTop3MagicNote: "Inspect the top 3 cards. Choose which Magic cards to reveal and add to hand.",
+    addNoMagicCards: "Add no Magic cards",
     deckBaseNote: "Choose up to the allowed number of Base Minions from the deck, reveal them, and put them into base.",
     oneTargetNote: "Choose one effect target.",
+    deckTopOrBottomNote: "Inspect the top card of your deck, then return it to the top or bottom.",
+    deckTopChoice: "Return to deck top",
+    deckBottomChoice: "Return to deck bottom",
     chooseFieldReplacement: "Choose field replacement",
     fieldReplacementNote: "Send one allied field Minion to Trash, then summon this card.",
     fieldReplacementNoteMove: "Send one allied field Minion to Trash, then move this card to the field.",
     chooseBaseReplacement: "Choose base replacement",
     baseReplacementNotePlay: "Send one base card to Trash, then place this card.",
     baseReplacementNoteMove: "Send one base card to Trash, then move this card.",
+    baseReplacementNoteBlessing: "Send one base card to Trash, then return the Bless mana to the base Rested.",
     colorlessReplacementNote: "Send one base card to Trash, then place colorless Mana.",
     manaPayment: "Mana payment",
     paymentCost: "Cost {cost} · {selected}/{required}",
@@ -895,6 +926,7 @@ const UI_TEXT = {
     replaceWith: "replace {name}",
     moveToField: "Move to Field",
     moveToBase: "Move to Base",
+    bless: "Bless",
     attack: "Attack",
     activateEffect: "Activate Effect",
     selectAsEffectTarget: "Select as Effect Target",
@@ -914,6 +946,126 @@ const UI_TEXT = {
     zoneField: "Field",
     zoneTrash: "Trash",
     zoneDeck: "Deck",
+  },
+};
+
+const ACTIVE_EFFECT_COPY = {
+  zh: {
+    turn_stat_modifier: "本回合能力修正",
+    permanent_stat_modifier: "永久能力修正",
+    keyword_modifier: "获得关键字",
+    action_lock: "不能攻击、阻挡或移动",
+    magic_selection_immunity: "不能被对手的 Magic 选为对象",
+    battle_auto_win: "战斗时不比较 BP，直接获胜",
+    cannot_attack: "本回合不能攻击",
+    must_block: "本回合必须阻挡",
+    must_be_blocked: "攻击时必须被阻挡",
+    unblockable_by_cost_at_most_3: "不能被费用 3 以下的 Minion 阻挡",
+    forced_blocker: "必须由指定 Minion 阻挡",
+    skip_next_refresh: "下次 Refresh 时不能激活",
+    force_passive: "Force 持续效果",
+    turn_stat_aura: "本回合持续修正",
+    card_aura: "卡牌持续效果",
+    keyword_aura: "获得持续关键字",
+    next_red_minion_rush: "本回合下一只红色 Minion 获得[袭击]",
+    opponent_magic_cost_increase: "本回合 Magic 费用增加 3",
+    battle_win_damage: "本回合战斗获胜时对敌方 Player 和 Force 造成伤害",
+    hunter_must_be_blocked: "Hunter 攻击时必须被阻挡",
+    return_enemy_damager: "本回合受到敌方 Minion 伤害后将其返回手牌",
+    next_blue_magic_free: "本回合下一张蓝色 Magic 费用变为 0",
+    draw_on_enemy_destroy: "本回合敌方 Minion 被破坏时抽 1 张卡",
+    damage_reduction_blocked: "不能回复生命或减轻伤害",
+    prevent_player_damage: "Player 伤害减轻",
+    player_damage_reduction: "Player 伤害减轻",
+    prevent_force_damage: "Force 伤害减轻",
+    damage: "伤害",
+    opponent_turn: "对手回合",
+    enemy_minion_dp: "敌方 Minion 的 DP 伤害",
+  },
+  ja: {
+    turn_stat_modifier: "このターンの能力修正",
+    permanent_stat_modifier: "永続能力修正",
+    keyword_modifier: "付与キーワード",
+    action_lock: "アタック・ブロック・移動不可",
+    magic_selection_immunity: "相手のマジックの効果で選択されない",
+    battle_auto_win: "BPに関係なくバトルに勝利する",
+    cannot_attack: "このターン、アタックできない",
+    must_block: "このターン、必ずブロックする",
+    must_be_blocked: "アタック時、必ずブロックされる",
+    unblockable_by_cost_at_most_3: "コスト3以下のミニオンにブロックされない",
+    forced_blocker: "指定されたミニオンが必ずブロックする",
+    skip_next_refresh: "次のリフレッシュでアクティブにならない",
+    force_passive: "フォース常時効果",
+    turn_stat_aura: "このターンの継続修正",
+    card_aura: "カードの常時効果",
+    keyword_aura: "常時付与キーワード",
+    next_red_minion_rush: "このターン、次の赤のミニオンに[襲撃]を付与",
+    opponent_magic_cost_increase: "このターン、マジックのコストを3増やす",
+    battle_win_damage: "このターン、バトル勝利時に相手プレイヤーとフォースへダメージ",
+    hunter_must_be_blocked: "ハンターのアタックは必ずブロックされる",
+    return_enemy_damager: "このターン、敵ミニオンからダメージを受けた後、そのミニオンを手札に戻す",
+    next_blue_magic_free: "このターン、次の青のマジックのコストは0",
+    draw_on_enemy_destroy: "このターン、相手のミニオンが破壊された時に1枚ドロー",
+    damage_reduction_blocked: "ライフ回復とダメージ軽減ができない",
+    prevent_player_damage: "プレイヤーダメージ軽減",
+    player_damage_reduction: "プレイヤーダメージ軽減",
+    prevent_force_damage: "フォースダメージ軽減",
+    damage: "ダメージ",
+    opponent_turn: "相手のターン",
+    enemy_minion_dp: "相手ミニオンのDPダメージ",
+  },
+  en: {
+    turn_stat_modifier: "Turn stat modifier",
+    permanent_stat_modifier: "Permanent stat modifier",
+    keyword_modifier: "Granted keyword",
+    action_lock: "Cannot attack, block, or move",
+    magic_selection_immunity: "Cannot be selected by opposing Magic effects",
+    battle_auto_win: "Wins battles regardless of BP",
+    cannot_attack: "Cannot attack this turn",
+    must_block: "Must block this turn",
+    must_be_blocked: "Must be blocked when attacking",
+    unblockable_by_cost_at_most_3: "Cannot be blocked by Minions costing 3 or less",
+    forced_blocker: "Must be blocked by the selected Minion",
+    skip_next_refresh: "Does not become Active during the next Refresh",
+    force_passive: "Force passive effect",
+    turn_stat_aura: "Turn-long stat effect",
+    card_aura: "Card passive effect",
+    keyword_aura: "Granted passive keyword",
+    next_red_minion_rush: "The next Red Minion this turn gains Charge",
+    opponent_magic_cost_increase: "Magic costs 3 more this turn",
+    battle_win_damage: "Battle wins this turn damage the opposing Player and Forces",
+    hunter_must_be_blocked: "Hunter attacks must be blocked",
+    return_enemy_damager: "After an enemy Minion deals damage this turn, return it to hand",
+    next_blue_magic_free: "The next Blue Magic this turn costs 0",
+    draw_on_enemy_destroy: "Draw 1 when an enemy Minion is destroyed this turn",
+    damage_reduction_blocked: "Life cannot be restored and damage cannot be reduced",
+    prevent_player_damage: "Player damage reduction",
+    player_damage_reduction: "Player damage reduction",
+    prevent_force_damage: "Force damage reduction",
+    damage: "Damage",
+    opponent_turn: "opponent turn",
+    enemy_minion_dp: "enemy Minion DP damage",
+  },
+};
+
+const KEYWORD_COPY = {
+  zh: {
+    REAWAKEN: "再起", RUSH: "袭击", REACTIVE: "Reactive", PENETRATE: "贯通",
+    FLYING: "飞来", SNEAKING: "潜入", DEATH_BLOW: "夺命", COOPERATION: "协力",
+    BLESS: "加护", COST_REDUCTION: "费用减免", CANNOT_BLOCK: "不能阻挡",
+    KAGO: "加护", UNBLOCKABLE: "不能被阻挡",
+  },
+  ja: {
+    REAWAKEN: "再起", RUSH: "襲撃", REACTIVE: "リアクティブ", PENETRATE: "貫通",
+    FLYING: "飛来", SNEAKING: "潜入", DEATH_BLOW: "奪命", COOPERATION: "協力",
+    BLESS: "加護", COST_REDUCTION: "コスト軽減", CANNOT_BLOCK: "ブロックできない",
+    KAGO: "加護", UNBLOCKABLE: "ブロックされない",
+  },
+  en: {
+    REAWAKEN: "Resurge", RUSH: "Charge", REACTIVE: "Reactive", PENETRATE: "Pierce",
+    FLYING: "Flying", SNEAKING: "Infiltrate", DEATH_BLOW: "Revenge", COOPERATION: "Cooperation",
+    BLESS: "Boost", COST_REDUCTION: "Cost Reduction", CANNOT_BLOCK: "Cannot Block",
+    KAGO: "Boost", UNBLOCKABLE: "Unblockable",
   },
 };
 
@@ -1417,6 +1569,11 @@ function localizedAbility(item) {
 function localizedCardAssetUrl(card) {
   if (card && currentLanguage() === "en" && card.assetUrlEn) return card.assetUrlEn;
   return card && card.assetUrl ? card.assetUrl : null;
+}
+
+function localizedForceAssetUrl(force) {
+  if (force && currentLanguage() === "en" && force.assetUrlEn) return force.assetUrlEn;
+  return force && force.assetUrl ? force.assetUrl : null;
 }
 
 function forceTitle(force) {
@@ -2269,6 +2426,40 @@ function filterGroups() {
   return catalog.filters || [];
 }
 
+function localizedCatalogLabel(item, fallback = "") {
+  if (!item) return fallback;
+  const lang = currentLanguage();
+  if (lang === "zh") return item.labelZh || fallback;
+  if (lang === "en") return item.labelEn || fallback;
+  return item.labelJp || fallback;
+}
+
+function localizedFilterValue(groupId, value, fallback = "") {
+  const group = filterGroups().find((item) => item.id === groupId);
+  const option = group && (group.options || []).find((item) => String(item.value) === String(value));
+  return option ? localizedCatalogLabel(option, fallback) : fallback;
+}
+
+function localizedCardType(card) {
+  return localizedFilterValue("cardtype", card.cardTypeJp, card.type || "");
+}
+
+function localizedCardAttribute(card) {
+  return localizedFilterValue("attribute", card.attributeJp, card.manaColor || "");
+}
+
+function localizedCardSeries(card) {
+  return localizedFilterValue("series", card.packJp, "");
+}
+
+function localizedCardRace(value) {
+  return localizedFilterValue("race", value, "");
+}
+
+function localizedCardRarity(card) {
+  return localizedFilterValue("reality", card.rarity, card.rarity || "");
+}
+
 function activeOfficialFilters() {
   return Object.entries(deckEditor.filters || {}).filter(([, value]) => Boolean(value));
 }
@@ -2349,6 +2540,12 @@ function showHome() {
   if (window.location.hash && parseCodemanReplayHash()) {
     window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
   }
+  render();
+}
+
+function showLobby() {
+  stopAuto(false);
+  appView = "lobby";
   render();
 }
 
@@ -2643,6 +2840,15 @@ function battleDebugCards() {
     .filter(cardMatchesBattleDebugFilters)
     .filter((card) => cardMatchesSearch(card, search))
     .slice(0, 120);
+}
+
+function refreshBattleDebugSearchResults() {
+  const list = app.querySelector(".battle-debug-card-list");
+  if (!list) throw new Error("Battle debug search result list is missing.");
+  const cards = battleDebugCards();
+  list.innerHTML = cards.length
+    ? cards.map((card) => renderBattleDebugCard(card)).join("")
+    : `<div class="empty">${esc(t("noCards"))}</div>`;
 }
 
 function captureBattleDebugScroll() {
@@ -3148,11 +3354,35 @@ function actionOptionsForCard(card) {
   if (!prompt) return [];
   return prompt.options.filter((option) => {
     if (option.cardIid === card.iid || option.attacker_iid === card.iid) return true;
+    if (option.kind === "bless") return option.mana_iid === card.iid;
     if (["play_card", "play_to_base", "move_card", "activate_flash_ability"].includes(option.kind)) {
       return option.iid === card.iid;
     }
     return false;
   }).sort(cardActionPriority);
+}
+
+function blessActionsForMana(card) {
+  return actionOptionsForCard(card).filter((option) => option.kind === "bless");
+}
+
+function blessActionsForTarget(card) {
+  if (replayReadonlyMode) return [];
+  const prompt = activePrompt();
+  if (!prompt) return [];
+  return prompt.options.filter((option) =>
+    option.kind === "bless" && option.target_iid === card.iid
+  );
+}
+
+function blessOptionForPair(sourceIid, targetIid) {
+  const prompt = activePrompt();
+  if (!prompt) return null;
+  return prompt.options.find((option) =>
+    option.kind === "bless" &&
+    Number(option.mana_iid) === Number(sourceIid) &&
+    Number(option.target_iid) === Number(targetIid)
+  ) || null;
 }
 
 function isFieldReplacementOption(option) {
@@ -3170,7 +3400,7 @@ function isBaseReplacementOption(option) {
   return Boolean(
     option &&
     option.replace_base_iid &&
-    ["play_to_base", "move_card"].includes(option.kind)
+    ["play_to_base", "move_card", "base_replacement"].includes(option.kind)
   );
 }
 
@@ -3181,6 +3411,15 @@ function fieldReplacementOptionsForCard(card) {
 
 function baseReplacementOptionsForCard(card) {
   if (!card) return [];
+  const prompt = activePrompt();
+  if (
+    prompt &&
+    prompt.kind === "blessing_base_replacement" &&
+    prompt.card &&
+    Number(prompt.card.iid) === Number(card.iid)
+  ) {
+    return prompt.options.filter(isBaseReplacementOption);
+  }
   return actionOptionsForCard(card).filter(isBaseReplacementOption);
 }
 
@@ -3227,7 +3466,7 @@ function isPaymentConfigurable(option) {
 
 function isCardActionOption(option) {
   if (option.cardIid || option.attacker_iid) return true;
-  return ["play_card", "play_to_base", "move_card", "attack", "activate_flash_ability"].includes(option.kind);
+  return ["play_card", "play_to_base", "move_card", "bless", "attack", "activate_flash_ability"].includes(option.kind);
 }
 
 function isVisibleManaPromptOption(option) {
@@ -3486,6 +3725,23 @@ function paymentRequiredCount(option) {
   return Object.values(option.paymentCost || {}).reduce((sum, value) => sum + Number(value || 0), 0);
 }
 
+function paymentCandidateValue(candidate) {
+  const value = Number(candidate && candidate.manaValue);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+function paymentSelectionValue(option) {
+  const candidates = new Map((option && option.paymentCandidates || []).map((candidate) => [candidate.iid, candidate]));
+  let total = 0;
+  for (const iid of paymentSelectionIids) {
+    const candidate = candidates.get(iid);
+    const value = paymentCandidateValue(candidate);
+    if (!candidate || value <= 0) return null;
+    total += value;
+  }
+  return total;
+}
+
 function consumeSelectedPaymentColor(colorCounts, color, amount, colorlessAsAny) {
   let missing = Number(amount || 0);
   const direct = Math.min(colorCounts[color] || 0, missing);
@@ -3501,13 +3757,14 @@ function consumeSelectedPaymentColor(colorCounts, color, amount, colorlessAsAny)
 
 function paymentSelectionIsValid(option) {
   if (!option) return false;
-  if (paymentSelectionIids.size !== paymentRequiredCount(option)) return false;
+  const selectedValue = paymentSelectionValue(option);
+  if (selectedValue == null || selectedValue < paymentRequiredCount(option)) return false;
   const candidates = new Map((option.paymentCandidates || []).map((candidate) => [candidate.iid, candidate]));
   const colorCounts = {};
   for (const iid of paymentSelectionIids) {
     const candidate = candidates.get(iid);
     if (!candidate) return false;
-    colorCounts[candidate.color] = (colorCounts[candidate.color] || 0) + 1;
+    colorCounts[candidate.color] = (colorCounts[candidate.color] || 0) + paymentCandidateValue(candidate);
   }
   for (const [color, amount] of Object.entries(option.paymentCost || {})) {
     if (color === "COLORLESS") continue;
@@ -3554,33 +3811,7 @@ function cardTitle(card) {
   return localizedName(card, card.cardId || "Card");
 }
 
-function isRecoloredManaToken(card) {
-  return Boolean(
-    card &&
-    !card.faceDown &&
-    card.type === "mana_token" &&
-    card.manaColor &&
-    card.manaColor !== "COLORLESS"
-  );
-}
-
-function manaColorName(color) {
-  return String(color || "").replaceAll("_", " ");
-}
-
-function renderManaTokenSwatch(card) {
-  const color = card.manaColor || "COLORLESS";
-  return `
-    <div class="card-mana-token-swatch ${esc(color)}" aria-label="${esc(manaColorName(color))} mana">
-      <span>${esc(manaColorName(color))}</span>
-    </div>
-  `;
-}
-
 function cardImage(card) {
-  if (isRecoloredManaToken(card)) {
-    return renderManaTokenSwatch(card);
-  }
   const assetUrl = localizedCardAssetUrl(card);
   if (assetUrl) {
     return `<img src="${esc(assetUrl)}" alt="${esc(cardTitle(card))}">`;
@@ -3607,19 +3838,75 @@ function visualPlaybackActive() {
   return Boolean(activeAnimationEvent || animationEventQueue.length || pendingVisualStateStillNeeded());
 }
 
+const OPEN_REVEAL_REASONS = new Set(["top_four", "top_cards", "top_deck_search", "deck_search"]);
+
+function isOpenRevealRecord(reveal) {
+  const reason = String(reveal && reveal.reason || "");
+  return Boolean(
+    reveal &&
+    reveal.card &&
+    (OPEN_REVEAL_REASONS.has(reason) || reason.startsWith("top"))
+  );
+}
+
+function clearPublicRevealBatchTimer() {
+  if (publicRevealBatchTimer) {
+    clearTimeout(publicRevealBatchTimer);
+    publicRevealBatchTimer = null;
+  }
+}
+
+function schedulePublicRevealBatchDismiss() {
+  clearPublicRevealBatchTimer();
+  if (!activePublicReveal || !activePublicReveal.batch) return;
+  publicRevealBatchTimer = setTimeout(() => {
+    publicRevealBatchTimer = null;
+    if (activePublicReveal && activePublicReveal.batch) closePublicReveal();
+  }, 1200);
+}
+
 function activatePublicRevealIfIdle() {
   if (activePublicReveal || !publicRevealQueue.length || visualPlaybackActive()) return false;
   activePublicReveal = publicRevealQueue.shift() || null;
+  schedulePublicRevealBatchDismiss();
   return Boolean(activePublicReveal);
 }
 
 function enqueuePublicReveals(reveals) {
   if (!reveals || !reveals.length) return;
-  publicRevealQueue.push(...reveals);
+  for (let index = 0; index < reveals.length;) {
+    const first = reveals[index];
+    if (!isOpenRevealRecord(first)) {
+      publicRevealQueue.push(first);
+      index += 1;
+      continue;
+    }
+    const batch = [first];
+    while (
+      index + batch.length < reveals.length &&
+      isOpenRevealRecord(reveals[index + batch.length]) &&
+      reveals[index + batch.length].playerSide === first.playerSide
+    ) {
+      batch.push(reveals[index + batch.length]);
+    }
+    if (batch.length > 1 || String(first.reason || "").startsWith("top")) {
+      publicRevealQueue.push({
+        batch: true,
+        cards: batch.map((reveal) => reveal.card),
+        playerName: first.playerName,
+        playerSide: first.playerSide,
+        reason: first.reason,
+      });
+    } else {
+      publicRevealQueue.push(first);
+    }
+    index += batch.length;
+  }
   activatePublicRevealIfIdle();
 }
 
 function closePublicReveal() {
+  clearPublicRevealBatchTimer();
   activePublicReveal = null;
   activatePublicRevealIfIdle();
   if (!activePublicReveal) scheduleAutoStep(AI_AUTO_VISUAL_POLL_MS);
@@ -4430,6 +4717,12 @@ function promptOptionAssetId(option) {
 
 function promptOptionLabel(option) {
   if (!option) return "";
+  if (option.kind === "effect_target_skip") {
+    const prompt = activePrompt();
+    if (prompt && prompt.choiceKind === "top3_magic") return t("addNoMagicCards");
+  }
+  if (option.reorderPosition === "top") return t("deckTopChoice");
+  if (option.reorderPosition === "bottom") return t("deckBottomChoice");
   if (option.kind === "end_turn") return t("endTurn");
   if (option.kind === "flash_pass" || option.kind === "no_block" || option.kind === "skip_mana") return t("pass");
   if (option.id === "keep") return t("keep");
@@ -4441,10 +4734,11 @@ function renderPromptButton(option, index = 0) {
   const assetId = promptOptionAssetId(option);
   const art = assetId ? uiAssetUrl(assetId) : null;
   const visualClass = art ? " action-art-button" : "";
+  const actionClass = option.kind === "end_turn" ? " end-turn-action" : "";
   const primary = index === 0 ? " primary" : "";
   const label = promptOptionLabel(option);
   return `
-    <button class="${primary}${visualClass}" data-option="${esc(option.id)}" title="${esc(label)}" aria-label="${esc(option.label)}">
+    <button class="${primary}${visualClass}${actionClass}" data-option="${esc(option.id)}" title="${esc(label)}" aria-label="${esc(option.label)}">
       ${art ? `<img class="action-art" src="${esc(art)}" alt="${esc(label)}">` : ""}
       <span class="action-label">${esc(label)}</span>
     </button>
@@ -4469,7 +4763,11 @@ function isActiveZoneMoveSourceCard(card) {
 
 function renderCard(card, size = "") {
   const actions = actionOptionsForCard(card);
+  const blessSourceActions = blessActionsForMana(card);
+  const blessTargetActions = blessActionsForTarget(card);
   const legal = actions.length ? " legal" : "";
+  const blessSource = blessSourceActions.length ? " bless-source-ready" : "";
+  const blessTarget = blessTargetActions.length ? " bless-target-ready" : "";
   const playable = isPlayableCard(card) ? " playable" : "";
   const rested = cardCanBeRested(card) && card.rested ? " rested" : "";
   const movingSource = isActiveZoneMoveSourceCard(card) ? " zone-moving-source" : "";
@@ -4491,13 +4789,19 @@ function renderCard(card, size = "") {
     ? `<div class="card-field-stats"><span>BP ${esc(bp)}</span><span>DP ${esc(dp)}</span></div>`
     : "";
   const actionBadge = actions.length ? `<div class="card-action-dot"></div>` : "";
+  const blessDragAttrs = blessSourceActions.length
+    ? `data-bless-source-iid="${esc(card.iid)}"`
+    : "";
+  const blessTargetAttr = blessTargetActions.length
+    ? `data-bless-target-iid="${esc(card.iid)}"`
+    : "";
   const mulliganToggle = mulliganSelectable
     ? `<button class="mulligan-toggle" data-mulligan-iid="${esc(card.iid)}" aria-label="${esc(t("selectForMulligan"))}"></button>`
     : "";
   const cardAnchor = boardCardAnchorAttr(card);
   return `
-    <div class="card${classes}${legal}${playable}${rested}${selected}${mulliganClass}${movingSource}" role="button" tabindex="0" ${cardAnchor}
-         data-card-iid="${esc(card.iid)}" title="${label}">
+    <div class="card${classes}${legal}${playable}${blessSource}${blessTarget}${rested}${selected}${mulliganClass}${movingSource}" role="button" tabindex="0" ${cardAnchor}
+         data-card-iid="${esc(card.iid)}" ${blessDragAttrs} ${blessTargetAttr} title="${label}">
       ${art}
       ${actionBadge}
       ${mulliganToggle}
@@ -4523,8 +4827,9 @@ function renderForce(force) {
   const key = forceKey(force);
   const title = forceTitle(force);
   const actionLabel = option && option.kind === "effect_target" ? t("selectAsEffectTarget") : t("attack");
-  const art = force.assetUrl
-    ? `<img src="${esc(force.assetUrl)}" alt="${esc(title)}">`
+  const forceAssetUrl = localizedForceAssetUrl(force);
+  const art = forceAssetUrl
+    ? `<img src="${esc(forceAssetUrl)}" alt="${esc(title)}">`
     : `<div class="force-art-fallback">F</div>`;
   const forceAnchor = boardForceAnchorAttr(force);
   return `
@@ -4726,7 +5031,6 @@ function renderPilotIdentity(player, top = false) {
   const click = ` role="button" tabindex="0" data-player-side="${esc(player.side)}" data-board-anchor="${esc(boardAnchorKey(player.side, "player"))}"${option ? ` data-option="${esc(option.id)}"` : ""}`;
   const initial = player.name.slice(0, 1) || "P";
   const canRequestAdvice = !replayReadonlyMode && !top;
-  const adviceStage = canRequestAdvice && !option ? ` data-ai-advice title="${esc(t("aiAdvicePrefix"))}"` : "";
   const adviceButton = canRequestAdvice
     ? `<button class="pilot-advice-button" type="button" data-ai-advice title="${esc(t("aiAdvicePrefix"))}">AI</button>`
     : "";
@@ -4735,7 +5039,7 @@ function renderPilotIdentity(player, top = false) {
          data-codeman-id="${esc(codeman.id || "")}"
          style="--pilot-accent:${esc(codeman.color || "#32d5c8")}">
       ${adviceButton}
-      <div class="pilot-codeman-stage"${adviceStage}>
+      <div class="pilot-codeman-stage" data-player-detail="${esc(player.side)}">
         ${renderCodemanHalfbody(codeman, "pilot-codeman-art", initial)}
       </div>
       <div class="pilot-codeman-copy">
@@ -4881,6 +5185,7 @@ function renderPrompt(error) {
       </section>
     `;
   }
+  if (prompt.kind === "blessing_base_replacement") return "";
   const mulliganCount = prompt.kind === "mulligan"
     ? `<div class="prompt-note">${esc(mulliganSelectedIids.size)} ${esc(t("selected"))}</div>`
     : "";
@@ -4928,8 +5233,14 @@ function promptTitle(prompt) {
   if (prompt.kind === "effect_target" && prompt.choiceKind === "deck_base_minion") {
     return t("revealFromDeck");
   }
-  if (prompt.kind === "effect_target" && prompt.choiceKind === "top_field_minion") {
-    return t("revealFromTopCards");
+  if (prompt.kind === "effect_target" && prompt.choiceKind === "deck_top_or_bottom") {
+    return t("inspectTopCards");
+  }
+  if (prompt.kind === "effect_target" && prompt.choiceKind === "top3_magic") {
+    return t("inspectTopCards");
+  }
+  if (prompt.kind === "effect_target" && ["top_field_minion", "top2_field_minion", "top3_field_minion", "top4_card", "top2_card"].includes(prompt.choiceKind)) {
+    return t("inspectTopCards");
   }
   if (prompt.kind === "effect_target") return t("chooseEffectTarget");
   return t("promptMainAction");
@@ -4978,6 +5289,42 @@ function renderEffectChoiceOptions(options) {
 function renderEffectPromptModal() {
   const prompt = activePrompt();
   if (!prompt || prompt.kind !== "effect_target") return "";
+  if (prompt.choiceKind === "deck_top_or_bottom") {
+    const topOption = (prompt.options || []).find((option) => option.reorderPosition === "top");
+    const bottomOption = (prompt.options || []).find((option) => option.reorderPosition === "bottom");
+    if (!topOption || !bottomOption) return "";
+    const inspectedCard = (prompt.revealedCards || []).find(
+      (card) => Number(card.cardIid) === Number(topOption.cardIid)
+    ) || topOption;
+    const catalogCard = inspectedCard.cardId ? cardById(inspectedCard.cardId) : null;
+    const topCard = catalogCard ? { ...catalogCard, ...inspectedCard } : inspectedCard;
+    const actionsHtml = `
+      <div class="card-detail-actions">
+        <button class="card-detail-action primary" data-option="${esc(topOption.id)}">
+          ${esc(t("deckTopChoice"))}
+        </button>
+        <button class="card-detail-action" data-option="${esc(bottomOption.id)}">
+          ${esc(t("deckBottomChoice"))}
+        </button>
+      </div>
+    `;
+    const contextHtml = `
+      <div class="field-replace-head">
+        <div>
+          <div class="payment-title">${esc(promptTitle(prompt))}</div>
+          <div class="payment-note">${esc(t("deckTopOrBottomNote"))}</div>
+        </div>
+      </div>
+    `;
+    return renderCardDetail(topCard, {
+      modalClass: "effect-prompt-modal",
+      closeButton: false,
+      contextHtml,
+      actionsHtml,
+      showCardActions: false,
+      showDebugTools: false,
+    });
+  }
   const minimum = effectPromptMinimumCount(prompt);
   const maximum = effectPromptMaximumCount(prompt);
   const isMulti = maximum > 1;
@@ -5044,14 +5391,21 @@ function effectTargetKey(option) {
 }
 
 function effectPromptNote(prompt) {
+  if (prompt.choiceKind === "top3_magic") return t("lookTop3MagicNote");
   if (prompt.allowVariableTargetCount) {
     return t("variableTargetNote", { min: effectPromptMinimumCount(prompt), max: effectPromptMaximumCount(prompt) });
   }
   if (effectPromptMaximumCount(prompt) > 1) {
     return t("multiTargetNote", { selected: effectTargetSelectionIds.size, max: effectPromptMaximumCount(prompt) });
   }
-  if (prompt.choiceKind === "top_field_minion") return t("top4Note");
-  if (prompt.choiceKind === "top2_field_minion") return t("top2Note");
+  const topWindowSize = {
+    top_field_minion: 4,
+    top2_field_minion: 2,
+    top3_field_minion: 3,
+    top4_card: 4,
+    top2_card: 2,
+  }[prompt.choiceKind];
+  if (topWindowSize) return t("inspectTopCardsNote", { count: topWindowSize });
   if (prompt.choiceKind === "deck_base_minion") return t("deckBaseNote");
   return t("oneTargetNote");
 }
@@ -5365,7 +5719,6 @@ function renderDuelView(error = null) {
       <div class="controls">
         ${renderLanguageSwitch()}
         <button data-view="home">${esc(t("home"))}</button>
-        ${online ? "" : `<button data-view="deckbuilder">${esc(t("deckBuilderShort"))}</button>`}
         ${online ? "" : `<button data-mode="human-vs-ai">${esc(t("human"))}</button>`}
         ${online ? "" : `<button data-mode="god">${esc(t("god"))}</button>`}
         ${online ? "" : `<button data-mode="ai-vs-ai">${esc(t("aiVsAi"))}</button>`}
@@ -5398,7 +5751,7 @@ function renderBattleDebugCard(card) {
       <span class="battle-debug-card-art">${art}</span>
       <span class="battle-debug-card-copy">
         <strong>${title}</strong>
-        <small>${esc(card.cardTypeJp || card.type || "card")} / ${esc(card.attributeJp || card.manaColor || "")} / ${esc(cost)}</small>
+        <small>${esc(localizedCardType(card))} / ${esc(localizedCardAttribute(card))} / ${esc(cost)}</small>
         <small>BP ${esc(card.bp ?? "-")} / DP ${esc(card.dp ?? "-")}</small>
       </span>
     </button>
@@ -5412,12 +5765,12 @@ function renderBattleDebugFilters() {
     <div class="battle-debug-filter-grid">
       ${groups.map((group) => `
         <label>
-          <span>${esc(group.label || group.id)}</span>
+          <span>${esc(localizedCatalogLabel(group, group.id))}</span>
           <select data-battle-debug-filter="${esc(group.id)}">
             <option value="">${esc(t("all"))}</option>
             ${(group.options || []).map((option) => `
               <option value="${esc(option.value)}" ${battleDebugFilters[group.id] === option.value ? "selected" : ""}>
-                ${esc(option.label || option.value)}
+                ${esc(localizedCatalogLabel(option))}
               </option>
             `).join("")}
           </select>
@@ -5539,15 +5892,45 @@ function renderBattleDebugCardTools(card) {
   `;
 }
 
+function activeEffectKindLabel(kind) {
+  const table = ACTIVE_EFFECT_COPY[currentLanguage()] || ACTIVE_EFFECT_COPY.zh;
+  return table[kind] || t("activeEffects");
+}
+
+function localizedKeywordName(keyword) {
+  const table = KEYWORD_COPY[currentLanguage()] || KEYWORD_COPY.zh;
+  return table[keyword] || String(keyword || "");
+}
+
+function activeEffectScopeLabel(scope) {
+  const table = ACTIVE_EFFECT_COPY[currentLanguage()] || ACTIVE_EFFECT_COPY.zh;
+  return table[scope] || "";
+}
+
+function activeEffectSource(effect) {
+  if (effect.sourceCardId) {
+    const card = cardById(effect.sourceCardId);
+    return card ? localizedName(card, effect.sourceCardId) : effect.sourceCardId;
+  }
+  if (effect.sourceForceId) {
+    const force = forceById(effect.sourceForceId);
+    return force ? forceTitle(force) : effect.sourceForceId;
+  }
+  return "";
+}
+
 function activeEffectText(effect) {
   const bits = [];
   if (effect.bpDelta) bits.push(`BP ${effect.bpDelta > 0 ? "+" : ""}${effect.bpDelta}`);
   if (effect.dpDelta) bits.push(`DP ${effect.dpDelta > 0 ? "+" : ""}${effect.dpDelta}`);
-  if (effect.amount) bits.push(`Damage -${effect.amount}`);
-  if (effect.keywords && effect.keywords.length) bits.push(effect.keywords.join(", "));
-  if (effect.scope) bits.push(effect.scope.replaceAll("_", " "));
-  const body = bits.length ? bits.join(" / ") : (effect.kind || "active effect").replaceAll("_", " ");
-  const source = effect.sourceName || effect.sourceCardId || effect.sourceForceId || "";
+  if (effect.amount) bits.push(`${activeEffectKindLabel("damage")} -${effect.amount}`);
+  if (effect.keywords && effect.keywords.length) bits.push(effect.keywords.map(localizedKeywordName).join(", "));
+  if (effect.scope) {
+    const scope = activeEffectScopeLabel(effect.scope);
+    if (scope) bits.push(scope);
+  }
+  const body = [activeEffectKindLabel(effect.kind), ...bits].join(" / ");
+  const source = activeEffectSource(effect);
   return source ? `${source}: ${body}` : body;
 }
 
@@ -5564,33 +5947,78 @@ function renderActiveEffects(effects) {
   `;
 }
 
-function renderCardDetail() {
-  if (!selectedCardIid) return "";
-  const card = findCardByIid(selectedCardIid);
-  if (!card) return "";
+function renderBlessingDetails(blessings) {
+  const rows = (blessings || []).filter(Boolean);
+  if (!rows.length) return "";
+  return `
+    <div class="card-detail-blessings">
+      <div class="active-effect-title">${esc(t("blessingDetails"))}</div>
+      <div class="blessing-detail-list">
+        ${rows.map((blessing) => {
+          const effect = cardEffectText(blessing);
+          const bp = Number(blessing.bp || 0);
+          const dp = Number(blessing.dp || 0);
+          return `
+            <div class="blessing-detail-item">
+              <div class="blessing-detail-heading">${esc(t("blessingSource", { name: cardTitle(blessing) }))}</div>
+              ${effect ? `<div class="blessing-detail-effect">${multiline(effect)}</div>` : ""}
+              <div class="blessing-detail-stats">BP ${bp >= 0 ? "+" : ""}${esc(bp)} / DP ${dp >= 0 ? "+" : ""}${esc(dp)}</div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderCardDetailPanel(card, {
+  closeButton = true,
+  contextHtml = "",
+  actionsHtml = null,
+  showCardActions = true,
+  showDebugTools = true,
+} = {}) {
   const title = esc(cardTitle(card));
   const bp = card.effectiveBp ?? card.bp ?? "-";
   const dp = card.effectiveDp ?? card.dp ?? "-";
   const effect = cardEffectText(card);
   const art = cardImage(card) || `<div class="card-detail-fallback">${title}</div>`;
+  const actions = actionsHtml !== null
+    ? actionsHtml
+    : (showCardActions ? renderCardDetailActions(card) : "");
   return `
-    <div class="card-detail-modal" data-close-detail>
-      <article class="card-detail-panel" role="dialog" aria-modal="true" aria-label="${title}">
-        <button class="detail-close" data-close-detail>${esc(t("close"))}</button>
-        <div class="card-detail-art">${art}</div>
-        <div class="card-detail-copy">
-          <div class="card-detail-title">${title}</div>
-          <div class="card-detail-meta">
-            <span>${esc(card.type || "card")}</span>
-            <span>${esc(bp)}/${esc(dp)}</span>
-            <span>${esc(card.area || "")}</span>
-          </div>
-          ${effect ? `<div class="card-detail-effect">${multiline(effect)}</div>` : ""}
-          ${renderActiveEffects(card.activeEffects)}
-          ${renderCardDetailActions(card)}
-          ${renderBattleDebugCardTools(card)}
+    <article class="card-detail-panel" role="dialog" aria-modal="true" aria-label="${title}">
+      ${closeButton ? `<button class="detail-close" data-close-detail>${esc(t("close"))}</button>` : ""}
+      <div class="card-detail-art">${art}</div>
+      <div class="card-detail-copy">
+        ${contextHtml}
+        <div class="card-detail-title">${title}</div>
+        <div class="card-detail-meta">
+          <span>${esc(card.type || "card")}</span>
+          <span>${esc(bp)}/${esc(dp)}</span>
+          <span>${esc(card.area || "")}</span>
         </div>
-      </article>
+        ${effect ? `<div class="card-detail-effect">${multiline(effect)}</div>` : ""}
+        ${renderBlessingDetails(card.blessings)}
+        ${renderActiveEffects(card.activeEffects)}
+        ${actions}
+        ${showDebugTools ? renderBattleDebugCardTools(card) : ""}
+      </div>
+    </article>
+  `;
+}
+
+function renderCardDetail(cardOverride = null, options = {}) {
+  const card = cardOverride || (selectedCardIid ? findCardByIid(selectedCardIid) : null);
+  if (!card) return "";
+  const {
+    modalClass = "card-detail-modal",
+    modalAttributes = "data-close-detail",
+    ...panelOptions
+  } = options;
+  return `
+    <div class="${modalClass}"${modalAttributes ? ` ${modalAttributes}` : ""}>
+      ${renderCardDetailPanel(card, panelOptions)}
     </div>
   `;
 }
@@ -5601,8 +6029,9 @@ function renderForceDetail() {
   if (!force) return "";
   const title = esc(forceTitle(force));
   const effect = forceAbilityText(force);
-  const art = force.assetUrl
-    ? `<img src="${esc(force.assetUrl)}" alt="${title}">`
+  const forceAssetUrl = localizedForceAssetUrl(force);
+  const art = forceAssetUrl
+    ? `<img src="${esc(forceAssetUrl)}" alt="${title}">`
     : `<div class="card-detail-fallback">${title}</div>`;
   return `
     <div class="card-detail-modal force-detail-modal" data-close-detail>
@@ -5680,7 +6109,45 @@ function renderTrashDetail() {
 }
 
 function renderPublicRevealModal() {
-  if (!activePublicReveal || !activePublicReveal.card) return "";
+  if (!activePublicReveal) return "";
+  if (activePublicReveal.batch) {
+    const reveal = activePublicReveal;
+    const cards = (reveal.cards || []).filter(Boolean);
+    if (!cards.length) return "";
+    return `
+      <div class="public-reveal-modal public-reveal-batch-modal" aria-live="polite">
+        <article class="public-reveal-batch-card" role="status" aria-label="${esc(t("revealFromTopCards"))}">
+          <div class="public-reveal-batch-head">
+            <div class="prompt-title">${esc(t("revealFromTopCards"))}</div>
+            <div class="card-detail-meta">
+              <span>${esc(reveal.playerName || reveal.playerSide || "")}</span>
+              <span>${esc(reveal.reason || "")}</span>
+            </div>
+          </div>
+          <div class="public-reveal-batch-grid">
+            ${cards.map((card) => {
+              const title = esc(cardTitle(card));
+              const artUrl = localizedCardAssetUrl(card);
+              const stats = card.type && card.type !== "magic"
+                ? `<span>${esc(card.bp ?? "-")}/${esc(card.dp ?? "-")}</span>`
+                : "";
+              const art = artUrl
+                ? `<img src="${esc(artUrl)}" alt="${title}">`
+                : `<div class="card-detail-fallback">${title}</div>`;
+              return `
+                <div class="public-reveal-batch-item">
+                  <div class="public-reveal-batch-art">${art}</div>
+                  <div class="public-reveal-batch-title">${title}</div>
+                  <div class="card-detail-meta">${stats}</div>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </article>
+      </div>
+    `;
+  }
+  if (!activePublicReveal.card) return "";
   const reveal = activePublicReveal;
   const card = reveal.card;
   const title = esc(cardTitle(card));
@@ -5726,6 +6193,7 @@ function cardActionLabel(option, card) {
     const replaced = replacedIid ? findCardByIid(replacedIid) : null;
     return replaced ? `${baseLabel} / ${t("replaceWith", { name: cardTitle(replaced) })}` : baseLabel;
   }
+  if (option.kind === "bless") return t("bless");
   if (option.kind === "attack") return t("attack");
   if (option.kind === "activate_flash_ability") return t("activateEffect");
   if (option.kind === "effect_target") return t("selectAsEffectTarget");
@@ -5740,7 +6208,7 @@ function renderCardDetailActions(card) {
   const fieldReplacementActions = actions.filter(isFieldReplacementOption);
   const baseReplacementActions = actions.filter(isBaseReplacementOption);
   const directActions = actions.filter((option) =>
-    !isFieldReplacementOption(option) && !isBaseReplacementOption(option)
+    !isFieldReplacementOption(option) && !isBaseReplacementOption(option) && option.kind !== "bless"
   );
   if (!fieldReplacementActions.length && !baseReplacementActions.length && !directActions.length) return "";
   const fieldReplacementLabel = fieldReplacementActions.some((option) => option.kind === "move_card")
@@ -5775,7 +6243,7 @@ function renderCardHoverActions(card, actions) {
   const fieldReplacementActions = actions.filter(isFieldReplacementOption);
   const baseReplacementActions = actions.filter(isBaseReplacementOption);
   const directActions = actions.filter((option) =>
-    !isFieldReplacementOption(option) && !isBaseReplacementOption(option)
+    !isFieldReplacementOption(option) && !isBaseReplacementOption(option) && option.kind !== "bless"
   );
   if (!fieldReplacementActions.length && !baseReplacementActions.length && !directActions.length) return "";
   const fieldReplacementLabel = fieldReplacementActions.some((option) => option.kind === "move_card")
@@ -5816,6 +6284,7 @@ function renderPaymentEditor() {
   if (!option) return "";
   const card = findCardByIid(option.iid);
   const valid = paymentSelectionIsValid(option);
+  const selected = paymentSelectionValue(option) ?? 0;
   const required = paymentRequiredCount(option);
   const defaultIids = new Set(option.paymentDefaultIids || []);
   return `
@@ -5824,7 +6293,7 @@ function renderPaymentEditor() {
         <div class="payment-head">
           <div>
             <div class="payment-title">${esc(card ? cardTitle(card) : promptOptionLabel(option))}</div>
-            <div class="payment-note">${esc(t("paymentCost", { cost: paymentCostText(option), selected: paymentSelectionIids.size, required }))}</div>
+            <div class="payment-note">${esc(t("paymentCost", { cost: paymentCostText(option), selected, required }))}</div>
           </div>
           <button data-payment-cancel>${esc(t("close"))}</button>
         </div>
@@ -5832,11 +6301,26 @@ function renderPaymentEditor() {
           ${(option.paymentCandidates || []).map((candidate) => {
             const selected = paymentSelectionIids.has(candidate.iid);
             const isDefault = defaultIids.has(candidate.iid);
+            const paymentCard = candidate.card || findCardByIid(candidate.iid);
+            const paymentName = paymentCard
+              ? cardTitle(paymentCard)
+              : localizedName(candidate, candidate.nameJp || candidate.cardId || candidate.iid);
+            const paymentArt = paymentCard ? cardImage(paymentCard) : "";
+            const paymentValue = paymentCandidateValue(candidate);
             return `
               <button class="mana-choice ${selected ? "selected" : ""} ${isDefault ? "default" : ""}"
-                      data-payment-iid="${esc(candidate.iid)}">
-                <span class="mana-color ${esc(candidate.color)}">${esc(candidate.color.slice(0, 1))}</span>
-                <span>${esc(localizedName(candidate, candidate.cardId || candidate.iid))}</span>
+                      data-payment-iid="${esc(candidate.iid)}"
+                      title="${esc(paymentName)}">
+                <span class="mana-card-thumb">
+                  ${paymentArt || `<span class="mana-card-thumb-fallback">${esc(paymentName).slice(0, 1)}</span>`}
+                </span>
+                <span class="mana-choice-copy">
+                  <strong>${esc(paymentName)}</strong>
+                  <span class="mana-choice-meta">
+                    <span class="mana-color ${esc(candidate.color)}" aria-hidden="true">${esc(candidate.color.slice(0, 1))}</span>
+                    <span class="mana-value" aria-label="${esc(`x${paymentValue}`)}">x${esc(paymentValue)}</span>
+                  </span>
+                </span>
               </button>
             `;
           }).join("")}
@@ -5894,19 +6378,24 @@ function replacementRestState(card) {
 }
 
 function renderBaseReplaceEditor() {
-  if (!pendingBaseReplaceSourceIid) return "";
-  const source = findCardByIid(pendingBaseReplaceSourceIid);
+  const prompt = activePrompt();
+  const isBlessingReturn = prompt && prompt.kind === "blessing_base_replacement";
+  if (!pendingBaseReplaceSourceIid && !isBlessingReturn) return "";
+  const source = isBlessingReturn ? prompt.card : findCardByIid(pendingBaseReplaceSourceIid);
   if (!source) return "";
   const options = baseReplacementOptionsForCard(source);
   if (!options.length) return "";
   const isMove = options.some((option) => option.kind === "move_card");
+  const noteKey = isBlessingReturn
+    ? "baseReplacementNoteBlessing"
+    : (isMove ? "baseReplacementNoteMove" : "baseReplacementNotePlay");
   return `
     <div class="base-replace-modal">
       <section class="base-replace-panel" role="dialog" aria-modal="true" aria-label="${esc(t("chooseBaseReplacement"))}">
         <div class="field-replace-head">
           <div>
             <div class="payment-title">${esc(cardTitle(source))}</div>
-            <div class="payment-note">${esc(t(isMove ? "baseReplacementNoteMove" : "baseReplacementNotePlay"))}</div>
+            <div class="payment-note">${esc(t(noteKey))}</div>
           </div>
           <button data-base-replace-cancel>${esc(t("close"))}</button>
         </div>
@@ -5986,10 +6475,6 @@ function renderShellHeader(title = "ZENONZARD") {
         ${renderLanguageSwitch()}
         ${navButton("home", t("home"))}
         ${navButton("lobby", t("gameLobby"))}
-        ${navButton(ONLINE_VIEW, t("onlineGame"))}
-        ${navButton(AI_TRAINING_VIEW, t("replayTraining"))}
-        ${navButton("deckbuilder", t("deckBuilder"))}
-        ${navButton("playmats", t("playmats"))}
         ${navButton("settings", t("setting"))}
         ${state ? `<button data-view="duel">${esc(t("continueDuel"))}</button>` : ""}
         <button class="bgm-toggle ${bgmPlaying ? "active" : ""}" data-bgm-toggle
@@ -6839,7 +7324,7 @@ function renderPlaymatDatabase(error = null) {
       <section class="home-panel playmat-database-panel">
         <div class="home-panel-head">
           <h1>${esc(t("playmats"))}</h1>
-          <button data-view="home">${esc(t("back"))}</button>
+          <button data-view="lobby">${esc(t("back"))}</button>
         </div>
         <div class="playmat-database-toolbar">
           <div class="playmat-target-tabs">
@@ -6902,12 +7387,12 @@ function renderOfficialFilterControls() {
     <div class="deck-filter-grid">
       ${groups.map((group) => `
         <label class="deck-filter">
-          <span>${esc(group.label || group.id)}</span>
+          <span>${esc(localizedCatalogLabel(group, group.id))}</span>
           <select data-deck-filter-group="${esc(group.id)}">
             <option value="">${esc(t("all"))}</option>
             ${(group.options || []).map((option) => `
               <option value="${esc(option.value)}" ${deckEditor.filters[group.id] === option.value ? "selected" : ""}>
-                ${esc(option.label || option.value)}
+                ${esc(localizedCatalogLabel(option))}
               </option>
             `).join("")}
           </select>
@@ -6918,11 +7403,21 @@ function renderOfficialFilterControls() {
   `;
 }
 
-function renderDeckBuilder(error = null) {
+function filteredDeckCatalogCards() {
   const search = deckEditor.search.trim().toLowerCase();
-  const filteredCards = catalog.cards.filter((card) => {
+  return catalog.cards.filter((card) => {
     return cardMatchesOfficialFilters(card) && cardMatchesSearch(card, search);
   });
+}
+
+function refreshDeckSearchResults() {
+  const list = app.querySelector(".card-catalog-list");
+  if (!list) throw new Error("Deck search result list is missing.");
+  list.innerHTML = filteredDeckCatalogCards().map((card) => renderCatalogCard(card)).join("");
+}
+
+function renderDeckBuilder(error = null) {
+  const filteredCards = filteredDeckCatalogCards();
   const total = deckTotal();
   const deckReadyText = `${t("deck")} ${total} / 40`;
   const forceReady = deckEditor.selectedForceIds.length === 2;
@@ -6939,6 +7434,7 @@ function renderDeckBuilder(error = null) {
     <main class="deck-builder">
       ${error ? `<div class="error">${esc(error.message || error)}</div>` : ""}
       <section class="deck-editor-toolbar">
+        <button data-view="lobby">${esc(t("back"))}</button>
         <input data-deck-name value="${esc(deckEditor.name)}" aria-label="deck name">
         <div class="deck-status ${valid ? "ready" : ""}">
           <span>${esc(deckReadyText)}</span>
@@ -7009,8 +7505,9 @@ function renderDeckBuilder(error = null) {
 }
 
 function renderForcePickArt(force) {
-  if (force.assetUrl) {
-    return `<img src="${esc(force.assetUrl)}" alt="${esc(forceTitle(force))}">`;
+  const forceAssetUrl = localizedForceAssetUrl(force);
+  if (forceAssetUrl) {
+    return `<img src="${esc(forceAssetUrl)}" alt="${esc(forceTitle(force))}">`;
   }
   return `<i>${esc((forceTitle(force) || "?").slice(0, 1))}</i>`;
 }
@@ -7036,8 +7533,8 @@ function renderCatalogCard(card) {
       <button class="catalog-art" data-deck-add="${esc(card.id)}" ${canAddDeckCard(card.id) ? "" : "disabled"}>${art}</button>
       <div class="catalog-copy">
         <strong>${esc(title)}</strong>
-        <span>${esc(card.cardTypeJp || card.type)} / ${esc(card.officialCost || card.totalCost)}</span>
-        <span>${esc(card.attributeJp || card.manaColor || "")} ${esc(card.packJp || "")}</span>
+        <span>${esc(localizedCardType(card))} / ${esc(card.officialCost || card.totalCost)}</span>
+        <span>${esc(localizedCardAttribute(card))} ${esc(localizedCardSeries(card))}</span>
         <span>${esc(card.bp ?? "-")}/${esc(card.dp ?? "-")}</span>
       </div>
       <div class="catalog-count">
@@ -7059,7 +7556,7 @@ function renderCatalogCardDetail() {
   const art = artUrl
     ? `<img src="${esc(artUrl)}" alt="${title}">`
     : `<div class="card-detail-fallback">${title}</div>`;
-  const races = (card.raceJp || []).join(" / ");
+  const races = (card.raceJp || []).map((race) => localizedCardRace(race)).filter(Boolean).join(" / ");
   const effect = localizedAbility(card);
   return `
     <div class="catalog-detail-modal" data-catalog-detail-close>
@@ -7070,16 +7567,15 @@ function renderCatalogCardDetail() {
           <div class="card-detail-title">${title}</div>
           <div class="catalog-detail-meta">
             <span>${esc(card.id)}</span>
-            <span>${esc(card.cardTypeJp || card.type)}</span>
-            <span>${esc(card.attributeJp || "")}</span>
+            <span>${esc(localizedCardType(card))}</span>
+            <span>${esc(localizedCardAttribute(card))}</span>
             <span>${esc(t("cost"))} ${esc(card.officialCost || card.totalCost)}</span>
             <span>BP ${esc(card.bp ?? "-")} / DP ${esc(card.dp ?? "-")}</span>
-            ${card.packJp ? `<span>${esc(card.packJp)}</span>` : ""}
+            ${localizedCardSeries(card) ? `<span>${esc(localizedCardSeries(card))}</span>` : ""}
             ${races ? `<span>${esc(races)}</span>` : ""}
-            ${card.rarity ? `<span>${esc(card.rarity)}</span>` : ""}
+            ${localizedCardRarity(card) ? `<span>${esc(localizedCardRarity(card))}</span>` : ""}
           </div>
           ${effect ? `<div class="card-detail-effect">${multiline(effect)}</div>` : ""}
-          ${currentLanguage() !== "en" && card.abilityEn ? `<div class="card-detail-effect catalog-detail-en">${multiline(card.abilityEn)}</div>` : ""}
         </div>
       </article>
     </div>
@@ -7281,6 +7777,7 @@ function clearDuelUiState() {
   battleDebugZone = "hand";
   battleDebugRested = false;
   publicRevealQueue = [];
+  clearPublicRevealBatchTimer();
   activePublicReveal = null;
   animationEventQueue = [];
   activeAnimationEvent = null;
@@ -7340,8 +7837,7 @@ function enterDuelPage() {
 
 function shouldDeferDuelLaunch() {
   return window.location.protocol !== "file:"
-    && window.location.pathname !== "/duel"
-    && (!window.ZZDuelRuntime || typeof window.ZZDuelRuntime.render !== "function");
+    && window.location.pathname !== "/duel";
 }
 
 function deferDuelLaunch(mode, payload) {
@@ -7431,8 +7927,8 @@ function hasBlockingAutoVisuals() {
   return Boolean(
     activeAnimationEvent ||
     animationEventQueue.length ||
-    activePublicReveal ||
-    publicRevealQueue.length ||
+    (activePublicReveal && !activePublicReveal.batch) ||
+    publicRevealQueue.some((reveal) => !reveal.batch) ||
     pendingVisualState
   );
 }
@@ -7584,7 +8080,123 @@ function handleOption(optionId) {
   choose(optionId);
 }
 
+function clearBlessDragState() {
+  draggingBlessSourceIid = null;
+  pendingBlessDrag = null;
+  app.classList.remove("bless-dragging");
+  app.querySelectorAll(".bless-drag-source, .bless-drop-hover").forEach((element) => {
+    element.classList.remove("bless-drag-source", "bless-drop-hover");
+  });
+  blessDragArrow?.remove();
+  blessDragArrow = null;
+}
+
+function updateBlessDragArrow(clientX, clientY) {
+  const drag = pendingBlessDrag;
+  if (!drag || !drag.active || !drag.source?.isConnected) return;
+  if (!blessDragArrow) {
+    blessDragArrow = document.createElement("div");
+    blessDragArrow.className = "bless-drag-arrow";
+    blessDragArrow.setAttribute("aria-hidden", "true");
+    document.body.appendChild(blessDragArrow);
+  }
+  const rect = drag.source.getBoundingClientRect();
+  const startX = rect.left + rect.width / 2;
+  const startY = rect.top + rect.height / 2;
+  const dx = clientX - startX;
+  const dy = clientY - startY;
+  const length = Math.max(1, Math.hypot(dx, dy));
+  blessDragArrow.style.left = `${startX}px`;
+  blessDragArrow.style.top = `${startY}px`;
+  blessDragArrow.style.width = `${length}px`;
+  blessDragArrow.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+  const target = blessTargetElementAt(clientX, clientY);
+  blessDragArrow.classList.toggle(
+    "bless-drag-arrow-valid",
+    Boolean(target && blessOptionForPair(drag.sourceIid, target.dataset.blessTargetIid)),
+  );
+}
+
+function blessTargetElementAt(clientX, clientY) {
+  const element = document.elementFromPoint(clientX, clientY);
+  return element ? element.closest("[data-bless-target-iid]") : null;
+}
+
+function updateBlessDropHover(clientX, clientY) {
+  app.querySelectorAll(".bless-drop-hover").forEach((element) => element.classList.remove("bless-drop-hover"));
+  const target = blessTargetElementAt(clientX, clientY);
+  if (
+    target &&
+    draggingBlessSourceIid !== null &&
+    blessOptionForPair(draggingBlessSourceIid, target.dataset.blessTargetIid)
+  ) {
+    target.classList.add("bless-drop-hover");
+  }
+  updateBlessDragArrow(clientX, clientY);
+}
+
+app.addEventListener("pointerdown", (event) => {
+  const source = event.target.closest("[data-bless-source-iid]");
+  if (!source) return;
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+  const sourceIid = source.dataset.blessSourceIid;
+  if (!blessActionsForMana(findCardByIid(sourceIid)).length) {
+    return;
+  }
+  pendingBlessDrag = {
+    pointerId: event.pointerId,
+    sourceIid,
+    source,
+    startX: event.clientX,
+    startY: event.clientY,
+    active: false,
+  };
+  source.setPointerCapture?.(event.pointerId);
+});
+
+app.addEventListener("pointermove", (event) => {
+  const drag = pendingBlessDrag;
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  if (!drag.active) {
+    const distance = Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY);
+    if (distance < 8) return;
+    drag.active = true;
+    draggingBlessSourceIid = drag.sourceIid;
+    suppressCardDetailUntil = Date.now() + 300;
+    app.classList.add("bless-dragging");
+    drag.source.classList.add("bless-drag-source");
+    updateBlessDragArrow(event.clientX, event.clientY);
+  }
+  event.preventDefault();
+  updateBlessDropHover(event.clientX, event.clientY);
+});
+
+function finishBlessPointerDrag(event) {
+  const drag = pendingBlessDrag;
+  if (!drag || drag.pointerId !== event.pointerId) return false;
+  const wasActive = drag.active;
+  const target = wasActive ? blessTargetElementAt(event.clientX, event.clientY) : null;
+  const option = target ? blessOptionForPair(drag.sourceIid, target.dataset.blessTargetIid) : null;
+  if (drag.source.hasPointerCapture?.(event.pointerId)) {
+    drag.source.releasePointerCapture(event.pointerId);
+  }
+  clearBlessDragState();
+  if (!wasActive) return false;
+  event.preventDefault();
+  suppressCardDetailUntil = Date.now() + 300;
+  if (option) handleOption(option.id);
+  return true;
+}
+
+app.addEventListener("pointercancel", (event) => {
+  if (!pendingBlessDrag || pendingBlessDrag.pointerId !== event.pointerId) return;
+  if (pendingBlessDrag.active) suppressCardDetailUntil = Date.now() + 300;
+  clearBlessDragState();
+});
+
 app.addEventListener("pointerup", (event) => {
+  if (finishBlessPointerDrag(event)) return;
+  if (Date.now() < suppressCardDetailUntil) return;
   const card = cardFromPointerEvent(event);
   if (card) {
     openCardDetail(card.dataset.cardIid);
@@ -7602,6 +8214,10 @@ app.addEventListener("dblclick", (event) => {
 });
 
 app.addEventListener("click", async (event) => {
+  if (Date.now() < suppressCardDetailUntil && event.target.closest("[data-card-iid]")) {
+    event.preventDefault();
+    return;
+  }
   if (event.target.closest("[data-home-theme-skip]")) {
     event.preventDefault();
     stopHomeThemeVideo();
@@ -7816,10 +8432,7 @@ app.addEventListener("click", async (event) => {
       stopHomeThemeVideo(false);
     }
     if (view === "home") showHome();
-    else if (view === "lobby") {
-      appView = "lobby";
-      render();
-    }
+    else if (view === "lobby") showLobby();
     else if (view === ONLINE_VIEW) {
       appView = ONLINE_VIEW;
       render();
@@ -8057,6 +8670,16 @@ app.addEventListener("click", async (event) => {
     confirmEffectTargetSelection();
     return;
   }
+  const playerDetailTarget = event.target.closest("[data-player-detail]");
+  if (playerDetailTarget) {
+    const playerTargetOption = playerDetailTarget.closest("[data-option]");
+    if (playerTargetOption) {
+      handleOption(playerTargetOption.dataset.option);
+      return;
+    }
+    openPlayerDetail(playerDetailTarget.dataset.playerDetail);
+    return;
+  }
   const option = event.target.closest("[data-option]");
   if (option) {
     handleOption(option.dataset.option);
@@ -8130,13 +8753,7 @@ app.addEventListener("input", (event) => {
   const battleDebugSearchInput = event.target.closest("[data-battle-debug-search]");
   if (battleDebugSearchInput) {
     battleDebugSearch = battleDebugSearchInput.value;
-    renderPreservingBattleDebugScroll();
-    const restored = app.querySelector("[data-battle-debug-search]");
-    if (restored) {
-      restored.focus();
-      const index = battleDebugSearch.length;
-      restored.setSelectionRange(index, index);
-    }
+    refreshBattleDebugSearchResults();
     return;
   }
   const deckName = event.target.closest("[data-deck-name]");
@@ -8147,7 +8764,7 @@ app.addEventListener("input", (event) => {
   const deckSearch = event.target.closest("[data-deck-search]");
   if (deckSearch) {
     deckEditor.search = deckSearch.value;
-    render();
+    refreshDeckSearchResults();
   }
 });
 
@@ -8250,7 +8867,11 @@ app.addEventListener("change", (event) => {
 });
 
 app.addEventListener("keydown", (event) => {
-  if ((event.key === "Escape" || event.key === "Enter" || event.key === " ") && activePublicReveal) {
+  if (
+    (event.key === "Escape" || event.key === "Enter" || event.key === " ") &&
+    activePublicReveal &&
+    !activePublicReveal.batch
+  ) {
     event.preventDefault();
     closePublicReveal();
     return;
@@ -8302,7 +8923,12 @@ app.addEventListener("keydown", (event) => {
     render();
     return;
   }
-  if (event.key === "Escape" && ["playmats", "lobby", ONLINE_VIEW, "settings", AI_TRAINING_VIEW].includes(appView)) {
+  if (event.key === "Escape" && ["playmats", "deckbuilder"].includes(appView)) {
+    event.preventDefault();
+    showLobby();
+    return;
+  }
+  if (event.key === "Escape" && ["lobby", ONLINE_VIEW, "settings", AI_TRAINING_VIEW].includes(appView)) {
     event.preventDefault();
     showHome();
     return;
@@ -8334,6 +8960,17 @@ app.addEventListener("keydown", (event) => {
   if (trash) {
     event.preventDefault();
     openTrashDetail(trash.dataset.trashSide);
+    return;
+  }
+  const playerDetailTarget = event.target.closest("[data-player-detail]");
+  if (playerDetailTarget) {
+    event.preventDefault();
+    const playerTargetOption = playerDetailTarget.closest("[data-option]");
+    if (playerTargetOption) {
+      handleOption(playerTargetOption.dataset.option);
+      return;
+    }
+    openPlayerDetail(playerDetailTarget.dataset.playerDetail);
     return;
   }
   const option = event.target.closest("[data-option]");

@@ -35,6 +35,8 @@ FORCE_IMAGE_NAMES = {
 }
 
 CARD_COLOR_DIRS = ["RED", "YELLOW", "WHITE", "GREEN", "BLUE", "PURPLE", "COLORLESS"]
+ENGLISH_CARD_DIR = "Eng-cards"
+ENGLISH_CARD_MANIFEST = "manifest.json"
 PLAYMAT_IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
 PLAYMAT_EXCLUDED_STEMS = {"contact_sheet"}
 CHARACTER_PORTRAIT_DIR = "codeman_portraits"
@@ -49,6 +51,7 @@ TOKEN_IMAGE_NAMES = {
     "s_golem_token": ["red_01_04_00_00.png"],
     "merfolk_token": ["blue_02_04_00_00.png"],
     "slime_block_token": ["colorless_01_04_00_00.png"],
+    "s_aryushinashion_token": ["purple_02_04_00_00.png"],
 }
 
 AUDIO_NAMES = {
@@ -109,6 +112,8 @@ class AssetIndex:
         self._playmat_asset_ids: set[str] = set()
         self._playmat_catalog: list[dict[str, object]] = []
         self._character_asset_ids: set[str] = set()
+        self._english_asset_ids: dict[str, str] = {}
+        self._mana_asset_ids: dict[str, str] = {}
         if self.root is not None:
             self._build_manifest()
         self._build_local_audio_manifest()
@@ -162,6 +167,58 @@ class AssetIndex:
             for name in names:
                 if self._add_audio_if_exists(audio_id, self.root / name):
                     break
+        self._build_english_card_manifest()
+
+    def _build_english_card_manifest(self) -> None:
+        assert self.root is not None
+        english_root = self.root / ENGLISH_CARD_DIR
+        data = self._load_json(english_root / ENGLISH_CARD_MANIFEST)
+        if data is None:
+            return
+        if not isinstance(data, dict) or data.get("schemaVersion") != 1:
+            raise ValueError("invalid English card asset manifest")
+        for group_name in ("cards", "forces"):
+            entries = data.get(group_name)
+            if not isinstance(entries, dict):
+                raise ValueError(f"English card asset manifest is missing {group_name}")
+            for card_id, relative_path in entries.items():
+                synthetic_id = self._register_manifest_asset(
+                    english_root, "english", card_id, relative_path
+                )
+                self._english_asset_ids[card_id] = synthetic_id
+        mana_entries = data.get("mana")
+        if not isinstance(mana_entries, dict):
+            raise ValueError("English card asset manifest is missing mana")
+        for color, relative_path in mana_entries.items():
+            normalized_color = str(color).upper()
+            synthetic_id = self._register_manifest_asset(
+                english_root, "mana", normalized_color, relative_path
+            )
+            self._mana_asset_ids[normalized_color] = synthetic_id
+
+    def _register_manifest_asset(
+        self,
+        base: Path,
+        namespace: str,
+        asset_id: object,
+        relative_path: object,
+    ) -> str:
+        if not isinstance(asset_id, str) or not self._safe_asset_id(asset_id):
+            raise ValueError(f"invalid {namespace} asset id: {asset_id!r}")
+        if not isinstance(relative_path, str) or urlparse(relative_path).scheme:
+            raise ValueError(f"invalid {namespace} asset path for {asset_id}")
+        path = Path(relative_path)
+        if path.is_absolute():
+            raise ValueError(f"absolute {namespace} asset path for {asset_id}")
+        resolved = (base / path).resolve()
+        try:
+            resolved.relative_to(base.resolve())
+        except ValueError as exc:
+            raise ValueError(f"{namespace} asset escapes its root: {asset_id}") from exc
+        synthetic_id = f"{namespace}:{asset_id}"
+        if not self._add_if_exists(synthetic_id, resolved):
+            raise FileNotFoundError(f"missing {namespace} asset for {asset_id}: {resolved}")
+        return synthetic_id
 
     def _build_local_audio_manifest(self) -> None:
         if self.root is not None:
@@ -390,7 +447,17 @@ class AssetIndex:
     def asset_url_en(self, asset_id: str | None) -> str | None:
         if not asset_id or not self._safe_asset_id(asset_id):
             return None
+        local_id = self._english_asset_ids.get(asset_id)
+        if local_id is not None:
+            return self.asset_url(local_id)
         return self._english_official_card_url(self._official_urls.get(asset_id))
+
+    def mana_asset_url(self, color: str | None) -> str | None:
+        normalized = str(color or "COLORLESS").upper()
+        local_id = self._mana_asset_ids.get(normalized)
+        if local_id is None:
+            return None
+        return self.asset_url(local_id)
 
     def ui_asset_url(self, asset_id: str | None) -> str | None:
         if not asset_id or asset_id not in self._ui_asset_ids:

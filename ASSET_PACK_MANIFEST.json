@@ -1,10 +1,16 @@
 {
-  "kind": "zz_external_asset_pack_v1",
-  "archive": "ZZ-Assets-v1.zip",
-  "archiveBytes": 916958059,
-  "sha256": "E0BDF4B5BDC9B90D69E7D0EAAABE9F92AE37D49ED075E11471BDC93DD0FF28A8",
-  "sourceFileCount": 487,
-  "sourceBytes": 943434563,
+  "kind": "zz_external_asset_pack_v2",
+  "release": "v0.2.0",
+  "archive": "ZZ-Assets-PC02-v1.zip",
+  "archiveBytes": 1205547680,
+  "sha256": "BDD5EF3A43FB8E98A479C8AF60DD4ADA17AE6A3DACF7E8A203832BDB0B68026A",
+  "sourceFileCount": 687,
+  "sourceBytes": 1230685467,
+  "englishArchive": "ZZ-Assets-PC02-English-v1.zip",
+  "englishArchiveBytes": 195374917,
+  "englishSha256": "DBF4DB95A4A3B111E0C6655D22F1E2634BA10892F21A265E11018A5904C1E37D",
+  "englishSourceFileCount": 1315,
+  "englishSourceBytes": 195480368,
   "extractTo": ".",
   "expectedRoot": "asserts",
   "topLevelContents": [
@@ -14,8 +20,30 @@
     "asserts/images",
     "asserts/video"
   ],
+  "englishTopLevelContents": [
+    "asserts/Eng-cards"
+  ],
   "distribution": {
     "url": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing",
-    "note": "Hosted on Google Drive."
+    "note": "The main pack is also provided in two ZIP volumes for Drive transport. Download both volumes, open .001 with 7-Zip, and extract to the project root.",
+    "driveTransport": {
+      "mainVolumePattern": "ZZ-Assets-PC02-v1.zip.00N",
+      "mainVolumeCount": 2,
+      "mainVolumes": [
+        {
+          "archive": "ZZ-Assets-PC02-v1.zip.001",
+          "bytes": 629145600,
+          "sha256": "C13501D64806556D5D2821F90D6CF1D6A37645B12B97DB7D1895BD9551C398D7"
+        },
+        {
+          "archive": "ZZ-Assets-PC02-v1.zip.002",
+          "bytes": 576401952,
+          "sha256": "E7EBB1E71BA3777E47471B1AC355F7C8EC7F73EE37C25659F8B2DE782E5E02D0"
+        }
+      ],
+      "englishArchive": "ZZ-Assets-PC02-English-v1.zip",
+      "englishBytes": 195374917,
+      "englishSha256": "DBF4DB95A4A3B111E0C6655D22F1E2634BA10892F21A265E11018A5904C1E37D"
+    }
   }
 }

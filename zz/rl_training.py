@@ -3832,8 +3832,8 @@ def _setup_game(
     p2_forces = p2_forces or DECKCODE0_GREEN_FORCES
     _attach_runtime_deck_profile(p1, deck_id="runtime-p1", name="P1 runtime deck", recipe=p1_recipe, forces=p1_forces)
     _attach_runtime_deck_profile(p2, deck_id="runtime-p2", name="P2 runtime deck", recipe=p2_recipe, forces=p2_forces)
-    p1.deck = build_deck(p1_recipe, owner=p1)
-    p2.deck = build_deck(p2_recipe, owner=p2)
+    p1.deck = build_deck(p1_recipe, owner=p1, iid_factory=state.allocate_iid)
+    p2.deck = build_deck(p2_recipe, owner=p2, iid_factory=state.allocate_iid)
     rng.shuffle(p1.deck)
     rng.shuffle(p2.deck)
     for player in (p1, p2):

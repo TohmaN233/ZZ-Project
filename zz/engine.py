@@ -4,7 +4,7 @@ from typing import Optional, Callable, Iterable, Any
 
 from zz.enums import AreaType, CardType, Color, Keyword, Phase, Side, Step, TriggerTiming
 from zz import keyword_rules
-from zz.effects import EffectTiming
+from zz.effects import EffectTiming, EffectSpec, effect_once_per_turn_used
 from zz.model import (Action, AttackTarget, Card, CardInstance, Context,
                        ForceInstance, GameState, Player)
 from zz.triggers import TriggerRegistry
@@ -18,7 +18,7 @@ MAX_TURNS_SAFETY = 100
 
 
 class IllegalActionError(Exception):
-    pass
+    """Raised when a requested game action is not legal in the current state."""
 
 
 class GameOver(Exception):
@@ -28,9 +28,27 @@ class GameOver(Exception):
         super().__init__(reason)
 
 
+class _GrantedForceAbilitySource:
+    """Force-passive adapter whose lifetime is tied to one field minion."""
+
+    def __init__(self, source: CardInstance, force: Any):
+        self.source = source
+        self.force = force
+        self.owner = source.owner
+
+    @property
+    def destroyed(self) -> bool:
+        return self.source.area is not AreaType.FIELD or self.source not in self.owner.field
+
+    @property
+    def rested(self) -> bool:
+        return False
+
+
 class Engine:
     def __init__(self, state: GameState, rng: random.Random):
         self.state = state
+        self.state.engine = self
         self.rng = rng
         self.triggers = TriggerRegistry(self)
         self._policies: list = [None, None]   # filled by set_policies
@@ -44,8 +62,10 @@ class Engine:
         self.zone_move_events: list[dict[str, Any]] = []
         self.ignore_hand_cap = False
         self.defer_force_base_choice: Callable[[Player], bool] = lambda player: False
+        self.defer_blessing_base_choice: Callable[[Player], bool] = lambda player: False
         self.defer_trigger_choice: Callable[[Any], bool] | None = None
         self.defer_source_effect_choice: Callable[[CardInstance, Any, Context], bool] | None = None
+        self.pending_blessing_returns: list[tuple[CardInstance, CardInstance]] = []
         self._player_damage_reduction: dict[int, int] = {}
         self._player_damage_reduction_blocked: set[int] = set()
         self._force_damage_reduction: dict[int, int] = {}
@@ -98,6 +118,8 @@ class Engine:
     def _leave_effect_resolution(self) -> None:
         self._effect_resolution_depth = max(0, self._effect_resolution_depth - 1)
         if self._effect_resolution_depth == 0:
+            if self.pending_blessing_returns:
+                return
             self._resolve_state_based_actions()
             self._flush_pending_destroy_events()
             self._resolve_state_based_actions()
@@ -112,6 +134,13 @@ class Engine:
             fn(*args)
         finally:
             self._leave_effect_resolution()
+
+    def _run_pre_target_effect(self, effect: Any, source: CardInstance, ctx: Context) -> None:
+        pre_target_fn = getattr(effect, "pre_target_fn", None)
+        if pre_target_fn is None or getattr(ctx, "_pre_target_effect_applied", False):
+            return
+        pre_target_fn(source, self.state, ctx)
+        setattr(ctx, "_pre_target_effect_applied", True)
 
     def _flush_pending_destroy_events(self) -> None:
         if self._flushing_destroy_events:
@@ -293,6 +322,7 @@ class Engine:
             self._resolve_state_based_actions()
 
     def _reset_card_modifiers(self, ci: CardInstance) -> None:
+        self._remove_granted_force_ability(ci)
         ci.bp_mod = 0
         ci.dp_mod = 0
         ci.permanent_bp_mod = 0
@@ -312,6 +342,12 @@ class Engine:
 
     def effective_keywords(self, ci: CardInstance) -> list[Keyword]:
         keywords = list(ci.keywords)
+        if ci.area is AreaType.FIELD and ci.blessings:
+            from zz.pc02 import blessing_keywords
+
+            for keyword in blessing_keywords(ci):
+                if keyword not in keywords:
+                    keywords.append(keyword)
         if ci.area is AreaType.FIELD:
             for player in self.state.players:
                 for source in player.field:
@@ -360,6 +396,23 @@ class Engine:
                 "sourceName": "Keyword modifier",
                 "keywords": [kw.name for kw in ci.extra_keywords],
             })
+        visible_flags = {
+            "pc01r:locked_until_owner_turn_end": ("action_lock", "Attack, block, and movement lock"),
+            "turn:pc01r_opponent_magic_immune": ("magic_selection_immunity", "Opponent Magic selection immunity"),
+            "turn:pc01r_always_wins_battle": ("battle_auto_win", "Wins battle regardless of BP"),
+            "turn:pc02_always_wins_battle": ("battle_auto_win", "Wins battle regardless of BP"),
+            "turn:pc02_cannot_attack": ("cannot_attack", "Cannot attack this turn"),
+            "turn:must_block": ("must_block", "Must block this turn"),
+            "must_be_blocked": ("must_be_blocked", "Must be blocked when attacking"),
+            "unblockable_by_cost_at_most_3": ("unblockable_by_cost_at_most_3", "Cannot be blocked by cost 3 or less"),
+        }
+        for flag, (kind, source_name) in visible_flags.items():
+            if flag in ci.flags:
+                effects.append({"kind": kind, "sourceName": source_name})
+        if any(flag.startswith("force_block_iid:") for flag in ci.flags):
+            effects.append({"kind": "forced_blocker"})
+        if self._skip_refresh_flag(ci.owner.side) in ci.flags:
+            effects.append({"kind": "skip_next_refresh"})
         if ci.area is not AreaType.FIELD:
             return effects
         for kind, fn in self._passive_modifiers:
@@ -368,15 +421,15 @@ class Engine:
             bp_delta, dp_delta = fn(ci, self.state)
             if not bp_delta and not dp_delta:
                 continue
-                force = self._force_for_passive(fn)
-                effects.append({
-                    "kind": "force_passive",
-                    "sourceType": "force",
-                    "sourceForceId": None if force is None else force.force.id,
+            force = self._force_for_passive(fn)
+            effects.append({
+                "kind": "force_passive",
+                "sourceType": "force",
+                "sourceForceId": None if force is None else force.force.id,
                 "sourceName": "Force passive" if force is None else force.force.name_jp,
                 "bpDelta": bp_delta,
-                    "dpDelta": dp_delta,
-                })
+                "dpDelta": dp_delta,
+            })
         for modifier in self._turn_stat_modifiers:
             if not self._turn_stat_modifier_matches(ci, modifier):
                 continue
@@ -431,6 +484,21 @@ class Engine:
     def reveal_card(self, player: Player, ci: CardInstance, reason: str) -> None:
         self.public_reveals.append((player, ci, reason))
 
+    def reveal_top_cards(
+            self,
+            player: Player,
+            cards: Iterable[CardInstance],
+            *,
+            reason: str | None = None,
+            window_size: int | None = None,
+    ) -> None:
+        """Publish one complete opponent-visible top-deck open window."""
+        window = list(cards)
+        if reason is None:
+            reason = "top_four" if (window_size or len(window)) == 4 else "top_cards"
+        for card in window:
+            self.reveal_card(player, card, reason)
+
     def _record_effect_event(self, ci: CardInstance, effect: Any, ctx: Context | None = None) -> None:
         timing = getattr(effect, "timing", getattr(effect, "when", None))
         if timing is EffectTiming.CONTINUOUS:
@@ -462,13 +530,27 @@ class Engine:
         ) else 0
 
     def player_active_effects(self, player: Player) -> list[dict[str, Any]]:
+        effects: list[dict[str, Any]] = []
         if id(player) in self._player_damage_reduction_blocked:
-            return [{
+            effects.append({
                 "kind": "damage_reduction_blocked",
                 "target": "player",
                 "sourceName": "Damage reduction blocked",
-            }]
-        effects: list[dict[str, Any]] = []
+            })
+        visible_flags = {
+            "turn:pc01r_next_red_summon_rush": "next_red_minion_rush",
+            "turn:pc01r_opponent_magic_plus3": "opponent_magic_cost_increase",
+            "turn:pc01r_battle_win_damage": "battle_win_damage",
+            "hunter_must_be_blocked": "hunter_must_be_blocked",
+            "turn:pc02_return_damager": "return_enemy_damager",
+            "turn:pc02_next_blue_magic_free": "next_blue_magic_free",
+            "turn:pc02_draw_enemy_destroy": "draw_on_enemy_destroy",
+        }
+        for flag, kind in visible_flags.items():
+            if flag in player.flags:
+                effects.append({"kind": kind, "target": "player"})
+        if id(player) in self._player_damage_reduction_blocked:
+            return effects
         temporary = self._player_damage_reduction.get(id(player), 0)
         if temporary:
             effects.append({
@@ -511,21 +593,26 @@ class Engine:
         return effects
 
     def force_active_effects(self, force: ForceInstance) -> list[dict[str, Any]]:
+        effects: list[dict[str, Any]] = []
+        if self._skip_refresh_flag(force.owner.side) in getattr(force, "flags", set()):
+            effects.append({"kind": "skip_next_refresh", "target": "force"})
         if id(force) in self._force_damage_reduction_blocked:
-            return [{
+            effects.append({
                 "kind": "damage_reduction_blocked",
                 "target": "force",
                 "sourceName": "Damage reduction blocked",
-            }]
+            })
+            return effects
         amount = self._force_damage_reduction.get(id(force), 0)
         if not amount:
-            return []
-        return [{
+            return effects
+        effects.append({
             "kind": "prevent_force_damage",
             "target": "force",
             "sourceName": "Force damage prevention",
             "amount": amount,
-        }]
+        })
+        return effects
 
     def block_life_gain_and_damage_reduction(self, player: Player) -> None:
         self._player_damage_reduction_blocked.add(id(player))
@@ -625,6 +712,11 @@ class Engine:
         self.triggers.emit(TriggerTiming.TURN_END, Context(controller=active))
         self.triggers.resolve_all()
         self._fire_turn_end_hooks()
+        from zz.pc01r import clear_owner_turn_end_locks
+        from zz.pc02 import clear_turn_state
+
+        clear_owner_turn_end_locks(active)
+        clear_turn_state(self.state)
         for ci in active.field:
             if ci.owner is active and ci.area is AreaType.FIELD and self.has_keyword(ci, Keyword.REAWAKEN):
                 ci.rested = False
@@ -738,6 +830,11 @@ class Engine:
 
     def _remove_token_from_game(self, ci: CardInstance) -> None:
         owner = ci.owner
+        # Tokens can also be Bless hosts.  Removing one from the field is a
+        # leave-field event, regardless of whether the destination is trash,
+        # base, or removed, so detach its Bless mana before clearing the zone.
+        if ci.area is AreaType.FIELD:
+            self._return_blessings_to_base(ci)
         for zone in (owner.field, owner.base, owner.hand, owner.trash):
             if ci in zone:
                 zone.remove(ci)
@@ -746,7 +843,13 @@ class Engine:
         if ci not in owner.removed:
             owner.removed.append(ci)
 
-    def _eject_base_card(self, player: Player, ci: CardInstance) -> None:
+    def _eject_base_card(
+            self,
+            player: Player,
+            ci: CardInstance,
+            *,
+            reason: str = "destroy",
+    ) -> None:
         if ci not in player.base:
             raise IllegalActionError("replacement card not in base")
         player.base.remove(ci)
@@ -757,6 +860,9 @@ class Engine:
             self._reset_card_zone_state(ci)
             ci.area = AreaType.TRASH
             player.trash.append(ci)
+        from zz.pc02 import on_base_mana_removed
+
+        on_base_mana_removed(self, player, ci, reason=reason)
 
     def _eject_field_card(self, player: Player, ci: CardInstance) -> None:
         if ci not in player.field:
@@ -765,18 +871,32 @@ class Engine:
             self._remove_token_from_game(ci)
             return
         player.field.remove(ci)
+        self._return_blessings_to_base(ci)
         self._reset_card_zone_state(ci)
         ci.area = AreaType.TRASH
         player.trash.append(ci)
 
-    def _make_base_space(self, player: Player, replace_base_iid: int | None) -> None:
-        if len(player.base) < BASE_CAP:
+    def _make_base_space(
+            self,
+            player: Player,
+            replace_base_iid: int | None,
+            *,
+            slots_needed: int = 1,
+    ) -> None:
+        if slots_needed < 1:
+            raise IllegalActionError("base space request must need at least one slot")
+        overflow = max(0, len(player.base) + slots_needed - BASE_CAP)
+        if overflow == 0:
             if replace_base_iid is not None:
                 raise IllegalActionError("base replacement is only legal when base is full")
             return
         if replace_base_iid is None:
             raise IllegalActionError(f"base cap {BASE_CAP} reached; choose a replacement")
-        self._eject_base_card(player, self._find(player.base, replace_base_iid))
+        self._eject_base_card(
+            player,
+            self._find(player.base, replace_base_iid),
+            reason="replacement",
+        )
 
     def _field_replacement(self, player: Player, replace_field_iid: int | None) -> CardInstance | None:
         if len(player.field) < FIELD_CAP:
@@ -830,14 +950,24 @@ class Engine:
         active.flags.add(f"turn:placed_mana:{Color.COLORLESS.name}")
         self.advance_from_mana()
 
-    def _available_mana(self, player: Player) -> dict[Color, int]:
+    def _mana_value(self, ci: CardInstance, ci_being_paid_for: CardInstance | None = None) -> int:
+        from zz.pc01r import mana_value
+        from zz.pc02 import mana_value as pc02_mana_value
+
+        return pc02_mana_value(ci, ci_being_paid_for, mana_value(ci, ci_being_paid_for))
+
+    def _available_mana(
+            self,
+            player: Player,
+            ci_being_paid_for: CardInstance | None = None,
+    ) -> dict[Color, int]:
         """Color counts of unrested base cards."""
         pool: dict[Color, int] = {}
         for ci in player.base:
             if ci.rested:
                 continue
             c = self._mana_color_of(ci)
-            pool[c] = pool.get(c, 0) + 1
+            pool[c] = pool.get(c, 0) + self._mana_value(ci, ci_being_paid_for)
         return pool
 
     def _is_colorless_mana_token(self, ci: CardInstance) -> bool:
@@ -894,7 +1024,7 @@ class Engine:
             ci_being_paid_for: CardInstance | None = None,
     ) -> bool:
         return self._consume_cost_from_pool(
-            self._available_mana(player),
+            self._available_mana(player, ci_being_paid_for),
             cost,
             colorless_as_any=self._colorless_counts_as_any_mana(player, ci_being_paid_for),
             colorless_as_any_available=self._ready_colorless_mana_token_count(player),
@@ -918,6 +1048,11 @@ class Engine:
             self._reduce_free_cost(cost, reduction)
         if ci.card.id == "colorless_012_02_01_00" and self.state.active is player:
             self._reduce_free_cost(cost, self._destroyed_forces_count() * 3)
+        if ci.card.id in {"colorless_05_02_ex01_02", "colorless_08_02_ex01_00"}:
+            from zz.ex01 import memoria_free_cost_reduction, twin_free_cost_reduction
+
+            self._reduce_free_cost(cost, twin_free_cost_reduction(player, ci, self.state))
+            self._reduce_free_cost(cost, memoria_free_cost_reduction(player, ci, self.state))
         if (
             ci.card.id == "yellow_04_02_01_01"
             and self.state.active is player
@@ -943,7 +1078,16 @@ class Engine:
         for kind, fn in self._passive_modifiers:
             if kind == "magic_cost_reduce":
                 cost = fn(ci, cost)
-        return {color: amount for color, amount in cost.items() if amount > 0}
+        from zz.pc01r import free_cost_delta
+        from zz.pc02 import adjust_effective_cost
+
+        pc01r_delta = free_cost_delta(player, ci, self.state)
+        if pc01r_delta < 0:
+            self._reduce_free_cost(cost, -pc01r_delta)
+        elif pc01r_delta > 0:
+            cost[Color.COLORLESS] = cost.get(Color.COLORLESS, 0) + pc01r_delta
+        cost = {color: amount for color, amount in cost.items() if amount > 0}
+        return adjust_effective_cost(player, ci, self.state, cost)
 
     def _card_is_colored(self, card: Card) -> bool:
         return any(color is not Color.COLORLESS for color in card.cost) or card.mana_color not in (None, Color.COLORLESS)
@@ -976,8 +1120,6 @@ class Engine:
             raise IllegalActionError("selected mana payment is invalid") from exc
         if len(selected_ids) != len(set(selected_ids)):
             raise IllegalActionError("selected mana payment has duplicates")
-        if len(selected_ids) != self._payment_total(cost):
-            raise IllegalActionError("selected mana payment has wrong amount")
         ready_by_iid = {ci.iid: ci for ci in self._ready_base_cards(player)}
         try:
             selected = [ready_by_iid[iid] for iid in selected_ids]
@@ -986,7 +1128,7 @@ class Engine:
         selected_colors: dict[Color, int] = {}
         for ci in selected:
             color = self._mana_color_of(ci)
-            selected_colors[color] = selected_colors.get(color, 0) + 1
+            selected_colors[color] = selected_colors.get(color, 0) + self._mana_value(ci, ci_being_paid_for)
         selected_colorless_tokens = sum(1 for ci in selected if self._is_colorless_mana_token(ci))
         if self._consume_cost_from_pool(
             selected_colors,
@@ -1010,10 +1152,12 @@ class Engine:
             selected_iids = {ci.iid for ci in selected}
             return [ci for ci in self._ready_base_cards(player) if ci.iid not in selected_iids]
 
+        colored_surplus = 0
         for color, amount in cost.items():
             if color is Color.COLORLESS:
                 continue
-            for _ in range(amount):
+            paid = 0
+            while paid < amount:
                 match = next(
                     (ci for ci in unused_ready() if self._mana_color_of(ci) is color),
                     None,
@@ -1026,8 +1170,12 @@ class Engine:
                 if match is None:
                     raise IllegalActionError(f"cannot pay cost {cost}")
                 selected.append(match)
+                paid += self._mana_value(match, ci_being_paid_for)
+            colored_surplus += max(0, paid - amount)
 
-        for _ in range(cost.get(Color.COLORLESS, 0)):
+        free_paid = 0
+        free_needed = max(0, cost.get(Color.COLORLESS, 0) - colored_surplus)
+        while free_paid < free_needed:
             match = next(
                 (ci for ci in unused_ready() if self._mana_color_of(ci) is Color.COLORLESS),
                 None,
@@ -1037,6 +1185,7 @@ class Engine:
             if match is None:
                 raise IllegalActionError(f"cannot pay cost {cost}")
             selected.append(match)
+            free_paid += self._mana_value(match, ci_being_paid_for)
         return [ci.iid for ci in selected]
 
     def _record_summon(self, ci: CardInstance) -> None:
@@ -1062,7 +1211,11 @@ class Engine:
             "default": default,
             "colorlessAsAny": colorless_as_any,
             "candidates": [
-                {"iid": ci.iid, "color": self._mana_color_of(ci).name}
+                {
+                    "iid": ci.iid,
+                    "color": self._mana_color_of(ci).name,
+                    "manaValue": self._mana_value(ci, ci_being_paid_for),
+                }
                 for ci in self._ready_base_cards(player)
             ],
         }
@@ -1098,6 +1251,10 @@ class Engine:
             raise IllegalActionError("B-Minion cannot be summoned directly; use Mana phase")
         if ci.card.type is CardType.MAGIC and not ci.card.main_timing_ok:
             raise IllegalActionError("magic card is flash-only timing")
+        from zz.pc02 import can_use_card
+
+        if not can_use_card(active, ci, self.state):
+            raise IllegalActionError("card-specific use condition is not met")
         effective_cost = self.effective_cost(active, ci)
         if not self._can_pay(active, effective_cost, ci):
             raise IllegalActionError(f"cannot pay cost {effective_cost}")
@@ -1108,6 +1265,9 @@ class Engine:
             raise IllegalActionError("field replacement is only legal for field minions")
         original_cost = dict(ci.card.cost)
         self._pay(active, effective_cost, payment_base_iids=payment_base_iids, ci_being_paid_for=ci)
+        from zz.pc02 import consume_cost_override
+
+        consume_cost_override(active, ci)
         if field_replacement is not None:
             self._eject_field_card(active, field_replacement)
         active.hand.remove(ci)
@@ -1123,6 +1283,7 @@ class Engine:
                 self._resolve_source_triggers(ci, TriggerTiming.ON_PLAY, ctx)
             self.triggers.emit(EffectTiming.ON_CAST_MAGIC, ctx)
             self.triggers.emit(TriggerTiming.ON_PLAY, ctx)
+            self.triggers.emit(EffectTiming.ON_CARD_USED, ctx)
             if resolve_triggers:
                 self.triggers.resolve_all()
             if sum(original_cost.values()) >= 4:
@@ -1138,6 +1299,7 @@ class Engine:
             self.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=active, source=ci))
             self._emit_enter_field(active, ci)
             self.triggers.emit(TriggerTiming.ON_PLAY, Context(controller=active, source=ci))
+            self.triggers.emit(EffectTiming.ON_CARD_USED, Context(controller=active, source=ci))
             if resolve_triggers:
                 self.triggers.resolve_all()
 
@@ -1158,12 +1320,17 @@ class Engine:
                 raise IllegalActionError("card cannot move while opponent has a force")
             if ci.card.type is CardType.MANA_TOKEN:
                 raise IllegalActionError("mana tokens cannot move to field")
+            if self.has_keyword(ci, Keyword.KAGO) or self.has_keyword(ci, Keyword.BLESS):
+                raise IllegalActionError("Bless mana cannot move to field")
             if ci.card.is_token:
                 raise IllegalActionError("token minions cannot move with movement right")
             field_replacement = self._field_replacement(active, replace_field_iid)
             if field_replacement is not None:
                 self._eject_field_card(active, field_replacement)
             active.base.remove(ci)
+            from zz.pc02 import on_base_mana_removed
+
+            on_base_mana_removed(self, active, ci, reason="move_to_field")
             ci.area = AreaType.FIELD
             active.field.append(ci)
             self._fire_siren_mana_hooks("minion_mana_moves_to_field", ci)
@@ -1181,6 +1348,7 @@ class Engine:
                 raise IllegalActionError("token minions cannot move with movement right")
             self._make_base_space(active, replace_base_iid)
             active.field.remove(ci)
+            self._return_blessings_to_base(ci, reserve_slots=1)
             self._reset_card_modifiers(ci)
             ci.area = AreaType.BASE
             active.base.append(ci)
@@ -1192,6 +1360,105 @@ class Engine:
         else:
             raise IllegalActionError(f"unknown direction {direction!r}")
         active.movement_right_count -= 1
+
+    def can_bless(self, mana: CardInstance, target: CardInstance) -> bool:
+        active = self.state.active
+        if self.state.step is not Step.MAIN or active.movement_right_count <= 0:
+            return False
+        if mana not in active.base or target not in active.field or target.blessings:
+            return False
+        if not (self.has_keyword(mana, Keyword.KAGO) or self.has_keyword(mana, Keyword.BLESS)):
+            return False
+        allow_rested = any(ci.card.id == "colorless_04_02_02_03" for ci in active.field)
+        if mana.rested and not allow_rested:
+            return False
+        from zz.pc02 import bless_condition_matches
+
+        return bless_condition_matches(mana, target)
+
+    def bless(self, mana: CardInstance, target: CardInstance) -> None:
+        if not self.can_bless(mana, target):
+            raise IllegalActionError("illegal Bless attachment")
+        owner = mana.owner
+        owner.base.remove(mana)
+        mana.area = AreaType.BLESSING
+        target.blessings.append(mana)
+        owner.movement_right_count -= 1
+        self._record_zone_move(mana, AreaType.BASE, AreaType.BLESSING)
+        from zz.pc02 import on_base_mana_removed
+
+        on_base_mana_removed(self, owner, mana, reason="bless")
+        ctx = Context(controller=owner, source=target, target=mana)
+        self.triggers.emit(EffectTiming.ON_BLESS, ctx)
+        self.triggers.resolve_all()
+
+    def _finish_blessing_return(
+            self,
+            host: CardInstance,
+            mana: CardInstance,
+            *,
+            detached: bool = False,
+    ) -> None:
+        if detached:
+            if mana.area is not AreaType.BLESSING:
+                raise IllegalActionError("pending Bless mana is no longer attached")
+        else:
+            if mana not in host.blessings:
+                raise IllegalActionError("Bless mana is no longer attached to its host")
+            host.blessings.remove(mana)
+        mana.area = AreaType.BASE
+        mana.rested = True
+        mana.summoning_sickness = True
+        mana.owner.base.append(mana)
+        self._record_zone_move(mana, AreaType.BLESSING, AreaType.BASE)
+        from zz.pc02 import on_mana_moved_to_base
+
+        on_mana_moved_to_base(mana.owner, mana)
+
+    def _return_blessings_to_base(self, host: CardInstance, *, reserve_slots: int = 0) -> None:
+        if not host.blessings:
+            return
+        for mana in list(host.blessings):
+            owner = mana.owner
+            if len(owner.base) >= BASE_CAP - reserve_slots:
+                replacements = self.select_target(owner, "ally_base", 1, 1)
+                if replacements:
+                    self._make_base_space(
+                        owner,
+                        replacements[0].iid,
+                        slots_needed=reserve_slots + 1,
+                    )
+                elif self.defer_blessing_base_choice(owner):
+                    # The host may leave the field before the replacement prompt resolves;
+                    # keep the pending mana separate so it cannot serialize with the host.
+                    host.blessings.remove(mana)
+                    self.pending_blessing_returns.append((host, mana))
+                    continue
+                else:
+                    raise IllegalActionError(
+                        "Bless mana returning to a full base requires a replacement"
+                    )
+            self._finish_blessing_return(host, mana)
+
+    def resolve_blessing_base_choice(
+            self,
+            host: CardInstance,
+            mana: CardInstance,
+            replacement: CardInstance,
+    ) -> None:
+        pending = (host, mana)
+        if not self.pending_blessing_returns or self.pending_blessing_returns[0] != pending:
+            raise IllegalActionError("Bless return is not awaiting a base replacement")
+        if replacement not in mana.owner.base:
+            raise IllegalActionError("Bless return replacement is not in the owner's base")
+        self.pending_blessing_returns.pop(0)
+        self._make_base_space(mana.owner, replacement.iid)
+        self._finish_blessing_return(host, mana, detached=True)
+        if not self.pending_blessing_returns and self._effect_resolution_depth == 0:
+            self._resolve_state_based_actions()
+            self._flush_pending_destroy_events()
+            self.triggers.resolve_all()
+            self._resolve_state_based_actions()
 
     def create_token(
             self,
@@ -1214,6 +1481,64 @@ class Engine:
         player.field.append(token)
         self._emit_enter_field(player, token)
         return token
+
+    def create_tokens(
+            self,
+            player: Player,
+            cards: Iterable[Card],
+            *,
+            source: CardInstance | None = None,
+            rested: bool = False,
+            optional: bool = False,
+            count: int | None = None,
+    ) -> list[CardInstance]:
+        """Create a batch of tokens through the shared full-field replacement path."""
+        specs = list(cards)
+        if not specs:
+            return []
+        if count is not None:
+            if isinstance(count, bool) or not isinstance(count, int):
+                raise IllegalActionError("token count must be an integer")
+            if count < 0 or count > len(specs):
+                raise IllegalActionError("token count is outside the effect range")
+            specs = specs[:count]
+        if not specs:
+            return []
+        replacements_needed = max(0, len(player.field) + len(specs) - FIELD_CAP)
+        replacement_iids: list[int] = []
+        create_count = len(specs)
+        if replacements_needed:
+            explicit_count = count is not None
+            minimum_replacements = replacements_needed if explicit_count else (0 if optional else replacements_needed)
+            replacements = self.select_target(
+                player,
+                "ally_minion",
+                minimum_replacements,
+                replacements_needed,
+                source=source,
+            )
+            if len(replacements) < replacements_needed and (not optional or explicit_count):
+                return []
+            replacement_iids = [target.iid for target in replacements]
+            if optional and not explicit_count:
+                open_slots = max(0, FIELD_CAP - len(player.field))
+                create_count = min(len(specs), open_slots + len(replacement_iids))
+        created: list[CardInstance] = []
+        for card in specs[:create_count]:
+            replace_iid = None
+            if len(player.field) >= FIELD_CAP:
+                if not replacement_iids:
+                    return created
+                replace_iid = replacement_iids.pop(0)
+            created.append(
+                self.create_token(
+                    player,
+                    card,
+                    rested=rested,
+                    replace_field_iid=replace_iid,
+                )
+            )
+        return created
 
     def move_base_minion_to_field(
             self,
@@ -1253,6 +1578,50 @@ class Engine:
         )
         player.base.append(token)
         return token
+
+    def put_field_minion_from_hand(
+            self,
+            player: Player,
+            ci: CardInstance,
+            *,
+            rested: bool = False,
+            replace_field_iid: int | None = None,
+    ) -> None:
+        """Put an F-Minion from hand onto the field without paying or summoning it."""
+        if ci not in player.hand:
+            raise IllegalActionError("card is not in hand")
+        if ci.card.type is not CardType.F_MINION:
+            raise IllegalActionError("only field minions can be put onto the field")
+        self._make_field_space(player, replace_field_iid)
+        player.hand.remove(ci)
+        ci.area = AreaType.FIELD
+        ci.rested = rested
+        ci.summoning_sickness = not keyword_rules.enters_without_summoning_sickness(ci)
+        player.field.append(ci)
+        self._record_zone_move(ci, AreaType.HAND, AreaType.FIELD)
+        self._emit_enter_field(player, ci)
+        self.triggers.resolve_all()
+
+    def put_base_minion_from_hand(
+            self,
+            player: Player,
+            ci: CardInstance,
+            *,
+            rested: bool = True,
+            replace_base_iid: int | None = None,
+    ) -> None:
+        """Put an F-Minion from hand into the base without summoning it."""
+        if ci not in player.hand:
+            raise IllegalActionError("card is not in hand")
+        if ci.card.type is not CardType.F_MINION:
+            raise IllegalActionError("only field minions can be put into the base")
+        self._make_base_space(player, replace_base_iid)
+        player.hand.remove(ci)
+        ci.area = AreaType.BASE
+        ci.rested = rested
+        ci.summoning_sickness = True
+        player.base.append(ci)
+        self._record_zone_move(ci, AreaType.HAND, AreaType.BASE)
 
     def place_from_deck_to_base(
             self,
@@ -1307,6 +1676,7 @@ class Engine:
         owner = ci.owner
         self._make_base_space(owner, replace_base_iid)
         owner.field.remove(ci)
+        self._return_blessings_to_base(ci, reserve_slots=1)
         self._reset_card_modifiers(ci)
         ci.area = AreaType.BASE
         ci.rested = rested
@@ -1329,6 +1699,11 @@ class Engine:
         if attacker.card.id == "purple_02_02_01_01" and self._opponent_has_force(attacker.owner):
             return False
         if attacker.card.id == "red_01_02_01_00" and self._own_field_minion_count(attacker.owner) <= 2:
+            return False
+        from zz.pc01r import can_attack_or_move
+        from zz.pc02 import can_attack
+
+        if not can_attack_or_move(attacker) or not can_attack(attacker):
             return False
         if attacker.rested:
             return False
@@ -1356,11 +1731,23 @@ class Engine:
         return out
 
     def legal_blockers(self, attacker: CardInstance) -> list[CardInstance]:
+        from zz.pc01r import can_block
+        from zz.pc02 import can_block as pc02_can_block
+
         out = []
         for b in self.state.opponent.field:
             if b.card.id == "purple_02_02_01_01" and self._opponent_has_force(b.owner):
                 continue
-            if not keyword_rules.can_block_attacker(b, attacker, self.state.active):
+            if not keyword_rules.can_block_attacker(
+                    b,
+                    attacker,
+                    self.state.active,
+                    keyword_fn=self.has_keyword,
+            ):
+                continue
+            if not can_block(attacker, b, self.state):
+                continue
+            if not pc02_can_block(attacker, b, self.state):
                 continue
             out.append(b)
         return out
@@ -1370,7 +1757,11 @@ class Engine:
         return any(not force.destroyed for force in opponent.forces)
 
     def _movement_locked(self, ci: CardInstance) -> bool:
-        return ci.card.id == "purple_02_02_01_01" and self._opponent_has_force(ci.owner)
+        from zz.pc01r import can_attack_or_move
+
+        return (
+            ci.card.id == "purple_02_02_01_01" and self._opponent_has_force(ci.owner)
+        ) or not can_attack_or_move(ci)
 
     def _own_field_minion_count(self, player: Player) -> int:
         return sum(
@@ -1380,6 +1771,10 @@ class Engine:
         )
 
     def _force_attack_restricted(self, attacker: CardInstance, force: ForceInstance) -> bool:
+        from zz.pc02 import can_attack_force
+
+        if not can_attack_force(attacker):
+            return True
         if sum(attacker.card.cost.values()) > 5:
             return False
         return any(
@@ -1432,18 +1827,29 @@ class Engine:
         reduction_blocked = id(player) in self._player_damage_reduction_blocked
         if not reduction_blocked:
             amount = self._force_reduced_player_damage(player, amount, source, damage_kind)
+            if damage_kind == "minion_dp":
+                from zz.pc01r import adjust_minion_dp_damage
+
+                amount = adjust_minion_dp_damage(self.state, amount, source)
             amount = max(0, amount - self._yakutzork_player_damage_reduction(player))
             amount = max(0, amount - self._player_damage_reduction.get(id(player), 0))
         if amount <= 0:
             return
-        player.life -= amount
+        player.life = max(0, player.life - amount)
+        player.flags.add(self._player_damage_marker())
         self._record_visual_event({
             "type": "damage",
             "targetKind": "player",
             "side": player.side.name,
             "amount": amount,
         })
-        self._emit_damage(EffectTiming.ON_DAMAGE_PLAYER, source, player, damage_kind=damage_kind)
+        self._emit_damage(
+            EffectTiming.ON_DAMAGE_PLAYER,
+            source,
+            player,
+            amount=amount,
+            damage_kind=damage_kind,
+        )
         if player.life <= 0:
             winner = self.state.players[1 - self.state.players.index(player)]
             raise GameOver(winner=winner, reason=f"{player.name} player life <= 0")
@@ -1477,15 +1883,33 @@ class Engine:
         spill = amount - absorbed
         if fi.life <= 0:
             self._destroy_force(fi, source=source)
-        self._emit_damage(EffectTiming.ON_DAMAGE_FORCE, source, fi, damage_kind=damage_kind)
+        self._emit_damage(
+            EffectTiming.ON_DAMAGE_FORCE,
+            source,
+            fi,
+            amount=absorbed,
+            damage_kind=damage_kind,
+        )
         return spill
 
-    def _emit_damage(self, timing: EffectTiming, source, target, *, damage_kind: str = "effect") -> None:
+    def _emit_damage(
+            self,
+            timing: EffectTiming,
+            source,
+            target,
+            *,
+            amount: int,
+            damage_kind: str = "effect",
+    ) -> None:
         controller = source.owner if isinstance(source, CardInstance) else target.owner
         ctx = Context(controller=controller, source=source, target=target)
         setattr(ctx, "damage_kind", damage_kind)
+        setattr(ctx, "damage_amount", amount)
         self.triggers.emit(timing, ctx)
         self.triggers.resolve_all()
+        from zz.pc02 import on_damage_resolved
+
+        on_damage_resolved(self, source, target, amount)
 
     def _emit_battle_win(self, winner: CardInstance, loser: CardInstance) -> None:
         if winner.area is not AreaType.FIELD:
@@ -1495,6 +1919,14 @@ class Engine:
             Context(controller=winner.owner, source=winner, target=loser),
         )
         self.triggers.resolve_all()
+        from zz.pc01r import battle_win_damage_enabled
+
+        if battle_win_damage_enabled(winner.owner):
+            self._damage_player(
+                self.state.players[1 - self.state.players.index(winner.owner)],
+                1,
+                source=winner,
+            )
 
     def _destroy_force(self, fi: ForceInstance, source) -> None:
         fi.destroyed = True
@@ -1503,8 +1935,15 @@ class Engine:
         if fi.force.on_destroy is not None:
             fi.force.on_destroy(fi, self.state, Context(controller=fi.owner, source=source))
         # Unregister passive
-        self._passive_modifiers = [(k, fn) for (k, fn) in self._passive_modifiers
-                                    if not (k == "force_passive" and getattr(fn, "_force_iid", None) == id(fi))]
+        self._passive_modifiers = [
+            (kind, fn) for kind, fn in self._passive_modifiers
+            if getattr(fn, "_force_iid", None) != id(fi)
+        ]
+        self.triggers.emit(
+            EffectTiming.ON_FORCE_DESTROYED,
+            Context(controller=fi.owner, source=source, target=fi),
+        )
+        self._resolve_triggers_if_idle()
 
     def declare_attack(self, attacker: CardInstance, target: AttackTarget,
                        resolve_triggers: bool = True) -> None:
@@ -1526,6 +1965,9 @@ class Engine:
                                    blocker: Optional[CardInstance] = None) -> None:
         """Block and Battle Resolution steps after Flash has finished."""
         from zz.enums import AttackTargetKind
+        target = getattr(self, "_pc02_attack_target_override", target)
+        if hasattr(self, "_pc02_attack_target_override"):
+            delattr(self, "_pc02_attack_target_override")
         if attacker.area is not AreaType.FIELD:
             return
         blockers = self.legal_blockers(attacker)
@@ -1547,8 +1989,19 @@ class Engine:
             self.triggers.resolve_all()
             self._apply_player_blocked_attack_effects(attacker, blocker)
             # 4. Minion battle compares BP against BP.
-            atk_dest = self.effective_bp(attacker) >= self.effective_bp(blocker)
-            blk_dest = self.effective_bp(blocker) >= self.effective_bp(attacker)
+            from zz.pc01r import battle_outcome_override
+            from zz.pc02 import battle_outcome_override as pc02_battle_outcome_override
+
+            override = pc02_battle_outcome_override(attacker, blocker, self.state)
+            if override is None:
+                override = battle_outcome_override(attacker, blocker)
+            if override is None:
+                atk_dest = self.effective_bp(attacker) >= self.effective_bp(blocker)
+                blk_dest = self.effective_bp(blocker) >= self.effective_bp(attacker)
+            else:
+                atk_dest, blk_dest = override
+            attacker_death_blow = self._should_death_blow_destroy(attacker, blocker, self.state.active)
+            blocker_death_blow = self._should_death_blow_destroy(blocker, attacker, self.state.active)
             spill_damage = max(0, self.effective_dp(attacker) - self.effective_dp(blocker))
             if atk_dest and not blk_dest:
                 self._emit_battle_win(attacker, blocker)
@@ -1566,7 +2019,12 @@ class Engine:
             finally:
                 self._leave_effect_resolution()
             self.triggers.resolve_all()
-            self._apply_death_blow(attacker, blocker)
+            self._apply_death_blow(
+                attacker,
+                blocker,
+                first_active=attacker_death_blow,
+                second_active=blocker_death_blow,
+            )
             self._destroy_maddoll_after_battle(attacker, blocker)
         else:
             # 4. Unblocked: damage to player/force = attacker.DP per rulebook p20
@@ -1637,11 +2095,22 @@ class Engine:
         if "turn:arondai_player_attack" in attacker.owner.flags:
             self._damage_player(blocker.owner, 1, source=attacker)
 
-    def _apply_death_blow(self, first: CardInstance, second: CardInstance) -> None:
+    def _apply_death_blow(
+            self,
+            first: CardInstance,
+            second: CardInstance,
+            *,
+            first_active: bool | None = None,
+            second_active: bool | None = None,
+    ) -> None:
         active = self.state.active
-        if self._should_death_blow_destroy(first, second, active):
+        if first_active is None:
+            first_active = self._should_death_blow_destroy(first, second, active)
+        if second_active is None:
+            second_active = self._should_death_blow_destroy(second, first, active)
+        if first_active:
             self._destroy(second, source=first)
-        if self._should_death_blow_destroy(second, first, active):
+        if second_active:
             self._destroy(first, source=second)
 
     def _destroy_maddoll_after_battle(self, *participants: CardInstance) -> None:
@@ -1655,8 +2124,10 @@ class Engine:
             opponent: CardInstance,
             active: Player,
     ) -> bool:
+        from zz.pc02 import death_blow_active
+
         return (
-            source.owner is active
+            death_blow_active(source, active, self.state)
             and source.card.type in {CardType.F_MINION, CardType.B_MINION}
             and opponent.card.type in {CardType.F_MINION, CardType.B_MINION}
             and self.has_keyword(source, Keyword.DEATH_BLOW)
@@ -1676,12 +2147,15 @@ class Engine:
             return
         if ci in owner.field:
             owner.field.remove(ci)
+        had_blessed_return = ci.card.id == "yellow_05_02_02_00" and bool(ci.blessings)
+        self._return_blessings_to_base(ci)
         self._reset_card_zone_state(ci)
         ci.area = AreaType.TRASH
         owner.trash.append(ci)
         ctx = Context(controller=owner, source=source, target=ci)
+        setattr(ctx, "blessed_return_to_hand", had_blessed_return)
         self._pending_destroy_events.append((ci, ctx))
-        if self._effect_resolution_depth == 0:
+        if self._effect_resolution_depth == 0 and not self.pending_blessing_returns:
             self._flush_pending_destroy_events()
             self.triggers.resolve_all()
             self._resolve_state_based_actions()
@@ -1693,6 +2167,9 @@ class Engine:
                            ctx)
         self.triggers.emit(TriggerTiming.ON_DESTROY,
                            ctx)
+        from zz.pc02 import on_minion_destroyed
+
+        on_minion_destroyed(self, ci)
 
     # ---- top-level action API ----------------------------------------
 
@@ -1744,6 +2221,10 @@ class Engine:
             for ci in active.hand:
                 if ci.card.type is CardType.B_MINION:
                     continue
+                from zz.pc02 import can_use_card
+
+                if not can_use_card(active, ci, self.state):
+                    continue
                 cost = self.effective_cost(active, ci)
                 if not self._can_pay(active, cost, ci):
                     continue
@@ -1759,8 +2240,17 @@ class Engine:
                 out.append(Action(kind="play_card", payload={"iid": ci.iid}))
             # Movement Right
             if active.movement_right_count > 0:
+                for mana in active.base:
+                    for target in active.field:
+                        if self.can_bless(mana, target):
+                            out.append(Action(
+                                kind="bless",
+                                payload={"iid": mana.iid, "mana_iid": mana.iid, "target_iid": target.iid},
+                            ))
                 for ci in active.base:
                     if self._movement_locked(ci):
+                        continue
+                    if self.has_keyword(ci, Keyword.KAGO) or self.has_keyword(ci, Keyword.BLESS):
                         continue
                     if (ci.card.type is not CardType.MANA_TOKEN
                         and not ci.card.is_token):
@@ -1842,6 +2332,11 @@ class Engine:
                 payload.get("replace_base_iid"),
                 payload.get("replace_field_iid"),
             )
+        elif action.kind == "bless":
+            self.bless(
+                self._find(active.base, payload["mana_iid"]),
+                self._find(active.field, payload["target_iid"]),
+            )
         elif action.kind == "attack":
             atk = self._find(active.field, payload["attacker_iid"])
             # Sub-decisions: target now, then Flash, then blocker after Flash changes settle.
@@ -1917,7 +2412,11 @@ class Engine:
 
     def legal_flash_actions(self, player: Player) -> list[Action]:
         out = [Action(kind="flash_pass")]
+        from zz.pc02 import can_use_card
+
         for ci in player.hand:
+            if not can_use_card(player, ci, self.state):
+                continue
             if ci.card.type is CardType.MAGIC and ci.card.flash_timing_ok and self._can_pay(player, self.effective_cost(player, ci), ci):
                 out.append(Action(kind="play_card", payload={"iid": ci.iid}))
             elif (keyword_rules.is_flash_summonable(ci)
@@ -1945,6 +2444,10 @@ class Engine:
             return "pass"
         if action.kind == "play_card":
             ci = self._find(player.hand, action.payload["iid"])
+            from zz.pc02 import can_use_card
+
+            if not can_use_card(player, ci, self.state):
+                raise IllegalActionError("card-specific use condition is not met")
             effective_cost = self.effective_cost(player, ci)
             if not self._can_pay(player, effective_cost, ci):
                 raise IllegalActionError("flash play cannot pay")
@@ -1959,6 +2462,9 @@ class Engine:
             self._pay(player, effective_cost,
                       payment_base_iids=action.payload.get("payment_base_iids"),
                       ci_being_paid_for=ci)
+            from zz.pc02 import consume_cost_override
+
+            consume_cost_override(player, ci)
             if field_replacement is not None:
                 self._eject_field_card(player, field_replacement)
             player.hand.remove(ci)
@@ -1973,6 +2479,7 @@ class Engine:
                 self._resolve_source_triggers(ci, TriggerTiming.ON_PLAY, ctx)
                 self.triggers.emit(EffectTiming.ON_CAST_MAGIC, ctx)
                 self.triggers.emit(TriggerTiming.ON_PLAY, ctx)
+                self.triggers.emit(EffectTiming.ON_CARD_USED, ctx)
                 if resolve_triggers:
                     self.triggers.resolve_all()
                 if sum(original_cost.values()) >= 4:
@@ -1988,6 +2495,7 @@ class Engine:
                 self.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=player, source=ci))
                 self._emit_enter_field(player, ci)
                 self.triggers.emit(TriggerTiming.ON_PLAY, Context(controller=player, source=ci))
+                self.triggers.emit(EffectTiming.ON_CARD_USED, Context(controller=player, source=ci))
                 if resolve_triggers:
                     self.triggers.resolve_all()
             return "action"
@@ -2139,6 +2647,11 @@ class Engine:
             ]
         elif kind == "hand_card":
             eligible = list(player.hand)
+        elif kind == "hand_field_minion_cost_at_most_2":
+            eligible = [
+                ci for ci in player.hand
+                if ci.card.type is CardType.F_MINION and sum(ci.card.cost.values()) <= 2
+            ]
         elif kind == "top_field_minion":
             eligible = [
                 ci for ci in player.deck[:4]
@@ -2149,6 +2662,25 @@ class Engine:
                 ci for ci in player.deck[:2]
                 if ci.card.type is CardType.F_MINION
             ]
+        elif kind == "top1_card":
+            eligible = list(player.deck[:1])
+        elif kind == "top2_card":
+            eligible = list(player.deck[:2])
+        elif kind == "top4_card":
+            eligible = list(player.deck[:4])
+        elif kind == "top3_magic":
+            eligible = [
+                ci for ci in player.deck[:3]
+                if ci.card.type is CardType.MAGIC
+            ]
+        elif kind == "deck_card":
+            eligible = list(player.deck)
+        elif kind == "enemy_minion_bp_at_most_500_or_opponent_player":
+            opp = self.state.opponent if player is self.state.active else self.state.active
+            eligible = [ci for ci in opp.field if self.effective_bp(ci) <= 500] + [opp]
+        elif kind == "force_catalog":
+            from zz.forces import ALL_FORCES
+            eligible = list(ALL_FORCES.values())
         elif kind == "top3_field_minion":
             eligible = [
                 ci for ci in player.deck[:3]
@@ -2164,13 +2696,15 @@ class Engine:
         previous_context = getattr(self, "_target_selection_context", None)
         self._target_selection_context = {"source": source}
         try:
-            return policy.choose_target(self, kind, min_n, max_n, eligible)
+            selected = policy.choose_target(self, kind, min_n, max_n, eligible)
+            from zz.pc02 import on_targets_selected
+
+            on_targets_selected(player, source, selected)
+            return selected
         finally:
             if previous_context is None:
-                try:
+                if hasattr(self, "_target_selection_context"):
                     delattr(self, "_target_selection_context")
-                except AttributeError:
-                    pass
             else:
                 self._target_selection_context = previous_context
 
@@ -2182,7 +2716,17 @@ class Engine:
             source_area: AreaType | None = None,
     ) -> bool:
         if not isinstance(target, CardInstance):
-            return True
+            from zz.pc02 import can_effect_select_non_card
+
+            return can_effect_select_non_card(source, target, self.state)
+        from zz.pc01r import can_effect_select
+
+        if not can_effect_select(source, target):
+            return False
+        from zz.pc02 import can_effect_select as pc02_can_effect_select
+
+        if not pc02_can_effect_select(source, target, self.state):
+            return False
         source_effect_area = source_area or source.area
         if (
             target.card.id == "colorless_09_02_01_00"
@@ -2236,6 +2780,21 @@ class Engine:
         self._reset_card_zone_state(ci)
         ci.area = AreaType.TRASH
         player.trash.append(ci)
+
+    def mill_deck(self, player: Player, amount: int, *, source: CardInstance) -> list[CardInstance]:
+        milled = list(player.deck[:max(0, amount)])
+        for card in milled:
+            player.deck.remove(card)
+            card.area = AreaType.TRASH
+            player.trash.append(card)
+            self._record_zone_move(card, AreaType.DECK, AreaType.TRASH)
+        if milled:
+            self.triggers.emit(
+                EffectTiming.ON_DECK_DISCARD,
+                Context(controller=player, source=source, target=milled),
+            )
+            self.triggers.resolve_all()
+        return milled
         self._record_zone_move(ci, AreaType.HAND, AreaType.TRASH)
 
     def return_to_hand(self, ci: CardInstance) -> None:
@@ -2244,6 +2803,7 @@ class Engine:
         owner = ci.owner
         if ci in owner.field:
             owner.field.remove(ci)
+        self._return_blessings_to_base(ci)
         ci.rested = False
         ci.summoning_sickness = True
         self._reset_card_modifiers(ci)
@@ -2294,11 +2854,14 @@ class Engine:
         for effect in ci.card.effects:
             if effect.timing is not timing:
                 continue
+            if isinstance(effect, EffectSpec) and effect_once_per_turn_used(effect, ci):
+                continue
             if effect.condition and not effect.condition(ci, self.state, ctx):
                 continue
             if self.defer_source_effect_choice is not None and self.defer_source_effect_choice(ci, effect, ctx):
                 continue
             self._record_effect_event(ci, effect)
+            self._run_pre_target_effect(effect, ci, ctx)
             self._run_effect_callback(effect.fn, ci, self.state, ctx)
 
     # ---- Force lifecycle ---------------------------------------------
@@ -2355,12 +2918,63 @@ class Engine:
             if fi.force.passive is not None:
                 fi.force.passive(fi, self)
 
+    @staticmethod
+    def player_selected_force(player: Player, force_id: str) -> bool:
+        return any(fi.force.id == force_id for fi in player.forces)
+
+    @staticmethod
+    def destroyed_forces_count(player: Player) -> int:
+        return sum(1 for fi in player.forces if fi.destroyed)
+
+    def _player_damage_marker(self) -> str:
+        return f"turn:player_damaged:{self.state.turn}:{self.state.active_idx}"
+
+    def player_was_damaged_this_turn(self, player: Player) -> bool:
+        return self._player_damage_marker() in player.flags
+
+    def grant_force_ability(self, source: CardInstance, force_id: str) -> None:
+        from zz.forces import ALL_FORCES
+
+        if source.area is not AreaType.FIELD or source not in source.owner.field:
+            raise IllegalActionError("force ability can only be granted to a field minion")
+        if force_id not in ALL_FORCES:
+            raise IllegalActionError(f"unknown force ability: {force_id}")
+        self._remove_granted_force_ability(source)
+        source.flags = {
+            flag for flag in source.flags
+            if not flag.startswith("granted_force_ability:")
+        }
+        source.flags.add(f"granted_force_ability:{force_id}")
+        self._register_granted_force_ability(source, force_id)
+
+    def _remove_granted_force_ability(self, source: CardInstance) -> None:
+        self._passive_modifiers = [
+            (kind, fn) for kind, fn in self._passive_modifiers
+            if getattr(fn, "_granted_force_source_iid", None) != source.iid
+        ]
+
+    def _register_granted_force_ability(self, source: CardInstance, force_id: str) -> None:
+        from zz.forces import ALL_FORCES
+
+        force = ALL_FORCES[force_id]
+        if force.passive is None:
+            raise IllegalActionError(f"force has no unique passive ability: {force_id}")
+        proxy = _GrantedForceAbilitySource(source, force)
+        start = len(self._passive_modifiers)
+        force.passive(proxy, self)
+        for _, fn in self._passive_modifiers[start:]:
+            fn._granted_force_source_iid = source.iid
+
     def rebind_passive_modifiers(self) -> None:
         self._passive_modifiers = []
         for player in self.state.players:
             for fi in player.forces:
                 if fi.force.passive is not None:
                     fi.force.passive(fi, self)
+            for source in player.field:
+                for flag in source.flags:
+                    if flag.startswith("granted_force_ability:"):
+                        self._register_granted_force_ability(source, flag.split(":", 1)[1])
 
     def _bp_dp_bonus_for(self, ci: CardInstance) -> tuple[int, int]:
         if ci.area is not AreaType.FIELD:
@@ -2440,12 +3054,14 @@ class Engine:
 
     def effective_bp(self, ci: CardInstance) -> int:
         bonus_bp, _ = self._bp_dp_bonus_for(ci)
-        raw_bp = ci.card.bp + ci.bp_mod + ci.permanent_bp_mod
+        blessing_bp = sum(mana.card.bp for mana in ci.blessings)
+        raw_bp = ci.card.bp + ci.bp_mod + ci.permanent_bp_mod + blessing_bp
         return max(0, raw_bp + bonus_bp)
 
     def effective_dp(self, ci: CardInstance) -> int:
         _, bonus_dp = self._bp_dp_bonus_for(ci)
-        raw_dp = ci.card.dp + ci.dp_mod + ci.permanent_dp_mod
+        blessing_dp = sum(mana.card.dp for mana in ci.blessings)
+        raw_dp = ci.card.dp + ci.dp_mod + ci.permanent_dp_mod + blessing_dp
         return max(0, raw_dp + bonus_dp)
 
     def _fire_turn_start_hooks(self) -> None:

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from zz.engine import LIFE_CAP
-from zz.enums import Color
+from zz.enums import CardType, Color
 from zz.model import CardInstance, ForceInstance, Player
 from zz.web.assets import AssetIndex
 from zz.web.localization import card_translation, force_translation
@@ -63,7 +63,14 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
     effective_bp = engine.effective_bp(ci)
     effective_dp = engine.effective_dp(ci)
     active_effects = getattr(engine, "card_active_effects", lambda card: [])(ci)
-    return {
+    mana_color = _current_mana_color(engine, ci)
+    if ci.card.type is CardType.MANA_TOKEN:
+        asset_url = asset_index.mana_asset_url(mana_color)
+        asset_url_en = asset_url
+    else:
+        asset_url = asset_index.asset_url(asset_id)
+        asset_url_en = asset_index.asset_url_en(asset_id)
+    result = {
         "iid": ci.iid,
         "cardId": ci.card.id,
         "ownerSide": ci.owner.side.name,
@@ -75,7 +82,7 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
         "abilityZh": _first(translation.get("ability_zh")),
         "type": ci.card.type.value,
         "cost": _cost_dict(ci),
-        "manaColor": _current_mana_color(engine, ci),
+        "manaColor": mana_color,
         "bp": ci.card.bp,
         "dp": ci.card.dp,
         "effectiveBp": effective_bp,
@@ -92,9 +99,14 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
         "keywords": _keyword_names(engine, ci),
         "faceDown": False,
         "assetId": asset_id,
-        "assetUrl": asset_index.asset_url(asset_id),
-        "assetUrlEn": asset_index.asset_url_en(asset_id),
+        "assetUrl": asset_url,
+        "assetUrlEn": asset_url_en,
     }
+    result["blessings"] = [
+        serialize_card(engine, mana, asset_index)
+        for mana in ci.blessings
+    ]
+    return result
 
 
 def serialize_force(engine, fi: ForceInstance, asset_index: AssetIndex) -> dict[str, Any]:
@@ -115,6 +127,7 @@ def serialize_force(engine, fi: ForceInstance, asset_index: AssetIndex) -> dict[
         "rested": fi.rested,
         "assetId": fi.force.id,
         "assetUrl": asset_index.asset_url(fi.force.id),
+        "assetUrlEn": asset_index.asset_url_en(fi.force.id),
         "activeEffects": getattr(engine, "force_active_effects", lambda force: [])(fi),
     }
 

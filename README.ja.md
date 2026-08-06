@@ -19,7 +19,7 @@
 - **3 言語 UI**：简体中文、日本語、English。
 - **BGM 設定**：完全リソースパックには ZENONZARD のキャラクターソングが含まれます。
 - **更新確認**：起動時に GitHub Releases を確認し、新しいバージョンがある場合は公開ページを開けます。
-- **クロスプラットフォーム起動**：Windows は `.cmd`、Linux は `.sh`、macOS は `.command` を使用します。Linux / macOS は現在、実験的なソース起動対応です。
+- **クロスプラットフォーム起動**：Windows は `.cmd`、Linux/macOS は `.sh` を使用します。今回のリリースでは独立した `.command` launcher を削除しました。
 
 Story Mode は未実装です。長期目標は、Agent がプレイヤーと自動的に対話し、GAL 形式のフロントエンドを生成する仕組みです。SillyTavern 関連コミュニティのキャラクター、World Info、長期的な交流に関する知見も取り入れ、プレイヤーと自分の Codeman のための個別の ZZ 体験を目指します。
 
@@ -27,11 +27,13 @@ Story Mode は未実装です。長期目標は、Agent がプレイヤーと自
 
 本プロジェクトは実験モデルを強力な AI として宣伝しません。作者は統計学の学位を持っていますが、強化学習の授業を履修しておらず、研究分野も強化学習とは異なります。個人プロジェクトのため学習規模も限られており、現在の AI は ZENONZARD 正式運営時に使用された AI より明確に弱いものです。AI アドバイスも主に娯楽機能です。
 
+重要な注意：コンピューター AI の学習データと学習カードプールは現在 PC01 のみです。PC01R、EX01、PC02 はこの学習に含まれていないため、追加カードパックを AI が正しく理解することは期待しないでください。PC02 のルール実装と AI の強さは別のものです。
+
 AI 関連コードは Codex の支援を受け、[sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent) の公開手法と構成を参考にしています。詳細は [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
 
 ## インストール
 
-ソースコードと大型アセットは別々に配布しています。[完全リソースパック（ZZ-Assets-v1.zip）](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)をダウンロードしてください。詳しい手順は [INSTALL.md](INSTALL.md) にあります。
+プログラムと大型アセットは別々に配布しています。まず [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip) をダウンロードし、[Google Drive のアセットフォルダ](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)から主アセットの 2 つの ZIP volume、`ZZ-Assets-PC02-v1.zip.001` と `ZZ-Assets-PC02-v1.zip.002` を取得してください。両方をダウンロードしたら、`.001` を 7-Zip で開いてプロジェクト直下へ展開します。英語カード画像が必要な場合は別ファイル `ZZ-Assets-PC02-English-v1.zip` も取得し、同じく展開します。詳しい手順は [INSTALL.md](INSTALL.md) にあります。
 
 ```powershell
 python -m pip install -r requirements-runtime.txt
@@ -49,15 +51,19 @@ npm install
 # Linux
 ./launch-electron.sh
 
-# macOS
-./launch-electron.command
+# macOS（ソース起動）
+./launch-electron.sh
 ```
 
 ## 現在の制限
 
-カードプールは基本カードと PC01 を収録しています。今後、全カードプールの収録を目指して段階的に更新します。個人開発のため、すべてのカード組み合わせを十分にテストできておらず、小さなルールまたは UI の不具合が残っている可能性があります。
+カードプールは基本カード、EX01、PC01、PC01R、PC02 を収録しています。個人開発のため、すべてのカード組み合わせを十分にテストできておらず、小さなルールまたは UI の不具合が残っている可能性があります。
 
-英語版カード画像は公式サイトの URL を直接使用しているため、一部でカードと画像が一致しない既知の問題があります。英語圏の協力者から画像や英訳テキストを提供していただければ修正できます。
+英語カード画像と英語テキストは独立アセットパックで配布しています。未収録の画像は公式サイトの URL にフォールバックするため、一部でカードと画像が一致しない可能性があります。
+
+## 謝辞
+
+50 枚以上の高解像度 playmat 画像を提供してくださった theFeri と、英語テキストを提供してくださった **Valkyrie** に特別な感謝を表します。
 
 ## コントリビューション
 

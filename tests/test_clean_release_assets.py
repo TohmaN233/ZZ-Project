@@ -23,13 +23,19 @@ class CleanReleaseAssetTests(unittest.TestCase):
         self.index = AssetIndex(ASSET_ROOT)
 
     def test_asset_tree_is_ascii_only_and_has_no_unowned_top_level_content(self) -> None:
-        self.assertEqual(
-            {path.name for path in ASSET_ROOT.iterdir()},
-            {"audio", "card_back", "images", "video", "ZENONZARD_CARDLIST"},
-        )
+        runtime_entries = {
+            "audio", "card_back", "Eng-cards", "images", "video", "ZENONZARD_CARDLIST"
+        }
+        actual_entries = {path.name for path in ASSET_ROOT.iterdir()}
+        self.assertTrue(runtime_entries.issubset(actual_entries))
+        if os.environ.get("ZZ_RELEASE_ASSET_ROOT"):
+            self.assertEqual(actual_entries, runtime_entries)
+        else:
+            self.assertLessEqual(actual_entries - runtime_entries, {"card images", "db1.xml"})
         non_ascii = [
             str(path.relative_to(ASSET_ROOT))
-            for path in ASSET_ROOT.rglob("*")
+            for root_name in runtime_entries
+            for path in (ASSET_ROOT / root_name).rglob("*")
             if not str(path.relative_to(ASSET_ROOT)).isascii()
         ]
         self.assertEqual(non_ascii, [])
@@ -48,19 +54,52 @@ class CleanReleaseAssetTests(unittest.TestCase):
         }
         self.assertEqual(card_files, expected_cards)
         self.assertTrue(all(self.index.resolve_asset_id(card_id) for card_id in expected_cards))
+        english_manifest = json.loads(
+            (ASSET_ROOT / "Eng-cards" / "manifest.json").read_text(encoding="utf-8")
+        )
+        self.assertTrue(expected_cards.issubset(english_manifest["cards"]))
+        self.assertTrue(all(self.index.asset_url_en(card_id) for card_id in expected_cards))
 
         self.assertEqual(
             {path.stem for path in (card_root / "FORCE").glob("*.png")},
             set(ALL_FORCES),
         )
+        self.assertEqual(set(english_manifest["forces"]), set(ALL_FORCES))
+        self.assertEqual(
+            set(english_manifest["mana"]),
+            {"COLORLESS", "RED", "YELLOW", "WHITE", "GREEN", "BLUE", "PURPLE"},
+        )
         self.assertEqual(
             {path.name for path in (card_root / "tokens").glob("*.png")},
-            {"red_01_04_00_00.png", "blue_02_04_00_00.png", "colorless_01_04_00_00.png"},
+            {
+                "red_01_04_00_00.png",
+                "blue_02_04_00_00.png",
+                "colorless_01_04_00_00.png",
+                "colorless_01_04_00_01.png",
+                "colorless_03_04_00_00.png",
+                "colorless_04_04_00_00.png",
+                "colorless_04_04_00_01.png",
+                "colorless_05_04_00_00.png",
+                "purple_01_03_EX04c_00.png",
+                "purple_02_04_00_00.png",
+                "red_01_03_EX04c_00.png",
+                "yellow_02_03_EX04c_00.png",
+            },
         )
         self.assertTrue(self.index.resolve_asset_id("card_back"))
         self.assertTrue(self.index.resolve_asset_id("s_golem_token"))
         self.assertTrue(self.index.resolve_asset_id("merfolk_token"))
         self.assertTrue(self.index.resolve_asset_id("slime_block_token"))
+        self.assertTrue(
+            all(
+                self.index.resolve_asset_id(path.stem)
+                for path in (card_root / "tokens").glob("*.png")
+            )
+        )
+        self.assertEqual(
+            self.index.resolve_asset_id("s_aryushinashion_token").name,
+            "purple_02_04_00_00.png",
+        )
 
         expected_audio_ids = {f"bgm_{index:02d}" for index in range(1, 21)} | set(BATTLE_SFX_AUDIO_NAMES)
         self.assertTrue(all(self.index.resolve_audio_id(audio_id) for audio_id in expected_audio_ids))
@@ -77,8 +116,19 @@ class CleanReleaseAssetTests(unittest.TestCase):
 
         playmat_root = ASSET_ROOT / "images" / "clean_graph" / "playmats"
         playmat_manifest = json.loads((playmat_root / "manifest.json").read_text(encoding="utf-8"))
-        self.assertEqual(len(playmat_manifest), 185)
-        self.assertEqual(len(self.index.playmat_catalog()), 185)
+        self.assertEqual(len(playmat_manifest), 187)
+        self.assertEqual(len(self.index.playmat_catalog()), 187)
+        self.assertEqual(
+            len({entry["file"] for entry in playmat_manifest}),
+            len(playmat_manifest),
+        )
+        self.assertEqual(
+            sum(
+                (entry.get("width"), entry.get("height")) == (2880, 1760)
+                for entry in playmat_manifest
+            ),
+            53,
+        )
         self.assertEqual(
             {path.name for path in playmat_root.iterdir()},
             {"manifest.json", *(entry["file"] for entry in playmat_manifest)},

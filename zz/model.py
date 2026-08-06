@@ -74,7 +74,7 @@ from zz.enums import AreaType, Phase, Step, Side
 _id_counter = itertools.count(1)
 
 
-@dataclass
+@dataclass(eq=False)
 class CardInstance:
     """A specific in-game copy of a Card."""
     card: Card
@@ -91,6 +91,7 @@ class CardInstance:
     flags: set[str] = field(default_factory=set)
     # House-rule HR2 support
     mana_color_override: Optional[Color] = None
+    blessings: list["CardInstance"] = field(default_factory=list)
 
     def __deepcopy__(self, memo: dict[int, Any]) -> "CardInstance":
         import copy

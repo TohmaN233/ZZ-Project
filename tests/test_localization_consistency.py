@@ -57,7 +57,7 @@ def test_packaged_translations_are_available_without_external_workspace_files() 
     cards = card_translations()
     forces = force_translations()
 
-    assert len(cards) == 219
+    assert len(cards) == 401
     assert all(row.get("name_zh") for row in cards.values())
     assert len(forces) == 10
     assert all(row.get("name_zh") and row.get("ability_zh") for row in forces.values())

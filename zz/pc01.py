@@ -292,6 +292,9 @@ def _parse_seesaa_cost_label(label: str | None) -> dict[Color, int] | None:
 
 
 def _seesaa_cost(row: dict[str, str]) -> dict[Color, int] | None:
+    direct = _parse_seesaa_cost_label(row.get("cost") or row.get("cost_official"))
+    if direct is not None:
+        return direct
     for name_key in ("official_name_jp", "name_jp"):
         name = _clean_text(row.get(name_key))
         if not name:
@@ -306,6 +309,9 @@ def _total_cost(row: dict[str, str]) -> int:
     label = (row.get("cost") or row.get("cost_official") or "").strip()
     if label.endswith("+"):
         return _cost_from_image_id(row["image_id"])
+    exact_match = re.fullmatch(r"(\d+)\([^)]*\)", label)
+    if exact_match is not None:
+        return int(exact_match.group(1))
     return _parse_int(label)
 
 
@@ -337,8 +343,25 @@ def _keywords(ability_jp: str) -> list[Keyword]:
     ]
     for marker, keyword in _KEYWORD_MARKERS.items():
         marker_re = re.compile(rf"^[［\[]\s*{re.escape(marker)}(?:[：:].+)?\s*[］\]]$")
-        if any(line == marker or marker_re.match(line) for line in lines):
+        standalone_re = re.compile(rf"^{re.escape(marker)}(?:\s*[：:]\s*.*)?$")
+        # A card can mention a keyword in its rules text without owning it.
+        # For example, Tuhansapi says that it can receive [Bless], but it is
+        # not itself Bless mana.  Only standalone keyword markers contribute
+        # to the intrinsic keyword list.
+        if any(line == marker or marker_re.match(line) or standalone_re.match(line) for line in lines):
             keywords.append(keyword)
+    # Printed keyword badges may be adjacent on one line (for example
+    # ``［襲撃］［再起］``).  Treat the complete line as a keyword-only
+    # sequence, while still ignoring keyword mentions embedded in prose.
+    for line in lines:
+        markers = re.findall(r"[［\[]\s*([^］\]]+?)\s*[］\]]", line)
+        if not markers or "".join(f"［{marker}］" for marker in markers) != line.replace(" ", ""):
+            continue
+        for marker in markers:
+            marker = marker.strip()
+            keyword = _KEYWORD_MARKERS.get(marker)
+            if keyword is not None and keyword not in keywords:
+                keywords.append(keyword)
     if "このミニオンはブロックできない" in ability_jp or "このカードはブロックできない" in ability_jp:
         keywords.append(Keyword.CANNOT_BLOCK)
     return keywords

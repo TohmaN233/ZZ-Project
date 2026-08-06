@@ -3,7 +3,7 @@ from collections import deque
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from zz.effects import EffectTiming
+from zz.effects import EffectTiming, EffectSpec, effect_once_per_turn_used
 from zz.enums import AreaType, TriggerTiming
 
 if TYPE_CHECKING:
@@ -43,6 +43,13 @@ class TriggerRegistry:
             )
         )
 
+    def has_pending(self, *, instance: "CardInstance" | None = None, trigger: Any | None = None) -> bool:
+        return any(
+            (instance is None or pending.instance is instance)
+            and (trigger is None or pending.trigger is trigger)
+            for pending in self._queue
+        )
+
     def _effect_active_in_area(self, effect: Any, ci: "CardInstance") -> bool:
         active_areas = getattr(effect, "active_areas", None)
         if active_areas is None:
@@ -67,6 +74,8 @@ class TriggerRegistry:
                             continue
                         if not self._effect_active_in_area(effect, ci):
                             continue
+                        if isinstance(effect, EffectSpec) and effect_once_per_turn_used(effect, ci):
+                            continue
                         if effect.condition and not effect.condition(ci, state, ctx):
                             continue
                         self._queue.append(_Pending(timing, ci, effect, ctx))
@@ -81,6 +90,15 @@ class TriggerRegistry:
                         if trig.condition and not trig.condition(ci, state, ctx):
                             continue
                         self._queue.append(_Pending(timing, ci, trig, ctx))
+                    if ci.area is AreaType.FIELD and ci.blessings:
+                        from zz.pc02 import blessing_effects
+
+                        for effect in blessing_effects(ci, timing, ctx):
+                            if effect_once_per_turn_used(effect, ci):
+                                continue
+                            if effect.condition and not effect.condition(ci, state, ctx):
+                                continue
+                            self._queue.append(_Pending(timing, ci, effect, ctx))
 
     def resolve_all(self) -> None:
         while self._queue:
@@ -90,6 +108,8 @@ class TriggerRegistry:
                     f"trigger depth exceeded {MAX_TRIGGER_DEPTH}"
                 )
             p = self._queue.popleft()
+            if isinstance(p.trigger, EffectSpec) and effect_once_per_turn_used(p.trigger, p.instance):
+                continue
             defer_choice = getattr(self._engine, "defer_trigger_choice", None)
             if defer_choice is not None and defer_choice(p):
                 self._depth = 0

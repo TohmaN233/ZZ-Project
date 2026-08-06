@@ -23,6 +23,7 @@ from zz.effects import (
 from zz.engine import LIFE_CAP
 from zz.forces import ALL_FORCES
 from zz.web.assets import AssetIndex, DEFAULT_OFFICIAL_CARDLIST
+from zz.web.filter_localization import filter_group_labels, filter_option_labels
 from zz.web.localization import card_translation, force_translation
 from zz.web.profiles import character_catalog, home_guide_catalog
 
@@ -42,19 +43,6 @@ FILTER_GROUP_ORDER = [
     "effect_timing",
     "conditions",
 ]
-
-FILTER_GROUP_LABELS = {
-    "cardtype": "卡种",
-    "attribute": "属性",
-    "cost": "费用",
-    "series": "卡包",
-    "race": "种族",
-    "reality": "稀有度",
-    "dp": "DP",
-    "effect": "关键词能力",
-    "effect_timing": "效果时点",
-    "conditions": "条件",
-}
 
 TYPE_JP_BY_VALUE = {
     "b_minion": "ベース・ミニオン",
@@ -101,24 +89,29 @@ def _read_filter_groups(path: Path) -> list[dict[str, Any]]:
             value = (row.get("value") or "").strip()
             if not group or not value:
                 continue
+            labels = filter_option_labels(group, value, (row.get("label") or value).strip())
             option = {
                 "value": value,
-                "label": (row.get("label") or value).strip(),
+                "label": labels["labelJp"],
+                **labels,
                 "order": _int_or_none(row.get("order")),
             }
             pack_order = _int_or_none(row.get("pack_order"))
             if pack_order is not None:
                 option["packOrder"] = pack_order
             groups.setdefault(group, []).append(option)
-    return [
-        {
+    result = []
+    for group in FILTER_GROUP_ORDER:
+        if group not in groups:
+            continue
+        labels = filter_group_labels(group)
+        result.append({
             "id": group,
-            "label": FILTER_GROUP_LABELS.get(group, group),
-            "options": sorted(groups[group], key=lambda item: (item.get("order") or 9999, item["label"])),
-        }
-        for group in FILTER_GROUP_ORDER
-        if group in groups
-    ]
+            "label": labels["labelJp"],
+            **labels,
+            "options": sorted(groups[group], key=lambda item: (item.get("order") or 9999, item["labelJp"])),
+        })
+    return result
 
 
 def _int_or_none(value: Any) -> int | None:
@@ -272,6 +265,7 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
             "abilityEn": force.ability_en,
             "abilityZh": _first(translation.get("ability_zh")),
             "assetUrl": asset_index.asset_url(force.id),
+            "assetUrlEn": asset_index.asset_url_en(force.id),
         })
     forces.sort(key=lambda item: item["nameJp"])
 

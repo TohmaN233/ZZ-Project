@@ -1,0 +1,104 @@
+image_id	name_jp	cost_image	bp_image	dp_image	ability_jp	image_path	secondary_source
+blue_00_01_02_00	「泡精」バルボラ	-	300	0	加護：青	asserts/ZENONZARD_CARDLIST/BLUE/blue_00_01_02_00.png	data/seesaa.tsv::「泡精」バルボラ
+blue_00_01_02_01	「波精」ヴルーヴェ	-	100	1	［加護:青+コスト4以上］\n«付与能力»【アタック時】\n自分の移動権を1増やす。	asserts/ZENONZARD_CARDLIST/BLUE/blue_00_01_02_01.png	data/seesaa.tsv::「波精」ヴルーヴェ
+blue_00_03_02_00	マーフォークス・マーチ	0			【メイン】\n自分の青のミニオンがいる場合、自分の移動権を1増やす。	asserts/ZENONZARD_CARDLIST/BLUE/blue_00_03_02_00.png	data/seesaa.tsv::マーフォークス・マーチ
+blue_01_02_02_00	ペンタゴナ音楽隊「見習組」	1(青1)	200	0	【召喚時】\n自分のデッキを上から1枚見る。そのカードをデッキの上か下に戻す。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/BLUE/blue_01_02_02_00.png	data/seesaa.tsv::ペンタゴナ音楽隊「見習組」
+blue_02_02_02_00	ポイズンガブ	2(青1)	300	1	効果なし	asserts/ZENONZARD_CARDLIST/BLUE/blue_02_02_02_00.png	data/seesaa.tsv::ポイズンガブ
+blue_03_02_02_00	「顎砕の竜巫女」ソフィア	3(青1)	400	1	【自分のターン】\n自分の種族「ドラゴン」を持つ、青または無色のミニオンカードが出るたび、自分はカードを1枚引く。	asserts/ZENONZARD_CARDLIST/BLUE/blue_03_02_02_00.png	data/seesaa.tsv::「顎砕の竜巫女」ソフィア
+blue_03_03_02_00	ソニックウェイブ	3(青1)			【メイン】/【フラッシュ】\n相手のミニオン1体にBP-200と本来の数値にDP-1を付与する。	asserts/ZENONZARD_CARDLIST/BLUE/blue_03_03_02_00.png	data/seesaa.tsv::ソニックウェイブ
+blue_04_02_02_00	バンド・オブ・ブラックスケイル	4(青2)	400	1	《ベース》【後退時】\n相手のコスト5以下のミニオン1体をレスト状態でベースに移動させる。（この効果はマナの効果として発揮する。）	asserts/ZENONZARD_CARDLIST/BLUE/blue_04_02_02_00.png	data/seesaa.tsv::バンド・オブ・ブラックスケイル
+blue_05_02_02_00	「神餐の担い手」ジューリオ	4(青2)	600	1	【常時】\n他の自分の青のミニオンまたは自分の青のマナが移動するたび、それを移動先でアクティブにする。	asserts/ZENONZARD_CARDLIST/BLUE/blue_05_02_02_00.png	data/seesaa.tsv::「神餐の担い手」ジューリオ
+blue_05_02_02_01	レインボージェリー	5(青2)	400	1	潜入\n【加護時】\n自分はカードを1枚引く。	asserts/ZENONZARD_CARDLIST/BLUE/blue_05_02_02_01.png	data/seesaa.tsv::レインボージェリー
+blue_06_02_02_00	「知の探究者」ダビド	6(青2)	600	2	【召喚時】\n自分のデッキを上から3枚見て、その中のマジックカード全てを公開して手札に加える。残りをランダムにデッキの下に戻す。	asserts/ZENONZARD_CARDLIST/BLUE/blue_06_02_02_00.png	data/seesaa.tsv::「知の探究者」ダビド
+blue_09_02_02_00	「顎砕公」ゲレロフォン	9(青3)	900	3	【召喚時】＆【自分のターン開始時】\nこのターン、次に使用する自分の青のマジックカードのコストを0にする。\n【自分のターン】\nこのミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/BLUE/blue_09_02_02_00.png	data/seesaa.tsv::「顎砕公」ゲレロフォン
+colorless_00_01_02_00	「弓精」アキュレー	-	200	1	加護：コスト4以上	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_01_02_00.png	data/seesaa.tsv::「弓精」アキュレー
+colorless_00_01_02_01	「砂精」サンディー	-	200	0	加護：条件なし\n《付与能力》[再起]	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_01_02_01.png	data/seesaa.tsv::「砂精」サンディー
+colorless_00_01_02_02	「空精」クリスカ	-	200	0	加護：コスト4以上\n《ベース》【配置時】\n自分のデッキを上から4枚見て、その中の種族「ドラゴン」を持つフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_01_02_02.png	data/seesaa.tsv::「空精」クリスカ
+colorless_02_02_02_00	「紅の鼠騎士」スカーレット	2	200	1	【召喚時】\n自分の[加護]が付与されているミニオンがいるか、自分のベースに［加護］を持つマナがある場合、自分はカードを1枚引く。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_02_02_02_00.png	data/seesaa.tsv::「紅の鼠騎士」スカーレット
+colorless_02_02_02_01	グリーンミミック	2	300	1	【常時】\nお互いの手札にある種族「デミゴッド」を持つフィールド・ミニオンカードのフリーコストを2増やす。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_02_02_02_01.png	data/seesaa.tsv::グリーンミミック
+colorless_03_02_02_00	ドラゴン・プリースト	3	100	0	【破壊時】\n「ドラゴン・トークン」1体を出す。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_03_02_02_00.png	data/seesaa.tsv::ドラゴン・プリースト
+colorless_03_02_02_01	グレー・ブロッブ	3	100	0	【破壊時】\n相手のミニオン・トークンを全て破壊する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_03_02_02_01.png	data/seesaa.tsv::グレー・ブロッブ
+colorless_03_02_02_02	ドランゲール	3	300	1	【常時】\n自分の手札にある種族「ドラゴン」を持つミニオンカードのフリーコストを1減らす。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_03_02_02_02.png	data/seesaa.tsv::ドランゲール
+colorless_04_02_02_00	オブシディアン・ドラゴン	4	400	2	【常時】\n他の自分の種族「ドラゴン」を持つミニオン全てをBP+200する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_04_02_02_00.png	data/seesaa.tsv::オブシディアン・ドラゴン
+colorless_04_02_02_01	スレイビートル	4	400	1	【相手のターン】\n自分のフォース全ては、相手の効果で選択できない。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_04_02_02_01.png	data/seesaa.tsv::スレイビートル
+colorless_04_02_02_02	スティール・センチピード	4	400	1	【アタック時】\nこのミニオンがダメージを与えるたび、そのダメージ分、自分のプレイヤーを回復する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_04_02_02_02.png	data/seesaa.tsv::スティール・センチピード
+colorless_04_02_02_03	密林王ブラックサーベルジャガー	4	500	1	【自分のターン】\n自分の[加護]を持つマナ全ては、レスト状態でも付与することができる。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_04_02_02_03.png	data/seesaa.tsv::密林王ブラックサーベルジャガー
+colorless_05_02_02_00	ゴブリン・アサシン	5	400	2	奪命	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_05_02_02_00.png	data/seesaa.tsv::ゴブリン・アサシン
+colorless_05_02_02_01	モノアイドラゴン	5	500	1	【召喚時】\n相手の【破壊時】を持つミニオン1体を除外する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_05_02_02_01.png	data/seesaa.tsv::モノアイドラゴン
+colorless_05_02_02_03	「英雄」エラー・ド・ネジェル	5	600	1	【召喚時】\n相手のコスト8以上のミニオン全てを破壊する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_05_02_02_03.png	data/seesaa.tsv::「英雄」エラー・ド・ネジェル
+colorless_06_02_02_00	ギリーボア	6	500	2	襲撃\n【召喚時】\n自分のプレイヤーか自分のフォース1つを1回復する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_06_02_02_00.png	data/seesaa.tsv::ギリーボア
+colorless_06_02_02_01	暴風竜ストームギラ	6	500	1	飛来\n【召喚時】\n相手のBP400以下のミニオン1体をレストする。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_06_02_02_01.png	data/seesaa.tsv::暴風竜ストームギラ
+colorless_06_02_02_02	ブラック・フレイム	6	400	2	潜入\n【常時】\n他に自分のミニオンがいない場合、このミニオンは相手の効果で選択できない。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_06_02_02_02.png	data/seesaa.tsv::ブラック・フレイム
+colorless_07_02_02_00	咆竜ブラスティオス	7	1000	3	効果なし	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_07_02_02_00.png	data/seesaa.tsv::咆竜ブラスティオス
+colorless_07_02_02_01	「二艘槍」ハーゲン	7	400	2	【召喚時】\nこのターン中、このミニオンをBP+300する。\n【アタック時】\nターンに1回、このミニオンをアクティブにする。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_07_02_02_01.png	data/seesaa.tsv::「二艘槍」ハーゲン
+colorless_08_02_02_00	「悪夢」ハイドラ	8	700	1	【自分のターン終了時】\n「ドラゴン・トークン」1体を出す。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_08_02_02_00.png	data/seesaa.tsv::「悪夢」ハイドラ
+green_00_01_02_00	「種精」ピットボック	-	300	0	［加護:緑］	asserts/ZENONZARD_CARDLIST/GREEN/green_00_01_02_00.png	data/seesaa.tsv::「種精」ピットボック
+green_00_01_02_01	「樹精」グリーフィ	-	100	1	［加護:緑+コスト4以上］\n«付与能力»【アタック時】\n相手のフォース1つをレストする。	asserts/ZENONZARD_CARDLIST/GREEN/green_00_01_02_01.png	data/seesaa.tsv::「樹精」グリーフィ
+green_01_02_02_00	ツパ=チョカ	1(緑1)	200	0	【加護時】\nこのミニオンにDP+1を付与する。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/GREEN/green_01_02_02_00.png	data/seesaa.tsv::ツパ＝チョカ
+green_02_03_02_00	アニマ	2(緑1)			【メイン】\n自分はデッキの中から緑の種族「ニンフ」を持つベース・ミニオンカード1枚を、レスト状態でベースに置く。その後、自分のデッキをシャッフルする。	asserts/ZENONZARD_CARDLIST/GREEN/green_02_03_02_00.png	data/seesaa.tsv::アニマ
+green_03_02_02_00	トゥハンサピ	3(緑1)	200	1	【常時】\nこのミニオンには条件を無視して［加護］を付与させることができる。	asserts/ZENONZARD_CARDLIST/GREEN/green_03_02_02_00.png	data/seesaa.tsv::トゥハンサピ
+green_03_02_02_01	「太陽の竜巫女」クロエ	3(緑1)	300	1	«ベース»\nこのマナで種族「ドラゴン」を持つ、緑または無色のフィールド・ミニオンカードのコストを支払うとき、緑コスト2マナ分支払える。	asserts/ZENONZARD_CARDLIST/GREEN/green_03_02_02_01.png	data/seesaa.tsv::「太陽の竜巫女」クロエ
+green_03_03_02_00	フォレストガード	3(緑2)			【メイン】/【フラッシュ】\n相手のレスト状態であるミニオン1体にBP-500を付与する。	asserts/ZENONZARD_CARDLIST/GREEN/green_03_03_02_00.png	data/seesaa.tsv::フォレストガード
+green_04_02_02_00	モルフェオ「パピリオ」	4(緑2)	500	1	【常時】\n自分のデッキまたは手札から種族「ニンフ」を持つマナが置かれるたび、相手のレスト状態であるミニオン1体を破壊する。	asserts/ZENONZARD_CARDLIST/GREEN/green_04_02_02_00.png	data/seesaa.tsv::モルフェオ「パピリオ」
+green_05_02_02_00	「影疾走」バヤガン	5(緑2)	400	2	［貫通］\n【加護時】\nこのターン中、このミニオンに［襲撃］と［再起］を与える。	asserts/ZENONZARD_CARDLIST/GREEN/green_05_02_02_00.png	data/seesaa.tsv::「影疾走」バヤガン
+green_06_02_02_00	「風の乗り手」シルヴィー	6(緑2)	600	2	【召喚時】\n自分の種族「ニンフ」を持つマナ全てをアクティブにする。\n【自分のターン】\n自分の［加護］が付与されているミニオンがアタックするたび、相手のミニオン1体をレストする。	asserts/ZENONZARD_CARDLIST/GREEN/green_06_02_02_00.png	data/seesaa.tsv::「風の乗り手」シルヴィー
+green_08_02_02_00	アジャクツォーク	8(緑1)	900	4	効果なし	asserts/ZENONZARD_CARDLIST/GREEN/green_08_02_02_00.png	data/seesaa.tsv::アジャクツォーク
+green_08_03_02_00	テンタクル・エンタングル	8(緑3)			自分のコスト7以上の緑のミニオンがいる場合、自分の手札にあるこのカードのフリーコストは0になる。\n【メイン】\n相手のミニオン全てをレストする。	asserts/ZENONZARD_CARDLIST/GREEN/green_08_03_02_00.png	data/seesaa.tsv::テンタクル・エンタングル
+green_09_02_02_00	「太陽公」ハトト=ラキア	9(緑3)	1000	3	【相手のターン】\n相手のミニオンはフィールドに出るときにレスト状態で出る。\n【自分のターン】\nこのミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/GREEN/green_09_02_02_00.png	data/seesaa.tsv::「太陽公」ハトト＝ラキア
+purple_00_01_02_00	「沼精」ロッツ	-	300	0	［加護:紫］	asserts/ZENONZARD_CARDLIST/PURPLE/purple_00_01_02_00.png	data/seesaa.tsv::「沼精」ロッツ
+purple_00_01_02_01	「影精」プルシャ	-	100	1	［加護:紫+コスト4以上］\n«付与能力»［奪命］	asserts/ZENONZARD_CARDLIST/PURPLE/purple_00_01_02_01.png	data/seesaa.tsv::「影精」プルシャ
+purple_01_02_02_00	ミュルミュール	1(紫1)	100	0	【破壊時】\n自分の紫のミニオン1体にBP+100を付与する。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_01_02_02_00.png	data/seesaa.tsv::ミュルミュール
+purple_01_03_02_00	バッドトーク	1(紫1)			【メイン】\n自分のデッキを上から3枚破棄する。その後、自分のトラッシュにある、コスト3以下のミニオンカード1枚を手札に戻す。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_01_03_02_00.png	data/seesaa.tsv::バッドトーク
+purple_02_02_02_00	「さまよえる骨」リシャール	2(紫1)	100	1	［奪命］\n【加護時】\nこのターン中、自分のプレイヤーに「相手のミニオンが破壊されるたび、自分はカードを1枚引く。」を与える。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_02_02_02_00.png	data/seesaa.tsv::「さまよえる骨」リシャール
+purple_03_02_02_00	アン・テ・ロウフェ	3(紫1)	300	1	【召喚時】\n他の自分のミニオン1体を破壊する。そうした場合、このミニオンにBP+200/DP+1を付与する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_03_02_02_00.png	data/seesaa.tsv::アン・テ・ロウフェ
+purple_03_03_02_00	ドゥームドロード	3(紫1)			【メイン】/【フラッシュ】\n相手のミニオン1体にBP-200を付与する。そうした場合、自分の紫のミニオン全てにBP+100を付与する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_03_03_02_00.png	data/seesaa.tsv::ドゥームドロード
+purple_04_02_02_00	「死滅の竜巫女」フランチェスカ	4(紫2)	400	1	【召喚時】\n自分のトラッシュにある種族「ドラゴン」を持つ、紫または無色のフィールド・ミニオンカード1枚を手札に戻すことができる。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_04_02_02_00.png	data/seesaa.tsv::「死滅の竜巫女」フランチェスカ
+purple_05_02_02_00	ザ・シング	5(紫1)	700	2	効果なし	asserts/ZENONZARD_CARDLIST/PURPLE/purple_05_02_02_00.png	data/seesaa.tsv::ザ・シング
+purple_05_02_02_01	「暗黒騎士団隊長」イザーク	5(紫2)	500	2	【相手のターン】\n自分のミニオンが持つ［奪命］は相手のターンにも発揮する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_05_02_02_01.png	data/seesaa.tsv::「暗黒騎士団長」イザーク
+purple_06_02_02_00	「暴食」ギュスターヴ	6(紫2)	300	3	【召喚時】\nお互いのトラッシュにあるフィールド・ミニオンカード1枚毎に、このミニオンにBP+100を付与する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_06_02_02_00.png	data/seesaa.tsv::「暴食」ギュスターヴ
+purple_06_03_02_00	デーモンズテラー	6(紫2)			このカードは自分の種族「デーモン」を持つミニオンがいないとき使用できない。\n【フラッシュ】\nこのターン中、相手のミニオン全てはアタックできない。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_06_03_02_00.png	data/seesaa.tsv::デーモンズテラー
+purple_09_02_02_00	「死滅公」スカルボーン	9(紫3)	800	3	【召喚時】\n相手のミニオン1体を破壊する。この効果で破壊したミニオンのコスト分、自分のデッキを上から破棄する。\n【自分のターン】\nこのミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_09_02_02_00.png	data/seesaa.tsv::「死滅公」スカルボーン
+red_00_01_02_00	「石精」ロックバイス	-	300	0	［加護:赤］	asserts/ZENONZARD_CARDLIST/RED/red_00_01_02_00.png	data/seesaa.tsv::「石精」ロックバイス
+red_00_01_02_01	「炎精」ファイアリィ	-	100	1	［加護:赤+コスト4以上］\n«付与能力»【アタック時】\nこのミニオンがブロックされるたび、ブロックしているミニオンにBP-200を付与する。	asserts/ZENONZARD_CARDLIST/RED/red_00_01_02_01.png	data/seesaa.tsv::「炎精」ファイアリィ
+red_01_02_02_00	ゴレイム「タイプ：ディガー」	1(赤1)	100	0	【召喚時】\n自分のミニオンカードでない無色マナ1つを破壊できる。そうした場合、自分はカードを1枚引く。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/RED/red_01_02_02_00.png	data/seesaa.tsv::ゴレイム「タイプ：ディガー」
+red_02_02_02_00	ファイアリザード	2(赤1)	200	1	【自分のターン】\n他の自分の「ファイアリサード」1体毎に、このミニオンをBP+300する。	asserts/ZENONZARD_CARDLIST/RED/red_02_02_02_00.png	data/seesaa.tsv::ファイアリザード
+red_03_02_02_00	「爆焔の竜巫女」ジェーン	3(赤1)	400	1	【自分のターン】\n自分の種族「ドラゴン」を持つ、赤または無色のミニオン全てに［襲撃］を与える。	asserts/ZENONZARD_CARDLIST/RED/red_03_02_02_00.png	data/seesaa.tsv::「爆焔の竜巫女」ジェーン
+red_03_03_02_00	シェイプシフト	3(赤2)			【メイン】\n自分のコスト3以下の赤のミニオン1体と同じミニオン1体を出す。（【召喚時】効果は発揮しない。）	asserts/ZENONZARD_CARDLIST/RED/red_03_03_02_00.png	data/seesaa.tsv::シェイプシフト
+red_03_03_02_01	ブリーチング	3(赤1)			【メイン】/【フラッシュ】\n相手のミニオン1体にBP-300を付与する。そのミニオンが種族「ドラゴン」を持つ場合、代わりにBP-600を付与する。	asserts/ZENONZARD_CARDLIST/RED/red_03_03_02_01.png	data/seesaa.tsv::ブリーチング
+red_04_02_02_00	「暴竜」グラン=レックス	4(赤2)	500	2	［襲撃］\n【召喚時】\n自分のミニオンカードでない無色マナ1つを破壊する。	asserts/ZENONZARD_CARDLIST/RED/red_04_02_02_00.png	data/seesaa.tsv::「暴竜」グラン＝レックス
+red_05_02_02_00	ドワーフ・ウォーハンマー部隊	5(赤1)	500	1	［襲撃］\n【加護時】\n「S・ゴレイム・トークン」1体を出す。	asserts/ZENONZARD_CARDLIST/RED/red_05_02_02_00.png	data/seesaa.tsv::ドワーフ・ウォーハンマー部隊
+red_06_02_02_00	プテラノックス	6(赤1)	700	3	効果なし	asserts/ZENONZARD_CARDLIST/RED/red_06_02_02_00.png	data/seesaa.tsv::プテラノックス
+red_06_02_02_01	「稲妻」マーガス	6(赤2)	600	2	【召喚時】\n自分のミニオンカードでない無色マナ1つを破壊する。そうした場合、このターン中、相手のミニオン1体はブロックできない。\n【自分のターン】\n自分のマナが1つ入れ替えによる破棄以外で減るたび、赤マナ1つをレスト状態でベースに置く。この効果は重複しない。	asserts/ZENONZARD_CARDLIST/RED/red_06_02_02_01.png	data/seesaa.tsv::「稲妻」マーガス
+red_08_03_02_00	ドラゴン・オブ・フォーシル	8(赤3)			【メイン】\n自分のミニオンカードでない無色マナ1つを破壊する。そうした場合、自分のデッキを上から3枚見て、その中の種族「ドラゴン」を持つ、赤または無色のフィールド・ミニオンカード1枚を出す。（【召喚時】効果は発揮しない。）残りをランダムにデッキの下に戻す。	asserts/ZENONZARD_CARDLIST/RED/red_08_03_02_00.png	data/seesaa.tsv::ドラゴン・オブ・フォーシル
+red_09_02_02_00	「爆焔公」マグマファング	9(赤3)	900	3	【アタック時】\n相手のBP500以下のミニオン1体を破壊する。そうした場合、「ドラゴン・トークン」1体を出す。\n【自分のターン】\nこのミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/RED/red_09_02_02_00.png	data/seesaa.tsv::「爆焔公」マグマファング
+white_00_01_02_00	「雪精」ホワイトスノウ	-	300	0	加護：白	asserts/ZENONZARD_CARDLIST/WHITE/white_00_01_02_00.png	data/seesaa.tsv::「雪精」ホワイトスノウ
+white_00_01_02_01	「時精」クロノラ	-	100	1	加護：白+コスト4以上\n《付与能力》【常時】\nこのミニオンがコスト3以下のミニオンとのバトルに勝利するたび、このミニオンをアクティブにする。	asserts/ZENONZARD_CARDLIST/WHITE/white_00_01_02_01.png	data/seesaa.tsv::「時精」クロノラ
+white_01_02_02_00	アイゼンクロコ	1(白1)	100	0	【常時】\n自分の破壊されたフォース1つ毎に、このミニオンをBP+200/DP+1する。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/WHITE/white_01_02_02_00.png	data/seesaa.tsv::アイゼンクロコ
+white_03_02_02_00	R-A7 ラハルコフ	3(白1)	300	1	【相手のターン】\n自分のフォースが相手のミニオンにアタックされるたび、このミニオンにBP+100を付与する。	asserts/ZENONZARD_CARDLIST/WHITE/white_03_02_02_00.png	data/seesaa.tsv::R-A7ラハルコフ
+white_03_02_02_01	「氷原の竜巫女」マチルダ	3(白1)	400	1	【自分のターン】\n自分の種族「ドラゴン」を持つ、白または無色のミニオンカードがバトルに勝利するたび、相手のプレイヤーに1ダメージを与える。	asserts/ZENONZARD_CARDLIST/WHITE/white_03_02_02_01.png	data/seesaa.tsv::「氷原の竜巫女」マチルダ
+white_03_03_02_00	ムービングシールド	3(白1)			【フラッシュ】\n相手のアタックしているミニオンのアタック対象を変更する。自分のフォースが無い場合、代わりに自分はカードを1枚引く。	asserts/ZENONZARD_CARDLIST/WHITE/white_03_03_02_00.png	data/seesaa.tsv::ムービングシールド
+white_04_02_02_00	殲滅試験型ロイド・アポステル	4(白2)	400	1	【相手のターン】\nこのミニオンは相手の効果で選択できない。\n【常時】\n自分の白のミニオンがバトルに勝利するたび、このミニオンにBP+100/DP+1を付与する。	asserts/ZENONZARD_CARDLIST/WHITE/white_04_02_02_00.png	data/seesaa.tsv::殲滅試験型ロイド・アポステル
+white_04_02_02_01	R-A4 ヴォーギン	4(白1)	500	2	効果なし	asserts/ZENONZARD_CARDLIST/WHITE/white_04_02_02_01.png	data/seesaa.tsv::R-A4ヴォーギン
+white_04_03_02_00	オプションパーツ	4(白1)			【メイン】\n自分の白のミニオン全てにBP+200を付与する。	asserts/ZENONZARD_CARDLIST/WHITE/white_04_03_02_00.png	data/seesaa.tsv::オプションパーツ
+white_05_02_02_00	狙撃型ロイド・イワン	5(白2)	500	2	再起\n【加護時】\nこのミニオンに「【アタック時】相手は必ずブロックする。」を付与する。	asserts/ZENONZARD_CARDLIST/WHITE/white_05_02_02_00.png	data/seesaa.tsv::狙撃型ロイド・イワン
+white_06_02_02_00	カノーネン・ティーゲル	6(白2)	600	2	【召喚時】\n相手のミニオン1体を選択する。そのミニオンをアクティブにして、このターン中、そのミニオンは必ずブロックする。\n【自分のターン】\nこのミニオンがバトルに勝利するたび、自分はカードを1枚引く。	asserts/ZENONZARD_CARDLIST/WHITE/white_06_02_02_00.png	data/seesaa.tsv::カノーネン・ティーゲル
+white_06_03_02_00	エクス=キャノン	6(白3)			【フラッシュ】\n相手のミニオン1体を除外する。	asserts/ZENONZARD_CARDLIST/WHITE/white_06_03_02_00.png	data/seesaa.tsv::エクス＝キャノン
+white_09_02_02_00	「氷原公」フリーレン	9(白3)	1000	3	【アタック時】\nこのミニオンがダメージを与えたとき、相手の最もコストの低いミニオン全てを除外する。\n【自分のターン】\nこのミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/WHITE/white_09_02_02_00.png	data/seesaa.tsv::「氷原公」フリーレン
+yellow_00_01_02_00	「雲精」フィード	-	300	0	［加護:黄］	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_00_01_02_00.png	data/seesaa.tsv::「雲精」フィード
+yellow_00_01_02_01	「煌精」サンライト	-	100	1	［加護:黄＋コスト4以上］\n«付与能力»【常時】\n他の自分のミニオンがフィールドに出るたび、このターン中、このミニオンをBP+200する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_00_01_02_01.png	data/seesaa.tsv::「煌精」サンライト
+yellow_01_02_02_00	カワウソ親父	1(黄1)	200	0	【召喚時】\n自分のミニオン1体にBP+100を付与する。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_01_02_02_00.png	data/seesaa.tsv::カワウソ親父
+yellow_02_03_02_00	エアレイド	2(黄1)			【フラッシュ】\n相手のミニオン1体にBP-200を付与する。このターンに自分がミニオンを召喚している場合、代わりにBP-400を付与する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_02_03_02_00.png	data/seesaa.tsv::エアレイド
+yellow_03_02_02_00	ハンマー・ベア	3(黄1)	500	1	効果なし	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_03_02_02_00.png	data/seesaa.tsv::ハンマー・ベア
+yellow_03_03_02_00	トルネードブロウ	3(黄1)			【フラッシュ】\nこのターン中、自分のプレイヤーに「自分のプレイヤーか自分のフォースにダメージが与えられるたび、そのミニオンを手札に戻す。」を与える。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_03_03_02_00.png	data/seesaa.tsv::トルネードブロウ
+yellow_04_02_02_00	「雷鳴の竜巫女」セリカ	4(黄2)	400	1	【召喚時】\n自分はデッキの中から種族「ドラゴン」を持つ、黄またはコスト9以上のフィールド・ミニオンカード1枚を公開して手札に加えることができる。そうした場合、自分のデッキをシャッフルする。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_04_02_02_00.png	data/seesaa.tsv::「雷鳴の竜巫女」セリカ
+yellow_04_02_02_01	「剛腕無敵の将」チョウヒ	4(黄2)	500	1	【常時】\nレスト状態であるこのミニオンが自分の効果で選択されるたび、ターンに1回、このミニオンをアクティブにする。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_04_02_02_01.png	data/seesaa.tsv::「剛腕無敵の将」チョウヒ
+yellow_04_02_02_02	カンフー・モンク・モンキー	4(黄2)	400	1	【召喚時】\nこのターン中、自分のミニオン1体をBP+200して［再起］を与える。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_04_02_02_02.png	data/seesaa.tsv::カンフー・モンク・モンキー
+yellow_05_02_02_00	天翼ミルキー	5(黄2)	400	2	［飛来］\n【加護時】\nこのミニオンに「【破壊時】このミニオンを手札に戻す。」を付与する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_05_02_02_00.png	data/seesaa.tsv::天翼ミルキー
+yellow_06_02_02_00	「鬼武者」リュウドウ	6(黄2)	500	2	【アタック時】\nこのミニオンはBPに関係なくバトルに勝利する。\n【召喚時】\nこのターン中、他の自分のミニオン1体に「【常時】このミニオンはBPに関係なくバトルに勝利する。」を与える。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_06_02_02_00.png	data/seesaa.tsv::「鬼武者」リュウドウ
+yellow_06_03_02_00	パワー・オブ・サン	6(黄3)			【メイン】/【フラッシュ】\nこのターン中、自分のミニオン1体をBP+400/DP+2する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_06_03_02_00.png	data/seesaa.tsv::パワー・オブ・サン
+yellow_09_02_02_00	「雷鳴公」デンサイ	9(黄3)	900	3	【召喚時】\n相手のミニオン1体をデッキの上に戻す。\n【自分のターン】\nこのミニオンは種族「ドラゴン」または「ドラゴニュート」を持たないミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_09_02_02_00.png	data/seesaa.tsv::「雷鳴公」デンサイ
+blue_010_03_02_00	メイルシュトローム	10(青5)			"【メイン】
+「ドラゴン「火」・トークン」1体と「ドラゴン「水」・トークン」1体と「ドラゴン「風」・トークン」1体と「ドラゴン「雷」・トークン」1体を出す。"	asserts/ZENONZARD_CARDLIST/BLUE/blue_010_03_02_00.png	data/seesaa.tsv::メイルシュトローム
+colorless_010_02_02_00	九神龍「天」リジェネレイト	10	1000	2	"飛来
+【召喚時】
+自分の有色マナ全てをアクティブにする。自分の「九神龍「天」リジェネレイト」の効果はターンに1回だけ発揮する。"	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_010_02_02_00.png	data/seesaa.tsv::九神龍「天」リジェネレイト

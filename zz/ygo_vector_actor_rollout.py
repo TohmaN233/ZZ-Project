@@ -31,7 +31,12 @@ from zz.policy_factories import (
     OLD_BASELINE_EASY_POLICY_ID,
     create_rollout_policy,
 )
-from zz.rl_ai import _action_set_scorer_json_mapping, target_selection_player_for_context
+from zz.rl_ai import (
+    FeatureExtractor,
+    _action_set_scorer_json_mapping,
+    semantically_admissible_main_actions,
+    target_selection_player_for_context,
+)
 from zz.rl_training import StateSnapshot, calculate_step_reward, _setup_game
 from tools.hidden_multiprocessing_spawn import install_hidden_multiprocessing_spawn
 
@@ -2057,6 +2062,44 @@ def _run_worker(
                         ),
                     )
                     raise
+                except Exception as exc:
+                    active = getattr(getattr(engine, "state", None), "active", None)
+                    hand_card = next(
+                        (
+                            card
+                            for card in list(getattr(active, "hand", []) or [])
+                            if int(getattr(card, "iid", -1)) == int(action.payload.get("iid", -2))
+                        ),
+                        None,
+                    )
+                    payment_context = {
+                        "actionKind": action.kind,
+                        "actionPayload": dict(action.payload),
+                        "stillLegalAfterPolicyChoose": action in list(engine.legal_actions()),
+                        "cardId": str(getattr(getattr(hand_card, "card", None), "id", "")),
+                        "effectiveCost": (
+                            {
+                                str(getattr(color, "name", color)): int(amount)
+                                for color, amount in engine.effective_cost(active, hand_card).items()
+                            }
+                            if hand_card is not None and action.kind == "play_card"
+                            else None
+                        ),
+                        "readyBase": [
+                            {
+                                "iid": int(getattr(card, "iid", -1)),
+                                "cardId": str(getattr(getattr(card, "card", None), "id", "")),
+                                "manaColor": str(getattr(engine._mana_color_of(card), "name", "")),
+                                "manaValue": int(engine._mana_value(card, hand_card)),
+                            }
+                            for card in list(getattr(active, "base", []) or [])
+                            if not bool(getattr(card, "rested", False))
+                        ],
+                    }
+                    raise RuntimeError(
+                        "selected root action failed during engine.apply: "
+                        + json.dumps(payment_context, ensure_ascii=True, default=str)
+                    ) from exc
                 _annotate_local_step_reward(
                     policy,
                     row_index=local_reward_row_index,
@@ -2251,6 +2294,7 @@ class _BatchedActorPolicy:
         self.rows: list[dict[str, Any]] = []
         self._request_index = 0
         self._action_set_direct_history: list[dict[str, Any]] = []
+        self.extractor = FeatureExtractor()
 
     def begin_rollout_segment(
         self,
@@ -2330,10 +2374,32 @@ class _BatchedActorPolicy:
         return [card for card in list(getattr(player, "hand", []) or []) if self.rng.random() < 0.3]
 
     def _choose_action(self, engine: Any, player: Any, actions: list[Action], *, decision_kind: str) -> Action:
-        slot = self._choose_slot(engine, player, actions, decision_kind=decision_kind)
+        semantic_report: dict[str, Any] | None = None
+        if decision_kind == "main":
+            actions, semantic_report = semantically_admissible_main_actions(
+                engine,
+                player,
+                actions,
+                extractor=self.extractor,
+            )
+        slot = self._choose_slot(
+            engine,
+            player,
+            actions,
+            decision_kind=decision_kind,
+            semantic_filter_report=semantic_report,
+        )
         return actions[int(slot)]
 
-    def _choose_slot(self, engine: Any, player: Any, actions: list[Action], *, decision_kind: str) -> int:
+    def _choose_slot(
+        self,
+        engine: Any,
+        player: Any,
+        actions: list[Action],
+        *,
+        decision_kind: str,
+        semantic_filter_report: Mapping[str, Any] | None = None,
+    ) -> int:
         original_action_count = len(actions)
         if original_action_count > self.action_set_max_actions:
             actions = actions[: self.action_set_max_actions]
@@ -2342,6 +2408,15 @@ class _BatchedActorPolicy:
         request_id = f"{self.task_id}:d{request_index}"
         self._request_index += 1
         metadata = self._metadata(engine, player, decision_kind=decision_kind)
+        if semantic_filter_report:
+            metadata.update(
+                {
+                    "semanticActionOriginalCount": int(semantic_filter_report["originalActionCount"]),
+                    "semanticActionAdmissibleCount": int(semantic_filter_report["admissibleActionCount"]),
+                    "semanticActionRejectedCount": int(semantic_filter_report["rejectedActionCount"]),
+                    "semanticActionRejectedByReason": dict(semantic_filter_report["rejectedByReason"]),
+                }
+            )
         if original_action_count > len(actions):
             metadata["actionSetOriginalLegalCount"] = int(original_action_count)
             metadata["actionSetCappedToMaxActions"] = int(len(actions))
@@ -2395,11 +2470,30 @@ class _BatchedActorPolicy:
 
     def boundary_state_value(self, engine: Any) -> float | None:
         player = self._player_for_side(engine)
-        actions = list(engine.legal_actions()) if getattr(getattr(engine, "state", None), "active", None) is player else [Action(kind="end_turn")]
+        active_player = getattr(getattr(engine, "state", None), "active", None)
+        actions = list(engine.legal_actions()) if active_player is player else [Action(kind="end_turn")]
         if not actions:
             actions = [Action(kind="end_turn")]
+        semantic_report: dict[str, Any] | None = None
+        if active_player is player:
+            actions, semantic_report = semantically_admissible_main_actions(
+                engine,
+                player,
+                actions,
+                extractor=self.extractor,
+            )
         if len(actions) > self.action_set_max_actions:
             actions = actions[: self.action_set_max_actions]
+        metadata = self._metadata(engine, player, decision_kind="bootstrap_value")
+        if semantic_report:
+            metadata.update(
+                {
+                    "semanticActionOriginalCount": int(semantic_report["originalActionCount"]),
+                    "semanticActionAdmissibleCount": int(semantic_report["admissibleActionCount"]),
+                    "semanticActionRejectedCount": int(semantic_report["rejectedActionCount"]),
+                    "semanticActionRejectedByReason": dict(semantic_report["rejectedByReason"]),
+                }
+            )
         row = build_action_set_teacher_row(
             engine,
             player,
@@ -2409,10 +2503,8 @@ class _BatchedActorPolicy:
             max_actions=(len(actions) if self.compact_action_rows else self.action_set_max_actions),
             decision_kind="bootstrap_value",
             raw_scores=[0.0 for _action in actions],
-            metadata=self._metadata(engine, player, decision_kind="bootstrap_value"),
-            history_context=self._direct_action_set_history_context(
-                self._metadata(engine, player, decision_kind="bootstrap_value")
-            ),
+            metadata=metadata,
+            history_context=self._direct_action_set_history_context(metadata),
         )
         request_id = f"{self.task_id}:bootstrap:{self.side}:{self._request_index}"
         recurrent_aliases = self._recurrent_aliases(player, step_index=int(self._request_index))

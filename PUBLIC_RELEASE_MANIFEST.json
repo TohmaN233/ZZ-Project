@@ -1,6 +1,14 @@
 {
-  "kind": "zz_public_release_manifest_v1",
+  "kind": "zz_public_release_manifest_v2",
+  "releaseVersion": "0.2.0",
   "sourceWorkspace": "clean_runtime_release_v2",
+  "currentCardPacks": [
+    "basic",
+    "EX01",
+    "PC01",
+    "PC01R",
+    "PC02"
+  ],
   "includedSurfaces": [
     "Python rules engine and card content",
     "Electron and browser frontend",
@@ -10,9 +18,17 @@
     "GitHub Pages release site"
   ],
   "externalAssetPack": {
-    "archive": "ZZ-Assets-v1.zip",
+    "archive": "ZZ-Assets-PC02-v1.zip",
+    "englishArchive": "ZZ-Assets-PC02-English-v1.zip",
     "extractTo": ".",
-    "manifest": "ASSET_PACK_MANIFEST.json"
+    "manifest": "ASSET_PACK_MANIFEST.json",
+    "distributionUrl": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing",
+    "driveMainVolumePattern": "ZZ-Assets-PC02-v1.zip.00N",
+    "driveMainVolumeCount": 2,
+    "driveMainVolumeBytes": [
+      629145600,
+      576401952
+    ]
   },
   "runtimeModels": [
     {
@@ -20,6 +36,12 @@
       "path": "local_ai_training/retained_mainline_20260630/cycle470_actor.json",
       "bytes": 12826602,
       "sha256": "3A60E592B89E388351DCD1725C9C050A11B018C3E7B65E84CE2243AF2A8EC57F"
+    },
+    {
+      "role": "medium_current_rl_actor",
+      "path": "local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json",
+      "bytes": 14263906,
+      "sha256": "D36E888F7B2FBF328A256429C375E2B9640D9A049A5095BB87128378AB570F94"
     },
     {
       "role": "medium_rl_baseline",

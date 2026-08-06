@@ -44,16 +44,16 @@
           <a class="button secondary" href="#features" data-i18n="heroExplore">了解当前版本</a>
         </div>
         <div class="hero-meta" aria-label="Release summary">
-          <span data-i18n="heroPlatforms">Windows · Linux / macOS 源码启动</span><span>Electron + Python</span><span data-i18n="heroLanguage">中文 / 日本語 / English</span>
+          <span data-i18n="heroPlatforms">Windows · Linux/macOS 使用 .sh</span><span>Electron + Python</span><span data-i18n="heroLanguage">中文 / 日本語 / English</span>
         </div>
       </div>
     </section>
 
     <section class="release-strip" aria-label="Release status">
-      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + PC01</span></div>
+      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + EX01 + PC01 + PC01R + PC02</span></div>
       <div><strong data-i18n="statusTwoTitle">对战方式</strong><span data-i18n="statusTwoBody">单机 / 局域网 / 在线</span></div>
       <div><strong data-i18n="statusThreeTitle">AI 档位</strong><span data-i18n="statusThreeBody">Greedy + 两档 RL</span></div>
-      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">首个公开版本</span></div>
+      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.2.0 · PC02</span></div>
     </section>
 
     <section class="section" id="features">
@@ -139,7 +139,7 @@
     <section class="section screenshots" aria-labelledby="screens-title">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="screensEyebrow">Actual UI</p>
-        <h2 id="screens-title" data-i18n="screensTitle">完整ZZ体验：目前卡池PC01</h2>
+        <h2 id="screens-title" data-i18n="screensTitle">完整 ZZ 体验：当前卡池包含 PC02</h2>
       </div>
       <div class="screen-stage">
         <img src="assets/battle.webp" alt="ZENONZARD 对战画面" loading="lazy">
@@ -172,10 +172,11 @@
         <h2 data-i18n="contentTitle">当前内容边界</h2>
       </div>
       <div class="status-list">
-        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">目前包含基本卡与 PC01，之后会逐步更新，直至补全卡池。</p></div>
+        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">当前包含基本卡、EX01、PC01、PC01R 与 PC02。</p></div>
         <div><strong data-i18n="testingTitle">测试</strong><p data-i18n="testingBody">个人项目无法覆盖足够多的组合测试，当前版本可能仍有小型规则或界面问题。</p></div>
-        <div><strong data-i18n="englishTitle">英文版</strong><p data-i18n="englishBody">英文版卡图直接使用官网链接，已知有图和卡没对齐的现象。英语圈的用户若能提供卡图资源和英文文本，此问题能轻易解决。</p></div>
+        <div><strong data-i18n="englishTitle">英文版</strong><p data-i18n="englishBody">英文卡图与文本是独立资源包；未覆盖的图仍可能回退到官网 URL。</p></div>
         <div><strong data-i18n="musicTitle">BGM</strong><p data-i18n="musicBody">基础设置中可选择对战 BGM；完整资源包包含 ZZ 各角色歌曲。</p></div>
+        <div><strong data-i18n="thanksTitle">致谢</strong><p data-i18n="thanksBody">感谢 theFeri 提供 50+ 张高清 playmat 图，以及 Valkyrie 提供英文文本。</p></div>
       </div>
     </section>
 
@@ -187,10 +188,10 @@
       </div>
       <div class="install-grid">
         <ol class="steps">
-          <li><span>1</span><div><strong data-i18n="installStep1Title">下载源码</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载名为 ZZ-Project-v0.1.0-source.zip 的附件，或使用 Git 与 Git LFS 克隆 main。</p></div></li>
-          <li><span>2</span><div><strong data-i18n="installStep2Title">放入资源包</strong><p data-i18n="installStep2Body">下载 ZZ-Assets-v1.zip，将其中的 asserts 文件夹放到项目根目录；最终应能看到 asserts/images、asserts/audio 等目录。</p></div></li>
+          <li><span>1</span><div><strong data-i18n="installStep1Title">下载源码</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载 ZZ-Project-v0.2.0-source.zip，或使用 Git 与 Git LFS 克隆 main。</p></div></li>
+          <li><span>2</span><div><strong data-i18n="installStep2Title">放入资源包</strong><p data-i18n="installStep2Body">下载 ZZ-Assets-PC02-v1.zip.001 与 .002，用 7-Zip 打开 .001；英文用户再下载独立的 ZZ-Assets-PC02-English-v1.zip。</p></div></li>
           <li><span>3</span><div><strong data-i18n="installStep3Title">安装依赖</strong><p data-i18n="installStep3Body">安装 Python 3.10+ 与 Node.js 20+，先安装 Python 运行依赖，再运行 npm install。</p></div></li>
-          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">Windows 使用 .cmd，Linux 使用 .sh，macOS 使用 .command；也可以运行 npm run electron:dev。</p></div></li>
+          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">Windows 使用 .cmd，Linux 使用 .sh；也可以运行 npm run electron:dev。</p></div></li>
         </ol>
         <aside class="requirements">
           <h3 data-i18n="requirementsTitle">运行要求</h3>
@@ -202,9 +203,9 @@
           </dl>
           <div class="download-actions">
             <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project" data-i18n="downloadCode">打开 GitHub 仓库</a>
-            <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">下载完整资源包</a>
+            <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">下载资源包（含英文包）</a>
           </div>
-          <p class="hash-note"><code>ZZ-Assets-v1.zip</code><br><span data-i18n="hashNote">文件大小与 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。</span></p>
+          <p class="hash-note"><code>ZZ-Assets-PC02-v1.zip.001</code><br><code>ZZ-Assets-PC02-v1.zip.002</code><br><code>ZZ-Assets-PC02-English-v1.zip</code><br><span data-i18n="hashNote">两个主资源 volume 与英文 ZIP 的大小和 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。</span></p>
         </aside>
       </div>
     </section>

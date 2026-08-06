@@ -22,8 +22,8 @@ from zz.decks import (
 )
 from zz.engine import BASE_CAP, FIELD_CAP, Engine, GameOver, IllegalActionError, LIFE_CAP
 from zz.effects import EffectSpec, EffectTiming, TIMING_LABELS, _target_filter
-from zz.enums import AreaType, AttackTargetKind, CardType, Color, Side, Step
-from zz.forces import ALL_FORCES
+from zz.enums import AreaType, AttackTargetKind, CardType, Color, Keyword, Side, Step, TriggerTiming
+from zz.forces import ALL_FORCES, Force
 from zz.model import Action, AttackTarget, CardInstance, Context, ForceInstance, GameState, Player
 from zz.web.assets import AssetIndex
 from zz.web.profiles import normalize_profile, profile_dto
@@ -42,8 +42,8 @@ LOCAL_GAME_DEEP_ACTOR_SOURCE_POLICY_ID = (
 LOCAL_GAME_DEEP_ACTOR_MODEL_PATH = Path(
     "local_ai_training/retained_mainline_20260630/cycle470_actor.json"
 )
-LOCAL_GAME_NORMAL_DEEP_BASELINE_MODEL_PATH = Path(
-    "local_ai_training/retained_mainline_20260630/deep_baseline_best_greedy.pt"
+LOCAL_GAME_MEDIUM_DEEP_ACTOR_MODEL_PATH = Path(
+    "local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json"
 )
 
 
@@ -53,7 +53,12 @@ TARGETED_ATTACK_CARD_KINDS = {}
 
 TARGETED_CARD_COUNTS = {}
 
-OPTIONAL_EFFECT_TARGET_KINDS = {"deck_base_minion"}
+OPTIONAL_EFFECT_TARGET_KINDS = {"deck_base_minion", "top3_magic"}
+
+LOOK_WINDOW_SIZES = {
+    "pc02_fossil_dragon": 3,
+    "top3_magic": 3,
+}
 
 MANA_COLOR_CHOICES = [
     Color.RED,
@@ -91,7 +96,9 @@ EFFECT_TARGET_FILTER_PARAMS = {
     "max_cost",
     "min_cost",
     "max_bp",
+    "min_bp",
     "max_dp",
+    "min_dp",
 }
 
 
@@ -234,6 +241,7 @@ class GameSession:
                 seed=seed,
                 codeman_id=str(codeman_id),
                 data_root=self.codeman_memory_store.root,
+                deep_model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return self._policy_for_difficulty(default_kind, seed=seed)
 
@@ -245,6 +253,7 @@ class GameSession:
                 seed=seed,
                 codeman_id=str(codeman_id),
                 data_root=self.codeman_memory_store.root,
+                deep_model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return self._policy_for_difficulty(self.opponent_ai_difficulty, seed=seed)
 
@@ -256,7 +265,7 @@ class GameSession:
             return resolve_battle_policy(
                 "deep",
                 seed=seed,
-                deep_model_path=LOCAL_GAME_NORMAL_DEEP_BASELINE_MODEL_PATH,
+                deep_model_path=LOCAL_GAME_MEDIUM_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return resolve_battle_policy(
             resolved,
@@ -290,6 +299,7 @@ class GameSession:
         self.engine = Engine(state, rng=self.rng)
         state.engine = self.engine
         self.engine.defer_force_base_choice = self._is_user_controlled
+        self.engine.defer_blessing_base_choice = self._is_user_controlled
         self.engine.defer_trigger_choice = self._defer_trigger_choice
         self.engine.defer_source_effect_choice = self._defer_source_effect_choice
         self._configure_mode_controls()
@@ -1689,10 +1699,16 @@ class GameSession:
                 self._finish_pending_effect(selected_effect_targets if selected_effect_targets is not None else value)
                 self._advance_after_user_choice(limit=200)
             elif kind == "optional_effect":
-                self._finish_optional_effect(bool(value.get("useEffect")))
+                if isinstance(value, dict) and "tokenCount" in value:
+                    self._finish_optional_effect(token_count=value["tokenCount"])
+                else:
+                    self._finish_optional_effect(bool(value.get("useEffect")))
                 self._advance_after_user_choice(limit=200)
             elif kind == "force_base_choice":
                 self._finish_force_base_choice(value)
+                self._advance_after_user_choice(limit=200)
+            elif kind == "blessing_base_replacement":
+                self._finish_blessing_base_replacement(value)
                 self._advance_after_user_choice(limit=200)
         except GameOver as exc:
             self._set_game_over(exc)
@@ -1751,6 +1767,8 @@ class GameSession:
         steps = 0
         while steps < limit and self._game_over is None and self.prompt is None:
             steps += 1
+            if self._drain_or_prompt_blessing_returns():
+                return
             if self._drain_or_prompt_force_base_choices():
                 return
             if self._attack is not None:
@@ -1778,6 +1796,37 @@ class GameSession:
         self._set_prompt("main_action", f"{self.engine.state.active.name}: choose action", options)
 
     def _perform_action(self, action: Action, actor: Player, *, continue_uncontrolled_attack: bool = True) -> None:
+        if action.kind == "move_card" and self._is_user_controlled(actor):
+            direction = action.payload.get("direction")
+            if direction == "field_to_base":
+                moving = self.engine._find(actor.field, action.payload["iid"])
+                replacements_needed = max(
+                    0,
+                    len(actor.base) + 1 + len(moving.blessings) - BASE_CAP,
+                )
+                action_replacements = 1 if action.payload.get("replace_base_iid") is not None else 0
+                additional_replacements = replacements_needed - action_replacements
+                if additional_replacements > 0:
+                    excluded = []
+                    if action.payload.get("replace_base_iid") is not None:
+                        excluded.append(
+                            self.engine._find(actor.base, action.payload["replace_base_iid"])
+                        )
+                    self._pending_effect = {
+                        "mode": "main",
+                        "stage": "blessing_return_replacement",
+                        "action": action,
+                        "player": actor,
+                    }
+                    self._prompt_effect_target(
+                        actor,
+                        "ally_base",
+                        action,
+                        additional_replacements,
+                        source_ci=moving,
+                        excluded_targets=excluded,
+                    )
+                    return
         if action.kind == "attack":
             attacker = self.engine._find(actor.field, action.payload["attacker_iid"])
             if self._is_user_controlled(actor):
@@ -1794,6 +1843,46 @@ class GameSession:
             if post_draw_discard_effect is not None:
                 self._begin_post_draw_discard_effect(actor, action, post_draw_discard_effect)
                 return
+            effect = self._targeted_effect_for_action(action, actor)
+            source = self._play_action_card(actor, action)
+            if (
+                isinstance(effect, EffectSpec)
+                and effect.pre_target_fn is not None
+                and source.card.type is CardType.MAGIC
+                and effect.timing is EffectTiming.ON_CAST_MAGIC
+            ):
+                self._begin_pre_target_effect(actor, action, effect)
+                return
+            if effect is not None:
+                sequence = self._custom_source_effect_sequence(
+                    source,
+                    effect,
+                    Context(controller=actor, source=source),
+                )
+                if sequence:
+                    if source.card.type is CardType.F_MINION:
+                        self._begin_deferred_play_effect(actor, action, "main")
+                        return
+                    self._pending_effect = {
+                        "mode": "main",
+                        "stage": "source_sequence",
+                        "target_sequence": sequence,
+                        "target_sequence_index": 0,
+                        "first_targets": [],
+                        "action": action,
+                        "player": actor,
+                        "source": source,
+                        "effect": effect,
+                    }
+                    self._prompt_effect_target(
+                        actor,
+                        sequence[0],
+                        action,
+                        1,
+                        effect=effect,
+                        source_ci=source,
+                    )
+                    return
         if (action.kind == "play_card"
                 and self._is_user_controlled(actor)
                 and self._action_needs_effect_target(action, actor)):
@@ -1871,6 +1960,8 @@ class GameSession:
 
     def _continue_attack_flow(self, *, single_step: bool = False) -> None:
         while self._attack is not None and self.prompt is None:
+            if self._drain_or_prompt_blessing_returns():
+                return
             flow = self._attack
             if flow.attacker.area is not AreaType.FIELD:
                 self.engine._flash_ctx = None
@@ -2019,6 +2110,64 @@ class GameSession:
             })
         return self.prompt is not None
 
+    def _drain_or_prompt_blessing_returns(self) -> bool:
+        while self.engine.pending_blessing_returns and self.prompt is None:
+            host, mana = self.engine.pending_blessing_returns[0]
+            owner = mana.owner
+            if self._is_user_controlled(owner):
+                options = [
+                    (
+                        f"br{index}",
+                        card.card.name_jp,
+                        card,
+                        {
+                            "kind": "base_replacement",
+                            "iid": mana.iid,
+                            "replace_base_iid": card.iid,
+                        },
+                    )
+                    for index, card in enumerate(owner.base)
+                ]
+                self._set_prompt(
+                    "blessing_base_replacement",
+                    "Choose base card replaced by returning Bless mana",
+                    options,
+                )
+                self.prompt["playerSide"] = owner.side.name
+                self.prompt["card"] = serialize_card(self.engine, mana, self.asset_index)
+                return True
+            selected = self.engine.policy_for(owner).choose_target(
+                self.engine,
+                "ally_base",
+                1,
+                1,
+                list(owner.base),
+            )
+            if not selected:
+                raise IllegalActionError(
+                    "Bless mana returning to a full base requires a replacement"
+                )
+            self.engine.resolve_blessing_base_choice(host, mana, selected[0])
+        return self.prompt is not None
+
+    def _finish_blessing_base_replacement(self, replacement: CardInstance) -> None:
+        if not isinstance(replacement, CardInstance):
+            raise IllegalActionError("choose a base card to replace")
+        host, mana = self.engine.pending_blessing_returns[0]
+        before = self._visual_state_snapshot()
+        self.engine.resolve_blessing_base_choice(host, mana, replacement)
+        self._record_visual_changes(before)
+        self._log_event(
+            f"{mana.owner.name}: replaced {replacement.card.name_jp} for returning Bless mana",
+            {
+                "type": "base_replacement",
+                "actorName": mana.owner.name,
+                "actorSide": mana.owner.side.name,
+                "card": self._card_log_payload(mana),
+                "replaced": self._card_log_payload(replacement),
+            },
+        )
+
     def _prompt_force_base_choice(self, fi: ForceInstance) -> None:
         options = []
         choices = self.engine.eligible_force_base_choices(fi.owner)
@@ -2158,21 +2307,38 @@ class GameSession:
             }
             self._prompt_effect_target(player, custom_kind, None, 1, effect=effect, source_ci=source)
             return True
+        if effect.optional and not self._effect_needs_target_choice(effect):
+            self._pending_effect = {
+                "mode": "trigger_deferred",
+                "player": player,
+                "source": source,
+                "effect": effect,
+                "context": pending.context,
+            }
+            self._prompt_optional_effect(player, source, effect)
+            return True
         if not self._effect_needs_target_choice(effect):
             replacement_count = self._field_replacements_needed_for_effect(player, {"effect": effect}, [])
+            replacement_kind = "ally_minion"
+            replacement_stage = "field_replacement"
+            if replacement_count <= 0 and effect.template_id == "place_colorless_mana" and len(player.base) >= BASE_CAP:
+                replacement_count = 1
+                replacement_kind = "ally_base"
+                replacement_stage = "base_replacement"
             if replacement_count <= 0:
                 return False
             self._pending_effect = {
                 "mode": "trigger_deferred",
-                "stage": "field_replacement",
+                "stage": replacement_stage,
                 "player": player,
                 "source": source,
                 "effect": effect,
                 "context": pending.context,
                 "first_targets": [],
                 "field_replacement_targets": [],
+                "base_replacement_targets": [],
             }
-            self._prompt_effect_target(player, "ally_minion", None, replacement_count, effect=effect, source_ci=source)
+            self._prompt_effect_target(player, replacement_kind, None, replacement_count, effect=effect, source_ci=source)
             return True
         kind = effect.target_kind
         eligible = self._eligible_targets(player, kind, None, effect, source_ci=source)
@@ -2228,6 +2394,38 @@ class GameSession:
                 kind for kind in ("enemy_minion", "enemy_force")
                 if self._eligible_targets(source.owner, kind, None, effect, source_ci=source)
             ]
+        if source.card.id == "red_06_02_02_01" and effect.timing is EffectTiming.ON_SUMMON:
+            if not self._eligible_targets(
+                source.owner,
+                "ally_colorless_mana_token",
+                None,
+                effect,
+                source_ci=source,
+            ):
+                return []
+            sequence = ["ally_colorless_mana_token"]
+            if self._eligible_targets(source.owner, "enemy_minion", None, effect, source_ci=source):
+                sequence.append("enemy_minion")
+            return sequence
+        if source.card.id == "red_08_03_02_00" and effect.timing is EffectTiming.ON_CAST_MAGIC:
+            if not self._eligible_targets(
+                source.owner,
+                "ally_colorless_mana_token",
+                None,
+                effect,
+                source_ci=source,
+            ):
+                return []
+            sequence = ["ally_colorless_mana_token"]
+            if self._eligible_targets(
+                source.owner,
+                "pc02_fossil_dragon",
+                None,
+                effect,
+                source_ci=source,
+            ):
+                sequence.append("pc02_fossil_dragon")
+            return sequence
         return []
 
     def _defer_source_effect_choice(self, source: CardInstance, effect: Any, ctx: Context) -> bool:
@@ -2257,7 +2455,51 @@ class GameSession:
             }
             self._prompt_effect_target(player, sequence[0], None, 1, effect=effect, source_ci=source)
             return True
+        if effect.optional and not self._effect_needs_target_choice(effect):
+            self._pending_effect = {
+                "mode": "source_deferred",
+                "player": player,
+                "source": source,
+                "effect": effect,
+                "context": ctx,
+            }
+            self._prompt_optional_effect(player, source, effect)
+            return True
         if not self._effect_needs_target_choice(effect):
+            replacement_count = self._field_replacements_needed_for_effect(player, {"effect": effect}, [])
+            if replacement_count:
+                self._pending_effect = {
+                    "mode": "source_deferred",
+                    "stage": "field_replacement",
+                    "player": player,
+                    "source": source,
+                    "effect": effect,
+                    "context": ctx,
+                    "first_targets": [],
+                    "field_replacement_targets": [],
+                }
+                self._prompt_effect_target(
+                    player,
+                    "ally_minion",
+                    None,
+                    replacement_count,
+                    effect=effect,
+                    source_ci=source,
+                )
+                return True
+            if effect.template_id == "place_colorless_mana" and len(player.base) >= BASE_CAP:
+                self._pending_effect = {
+                    "mode": "source_deferred",
+                    "stage": "base_replacement",
+                    "player": player,
+                    "source": source,
+                    "effect": effect,
+                    "context": ctx,
+                    "first_targets": [],
+                    "base_replacement_targets": [],
+                }
+                self._prompt_effect_target(player, "ally_base", None, 1, effect=effect, source_ci=source)
+                return True
             return False
         kind = effect.target_kind
         eligible = self._eligible_targets(player, kind, None, effect, source_ci=source)
@@ -2469,8 +2711,15 @@ class GameSession:
             return 0
         amount = 0
         if effect.template_id == "create_tokens":
-            amount = int(effect.params.get("amount") or 0)
+            selected_amount = pending.get("token_count")
+            amount = int(
+                effect.params.get("amount") or 0
+                if selected_amount is None
+                else selected_amount
+            )
         elif effect.template_id == "summon_from_trash" or effect.target_kind == "ally_minion_base":
+            amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
+        elif effect.params.get("puts_targets_on_field"):
             amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
         amount += sum(
             1 for target in targets_to_field
@@ -2490,22 +2739,27 @@ class GameSession:
         if not isinstance(effect, EffectSpec) or not targets_to_base:
             return []
         target_counts: list[tuple[Player, int]] = []
-        if effect.template_id in {"place_base_from_hand", "place_base_from_deck"}:
+        if (
+            effect.template_id in {"place_base_from_hand", "place_base_from_deck"}
+            or effect.params.get("puts_targets_on_base")
+        ):
             target_counts.append((player, len(targets_to_base)))
-        elif effect.template_id == "move_to_base_targets":
+        elif effect.template_id == "move_to_base_targets" or effect.params.get("moves_targets_to_base"):
             for target in targets_to_base:
                 if not isinstance(target, CardInstance) or target.card.is_token:
                     continue
                 owner = target.owner
+                entering_count = 1 + len(target.blessings)
                 for index, (existing_owner, count) in enumerate(target_counts):
                     if existing_owner is owner:
-                        target_counts[index] = (existing_owner, count + 1)
+                        target_counts[index] = (existing_owner, count + entering_count)
                         break
                 else:
-                    target_counts.append((owner, 1))
+                    target_counts.append((owner, entering_count))
         groups: list[tuple[Player, int]] = []
         for owner, count in target_counts:
-            replacements_needed = max(0, len(owner.base) + count - BASE_CAP)
+            overflow = max(0, len(owner.base) + count - BASE_CAP)
+            replacements_needed = min(count, overflow)
             if replacements_needed:
                 groups.append((owner, replacements_needed))
         return groups
@@ -2556,6 +2810,26 @@ class GameSession:
                     pass
             else:
                 self.engine._target_selection_context = previous_context
+
+    def _run_pending_effect_callback(self, pending: dict[str, Any]) -> None:
+        source = pending["source"]
+        effect = pending["effect"]
+        ctx = pending["context"]
+        marker = object()
+        previous_count = getattr(ctx, "_create_tokens_count", marker)
+        if "token_count" in pending:
+            setattr(ctx, "_create_tokens_count", pending["token_count"])
+        try:
+            self.engine._record_effect_event(source, effect, ctx)
+            self.engine._run_effect_callback(effect.fn, source, self.engine.state, ctx)
+        finally:
+            if previous_count is marker:
+                try:
+                    delattr(ctx, "_create_tokens_count")
+                except AttributeError:
+                    pass
+            else:
+                setattr(ctx, "_create_tokens_count", previous_count)
 
     def _resolve_pending_effect_with_targets(self, pending: dict[str, Any], queued_targets: list[Any]) -> None:
         player = pending["player"]
@@ -2613,19 +2887,11 @@ class GameSession:
             self._resolve_pre_prompted_trigger(pending)
             self._record_visual_changes(before)
         elif pending["mode"] == "trigger_deferred":
-            source = pending["source"]
-            effect = pending["effect"]
-            ctx = pending["context"]
-            self.engine._record_effect_event(source, effect, ctx)
-            self.engine._run_effect_callback(effect.fn, source, self.engine.state, ctx)
+            self._run_pending_effect_callback(pending)
             self.engine.triggers.resolve_all()
             self._record_visual_changes(before)
         elif pending["mode"] == "source_deferred":
-            source = pending["source"]
-            effect = pending["effect"]
-            ctx = pending["context"]
-            self.engine._record_effect_event(source, effect, ctx)
-            self.engine._run_effect_callback(effect.fn, source, self.engine.state, ctx)
+            self._run_pending_effect_callback(pending)
             self.engine.triggers.resolve_all()
             self._record_visual_changes(before)
         elif pending["mode"] == "attack_deferred":
@@ -2711,10 +2977,62 @@ class GameSession:
                 event["targetForceId"] = meta.get("forceId")
             self._queue_animation_event(event)
 
-    def _finish_optional_effect(self, use_effect: bool) -> None:
+    def _finish_optional_effect(self, use_effect: bool = False, *, token_count: int | None = None) -> None:
         pending = self._pending_effect
         self._pending_effect = None
         player = pending["player"]
+        if token_count is not None:
+            effect = pending.get("effect")
+            if not isinstance(effect, EffectSpec) or effect.template_id != "create_tokens":
+                raise IllegalActionError("token count is only valid for token creation effects")
+            amount = int(effect.params.get("amount") or 0)
+            if isinstance(token_count, bool) or not isinstance(token_count, int) or not 0 <= token_count <= amount:
+                raise IllegalActionError("token count is outside the effect range")
+            pending = {
+                **pending,
+                "token_count": token_count,
+            }
+            use_effect = token_count > 0
+        if pending["mode"] in {"trigger_deferred", "source_deferred"}:
+            before = self._visual_state_snapshot()
+            if use_effect:
+                replacements_needed = self._field_replacements_needed_for_effect(player, pending, [])
+                if replacements_needed:
+                    source = self._pending_effect_source(pending)
+                    self._pending_effect = {
+                        **pending,
+                        "stage": "field_replacement",
+                        "first_targets": [],
+                        "field_replacement_targets": [],
+                    }
+                    self._prompt_effect_target(
+                        player,
+                        "ally_minion",
+                        None,
+                        replacements_needed,
+                        effect=None,
+                        source_ci=source,
+                    )
+                    self._log_event(f"{player.name}: used optional effect", {
+                        "type": "optional_effect",
+                        "actorName": player.name,
+                        "actorSide": player.side.name,
+                        "used": True,
+                    })
+                    self._log_public_reveals()
+                    return
+                self._resolve_pending_effect_with_targets(pending, [])
+            else:
+                self.engine.triggers.resolve_all()
+                self._record_visual_changes(before)
+            self._log_event(f"{player.name}: {'used' if use_effect else 'skipped'} optional effect", {
+                "type": "optional_effect",
+                "actorName": player.name,
+                "actorSide": player.side.name,
+                "used": use_effect,
+            })
+            self._log_public_reveals()
+            return
         if pending.get("stage") == "followup_optional":
             first_targets = list(pending.get("first_targets") or [])
             kind = self._optional_followup_target_kind(pending)
@@ -2770,7 +3088,7 @@ class GameSession:
                         "ally_minion",
                         None,
                         replacements_needed,
-                        effect=pending.get("effect"),
+                        effect=None,
                         source_ci=source,
                     )
                     self._log_event(f"{player.name}: used optional effect", {
@@ -2783,10 +3101,10 @@ class GameSession:
                     return
         before = self._visual_state_snapshot()
         if pending["mode"] == "main_deferred":
-            self.engine.triggers.resolve_all()
+            self._resolve_pre_prompted_trigger(pending)
             self._record_visual_changes(before)
         elif pending["mode"] == "flash_deferred":
-            self.engine.triggers.resolve_all()
+            self._resolve_pre_prompted_trigger(pending)
             self._record_visual_changes(before)
             if self._attack is not None:
                 self._attack.passes = 0
@@ -2811,6 +3129,30 @@ class GameSession:
         event = self._action_log_event(player, action, label)
         if mode == "main":
             ci = self._play_action_card(player, action)
+            replacements_needed = self._token_replacements_needed_before_play(player, ci.card, effect, action)
+            if effect.template_id == "create_tokens" and replacements_needed:
+                self._log_event(f"{player.name}: {label}", event)
+                self._pending_effect = {
+                    "mode": "main",
+                    "stage": "field_replacement",
+                    "action": action,
+                    "player": player,
+                    "source": ci,
+                    "effect": effect,
+                    "first_targets": [],
+                    "field_replacement_targets": [],
+                }
+                self._prompt_effect_target(
+                    player,
+                    "ally_minion",
+                    None,
+                    replacements_needed,
+                    effect=effect,
+                    source_ci=ci,
+                )
+                return
+        if mode == "main":
+            ci = self._play_action_card(player, action)
             self.engine.play_card(
                 ci,
                 payment_base_iids=action.payload.get("payment_base_iids"),
@@ -2823,6 +3165,9 @@ class GameSession:
             self.engine.apply_flash_action(player, action, resolve_triggers=False)
             pending_mode = "flash_deferred"
         self._log_event(f"{player.name}: {label}", event)
+        if not self.engine.triggers.has_pending(instance=ci, trigger=effect):
+            self._resolve_deferred_play_without_effect(player, mode)
+            return
         replacements_needed = self._token_replacements_needed_after_play(player, effect)
         self._pending_effect = {
             "mode": pending_mode,
@@ -2889,11 +3234,76 @@ class GameSession:
         self._record_visual_changes(before)
         self._log_public_reveals()
 
+    def _begin_pre_target_effect(self, player: Player, action: Action, effect: EffectSpec) -> None:
+        label = self._action_label(action)
+        event = self._action_log_event(player, action, label)
+        source = self._play_action_card(player, action)
+        before = self._visual_state_snapshot()
+        self.engine.play_card(
+            source,
+            payment_base_iids=action.payload.get("payment_base_iids"),
+            replace_field_iid=action.payload.get("replace_field_iid"),
+            resolve_triggers=False,
+            resolve_source_effects=False,
+        )
+        ctx = Context(controller=player, source=source)
+        self.engine._run_pre_target_effect(effect, source, ctx)
+        self._record_visual_changes(before)
+        self._log_event(f"{player.name}: {label}", event)
+
+        kind = effect.target_kind
+        eligible = (
+            self._eligible_targets(player, kind, None, effect, source_ci=source)
+            if kind is not None
+            else []
+        )
+        if eligible:
+            target_count = min(self._target_count_for_effect(player, effect), len(eligible))
+            self._pending_effect = {
+                "mode": "source_deferred",
+                "player": player,
+                "source": source,
+                "effect": effect,
+                "context": ctx,
+            }
+            self._prompt_effect_target(
+                player,
+                kind,
+                None,
+                target_count,
+                effect=effect,
+                source_ci=source,
+            )
+            return
+
+        before = self._visual_state_snapshot()
+        self.engine._record_effect_event(source, effect, ctx)
+        self.engine._run_effect_callback(effect.fn, source, self.engine.state, ctx)
+        self.engine.triggers.resolve_all()
+        self._record_visual_changes(before)
+        self._log_public_reveals()
+
     def _prompt_optional_effect(self, player: Player, source: CardInstance, effect: EffectSpec) -> None:
-        self._set_prompt("optional_effect", f"Use {source.card.name_jp} effect?", [
-            ("yes", "Use effect", {"useEffect": True}, {"choice": "yes"}),
-            ("no", "Skip", {"useEffect": False}, {"choice": "no"}),
-        ])
+        if effect.template_id == "create_tokens":
+            amount = int(effect.params.get("amount") or 0)
+            options = [
+                (
+                    f"count_{count}",
+                    f"{count} token" if count == 1 else f"{count} tokens",
+                    {"useEffect": count > 0, "tokenCount": count},
+                    {"choice": "token_count", "kind": "token_count", "tokenCount": count},
+                )
+                for count in range(amount + 1)
+            ]
+            self._set_prompt("optional_effect", f"Choose tokens for {source.card.name_jp}", options)
+            self.prompt["choiceKind"] = "token_count"
+            self.prompt["minimumTokenCount"] = 0
+            self.prompt["maximumTokenCount"] = amount
+        else:
+            self._set_prompt("optional_effect", f"Use {source.card.name_jp} effect?", [
+                ("yes", "Use effect", {"useEffect": True}, {"choice": "yes"}),
+                ("no", "Skip", {"useEffect": False}, {"choice": "no"}),
+            ])
         self.prompt["playerSide"] = player.side.name
         self.prompt["card"] = serialize_card(self.engine, source, self.asset_index)
         text = self._effect_event_text(source, effect, Context(controller=player, source=source))
@@ -2919,8 +3329,57 @@ class GameSession:
             self.engine.apply_flash_action(player, action, resolve_triggers=False)
             pending_mode = "flash_deferred"
         self._log_event(f"{player.name}: {label}", event)
+        if isinstance(effect, EffectSpec) and not self.engine.triggers.has_pending(
+            instance=ci,
+            trigger=effect,
+        ):
+            self._resolve_deferred_play_without_effect(player, mode)
+            return
+        sequence = self._custom_source_effect_sequence(
+            ci,
+            effect,
+            Context(controller=player, source=ci),
+        )
+        if sequence:
+            self._pending_effect = {
+                "mode": pending_mode,
+                "stage": "source_sequence",
+                "target_sequence": sequence,
+                "target_sequence_index": 0,
+                "first_targets": [],
+                "player": player,
+                "action": action,
+                "source": ci,
+                "effect": effect,
+            }
+            self._prompt_effect_target(
+                player,
+                sequence[0],
+                None,
+                1,
+                effect=effect,
+                source_ci=ci,
+            )
+            return
         eligible_targets = self._eligible_targets(player, kind, None, effect, source_ci=ci)
         if not eligible_targets:
+            if kind == "top3_magic" and player.deck[:3]:
+                self._pending_effect = {
+                    "mode": pending_mode,
+                    "player": player,
+                    "action": action,
+                    "source": ci,
+                    "effect": effect,
+                }
+                self._prompt_effect_target(
+                    player,
+                    kind,
+                    None,
+                    1,
+                    effect=effect,
+                    source_ci=ci,
+                )
+                return
             self.engine.triggers.resolve_all()
             self._log_public_reveals()
             return
@@ -2933,6 +3392,14 @@ class GameSession:
             "effect": effect,
         }
         self._prompt_effect_target(player, kind, None, target_count, effect=effect, source_ci=ci)
+
+    def _resolve_deferred_play_without_effect(self, player: Player, mode: str) -> None:
+        self.engine.triggers.resolve_all()
+        self._log_public_reveals()
+        if mode == "flash" and self._attack is not None:
+            self._attack.passes = 0
+            self._attack.priority = self._other_player(player)
+            self._continue_attack_flow()
 
     def _log_public_reveals(self) -> None:
         while self.engine.public_reveals:
@@ -2954,6 +3421,8 @@ class GameSession:
     def _action_needs_effect_target(self, action: Action, player: Player) -> bool:
         kind = self._target_kind_for_action(action, player)
         effect = self._targeted_effect_for_action(action, player)
+        if kind == "top3_magic":
+            return bool(player.deck[:3])
         return kind is not None and bool(self._eligible_targets(player, kind, action, effect))
 
     def _play_effect_timing_for_card(self, card) -> EffectTiming | None:
@@ -2986,12 +3455,26 @@ class GameSession:
             return None
         return self._targeted_effect_for_card(card, self._play_effect_timing_for_card(card))
 
-    def _token_replacements_needed_before_play(self, player: Player, card, effect: EffectSpec) -> int:
+    def _token_replacements_needed_before_play(
+            self,
+            player: Player,
+            card,
+            effect: EffectSpec,
+            action: Action | None = None,
+    ) -> int:
         if effect.template_id != "create_tokens":
             return 0
         amount = int(effect.params.get("amount") or 0)
         entering = 1 if card.type is CardType.F_MINION else 0
-        return max(0, len(player.field) + entering + amount - FIELD_CAP)
+        explicit_field_replacement = bool(
+            card.type is CardType.F_MINION
+            and action is not None
+            and action.payload.get("replace_field_iid") is not None
+        )
+        return max(
+            0,
+            len(player.field) + entering + amount - FIELD_CAP - int(explicit_field_replacement),
+        )
 
     def _token_replacements_needed_after_play(self, player: Player, effect: EffectSpec) -> int:
         if effect.template_id != "create_tokens":
@@ -3006,7 +3489,7 @@ class GameSession:
             card = self._play_action_card(player, action).card
         except IllegalActionError:
             return None
-        if card.type is not CardType.F_MINION:
+        if card.type not in (CardType.F_MINION, CardType.MAGIC):
             return None
         timing = self._play_effect_timing_for_card(card)
         if timing is None:
@@ -3014,7 +3497,9 @@ class GameSession:
         for effect in card.effects:
             if effect.timing is not timing or self._effect_needs_target_choice(effect):
                 continue
-            if effect.optional or self._token_replacements_needed_before_play(player, card, effect) > 0:
+            if card.type is CardType.MAGIC and effect.template_id != "create_tokens":
+                continue
+            if effect.optional or self._token_replacements_needed_before_play(player, card, effect, action) > 0:
                 return effect
         return None
 
@@ -3039,6 +3524,8 @@ class GameSession:
     def _target_count_for_effect(self, player: Player, effect: EffectSpec | None) -> int:
         if effect is None:
             return 1
+        if effect.params.get("exact_target_count_from_own_destroyed_forces"):
+            return max(0, self.engine.destroyed_forces_count(player))
         return max(1, effect.max_targets + self._extra_rest_targets(player, effect))
 
     def _extra_rest_targets(self, player: Player, effect: EffectSpec | None) -> int:
@@ -3072,28 +3559,65 @@ class GameSession:
         eligible_targets = self._eligible_targets(player, kind, action, effect, source_ci=source_ci)
         if excluded_targets:
             eligible_targets = [target for target in eligible_targets if target not in excluded_targets]
+        deck_reorder = bool(
+            effect
+            and effect.params.get("deck_reorder") == "top_or_bottom"
+        )
+        if deck_reorder:
+            if len(eligible_targets) != 1:
+                raise IllegalActionError("deck top-or-bottom choice requires exactly one top card")
+            top_card = eligible_targets[0]
+            top_meta = self._effect_target_meta(top_card)
+            top_meta.update({
+                "kind": "deck_reorder_option",
+                "choiceKind": "deck_top_or_bottom",
+                "reorderPosition": "top",
+            })
+            options.extend([
+                ("top", "deck_top", top_card, top_meta),
+                (
+                    "bottom",
+                    "deck_bottom",
+                    None,
+                    {
+                        "kind": "deck_reorder_option",
+                        "choiceKind": "deck_top_or_bottom",
+                        "reorderPosition": "bottom",
+                        "targetKind": "deck_reorder",
+                    },
+                ),
+            ])
         optional_choice = kind in OPTIONAL_EFFECT_TARGET_KINDS or bool(effect and effect.optional)
+        exact_dynamic_targets = bool(effect and effect.params.get("exact_target_count_from_own_destroyed_forces"))
         variable_targets = bool(
             effect and (
                 effect.params.get("allow_variable_targets")
                 or effect.optional
                 or effect.min_targets != effect.max_targets
-            )
+            ) and not exact_dynamic_targets
         )
-        min_target_count = 0 if optional_choice else max(0, effect.min_targets if effect else 1)
+        min_target_count = (
+            target_count
+            if exact_dynamic_targets
+            else 0 if optional_choice else max(0, effect.min_targets if effect else 1)
+        )
         if kind in OPTIONAL_EFFECT_TARGET_KINDS:
-            target_count = max(target_count, effect.max_targets if effect else 1)
+            if kind == "top3_magic":
+                target_count = min(target_count, len(eligible_targets)) if eligible_targets else max(1, target_count)
+            else:
+                target_count = max(target_count, effect.max_targets if effect else 1)
         elif eligible_targets:
             target_count = max(1, min(target_count, len(eligible_targets)))
         if variable_targets:
             min_target_count = min(min_target_count, target_count)
-        for index, target in enumerate(eligible_targets):
-            options.append((
-                f"e{index}",
-                self._effect_target_label(target),
-                target,
-                self._effect_target_meta(target),
-            ))
+        if not deck_reorder:
+            for index, target in enumerate(eligible_targets):
+                options.append((
+                    f"e{index}",
+                    self._effect_target_label(target),
+                    target,
+                    self._effect_target_meta(target),
+                ))
         if optional_choice:
             options.append((
                 "none",
@@ -3105,7 +3629,7 @@ class GameSession:
         if target_count > 1:
             message += f" ({target_count})"
         self._set_prompt("effect_target", message, options)
-        self.prompt["choiceKind"] = kind
+        self.prompt["choiceKind"] = "deck_top_or_bottom" if deck_reorder else kind
         self.prompt["playerSide"] = player.side.name
         self.prompt["requiredTargetCount"] = target_count
         self.prompt["minimumTargetCount"] = min_target_count if variable_targets else target_count
@@ -3123,14 +3647,16 @@ class GameSession:
                 self._effect_target_meta(target) for target in revealed
             ]
 
-    def _effect_target_label(self, target: CardInstance | ForceInstance | Player) -> str:
+    def _effect_target_label(self, target: CardInstance | ForceInstance | Force | Player) -> str:
         if isinstance(target, Player):
             return target.name
         if isinstance(target, ForceInstance):
             return target.force.name_jp
+        if isinstance(target, Force):
+            return target.name_jp
         return target.card.name_jp
 
-    def _effect_target_position_label(self, target: CardInstance | ForceInstance | Player) -> str:
+    def _effect_target_position_label(self, target: CardInstance | ForceInstance | Force | Player) -> str:
         if isinstance(target, Player):
             return f"{target.side.name} PLAYER"
         if isinstance(target, ForceInstance):
@@ -3140,6 +3666,8 @@ class GameSession:
                 index = None
             suffix = f" #{index}" if index is not None else ""
             return f"{target.owner.side.name} FORCE{suffix}"
+        if isinstance(target, Force):
+            return "FORCE CATALOG"
         zone_names = {
             AreaType.FIELD: ("FIELD", target.owner.field),
             AreaType.BASE: ("BASE", target.owner.base),
@@ -3156,7 +3684,7 @@ class GameSession:
         suffix = f" #{index}" if index is not None else ""
         return f"{target.owner.side.name} {zone_name}{suffix}"
 
-    def _effect_target_meta(self, target: CardInstance | ForceInstance | Player) -> dict[str, Any]:
+    def _effect_target_meta(self, target: CardInstance | ForceInstance | Force | Player) -> dict[str, Any]:
         if isinstance(target, Player):
             return {
                 "kind": "effect_target",
@@ -3182,6 +3710,16 @@ class GameSession:
                 "assetUrl": self.asset_index.asset_url(target.force.id),
                 "ownerSide": target.owner.side.name,
                 "rested": target.rested,
+            }
+        if isinstance(target, Force):
+            return {
+                "kind": "effect_target",
+                "targetKind": "force_ability",
+                "forceId": target.id,
+                "nameJp": target.name_jp,
+                "type": "force_ability",
+                "targetLabel": "FORCE CATALOG",
+                "assetUrl": self.asset_index.asset_url(target.id),
             }
         return {
             "kind": "effect_target",
@@ -3211,7 +3749,7 @@ class GameSession:
                 "nameJp": target.name,
                 "targetLabel": target.name,
             }
-        if isinstance(target, (CardInstance, ForceInstance, Player)):
+        if isinstance(target, (CardInstance, ForceInstance, Force, Player)):
             return self._effect_target_meta(target)
         return {
             "kind": "effect_target",
@@ -3222,13 +3760,13 @@ class GameSession:
         }
 
     def _revealed_cards_for_effect(self, player: Player, kind: str) -> list[CardInstance]:
-        if kind == "top_field_minion":
-            return list(player.deck[:4])
-        if kind == "top2_field_minion":
-            return list(player.deck[:2])
-        if kind == "top3_field_minion":
-            return list(player.deck[:3])
-        return []
+        count = LOOK_WINDOW_SIZES.get(kind)
+        if count is None:
+            if not kind.startswith("top"):
+                return []
+            match = re.match(r"top(\d+)_", kind)
+            count = int(match.group(1)) if match else 4
+        return list(player.deck[:count])
 
     def _entering_minion_for_action(self, player: Player, action: Action | None) -> CardInstance | None:
         if action is None or action.kind != "play_card":
@@ -3270,15 +3808,31 @@ class GameSession:
                 if sum(target.card.cost.values()) <= 3
             ], action, effect, source_ci)
         if kind == "enemy_minion_or_force":
+            forces = self._filter_effect_targets(
+                player,
+                [force for force in opponent.forces if not force.destroyed],
+                action,
+                source_ci=source_ci,
+            )
             return (
                 self._filter_card_targets_for_effect(player, list(opponent.field), action, effect, source_ci)
-                + [force for force in opponent.forces if not force.destroyed]
+                + self._filter_targets_for_effect(forces, effect)
             )
         if kind == "any_minion_or_force":
+            forces = self._filter_effect_targets(
+                player,
+                [
+                    force
+                    for owner in (player, opponent)
+                    for force in owner.forces
+                    if not force.destroyed
+                ],
+                action,
+                source_ci=source_ci,
+            )
             return (
                 self._filter_card_targets_for_effect(player, list(player.field) + list(opponent.field), action, effect, source_ci)
-                + [force for force in player.forces if not force.destroyed]
-                + [force for force in opponent.forces if not force.destroyed]
+                + self._filter_targets_for_effect(forces, effect)
             )
         if kind == "surprise_attack_targets":
             return self._filter_card_targets_for_effect(player, list(player.field) + list(opponent.field), action, effect, source_ci)
@@ -3306,15 +3860,32 @@ class GameSession:
                 target for target in player.base
                 if target.card.type is CardType.MANA_TOKEN and self.engine._mana_color_of(target) is Color.COLORLESS
             ], action, effect, source_ci)
+        if kind == "pc02_fossil_dragon":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in player.deck[:3]
+                if target.card.type is CardType.F_MINION
+                and "ドラゴン" in target.card.race_jp
+                and (Color.RED in target.card.cost or set(target.card.cost) <= {Color.COLORLESS})
+            ], action, effect, source_ci)
         if kind == "ally_minion_base":
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.base
                 if target.card.type in (CardType.B_MINION, CardType.F_MINION)
             ], action, effect, source_ci)
         if kind == "enemy_force":
-            return [force for force in opponent.forces if not force.destroyed]
+            return self._filter_targets_for_effect(self._filter_effect_targets(
+                player,
+                [force for force in opponent.forces if not force.destroyed],
+                action,
+                source_ci=source_ci,
+            ), effect)
         if kind == "ally_force":
-            return [force for force in player.forces if not force.destroyed]
+            return self._filter_targets_for_effect(self._filter_effect_targets(
+                player,
+                [force for force in player.forces if not force.destroyed],
+                action,
+                source_ci=source_ci,
+            ), effect)
         if kind == "owner_player_or_force":
             return [player] + [force for force in player.forces if not force.destroyed]
         if kind == "ally_green_base_hand":
@@ -3329,6 +3900,23 @@ class GameSession:
             ], action, effect, source_ci)
         if kind == "hand_card":
             return self._filter_card_targets_for_effect(player, list(player.hand), action, effect, source_ci)
+        if kind == "deck_card":
+            return self._filter_card_targets_for_effect(player, list(player.deck), action, effect, source_ci)
+        if kind == "pc02_celica_dragon":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in player.deck
+                if target.card.type is CardType.F_MINION
+                and "ドラゴン" in target.card.race_jp
+                and (
+                    self._card_is_color(target.card, Color.YELLOW)
+                    or sum(target.card.cost.values()) >= 9
+                )
+            ], action, effect, source_ci)
+        if kind == "hand_field_minion_cost_at_most_2":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in player.hand
+                if target.card.type is CardType.F_MINION and sum(target.card.cost.values()) <= 2
+            ], action, effect, source_ci)
         if kind == "trash_magic_cost_at_most_4":
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.trash
@@ -3338,6 +3926,16 @@ class GameSession:
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.trash
                 if target.card.type is CardType.F_MINION
+            ], action, effect, source_ci)
+        if kind == "pc02_francesca_dragon":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in player.trash
+                if target.card.type is CardType.F_MINION
+                and "ドラゴン" in target.card.race_jp
+                and (
+                    self._card_is_color(target.card, Color.PURPLE)
+                    or self._card_is_color(target.card, Color.COLORLESS)
+                )
             ], action, effect, source_ci)
         if kind == "trash_minion":
             return self._filter_card_targets_for_effect(player, [
@@ -3369,10 +3967,38 @@ class GameSession:
                 target for target in player.deck[:2]
                 if target.card.type is CardType.F_MINION
             ], action, effect, source_ci)
+        if kind == "top1_card":
+            return self._filter_card_targets_for_effect(
+                player, list(player.deck[:1]), action, effect, source_ci
+            )
+        if kind == "top2_card":
+            return self._filter_card_targets_for_effect(
+                player, list(player.deck[:2]), action, effect, source_ci
+            )
+        if kind == "top4_card":
+            return self._filter_card_targets_for_effect(
+                player, list(player.deck[:4]), action, effect, source_ci
+            )
+        if kind == "top3_magic":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in player.deck[:3]
+                if target.card.type is CardType.MAGIC
+            ], action, effect, source_ci)
+        if kind == "enemy_minion_bp_at_most_500_or_opponent_player":
+            cards = [target for target in opponent.field if self.engine.effective_bp(target) <= 500]
+            return self._filter_card_targets_for_effect(player, cards, action, effect, source_ci) + [opponent]
+        if kind == "force_catalog":
+            return list(ALL_FORCES.values())
         if kind == "top3_field_minion":
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.deck[:3]
                 if target.card.type is CardType.F_MINION
+            ], action, effect, source_ci)
+        if kind == "pc02_destroy_effect_minion":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in opponent.field
+                if any(card_effect.timing is EffectTiming.ON_DESTROY for card_effect in target.card.effects)
+                or any(trigger.when is TriggerTiming.ON_DESTROY for trigger in target.card.triggers)
             ], action, effect, source_ci)
         return []
 
@@ -3385,6 +4011,14 @@ class GameSession:
             source_ci: CardInstance | None = None,
     ) -> list[CardInstance]:
         targets = self._filter_effect_targets(player, targets, action, source_ci=source_ci)
+        if effect is not None:
+            if effect.params.get("exclude_source") and source_ci is not None:
+                targets = [target for target in targets if target is not source_ci]
+            if effect.params.get("exclude_tokens"):
+                targets = [target for target in targets if not target.card.is_token]
+            if effect.params.get("required_keyword"):
+                keyword = Keyword[str(effect.params["required_keyword"])]
+                targets = [target for target in targets if self.engine.has_keyword(target, keyword)]
         return self._filter_targets_for_effect(targets, effect)
 
     def _filter_targets_for_effect(self, targets: list[Any], effect: EffectSpec | None) -> list[Any]:
@@ -3392,6 +4026,8 @@ class GameSession:
             return targets
         if effect.params.get("only_rested"):
             targets = [target for target in targets if bool(getattr(target, "rested", False))]
+        if effect.params.get("only_active"):
+            targets = [target for target in targets if not bool(getattr(target, "rested", False))]
         params = {
             key: value
             for key, value in effect.params.items()
@@ -3489,6 +4125,10 @@ class GameSession:
                 replaced = self.engine._find(active.base, action.payload["replace_base_iid"])
                 label += f" / replace {replaced.card.name_jp}"
             return label
+        if action.kind == "bless":
+            mana = self.engine._find(active.base, action.payload["mana_iid"])
+            target = self.engine._find(active.field, action.payload["target_iid"])
+            return f"bless: {mana.card.name_jp} -> {target.card.name_jp}"
         if action.kind == "attack":
             ci = self.engine._find(active.field, action.payload["attacker_iid"])
             return f"attack: {ci.card.name_jp}"
@@ -3536,6 +4176,8 @@ class GameSession:
                 "cardId": base_ci.card.id,
                 "nameJp": base_ci.card.name_jp,
                 "color": candidates_by_iid[base_ci.iid]["color"],
+                "manaValue": candidates_by_iid[base_ci.iid]["manaValue"],
+                "card": serialize_card(self.engine, base_ci, self.asset_index),
             })
         return {
             "paymentDefaultIids": plan["default"],

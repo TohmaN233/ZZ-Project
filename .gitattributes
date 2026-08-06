@@ -1,9 +1,10 @@
 * text=auto
 
+.gitattributes text eol=lf
+.gitignore text eol=lf
 *.py text eol=lf
 *.js text eol=lf
 *.css text eol=lf
-*.html text eol=lf
 *.md text eol=lf
 *.json text eol=lf
 *.yaml text eol=lf
@@ -12,11 +13,15 @@
 *.conf text eol=lf
 *.example text eol=lf
 *.service text eol=lf
+*.sh text eol=lf
 *.cmd text eol=crlf
 
 *.png binary
 *.jpg binary
 *.jpeg binary
-*.webp binary
 *.pt filter=lfs diff=lfs merge=lfs -text
 local_ai_training/retained_mainline_20260630/cycle470_actor.json filter=lfs diff=lfs merge=lfs -text
+local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json filter=lfs diff=lfs merge=lfs -text
+
+asserts/**/ELEMENTS*/*.wav filter=lfs diff=lfs merge=lfs -text
+asserts/video/*.mp4 filter=lfs diff=lfs merge=lfs -text

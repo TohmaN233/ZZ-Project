@@ -30,6 +30,7 @@ from zz.web.debug_tools import (
     move_debug_card,
     replace_debug_forces,
     set_debug_card_state,
+    set_debug_force_state,
     set_debug_control,
     set_debug_life,
     setup_debug_fixed_board,
@@ -511,6 +512,8 @@ def _dispatch_api_unlocked(
                     zone=str(body.get("zone") or "hand"),
                     player_forces=body.get("playerForces"),
                     opponent_forces=body.get("opponentForces"),
+                    compact_board=bool(body.get("compactBoard", False)),
+                    non_minion_mana_only=bool(body.get("nonMinionManaOnly", False)),
                 )
             except ValueError as exc:
                 return 400, {"ok": False, "error": {"code": "invalid_debug_setup", "message": str(exc)}}
@@ -566,6 +569,12 @@ def _dispatch_api_unlocked(
                     session,
                     int(body.get("iid")),
                     rested=body.get("rested") if "rested" in body else None,
+                    permanent_bp_modifier=(
+                        None if "permanentBpModifier" not in body else int(body.get("permanentBpModifier"))
+                    ),
+                    permanent_dp_modifier=(
+                        None if "permanentDpModifier" not in body else int(body.get("permanentDpModifier"))
+                    ),
                 )
             except (TypeError, ValueError) as exc:
                 return 400, {"ok": False, "error": {"code": "invalid_debug_card_state", "message": str(exc)}}
@@ -586,6 +595,8 @@ def _dispatch_api_unlocked(
                     session,
                     active_side=str(body.get("activeSide") or "P1"),
                     control_both=bool(body.get("controlBoth", True)),
+                    preserve_board=bool(body.get("preserveBoard", False)),
+                    step=str(body.get("step") or "main"),
                 )
             except (KeyError, ValueError) as exc:
                 return 400, {"ok": False, "error": {"code": "invalid_debug_fixed_board", "message": str(exc)}}
@@ -604,6 +615,22 @@ def _dispatch_api_unlocked(
                 )
             except (KeyError, TypeError, ValueError, IndexError) as exc:
                 return 400, {"ok": False, "error": {"code": "invalid_debug_life", "message": str(exc)}}
+            out = _envelope(session.state_dto(), app.is_dev_mode())
+            out["debug"] = debug
+            return 200, out
+        if method == "POST" and route == "/api/debug/force-state":
+            try:
+                session = app.ensure_session()
+                body = payload or {}
+                debug = set_debug_force_state(
+                    session,
+                    side=str(body.get("side") or "P1"),
+                    force_index=int(body.get("forceIndex")),
+                    destroyed=bool(body.get("destroyed", False)),
+                    rested=None if "rested" not in body else bool(body.get("rested")),
+                )
+            except (KeyError, TypeError, ValueError, IndexError) as exc:
+                return 400, {"ok": False, "error": {"code": "invalid_debug_force_state", "message": str(exc)}}
             out = _envelope(session.state_dto(), app.is_dev_mode())
             out["debug"] = debug
             return 200, out

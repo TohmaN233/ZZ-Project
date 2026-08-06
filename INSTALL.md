@@ -1,22 +1,23 @@
 # 安装说明
 
-当前发布把 **源码与默认模型** 放在 GitHub，把约 900 MB 的 **卡图、角色图、卡垫、视频与 BGM** 放在独立资源包中。两部分都准备好后，桌面客户端才能显示完整内容。
+当前发布把 **程序源码与默认模型** 放在 GitHub，把 **卡图、角色图、卡垫、视频与 BGM** 放在独立资源包中。英文卡图也单独提供一个覆盖包。程序包与资源包都准备好后，桌面客户端才能显示完整内容。
 
 ## 1. 系统要求
 
 - Windows 10 或 Windows 11
-- Linux 或 macOS 可从源码启动，目前属于实验支持，尚不提供打包安装程序
+- Linux 或 macOS 可从源码启动，目前属于实验支持，尚不提供原生安装程序
 - Python 3.10 或更高版本
 - Node.js 20 或更高版本
 - Git LFS（仅在使用 `git clone` 时需要）
+- 7-Zip（从 Google Drive 下载主资源包的两个 ZIP volumes 时需要）
 - 普通游玩不要求独立显卡
 - 本地 AI 训练需要 NVIDIA GPU、匹配的驱动与 CUDA 版 PyTorch
 
 ## 2. 下载源码
 
 推荐从 GitHub Releases 下载明确标注的
-[`ZZ-Project-v0.1.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.1.0/ZZ-Project-v0.1.0-source.zip)。
-该附件包含本次 v0.1.0 发布快照的实际默认模型；不要使用页面底部由旧版 tag 自动生成的
+[`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)。
+该附件包含本次 v0.2.0 发布快照的实际默认模型；不要使用页面底部由旧版 tag 自动生成的
 `Source code` 压缩包。开发者也可以使用：
 
 ```powershell
@@ -42,14 +43,15 @@ npm install
 
 默认的 PyTorch 包可在 CPU 上运行对战 AI。需要 CUDA 时，请按照 [PyTorch 官方安装选择器](https://pytorch.org/get-started/locally/) 安装与你的显卡驱动匹配的版本，再执行其余依赖安装。
 
-## 4. 安装完整资源包
+## 4. 安装资源包
 
-[从 Google Drive 下载 `ZZ-Assets-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)，在项目根目录解压。正确结构如下：
+从 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)下载主资源包的两个 volumes：`ZZ-Assets-PC02-v1.zip.001` 与 `ZZ-Assets-PC02-v1.zip.002`。两个文件都下载完成后，用 7-Zip 打开 `.001`，它会自动读取 `.002`，并将内容解压到项目根目录。不要只下载其中一个 volume。需要英文卡图的玩家再下载单独的 `ZZ-Assets-PC02-English-v1.zip`，同样在项目根目录解压。英文包会写入 `asserts/Eng-cards/`，不会覆盖主资源包。正确结构如下：
 
 ```text
 ZZ-Project/
 ├─ asserts/
 │  ├─ ZENONZARD_CARDLIST/
+│  ├─ Eng-cards/              # optional English card/Force/Mana faces
 │  ├─ audio/
 │  │  ├─ battle_sfx/
 │  │  └─ bgm/
@@ -64,19 +66,20 @@ ZZ-Project/
 ├─ electron/
 ├─ zz/
 ├─ launch-electron.cmd
-├─ launch-electron.sh
-└─ launch-electron.command
+└─ launch-electron.sh
 ```
 
 资源包中的目录名与程序引用路径全部使用 ASCII 英文字符，避免不同系统区域设置导致的路径乱码。
 
-发布页面会列出资源包大小和 SHA-256。下载后可以验证：
+发布页面会列出两个资源包的大小和 SHA-256。下载后可以验证：
 
 ```powershell
-Get-FileHash .\ZZ-Assets-v1.zip -Algorithm SHA256
+Get-FileHash .\ZZ-Assets-PC02-v1.zip.001 -Algorithm SHA256
+Get-FileHash .\ZZ-Assets-PC02-v1.zip.002 -Algorithm SHA256
+Get-FileHash .\ZZ-Assets-PC02-English-v1.zip -Algorithm SHA256
 ```
 
-输出应与发布页面和 `ASSET_PACK_MANIFEST.json` 中的值一致。
+输出应与发布页面和 `ASSET_PACK_MANIFEST.json` 中的 volume/archive 值一致。主资源包两个 volume 的大小分别为 629145600 bytes 和 576401952 bytes；英文包为 195374917 bytes。
 
 ## 5. 启动桌面客户端
 
@@ -92,16 +95,16 @@ Linux 在终端运行：
 ./launch-electron.sh
 ```
 
-macOS 在终端运行，也可以双击 `.command` 文件：
+macOS 也可以在终端运行同一个 `.sh` launcher：
 
 ```bash
-./launch-electron.command
+./launch-electron.sh
 ```
 
 Linux/macOS 启动器会优先使用 `python3`，也可以提前设置 `ZZ_PYTHON` 指定解释器。若下载工具移除了执行权限，先运行：
 
 ```bash
-chmod +x launch-electron.sh launch-electron.command
+chmod +x launch-electron.sh
 ```
 
 所有平台也都可以直接运行：
@@ -142,6 +145,8 @@ python -m zz.web.server --host 127.0.0.1 --port 8765 --asset-root .\asserts
 
 本地训练是实验与娱乐功能，不是正常游玩的必需步骤。
 
+当前发布的电脑 AI 训练只使用 PC01 卡池。PC01R、EX01 和 PC02 的规则已经可以游玩，但没有进入当前模型的训练数据，因此不要把新增卡包的电脑 AI 表现当作强度保证。
+
 1. 安装 NVIDIA 驱动与 CUDA 版 PyTorch。
 2. 在 Replay & Training 中积累本机对局记录。
 3. 从客户端训练入口启动任务，或使用 `ai_training/` 下的命令行工具。
@@ -153,11 +158,11 @@ python -m zz.web.server --host 127.0.0.1 --port 8765 --asset-root .\asserts
 
 ### 卡图、角色或音乐缺失
 
-确认 `asserts/` 是项目根目录的直接子目录，而不是 `asserts/asserts/`。检查 `asserts/images` 和 `asserts/ZENONZARD_CARDLIST` 是否存在。
+确认两个主资源 volume 都已下载，并且使用 7-Zip 打开 `.001`，而不是只解压单个 volume。确认 `asserts/` 是项目根目录的直接子目录，而不是 `asserts/asserts/`。检查 `asserts/images` 和 `asserts/ZENONZARD_CARDLIST` 是否存在。
 
 ### 英文卡图缺失
 
-英文版卡图直接使用官网 URL，已知存在图片与卡牌没有正确对齐的现象。英语圈用户若能提供卡图资源和对应英文文本，此问题可以轻易解决。
+确认已经额外下载并解压 `ZZ-Assets-PC02-English-v1.zip`，且路径为 `asserts/Eng-cards/`。本地包未覆盖的卡仍可能使用官网 URL，存在图片与卡牌没有正确对齐的现象。
 
 ### High AI 启动时报模型错误
 

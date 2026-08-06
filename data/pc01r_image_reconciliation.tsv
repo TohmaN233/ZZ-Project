@@ -1,0 +1,72 @@
+image_id	name_jp	cost_image	bp_image	dp_image	ability_jp	image_path	secondary_source
+blue_00_01_01r_00	マーメイドの戦士		300	1	【常時】\nこのミニオンはブロックできない。\n【配置時】\n自分のミニオン1体をベースに移動できる。	asserts/ZENONZARD_CARDLIST/BLUE/blue_00_01_01r_00.png	data/seesaa.tsv::マーメイドの戦士
+blue_01_03_01r_00	碧の秘術書	1			【メイン】\n自分のデッキを上から4枚見て、その中のマジックカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。	asserts/ZENONZARD_CARDLIST/BLUE/blue_01_03_01r_00.png	data/seesaa.tsv::碧の秘術書
+blue_02_02_01r_00	ウォードバイパー	2	200	1	【後退時】\n自分の手札が4枚以下である場合、自分はカードを1枚引く。	asserts/ZENONZARD_CARDLIST/BLUE/blue_02_02_01r_00.png	data/seesaa.tsv::ウォードバイパー
+blue_02_02_01r_01	ペンタゴナ音楽隊「フルート」	2	300	1	【常時】\n自分の手札にあるマジックカードのフリーコストを1減らす。	asserts/ZENONZARD_CARDLIST/BLUE/blue_02_02_01r_01.png	data/seesaa.tsv::ペンタゴナ音楽隊「フルート」
+blue_03_03_01r_00	サプライズドポータル	3			【メイン】/【フラッシュ】\n自分のミニオンであるマナ1つを、フィールドにアクティブ状態で移動させる。	asserts/ZENONZARD_CARDLIST/BLUE/blue_03_03_01r_00.png	data/seesaa.tsv::サプライズドポータル
+blue_05_02_01r_00	アクアコブラ	5	500	1	［潜入］\n【常時】\n自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。	asserts/ZENONZARD_CARDLIST/BLUE/blue_05_02_01r_00.png	data/seesaa.tsv::アクアコブラ
+blue_05_03_01r_00	ハウリングボイス	5			【フラッシュ】\n相手のBP500以下のミニオン1体をレスト状態でベースに移動させる。または相手のプレイヤーに1ダメージを与える。	asserts/ZENONZARD_CARDLIST/BLUE/blue_05_03_01r_00.png	data/seesaa.tsv::ハウリングボイス
+blue_06_02_01r_00	「慈しみを降らす者」ゴールドウェザー	6	500	2	【召喚時】\n自分の手札にある青のフィールド・ミニオンカード1枚を、レスト状態で置くことができる。	asserts/ZENONZARD_CARDLIST/BLUE/blue_06_02_01r_00.png	data/seesaa.tsv::「慈しみを降らす者」ゴールドウェザー
+blue_08_02_01r_00	「ソリスト」ローズパガニーニ	8	700	2	【自分のターン】\n自分の種族「マーフォーク」を持つミニオン全てに［潜入］を与える。\n【後退時】\n自分はカードを2枚引く。	asserts/ZENONZARD_CARDLIST/BLUE/blue_08_02_01r_00.png	data/seesaa.tsv::「ソリスト」ローズパガニーニ
+colorless_00_01_01r_00	魔術都市の住人		300	1	【配置時】\nこのマナをレストする。自分のトラッシュにある、コスト3以下のマジックカード1枚を手札に戻す。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_01_01r_00.png	data/seesaa.tsv::魔術都市の住人
+colorless_00_01_01r_01	セントールの狩人		300	1	【配置時】\n相手のコスト4以下のミニオン1体をレストする。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_01_01r_01.png	data/seesaa.tsv::セントールの狩人
+colorless_01_02_01r_00	ポリン	1	200	0	【召喚時】\n自分のベースにミニオンでない無色マナしかない場合、自分はカードを1枚引く。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_01_02_01r_00.png	data/seesaa.tsv::ポリン
+colorless_02_02_01r_00	スパイクトード	2	400	0	【常時】\nお互いのプレイヤーに与えられる、コスト3以下のミニオンからのDPによるダメージを1軽減する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_02_02_01r_00.png	data/seesaa.tsv::スパイクトード
+colorless_03_02_01r_00	ベテランゴブリン	3	300	1	【召喚時】\n相手のミニオン1体にBP-200を付与する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_03_02_01r_00.png	data/seesaa.tsv::ベテランゴブリン
+colorless_03_02_01r_01	ヤミーカクタス	3	300	1	【召喚時】\n自分はデッキの中からコスト2のマジックカード1枚を公開して手札に加えることができる。そうした場合、自分のデッキをシャッフルする。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_03_02_01r_01.png	data/seesaa.tsv::ヤミーカクタス
+colorless_03_02_01r_02	「天知」プラトーナ	3	300	1	【召喚時】\n自分の手札を好きな枚数破棄する。\nその後、同じ枚数のカードを引く。\n破棄したカードをランダムにデッキの下に戻す。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_03_02_01r_02.png	data/seesaa.tsv::「天知」プラトーナ
+colorless_04_02_01r_00	ヒドゥンヴォルフ	4	300	2	【召喚時】\n相手のミニオン1体毎に、このミニオンにBP+100を付与する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_04_02_01r_00.png	data/seesaa.tsv::ヒドゥンヴォルフ
+colorless_05_02_01r_00	サファイア・ドラゴン	5	500	1	【自分のターン】\nこのミニオンは有色のミニオンにはブロックされない。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_05_02_01r_00.png	data/seesaa.tsv::サファイア・ドラゴン
+colorless_05_02_01r_01	キャンセラーピューマ	5	600	2	【常時】\n相手がマジックを使用するたび、このミニオンにBP+100/DP+1を付与する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_05_02_01r_01.png	data/seesaa.tsv::キャンセラ―ピューマ
+colorless_06_02_01r_00	ガイオ・センチピード	6	700	2	【自分のターン】\n自分の種族「デミゴッド」を持つミニオンがいる場合、自分の手札にあるこのカードのフリーコストは3減らされる。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_06_02_01r_00.png	data/seesaa.tsv::ガイオ・センチピード
+colorless_06_02_01r_01	「扉を開く者」アルカス	6	600	2	【後退時】\n自分の手札にある本来のコストが6以下のフィールド・ミニオンカード1枚を出す。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_06_02_01r_01.png	data/seesaa.tsv::「扉を開く者」アルカス
+colorless_07_02_01r_00	「長雷槍」カルナール	7	700	2	［襲撃］［再起］	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_07_02_01r_00.png	data/seesaa.tsv::「長雷槍」カルナール
+colorless_07_02_01r_01	ゴルゴンシャーマン	7	500	2	【自分のターン終了時】\n種族「モンスター」を持たないミニオン全てにBP-200を付与する。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_07_02_01r_01.png	data/seesaa.tsv::ゴルゴンシャーマン
+colorless_07_02_01r_02	「炎魔」バルドロード	7	700	2	【召喚時】\n相手のBP1200以下のミニオン1体を破壊する。\n自分のフォース全てに1ダメージを与える。	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_07_02_01r_02.png	data/seesaa.tsv::「炎魔」バルドロード
+green_00_01_01r_00	エルフの剣士		300	1	【常時】\nこのミニオンはブロックできない。\n【配置時】\n自分の［貫通］を持つミニオン1体にBP+100/DP+1を付与する。	asserts/ZENONZARD_CARDLIST/GREEN/green_00_01_01r_00.png	data/seesaa.tsv::エルフの剣士
+green_01_03_01r_00	フォーリングロック	1			【メイン】\nレスト状態であるBP400以下のミニオン1体を破壊する。	asserts/ZENONZARD_CARDLIST/GREEN/green_01_03_01r_00.png	data/seesaa.tsv::フォーリングロック
+green_02_02_01r_00	ローレルツォーク	2	200	1	【後退時】\n自分の緑マナ1つをアクティブにする。	asserts/ZENONZARD_CARDLIST/GREEN/green_02_02_01r_00.png	data/seesaa.tsv::ローレルツォーク
+green_02_03_01r_00	トーンダウン	2			【フラッシュ】\nこのターン中、相手のミニオン1体のDPを0にする。	asserts/ZENONZARD_CARDLIST/GREEN/green_02_03_01r_00.png	data/seesaa.tsv::トーンダウン
+green_03_02_01r_00	モルフェオ「スカーレル」	3	300	1	【自分のマナフェイズ】\n自分の「デメテーの村娘」が置かれるたび、自分はカードを1枚引く。この効果は重複しない。	asserts/ZENONZARD_CARDLIST/GREEN/green_03_02_01r_00.png	data/seesaa.tsv::モルフェオ「スカーレル」
+green_03_03_01r_00	眠れる森の誘い	3			【メイン】/【フラッシュ】\n相手のミニオン1体と相手のフォース全てをレストする。	asserts/ZENONZARD_CARDLIST/GREEN/green_03_03_01r_00.png	data/seesaa.tsv::眠れる森の誘い
+green_05_02_01r_00	「豊穣をもたらす者」ヴァンジャン	5	500	2	【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。\n«ベース»\nこのマナで緑のカードのコストを支払うとき、緑コスト3マナ分支払える。	asserts/ZENONZARD_CARDLIST/GREEN/green_05_02_01r_00.png	data/seesaa.tsv::「豊穣をもたらす者」ヴァンジャン
+green_06_02_01r_00	ギンゴウツォーク	6	700	2	［貫通］\n【常時】\n自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。	asserts/ZENONZARD_CARDLIST/GREEN/green_06_02_01r_00.png	data/seesaa.tsv::ギンゴウツォーク
+green_07_02_01r_00	「秘術の御使い」アマリリア	7	700	2	【アタック時】\n相手のミニオン1体か相手のフォース1つをレストする。\n【後退時】\n自分の緑マナ2つをアクティブにする。	asserts/ZENONZARD_CARDLIST/GREEN/green_07_02_01r_00.png	data/seesaa.tsv::「秘術の御使い」アマリリア
+purple_00_01_01r_00	スケルトンの獄吏		300	1	【常時】\nこのミニオンはブロックできない。\n【配置時】\n自分は、相手の破壊されたフォース1つ毎に1枚カードを引く。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_00_01_01r_00.png	data/seesaa.tsv::スケルトンの獄吏
+purple_02_02_01r_00	酔いどれインプ	2	200	1	【破壊時】\n相手のフォース1つに1ダメージを与える。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_02_02_01r_00.png	data/seesaa.tsv::酔いどれインプ
+purple_03_02_01r_00	マッドライノ	3	300	1	【後退時】\n相手のミニオン1体にBP-200を付与する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_03_02_01r_00.png	data/seesaa.tsv::マッドライノ
+purple_03_03_01r_00	交換の壺	3			【メイン】/【フラッシュ】\n自分のミニオン1体を破壊する。そうした場合、自分はカードを2枚引く。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_03_03_01r_00.png	data/seesaa.tsv::交換の壺
+purple_04_02_01r_00	キューブロップ	4	300	2	［奪命］\n【常時】\n自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_04_02_01r_00.png	data/seesaa.tsv::キューブロップ
+purple_04_03_01r_00	ミッシングフォッグ	4			【メイン】\nコスト3以下のミニオン全てを破壊する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_04_03_01r_00.png	data/seesaa.tsv::ミッシングフォッグ
+purple_06_02_01r_00	「思惑を砕く者」キスカ	7	600	2	【召喚時】\n自分のデッキを上から5枚破棄する。\n【自分のターン】\n自分のデッキから紫のカードが破棄されるたび、そのカードの【破壊時】効果を全て発揮する。この効果は重複しない。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_06_02_01r_00.png	data/seesaa.tsv::「思惑を砕く者」キスカ
+purple_07_02_01r_00	「三頭の騎士」アリュシナシオン	7	600	3	【破壊時】\n「S・アリュシナシオン・トークン」3体を出すことができる。\n【後退時】\n相手のミニオン1体にBP-400を付与する。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_07_02_01r_00.png	data/seesaa.tsv::「三頭の騎士」アリュシナシオン
+purple_07_03_01r_00	リインカーネーション	7			【メイン】\n自分のトラッシュにあるフィールド・ミニオンカード1枚を出す。	asserts/ZENONZARD_CARDLIST/PURPLE/purple_07_03_01r_00.png	data/seesaa.tsv::リインカーネーション
+red_00_01_01r_00	ドワーフの闘士		300	1	【常時】\nこのミニオンはブロックできない。\n【配置時】\nこのターン中に自分が次に召喚する赤のミニオンに［襲撃］を与える。	asserts/ZENONZARD_CARDLIST/RED/red_00_01_01r_00.png	data/seesaa.tsv::ドワーフの闘士
+red_01_03_01r_00	増加装甲装着	1			【メイン】/【フラッシュ】\n自分のミニオン1体に、自分のミニオン・トークン1体毎にBP+100を付与する。	asserts/ZENONZARD_CARDLIST/RED/red_01_03_01r_00.png	data/seesaa.tsv::増加装甲装着
+red_02_02_01r_00	フレイムカーマン	2	300	1	【アタック時】\nプレイヤーにアタックした場合、このミニオンにBP+100を付与する。	asserts/ZENONZARD_CARDLIST/RED/red_02_02_01r_00.png	data/seesaa.tsv::フレイムカーマン
+red_02_03_01r_00	パラライズボール	2			【メイン】/【フラッシュ】\n相手のBP500以上のミニオン1体を選択する。このターン中、そのミニオンはブロックできない。	asserts/ZENONZARD_CARDLIST/RED/red_02_03_01r_00.png	data/seesaa.tsv::パラライズボール
+red_03_02_01r_00	ゴレイム「タイプ：ショベル」	3	300	1	【後退時】\n「S・ゴレイム・トークン」1体を出す。	asserts/ZENONZARD_CARDLIST/RED/red_03_02_01r_00.png	data/seesaa.tsv::ゴレイム「タイプ：ショベル」
+red_04_02_01r_00	「真実を映しだす者」ヤヌサス	4	400	1	【召喚時】\n他のトークンでないミニオン1体と同じカード1枚を手札に加える。	asserts/ZENONZARD_CARDLIST/RED/red_04_02_01r_00.png	data/seesaa.tsv::「真実を映し出す者」ヤヌサス
+red_05_02_01r_00	モーホークザウラー	5	400	2	［襲撃］\n【常時】\n自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。	asserts/ZENONZARD_CARDLIST/RED/red_05_02_01r_00.png	data/seesaa.tsv::モーホークザウラー
+red_05_03_01r_00	クレメイションズフレイム	5			【メイン】/【フラッシュ】\n相手のミニオン1体にBP-500を付与する。	asserts/ZENONZARD_CARDLIST/RED/red_05_03_01r_00.png	data/seesaa.tsv::クレイメイションズフレイム
+red_07_02_01r_00	「赤髭」ブラッド・ヒュージー	6	600	2	【アタック時】\nこのターン中、相手のミニオン1体をBP-300する。\n【後退時】\n「S・ゴレイム・トークン」2体を出す。	asserts/ZENONZARD_CARDLIST/RED/red_07_02_01r_00.png	data/seesaa.tsv::「赤髭」ブラッド・ヒュージー
+white_00_01_01r_00	アンドロイドの銃士		300	1	【常時】\nこのミニオンはブロックできない。\n【配置時】\n相手のミニオン1体を対象に選ぶことができる。このターン中、そのミニオンは必ずブロックする。	asserts/ZENONZARD_CARDLIST/WHITE/white_00_01_01r_00.png	data/seesaa.tsv::アンドロイドの銃士
+white_02_02_01r_00	ホーリーフライ	2	200	1	【後退時】\nこのターン中、自分のミニオン1体は相手のマジックの効果で選択できない。	asserts/ZENONZARD_CARDLIST/WHITE/white_02_02_01r_00.png	data/seesaa.tsv::ホーリーフライ
+white_02_03_01r_00	ゾーンディフェンス	2			【フラッシュ】\n相手のターンである場合、自分のミニオン全てと自分のフォース全てをアクティブにする。	asserts/ZENONZARD_CARDLIST/WHITE/white_02_03_01r_00.png	data/seesaa.tsv::ゾーンディフェンス
+white_02_03_01r_01	キルコマンド	2			【メイン】/【フラッシュ】\nこのターン中、自分の種族「ソルジャー」を持つミニオン1体はBPに関係なくバトルに勝利する。	asserts/ZENONZARD_CARDLIST/WHITE/white_02_03_01r_01.png	data/seesaa.tsv::キルコマンド
+white_03_02_01r_00	リカオニードル	3	400	1	［再起］\n【常時】\n自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。	asserts/ZENONZARD_CARDLIST/WHITE/white_03_02_01r_00.png	data/seesaa.tsv::リカオニードル
+white_04_02_01r_00	R-A6 フォーゲルバイン	4	500	1	【アタック時】\n相手は必ずブロックする。	asserts/ZENONZARD_CARDLIST/WHITE/white_04_02_01r_00.png	data/seesaa.tsv::R-A6フォーゲルバイン
+white_04_03_01r_00	ディメンジョナルクラック	4			【メイン】\n自分のミニオン全てにBP+100を付与する。このターン中、自分のミニオンがバトルに勝利するたび、相手のプレイヤーに1ダメージを与える。	asserts/ZENONZARD_CARDLIST/WHITE/white_04_03_01r_00.png	data/seesaa.tsv::ディメンジョナルクラック
+white_06_02_01r_00	「那由多に届く者」ヘルデューク	6	600	2	【アタック時】&【ブロック時】\n自分のフォース1つをレストできる。そうした場合、このミニオンをアクティブにする。	asserts/ZENONZARD_CARDLIST/WHITE/white_06_02_01r_00.png	data/seesaa.tsv::「那由他に届く者」ヘルデューク
+white_07_02_01r_00	戦闘型ロイド・シュバイン	7	700	2	【常時】\nこのミニオンがバトルに勝利するたび、相手のミニオン1体をレストする。\n【後退時】\nこのターン中、あなたのミニオン全ては相手のマジックの効果の対象に選べない。	asserts/ZENONZARD_CARDLIST/WHITE/white_07_02_01r_00.png	data/seesaa.tsv::戦闘型ロイド・シュバイン
+yellow_00_01_01r_00	アヴィアンの忍者		300	1	【常時】\nこのミニオンはブロックできない。\n【配置時】\nこのターン中、自分のミニオン全てをBP+100する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_00_01_01r_00.png	data/seesaa.tsv::アヴィアンの忍者
+yellow_01_03_01r_00	サンフィスト	1			【メイン】/【フラッシュ】\nこのターン中、相手の手札にあるマジックカードのフリーコストを3増やす。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_01_03_01r_00.png	data/seesaa.tsv::サンフィスト
+yellow_02_02_01r_00	エンジェルバニー	2	200	1	【後退時】\n自分のコスト6以上の黄のミニオン1体をアクティブにする。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_02_02_01r_00.png	data/seesaa.tsv::エンジェルバニー
+yellow_03_03_01r_00	強化札	3			【メイン】/【フラッシュ】\n自分のミニオン1体にBP+200/DP+1を付与する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_03_03_01r_00.png	data/seesaa.tsv::強化札
+yellow_04_02_01r_00	アルダープ	4	300	1	［飛来］\n【常時】\n自分の種族「デミゴッド」を持つミニオンがいる場合、このミニオンをBP+200/DP+1する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_04_02_01r_00.png	data/seesaa.tsv::アルダープ
+yellow_05_02_01r_00	猩猩	5	500	2	【常時】\n他の自分のミニオンがフィールドに出るたび、このミニオンにBP+100を付与する。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_05_02_01r_00.png	data/seesaa.tsv::猩猩
+yellow_06_02_01r_00	「身も心も縛る者」ザイレン	6	500	2	［飛来］\n【召喚時】\n次の相手のターン終了時まで、相手のミニオン1体はアタックもブロックも移動もできない。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_06_02_01r_00.png	data/seesaa.tsv::「身も心も縛る者」ザイレン
+yellow_06_02_01r_01	強欲のタタラ	6	600	2	【破壊時】\n相手のミニオン1体を手札に戻す。\n【後退時】\n自分の黄のミニオン1体をアクティブにする。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_06_02_01r_01.png	data/seesaa.tsv::強欲のタタラ
+yellow_07_03_01r_00	タイムリープ	7			【メイン】\n全てのミニオンを持ち主の手札に戻す。	asserts/ZENONZARD_CARDLIST/YELLOW/yellow_07_03_01r_00.png	data/seesaa.tsv::タイムリープ
+colorless_010_02_01r_00	「五幻獣」麒麟	10	600	1	"【召喚時】
+相手のプレイヤーにXダメージを与える。Xは自分の種族「ビースト」/「ファイブスター」を持つミニオンの数と同じとする。"	asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_010_02_01r_00.png	data/seesaa.tsv::「五幻獣」麒麟

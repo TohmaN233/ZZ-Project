@@ -54,6 +54,7 @@ def _runtime_value(value: Any) -> Any:
             "$effect": {
                 "timing": _runtime_value(value.timing),
                 "callback": _callable_name(value.fn),
+                "preTargetCallback": None if value.pre_target_fn is None else _callable_name(value.pre_target_fn),
                 "condition": None if value.condition is None else _callable_name(value.condition),
                 "targetKind": value.target_kind,
                 "minTargets": value.min_targets,
@@ -117,6 +118,7 @@ def _card_state(card: CardInstance) -> dict[str, Any]:
         "summoningSickness": card.summoning_sickness,
         "flags": sorted(card.flags),
         "manaColorOverride": None if card.mana_color_override is None else card.mana_color_override.value,
+        "blessings": [_card_state(mana) for mana in card.blessings],
     }
 
 
@@ -215,6 +217,7 @@ def canonical_authoritative_state(
         },
         "engineRuntime": {
             "pendingForceBaseChoices": _runtime_value(engine.pending_force_base_choices),
+            "pendingBlessingReturns": _runtime_value(engine.pending_blessing_returns),
             "triggerQueue": _runtime_value(list(engine.triggers._queue)),
             "ignoreHandCap": engine.ignore_hand_cap,
             "passiveModifiers": passive_modifiers,

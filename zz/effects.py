@@ -21,8 +21,12 @@ class EffectTiming(Enum):
     ON_DESTROY = "on_destroy"
     ON_DAMAGE_PLAYER = "on_damage_player"
     ON_DAMAGE_FORCE = "on_damage_force"
+    ON_CARD_USED = "on_card_used"
+    ON_FORCE_DESTROYED = "on_force_destroyed"
     ON_BATTLE_WIN = "on_battle_win"
     ON_ENTER_FIELD = "on_enter_field"
+    ON_BLESS = "on_bless"
+    ON_DECK_DISCARD = "on_deck_discard"
     ON_MOVE_TO_FIELD = "on_move_to_field"
     MOVE_TO_BASE = "move_to_base"
     TURN_START = "turn_start"
@@ -47,6 +51,29 @@ class EffectSpec:
     official_timing: str | None = None
     official_condition: str | None = None
     active_areas: tuple[AreaType, ...] | None = None
+    pre_target_fn: EffectFn | None = None
+
+
+def effect_once_per_turn_used(effect: EffectSpec, source: Any) -> bool:
+    """Return whether an explicitly marked once-per-turn effect was consumed.
+
+    Card callbacks remain responsible for setting their existing turn marker
+    only after the effect really resolves.  The shared trigger/session paths
+    use this predicate to avoid presenting a stale choice for a duplicate
+    pending trigger.
+    """
+    flag = effect.params.get("once_per_turn_flag")
+    if not flag:
+        return False
+    scope = effect.params.get("once_per_turn_scope", "source")
+    if scope == "source":
+        holder = source
+    elif scope == "owner":
+        holder = getattr(source, "owner", None)
+    else:
+        raise ValueError(f"unknown once-per-turn scope: {scope!r}")
+    flags = getattr(holder, "flags", None)
+    return isinstance(flags, set) and str(flag) in flags
 
 
 TIMING_LABELS = {
@@ -58,8 +85,12 @@ TIMING_LABELS = {
     EffectTiming.ON_DESTROY: "破壊時",
     EffectTiming.ON_DAMAGE_PLAYER: "ダメージ時",
     EffectTiming.ON_DAMAGE_FORCE: "フォースダメージ時",
+    EffectTiming.ON_CARD_USED: "カード使用時",
+    EffectTiming.ON_FORCE_DESTROYED: "フォース破壊時",
     EffectTiming.ON_BATTLE_WIN: "バトル勝利時",
     EffectTiming.ON_ENTER_FIELD: "フィールドに出る",
+    EffectTiming.ON_BLESS: "加護時",
+    EffectTiming.ON_DECK_DISCARD: "デッキから破棄された時",
     EffectTiming.ON_MOVE_TO_FIELD: "移動時",
     EffectTiming.MOVE_TO_BASE: "後退時",
     EffectTiming.TURN_START: "自分のターン開始時",
@@ -297,6 +328,10 @@ def build_effect(
 def _param_value(value: Any) -> Any:
     if isinstance(value, Enum):
         return value.name
+    if isinstance(value, (list, tuple)):
+        return [_param_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(key): _param_value(item) for key, item in value.items()}
     return value
 
 
@@ -382,6 +417,14 @@ def _stat_modifier(
     keyword: Keyword | str | None = None,
     exclude_self: bool = False,
     duration: str = "turn",
+    max_cost: int | None = None,
+    min_cost: int | None = None,
+    max_bp: int | None = None,
+    min_bp: int | None = None,
+    max_dp: int | None = None,
+    min_dp: int | None = None,
+    color: Color | str | None = None,
+    race: str | None = None,
     **_: Any,
 ) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
@@ -390,7 +433,18 @@ def _stat_modifier(
             return
         selection_kind = "ally_minion" if target_kind == "other_ally_minion" else target_kind
         should_exclude_self = exclude_self or target_kind == "other_ally_minion"
-        filter_fn = (lambda target: target is not ci) if should_exclude_self else None
+        matcher = _target_filter(
+            eng,
+            max_cost=max_cost,
+            min_cost=min_cost,
+            max_bp=max_bp,
+            min_bp=min_bp,
+            max_dp=max_dp,
+            min_dp=min_dp,
+            color=color,
+            race=race,
+        )
+        filter_fn = lambda target: (not should_exclude_self or target is not ci) and matcher(target)
         targets = eng.select_target(ci.owner, selection_kind, min_targets, max_targets, filter_fn=filter_fn, source=ci)
         for target in targets[:max_targets]:
             eng.modify_stat(target, bp_delta=bp_delta, dp_delta=dp_delta, duration=duration)
@@ -453,9 +507,14 @@ def _grant_keyword(
     target_kind: str | None,
     max_targets: int = 1,
     keyword: Keyword | str,
-    **_: Any,
+    **params: Any,
 ) -> EffectFn:
-    return _stat_modifier(target_kind=target_kind, max_targets=max_targets, keyword=keyword)
+    return _stat_modifier(
+        target_kind=target_kind,
+        max_targets=max_targets,
+        keyword=keyword,
+        **params,
+    )
 
 
 def _grant_unblockable(
@@ -575,6 +634,8 @@ def _create_tokens(
     dp: int = 0,
     rested: bool = False,
     optional: bool = False,
+    race_jp: str = "",
+    keywords: tuple[Keyword | str, ...] | list[Keyword | str] | None = None,
     **_: Any,
 ) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
@@ -593,32 +654,21 @@ def _create_tokens(
             cost=token_cost,
             bp=bp,
             dp=dp,
+            race_jp=race_jp,
+            keywords=[_keyword_from_value(keyword) for keyword in (keywords or ())],
         )
-        replacement_iids: list[int] = []
-        create_count = amount
-        replacements_needed = max(0, len(ci.owner.field) + amount - 5)
-        if replacements_needed:
-            minimum_replacements = 0 if optional else replacements_needed
-            replacements = eng.select_target(
-                ci.owner,
-                "ally_minion",
-                minimum_replacements,
-                replacements_needed,
-                source=ci,
-            )
-            if len(replacements) < replacements_needed and not optional:
-                return
-            replacement_iids = [target.iid for target in replacements]
-            if optional:
-                open_slots = max(0, 5 - len(ci.owner.field))
-                create_count = min(amount, open_slots + len(replacement_iids))
-        for _index in range(create_count):
-            replace_iid = None
-            if len(ci.owner.field) >= 5:
-                if not replacement_iids:
-                    return
-                replace_iid = replacement_iids.pop(0)
-            eng.create_token(ci.owner, token_card, rested=rested, replace_field_iid=replace_iid)
+        selected_amount = getattr(ctx, "_create_tokens_count", None)
+        if selected_amount is None:
+            selected_amount = amount
+        selected_amount = max(0, min(amount, int(selected_amount)))
+        eng.create_tokens(
+            ci.owner,
+            [token_card] * amount,
+            source=ci,
+            rested=rested,
+            optional=optional,
+            count=selected_amount,
+        )
     return fn
 
 
@@ -847,6 +897,14 @@ def _look_top_to_hand(
     min_targets: int = 1,
     max_targets: int = 1,
     optional: bool = False,
+    card_id: str | None = None,
+    card_ids: tuple[str, ...] | list[str] | None = None,
+    exclude_card_id: str | None = None,
+    race: str | None = None,
+    card_type: CardType | str | None = None,
+    color: Color | str | None = None,
+    max_cost: int | None = None,
+    min_cost: int | None = None,
     **_: Any,
 ) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
@@ -855,13 +913,31 @@ def _look_top_to_hand(
         if eng is None or target_kind is None:
             return
         seen = list(owner.deck[:top_n])
-        chosen = eng.select_target(owner, target_kind, 0 if optional else min_targets, max_targets, source=ci)
+        filter_fn = _target_filter(
+            eng,
+            card_id=card_id,
+            card_ids=card_ids,
+            exclude_card_id=exclude_card_id,
+            race=race,
+            card_type=card_type,
+            color=color,
+            max_cost=max_cost,
+            min_cost=min_cost,
+        )
+        chosen = eng.select_target(
+            owner,
+            target_kind,
+            0 if optional else min_targets,
+            max_targets,
+            filter_fn=filter_fn,
+            source=ci,
+        )
         chosen_ids = {card.iid for card in chosen}
         for card in chosen:
             if card not in owner.deck:
                 continue
             owner.deck.remove(card)
-            eng.reveal_card(owner, card, "top_deck_search")
+            eng.reveal_card(owner, card, "deck_search")
             eng.add_to_hand(owner, card, from_area=AreaType.DECK)
         rest = [card for card in seen if card.iid not in chosen_ids and card in owner.deck]
         for card in rest:
@@ -913,7 +989,7 @@ def _place_base_from_hand(
     return fn
 
 
-def _place_colorless_mana(**_: Any) -> EffectFn:
+def _place_colorless_mana(*, rested: bool = False, **_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
         eng = getattr(state, "engine", None)
         if eng is not None:
@@ -923,7 +999,8 @@ def _place_colorless_mana(**_: Any) -> EffectFn:
                 if not replacements:
                     return
                 replace_iid = replacements[0].iid
-            eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid)
+            token = eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid)
+            token.rested = rested
     return fn
 
 
@@ -1114,7 +1191,9 @@ def _target_filter(
     max_cost: int | None = None,
     min_cost: int | None = None,
     max_bp: int | None = None,
+    min_bp: int | None = None,
     max_dp: int | None = None,
+    min_dp: int | None = None,
     color: Color | str | None = None,
     card_id: str | None = None,
     card_ids: tuple[str, ...] | list[str] | None = None,
@@ -1147,7 +1226,11 @@ def _target_filter(
             return False
         if max_bp is not None and eng.effective_bp(target) > max_bp:
             return False
+        if min_bp is not None and eng.effective_bp(target) < min_bp:
+            return False
         if max_dp is not None and eng.effective_dp(target) > max_dp:
+            return False
+        if min_dp is not None and eng.effective_dp(target) < min_dp:
             return False
         if wanted_color is not None and _card_color(card) is not wanted_color:
             return False

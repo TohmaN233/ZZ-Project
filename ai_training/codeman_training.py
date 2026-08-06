@@ -155,6 +155,20 @@ def evaluate_promotion_gate(metrics: dict[str, Any]) -> PromotionDecision:
     return PromotionDecision(promoted=not reasons, reasons=reasons)
 
 
+def _native_promotion_decision_with_semantic_gate(
+    checkpoint_selection_report: Mapping[str, Any],
+    semantic_gate_report: Mapping[str, Any],
+) -> PromotionDecision:
+    reasons = list(checkpoint_selection_report.get("reasons") or [])
+    semantic_passed = bool(semantic_gate_report.get("passed"))
+    if not semantic_passed:
+        reasons.append("candidate failed runtime semantic action gate")
+    return PromotionDecision(
+        promoted=bool(checkpoint_selection_report.get("promoted")) and semantic_passed,
+        reasons=reasons,
+    )
+
+
 def run_codeman_training(
     codeman_id: str,
     *,
@@ -283,6 +297,12 @@ def _run_codeman_native_champion_training(
         codeman_id=safe_id,
         training_report=training_report,
     )
+    from zz.codeman_semantic_audit import audit_actor_semantic_contract
+
+    semantic_gate = audit_actor_semantic_contract(candidate_path, seed=seed + 700000)
+    semantic_gate_path = candidate_dir / "selection" / "semantic_runtime_gate.json"
+    semantic_gate_path.parent.mkdir(parents=True, exist_ok=True)
+    semantic_gate_path.write_text(json.dumps(semantic_gate, ensure_ascii=True, indent=2), encoding="utf-8")
     checkpoint_cleanup = _cleanup_training_checkpoints(
         candidate_dir / "training",
         source_selected_checkpoint=selected_checkpoint,
@@ -299,9 +319,9 @@ def _run_codeman_native_champion_training(
         "message": "Evaluating promotion gate",
     })
     resolved_metrics = dict(checkpoint_selection.report.get("replacementGate") or {})
-    decision = PromotionDecision(
-        promoted=bool(checkpoint_selection.report.get("promoted")),
-        reasons=list(checkpoint_selection.report.get("reasons") or []),
+    decision = _native_promotion_decision_with_semantic_gate(
+        checkpoint_selection.report,
+        semantic_gate,
     )
     memory_pruned_after_promotion = 0
     memory_games_after_promotion = memory_games
@@ -321,6 +341,7 @@ def _run_codeman_native_champion_training(
     )
     training_dir_removed = _remove_tree(candidate_dir / "training")
 
+    candidate_retained = bool(decision.promoted or semantic_gate.get("passed"))
     report = {
         "schema": 1,
         "kind": "codeman_training_run",
@@ -351,8 +372,11 @@ def _run_codeman_native_champion_training(
         "sourceSelectedCheckpointPath": str(selected_checkpoint),
         "candidatePath": str(candidate_path),
         "checkpointSelection": checkpoint_selection.report,
+        "semanticGate": semantic_gate,
+        "semanticGatePath": str(semantic_gate_path),
         "checkpointCleanup": checkpoint_cleanup,
         "trainingDirRemoved": training_dir_removed,
+        "candidateRetained": candidate_retained,
         "modelRetentionCleanup": model_retention_cleanup,
         "gateMetrics": resolved_metrics,
         "promoted": decision.promoted,
@@ -361,7 +385,7 @@ def _run_codeman_native_champion_training(
     report_path = codeman_root / "reports" / f"{run_name}.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=True, indent=2), encoding="utf-8")
-    if not decision.promoted:
+    if not candidate_retained:
         _remove_tree(candidate_dir)
     _emit_progress(progress_callback, {
         "state": "done",
@@ -929,7 +953,9 @@ def _evaluate_codeman_actor_memory_matrix(
         },
     )
     rows = list(report.get("_gameRows") or [])
-    errors = sum(1 for row in rows if row.get("error") is not None or row.get("winner") == "error")
+    row_errors = sum(1 for row in rows if row.get("error") is not None or row.get("winner") == "error")
+    worker_failures = int(report.get("workerFailures", 0) or 0)
+    errors = row_errors + worker_failures
     played_rows = [row for row in rows if row.get("error") is None and row.get("winner") != "error"]
     wins = sum(1 for row in played_rows if bool((row.get("result") or {}).get("modelPolicyWon")))
     reference_wins = sum(1 for row in played_rows if bool((row.get("result") or {}).get("opponentPolicyWon")))
@@ -938,6 +964,8 @@ def _evaluate_codeman_actor_memory_matrix(
         "referenceWins": int(reference_wins),
         "games": int(len(played_rows)),
         "errors": int(errors),
+        "rowErrors": int(row_errors),
+        "workerFailures": int(worker_failures),
         "winRate": float(wins) / float(max(1, len(played_rows))),
         "deckCount": int(len(decks)),
         "matchupCount": int(len(matchups or [])),
@@ -945,7 +973,6 @@ def _evaluate_codeman_actor_memory_matrix(
         "sampledTasks": int(len(selected_tasks)),
         "evaluationBackend": "worker_local_vector_gate",
         "throughput": report.get("throughput"),
-        "workerFailures": report.get("workerFailures"),
         "executionErrors": report.get("executionErrors"),
         "rolloutReportPath": str(report.get("reportPath") or ""),
         "rows": rows,

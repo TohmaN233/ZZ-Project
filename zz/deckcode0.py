@@ -152,7 +152,7 @@ def _aoba_search(ci: CardInstance, state, ctx: Context) -> None:
     for card in top:
         if card.iid in chosen_iids:
             if eng is not None:
-                eng.reveal_card(owner, card, "top_deck_search")
+                eng.reveal_card(owner, card, "deck_search")
                 eng.add_to_hand(owner, card, from_area=AreaType.DECK)
             else:
                 card.area = AreaType.HAND
@@ -519,7 +519,7 @@ register(Card(
     name_en="Rewind Wind",
     type=CardType.MAGIC,
     cost=_cost(4, Color.YELLOW, 2),
-    effects=[build_effect("return_to_hand", EffectTiming.ON_CAST_MAGIC, target_kind="enemy_minion")],
+    effects=[build_effect("return_to_hand", EffectTiming.ON_CAST_MAGIC, target_kind="any_minion")],
     main_timing_ok=True,
     flash_timing_ok=True,
 ))

@@ -21,8 +21,7 @@ npm run electron:dev
 Platform launchers are also available at the project root:
 
 - Windows: `launch-electron.cmd`
-- Linux: `launch-electron.sh`
-- macOS: `launch-electron.command`
+- Linux/macOS: `launch-electron.sh`
 
 Useful environment variables:
 
