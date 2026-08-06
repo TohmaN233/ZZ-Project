@@ -193,6 +193,14 @@ button:disabled {
   font-size: 13px;
 }
 
+.duel-status-meta {
+  min-width: 0;
+  min-height: 18px;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .controls {
   gap: 8px;
   justify-content: flex-end;

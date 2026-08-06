@@ -4996,10 +4996,6 @@ function localizedMode(value) {
   return key ? t(key) : String(value || "");
 }
 
-function renderDuelPhaseMeta() {
-  return `<span>${esc(localizedPhase(state.phase))} / ${esc(localizedPhase(state.step))}</span>`;
-}
-
 function renderDuelBrand() {
   const logo = uiAssetUrl("logo_zztitle");
   return `
@@ -5007,11 +5003,9 @@ function renderDuelBrand() {
       ${logo
         ? `<img class="brand-logo duel-brand-logo" src="${esc(logo)}" alt="ZENONZARD">`
         : `<strong>ZENONZARD</strong>`}
-      <div class="meta">
+      <div class="meta duel-status-meta">
         <span>${esc(localizedMode(state.mode))}</span>
         <span>${esc(t("turn"))} ${esc(state.turn)}</span>
-        ${renderDuelPhaseMeta()}
-        <span>${esc(t("activeSide"))} ${esc(state.activeSide)}</span>
       </div>
     </div>
   `;
