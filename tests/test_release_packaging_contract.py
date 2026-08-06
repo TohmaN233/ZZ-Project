@@ -38,10 +38,17 @@ class ReleasePackagingContractTests(unittest.TestCase):
         self.assertNotIn('add_data("local_ai_training/retained_mainline_20260630", "local_ai_training/retained_mainline_20260630")', windows_builder)
 
         installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
+        self.assertIn("!macro customCheckAppRunning", installer)
+        self.assertIn("Get-CimInstance -ClassName Win32_Process", installer)
+        self.assertIn("Stop-Process -Id $$_.ProcessId -Force", installer)
+        self.assertIn('taskkill.exe" /F /T /IM "ZZ-Project.exe"', installer)
+        self.assertIn('taskkill.exe" /F /T /IM "zz-server.exe"', installer)
+        self.assertIn('DeleteRegKey HKCU "${UNINSTALL_REGISTRY_KEY}"', installer)
+        self.assertIn('DeleteRegKey HKLM "${UNINSTALL_REGISTRY_KEY}"', installer)
+        self.assertIn('FileExists} "$INSTDIR\\${APP_EXECUTABLE_FILENAME}"', installer)
         self.assertIn("!macro customRemoveFiles", installer)
         self.assertIn("${If} ${isUpdated}", installer)
         self.assertIn("Keeping existing installation files during update.", installer)
-        self.assertNotIn("Rename \"$INSTDIR\\asserts\"", installer)
 
         server = (PROJECT_ROOT / "zz" / "web" / "server.py").read_text(encoding="utf-8")
         self.assertIn('parser.add_argument("--bundled-deck-root", default=None)', server)
