@@ -101,6 +101,25 @@ button:disabled {
   box-shadow: 0 0 12px rgba(62, 229, 213, 0.28);
 }
 
+.topbar-bgm-control {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topbar-bgm-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.topbar-bgm-control select {
+  width: min(180px, 24vw);
+  min-width: 0;
+  padding: 6px 8px;
+}
+
 .app {
   height: 100vh;
   min-height: 760px;
@@ -6610,6 +6629,15 @@ button.end-turn-action {
   .controls button,
   .controls select {
     max-width: 100%;
+  }
+
+  .topbar-bgm-control {
+    width: min(100%, 430px);
+  }
+
+  .topbar-bgm-control select {
+    flex: 1 1 180px;
+    width: auto;
   }
 
   .home-menu-screen {

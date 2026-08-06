@@ -1633,6 +1633,24 @@ function renderBgmTrackPicker() {
   `;
 }
 
+function renderTopbarBgmControl() {
+  const selected = selectedBgmTrack().id;
+  return `
+    <div class="topbar-bgm-control">
+      <span class="topbar-bgm-label">${esc(t("bgmSetting"))}</span>
+      <select data-bgm-track aria-label="${esc(t("bgmSetting"))}">
+        ${BGM_TRACKS.map((track) => `
+          <option value="${esc(track.id)}" ${track.id === selected ? "selected" : ""}>
+            ${esc(track.label)}
+          </option>
+        `).join("")}
+      </select>
+      <button class="bgm-toggle ${bgmPlaying ? "active" : ""}" data-bgm-toggle
+              title="${esc(bgmError || selectedBgmTrack().label)}">${bgmPlaying ? "BGM On" : "BGM"}</button>
+    </div>
+  `;
+}
+
 function normalizeSettings(raw = {}) {
   return {
     playerProfile: normalizeProfile(raw.playerProfile),
@@ -5727,8 +5745,7 @@ function renderDuelView(error = null) {
         ${shouldShowDuelAutoControls()
           ? `<button data-auto="toggle" class="${isAutoRunning() ? "active" : ""}">${isAutoRunning() ? esc(t("pause")) : esc(t("auto"))}</button>`
           : ""}
-        <button class="bgm-toggle ${bgmPlaying ? "active" : ""}" data-bgm-toggle
-                title="${esc(bgmError || selectedBgmTrack().label)}">${bgmPlaying ? "BGM On" : "BGM"}</button>
+        ${renderTopbarBgmControl()}
       </div>
     </header>
     ${online && multiplayerUi.status === "RECONNECTING"
@@ -6477,8 +6494,7 @@ function renderShellHeader(title = "ZENONZARD") {
         ${navButton("lobby", t("gameLobby"))}
         ${navButton("settings", t("setting"))}
         ${state ? `<button data-view="duel">${esc(t("continueDuel"))}</button>` : ""}
-        <button class="bgm-toggle ${bgmPlaying ? "active" : ""}" data-bgm-toggle
-                title="${esc(bgmError || selectedBgmTrack().label)}">${bgmPlaying ? "BGM On" : "BGM"}</button>
+        ${renderTopbarBgmControl()}
       </div>
     </header>
   `;
