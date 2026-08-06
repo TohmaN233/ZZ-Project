@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "dist" / "linux"
 STAGING = OUTPUT / "staging"
 EXCLUDED_ROOTS = {".git", "asserts", "dist", "node_modules", "__pycache__"}
-EXCLUDED_FILES = {"PUBLIC_RELEASE_MANIFEST.json", "RELEASE_NOTES.md"}
+EXCLUDED_FILES = {"PUBLIC_RELEASE_MANIFEST.json", "RELEASE_NOTES.md", "INSTALL.md"}
 
 
 def tracked_files() -> list[Path]:

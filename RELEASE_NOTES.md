@@ -45,9 +45,9 @@
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
-   Electron, and Python runtime files. Size: `45917128` bytes.
+   Electron, and Python runtime files. Size: `45913484` bytes.
    SHA-256:
-   `9ABFE2C4F016DA1CEBEABB2429E2029C38E723E9E94425D6D6D686391931F45C`.
+   `3652B109EBAA6F86A7CB41F936818E47EBACA044E3C1A21C1927E021E737EEE7`.
 3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.

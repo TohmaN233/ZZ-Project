@@ -85,10 +85,10 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `45917128` bytes.
+Bundle size: `45913484` bytes.
 
 Bundle SHA-256:
-`9ABFE2C4F016DA1CEBEABB2429E2029C38E723E9E94425D6D6D686391931F45C`.
+`3652B109EBAA6F86A7CB41F936818E47EBACA044E3C1A21C1927E021E737EEE7`.
 
 ## 5. Source launch and macOS
 
