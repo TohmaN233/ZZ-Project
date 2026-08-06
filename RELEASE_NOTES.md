@@ -48,9 +48,9 @@
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `45913697` bytes.
+   Size: `45913729` bytes.
    SHA-256:
-   `027F60ADE987C38E00EF7452751C8D55A5217B0332A299804236BB137CA487AB`.
+   `EA2AE167D1F6466E5B2EDDA972CF964E95963546A8E9F7698CDDF4CA57F8461E`.
 3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
