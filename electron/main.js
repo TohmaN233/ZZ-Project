@@ -393,6 +393,31 @@ function waitForProcessExit(child, timeoutMs = 5000) {
   });
 }
 
+function terminateProcessTree(child) {
+  if (!child || !child.pid) return;
+  if (process.platform !== "win32") {
+    child.kill();
+    return;
+  }
+  const killer = spawn("taskkill", ["/PID", String(child.pid), "/T", "/F"], {
+    windowsHide: true,
+    stdio: "ignore",
+  });
+  killer.once("error", (error) => {
+    appendLog(`Failed to terminate server process tree: ${error.message || error}`);
+    try {
+      child.kill();
+    } catch (killError) {
+      appendLog(`Fallback server termination failed: ${killError.message || killError}`);
+    }
+  });
+  killer.once("exit", (code, signal) => {
+    if (code !== 0 && code !== 128) {
+      appendLog(`taskkill exited with ${code ?? signal}`);
+    }
+  });
+}
+
 async function stopServer() {
   if (!serverProcess) {
     serverState = "stopped";
@@ -400,7 +425,7 @@ async function stopServer() {
   }
   serverState = "stopping";
   const processToStop = serverProcess;
-  processToStop.kill();
+  terminateProcessTree(processToStop);
   await waitForProcessExit(processToStop);
   if (serverProcess === processToStop) {
     serverProcess = null;
@@ -465,6 +490,7 @@ async function createWindow() {
   await mainWindow.loadURL(serverUrl);
   mainWindow.on("closed", () => {
     mainWindow = null;
+    if (!shutdownPrepared) app.quit();
   });
   return status;
 }
