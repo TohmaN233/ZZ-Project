@@ -9,6 +9,7 @@
     "electron:dev": "electron .",
     "electron:start": "electron .",
     "electron:build-main": "esbuild electron/main.js --bundle --platform=node --format=cjs --outfile=dist/electron/main.cjs --external:electron",
+    "package:windows": "python packaging/build_windows_package.py",
     "test:update-checker": "node --test tests/electron_update_checker.test.js",
     "test:multiplayer-electron": "node --test tests/electron_multiplayer_client.test.js tests/electron_lan_manager.test.js tests/electron_adaptive_websocket.test.js",
     "check:brain-manifest": "repo-harness run check-brain-manifest",
@@ -21,11 +22,55 @@
   },
   "devDependencies": {
     "electron": "^39.0.0",
+    "electron-builder": "^26.15.3",
     "esbuild": "^0.25.0",
     "wait-on": "^8.0.0"
   },
   "dependencies": {
     "https-proxy-agent": "^7.0.6",
     "ws": "^8.21.1"
+  },
+  "build": {
+    "appId": "com.tohman233.zzproject",
+    "productName": "ZZ-Project",
+    "asar": false,
+    "directories": {
+      "output": "dist/windows"
+    },
+    "files": [
+      "electron/**/*",
+      "zz/**/*",
+      "data/**/*",
+      "local_ai_training/retained_mainline_20260630/**/*",
+      "docs/rules/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "packaging/server-dist/zz-server.exe",
+        "to": "server/zz-server.exe"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "electron/icon-256.png"
+    },
+    "nsis": {
+      "artifactName": "ZZ-Project-v${version}-Windows-Setup.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": false
+    }
   }
 }

@@ -19,7 +19,7 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an experimenta
 - **Trilingual UI**: Simplified Chinese, Japanese, and English.
 - **BGM settings**: the complete asset pack includes ZENONZARD character songs.
 - **Update checks**: the desktop client checks GitHub Releases at startup and can open the release page when a newer version is available.
-- **Cross-platform launchers**: `.cmd` for Windows and `.sh` for Linux/macOS. The separate `.command` launcher was removed from this release.
+- **Cross-platform launchers**: a Windows installer plus `.cmd` for source launches, and `.sh` for Linux/macOS. The separate `.command` launcher was removed from this release.
 
 Story Mode has not been implemented. The long-term goal is an Agent-driven game that interacts with each player and generates a GAL-style frontend. The project also intends to learn from the SillyTavern community's work on characters, World Info, and long-term interaction to create a personal ZZ experience shared with the player's own Codeman.
 
@@ -33,7 +33,9 @@ The AI code was written with assistance from Codex and refers to the public meth
 
 ## Installation
 
-The program and large visual/audio assets are distributed separately. First download [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip), then download both main-pack ZIP volumes, `ZZ-Assets-PC02-v1.zip.001` and `ZZ-Assets-PC02-v1.zip.002`, from the [Google Drive asset folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing). After downloading both volumes, open `.001` with 7-Zip and extract it into the project root. English users should also download the separate `ZZ-Assets-PC02-English-v1.zip` and extract it into the project root. See [INSTALL.md](INSTALL.md) for the full directory layout and troubleshooting steps.
+Windows players should download and run [ZZ-Project-v0.2.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe). The installer contains the playable desktop client, frozen Python server, rules code, and default models; Python and Node.js are not required. Large visual/audio assets remain separate: download both main-pack volumes, `ZZ-Assets-PC02-v1.zip.001` and `ZZ-Assets-PC02-v1.zip.002`, from the [Google Drive asset folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing). Open `.001` with 7-Zip and place the resulting `asserts/` directory next to the installed `ZZ-Project.exe`. English users should also download the separate `ZZ-Assets-PC02-English-v1.zip` and extract it into the same `asserts/` directory. See [INSTALL.md](INSTALL.md) for the full directory layout and troubleshooting steps.
+
+Linux/macOS players and developers should use [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip) and follow the source setup below.
 
 ```powershell
 python -m pip install -r requirements-runtime.txt

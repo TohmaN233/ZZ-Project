@@ -40,11 +40,28 @@ let updateStatus = { status: "idle", currentVersion: null };
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 function projectRoot() {
+  if (app.isPackaged) return path.join(process.resourcesPath, "app");
   return path.resolve(__dirname, "..");
 }
 
+function packagedServerPath() {
+  if (!app.isPackaged) return null;
+  const executable = process.platform === "win32" ? "zz-server.exe" : "zz-server";
+  return path.join(process.resourcesPath, "server", executable);
+}
+
+function packagedAssetRoot() {
+  const configured = process.env.ZZ_ASSET_ROOT;
+  if (configured) return path.resolve(projectRoot(), configured);
+  return path.join(path.dirname(process.execPath), "asserts");
+}
+
+function packagedUserDataRoot() {
+  return path.join(app.getPath("userData"), "game-data");
+}
+
 function applicationIconPath() {
-  return path.join(app.getAppPath(), "electron", "icon.png");
+  return path.join(app.getAppPath(), "electron", "icon-256.png");
 }
 
 function openHelpUrl(url, label) {
@@ -296,17 +313,11 @@ function waitForHttp(url, timeoutMs = 15000) {
 }
 
 function pythonArgs(port) {
-  const args = [
-    "-m",
-    "zz.web.server",
-    "--host",
-    "127.0.0.1",
-    "--port",
-    String(port),
-  ];
-  if (process.env.ZZ_ASSET_ROOT) {
-    args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
-  }
+  const args = app.isPackaged
+    ? ["--host", "127.0.0.1", "--port", String(port), "--asset-root", packagedAssetRoot(),
+      "--user-data-root", packagedUserDataRoot()]
+    : ["-m", "zz.web.server", "--host", "127.0.0.1", "--port", String(port)];
+  if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
   return args;
 }
 
@@ -316,8 +327,8 @@ async function startServer(options = {}) {
   }
   const port = normalizePort(options.port);
   serverState = "starting";
-  const python = process.env.ZZ_PYTHON || "python";
-  serverProcess = spawn(python, pythonArgs(port), {
+  const serverCommand = packagedServerPath() || process.env.ZZ_PYTHON || "python";
+  serverProcess = spawn(serverCommand, pythonArgs(port), {
     cwd: projectRoot(),
     windowsHide: true,
     stdio: ["ignore", "pipe", "pipe"],

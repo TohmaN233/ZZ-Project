@@ -17,6 +17,19 @@
     "focused tests, rulebooks and deployment examples",
     "GitHub Pages release site"
   ],
+  "windowsInstaller": {
+    "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
+    "bytes": 197377656,
+    "sha256": "404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667",
+    "contains": [
+      "Electron desktop client",
+      "frozen Python web server",
+      "PC02 rules runtime",
+      "current runtime AI models"
+    ],
+    "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
+    "asserts": "external sibling directory next to ZZ-Project.exe"
+  },
   "externalAssetPack": {
     "archive": "ZZ-Assets-PC02-v1.zip",
     "englishArchive": "ZZ-Assets-PC02-English-v1.zip",

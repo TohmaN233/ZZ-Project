@@ -5,17 +5,16 @@ import json
 import mimetypes
 import os
 import secrets
+import shutil
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import RLock
 from urllib.parse import parse_qs, unquote, urlparse
 
-from zz.ai_league import run_difficulty_league_evaluation
 from zz.ai_registry import DEFAULT_DATA_ROOT, read_codeman_champion
 from zz.codeman_memory import CodemanMemoryStore
 from zz.codeman_replay_correction import attempt_memory_replay_correction
-from zz.codeman_training import list_codeman_training_runs, run_codeman_training
 from zz.deck_ai import (
     DeckBuildConstraints,
     _color_inputs_from_recipe,
@@ -365,6 +364,8 @@ def _dispatch_api_unlocked(
     if method == "GET" and route == "/api/ai/difficulties":
         return 200, {"ok": True, "difficulties": _ai_difficulties()}
     if method == "POST" and route == "/api/ai/league":
+        from zz.ai_league import run_difficulty_league_evaluation
+
         body = payload or {}
         try:
             report = run_difficulty_league_evaluation(
@@ -438,6 +439,8 @@ def _dispatch_api_unlocked(
                 return 400, {"ok": False, "error": {"code": "invalid_codeman_replay_correction", "message": str(exc)}}
             return 200, {"ok": True, "codemanId": codeman_id, "result": result}
         if method == "GET" and is_runs:
+            from zz.codeman_training import list_codeman_training_runs
+
             try:
                 limit = int(query["limit"]) if "limit" in query else None
                 runs = list_codeman_training_runs(codeman_id, data_root=app.ai_data_root_path(), limit=limit)
@@ -460,6 +463,8 @@ def _dispatch_api_unlocked(
         if method == "GET" and not is_train:
             return 200, {"ok": True, "codeman": _codeman_status(app, codeman_id)}
         if method == "POST" and is_train:
+            from zz.codeman_training import run_codeman_training
+
             body = payload or {}
             run_id = str(body.get("runId") or "").strip() or None
             try:
@@ -895,9 +900,27 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--mode", choices=["human-vs-ai", "ai-vs-ai", "god"], default="human-vs-ai")
     parser.add_argument("--asset-root", default=None)
+    parser.add_argument("--user-data-root", default=None)
     parser.add_argument("--dev-mode", action="store_true")
     args = parser.parse_args(argv)
-    app = ServerState(seed=args.seed, asset_root=args.asset_root, mode=args.mode, dev_mode=args.dev_mode)
+    user_data_root = Path(args.user_data_root).expanduser().resolve() if args.user_data_root else None
+    if user_data_root is not None:
+        for name in ("decks", "settings", "codeman_ai", "ai_challenges"):
+            (user_data_root / name).mkdir(parents=True, exist_ok=True)
+        bundled_decks = PROJECT_ROOT / "data" / "decks"
+        user_decks = user_data_root / "decks"
+        if bundled_decks.is_dir() and not any(user_decks.glob("*.json")):
+            for source in bundled_decks.glob("*.json"):
+                shutil.copy2(source, user_decks / source.name)
+    app = ServerState(
+        seed=args.seed,
+        asset_root=args.asset_root,
+        deck_root=user_data_root / "decks" if user_data_root is not None else None,
+        settings_root=user_data_root / "settings" if user_data_root is not None else None,
+        ai_data_root=user_data_root if user_data_root is not None else None,
+        mode=args.mode,
+        dev_mode=args.dev_mode,
+    )
     server = make_server(args.host, args.port, app)
     host, port = server.server_address
     print(f"Serving Zenonzard web frontend at http://{host}:{port}/", flush=True)

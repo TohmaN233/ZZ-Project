@@ -18,15 +18,17 @@
 - PC02 已加入，但个人测试无法覆盖所有卡牌组合，可能仍有小型规则或界面 Bug。
 - AI 训练规模有限，强度与原版正式运营 AI 有明显差距。
 - 电脑 AI 的训练数据和训练卡池目前只覆盖 PC01；PC01R、EX01、PC02 没有进入当前训练流程，不应期待电脑 AI 对新增卡包有可靠水平。
+- Windows 安装包面向直接游玩，不包含 CUDA/PyTorch 训练依赖；本地训练请使用源码包。
 - 英文卡图和英文文本作为独立资源包发布；未覆盖的卡图仍可能回退到官网 URL，图片与卡牌错位问题仍可能存在。
 - 公网服务器位于加拿大，跨地区稳定性没有充分验证；中国大陆通常需要代理。
 - Story Mode 是未来目标，本版尚未实现。
 
 ## 下载组成
 
-1. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)：v0.2.0 发布快照的程序、测试、文档与默认模型。
-2. [`ZZ-Assets-PC02-v1.zip.001` 与 `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：主卡图、角色、卡垫、视频、音效与 BGM。两个 volume 都下载后，用 7-Zip 打开 `.001` 解压。
-3. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：英文卡图、Force 与 Mana 卡面；英语用户将它叠加到主资源包上。
+1. [`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe)：可直接安装和游玩的 Windows 桌面版本，包含 Electron 客户端、冻结后的 Python server、PC02 规则运行时和当前默认模型。文件大小 `197377656` bytes，SHA-256 `404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667`。
+2. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)：v0.2.0 发布快照的源码、测试、文档与默认模型，供 Linux/macOS 和开发者使用。
+3. [`ZZ-Assets-PC02-v1.zip.001` 与 `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：主卡图、角色、卡垫、视频、音效与 BGM。两个 volume 都下载后，用 7-Zip 打开 `.001` 解压；Windows 安装包用户把得到的 `asserts/` 放到 `ZZ-Project.exe` 同级。
+4. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：英文卡图、Force 与 Mana 卡面；英语用户将它叠加到主资源包上。
 
 资源包校验：
 

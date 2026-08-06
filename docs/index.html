@@ -183,26 +183,26 @@
     <section class="section install" id="install">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="installEyebrow">INSTALLATION</p>
-        <h2 data-i18n="installTitle">代码与大型美术资源分开下载</h2>
-        <p data-i18n="installLead">GitHub 仓库保存源码、桌面客户端和当前默认模型；卡图、角色图、视频与音乐放在独立资源包中。解压到正确位置后即可启动。</p>
+        <h2 data-i18n="installTitle">Windows 安装包与大型资源分开下载</h2>
+        <p data-i18n="installLead">Windows 安装包已经包含可玩的桌面客户端、冻结后的 Python server 和默认模型；卡图、角色图、视频与音乐仍放在独立资源包中。</p>
       </div>
       <div class="install-grid">
         <ol class="steps">
-          <li><span>1</span><div><strong data-i18n="installStep1Title">下载源码</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载 ZZ-Project-v0.2.0-source.zip，或使用 Git 与 Git LFS 克隆 main。</p></div></li>
+          <li><span>1</span><div><strong data-i18n="installStep1Title">下载 Windows 安装包</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载 ZZ-Project-v0.2.0-Windows-Setup.exe 并运行；Linux/macOS 和开发者使用源码包。</p></div></li>
           <li><span>2</span><div><strong data-i18n="installStep2Title">放入资源包</strong><p data-i18n="installStep2Body">下载 ZZ-Assets-PC02-v1.zip.001 与 .002，用 7-Zip 打开 .001；英文用户再下载独立的 ZZ-Assets-PC02-English-v1.zip。</p></div></li>
-          <li><span>3</span><div><strong data-i18n="installStep3Title">安装依赖</strong><p data-i18n="installStep3Body">安装 Python 3.10+ 与 Node.js 20+，先安装 Python 运行依赖，再运行 npm install。</p></div></li>
-          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">Windows 使用 .cmd，Linux 使用 .sh；也可以运行 npm run electron:dev。</p></div></li>
+          <li><span>3</span><div><strong data-i18n="installStep3Title">源码版本安装依赖</strong><p data-i18n="installStep3Body">Windows 安装包不需要 Python 或 Node.js；源码启动才需要 Python 3.10+、Node.js 20+ 与 npm install。</p></div></li>
+          <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">安装包从开始菜单或桌面快捷方式启动；源码版本使用 .cmd、.sh 或 npm run electron:dev。</p></div></li>
         </ol>
         <aside class="requirements">
           <h3 data-i18n="requirementsTitle">运行要求</h3>
           <dl>
             <div><dt data-i18n="reqOs">系统</dt><dd data-i18n="reqOsBody">Windows 10/11；Linux/macOS 源码启动（实验支持）</dd></div>
-            <div><dt>Python</dt><dd>3.10+</dd></div>
-            <div><dt>Node.js</dt><dd>20+</dd></div>
+            <div><dt>Python</dt><dd data-i18n="reqPython">安装包无需；源码需要 3.10+</dd></div>
+            <div><dt>Node.js</dt><dd data-i18n="reqNode">安装包无需；源码需要 20+</dd></div>
             <div><dt data-i18n="reqGpu">显卡</dt><dd data-i18n="reqGpuBody">游玩不要求；本地训练需要 NVIDIA GPU / CUDA</dd></div>
           </dl>
           <div class="download-actions">
-            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project" data-i18n="downloadCode">打开 GitHub 仓库</a>
+            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe" data-i18n="downloadCode">下载 Windows 安装包</a>
             <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">下载资源包（含英文包）</a>
           </div>
           <p class="hash-note"><code>ZZ-Assets-PC02-v1.zip.001</code><br><code>ZZ-Assets-PC02-v1.zip.002</code><br><code>ZZ-Assets-PC02-English-v1.zip</code><br><span data-i18n="hashNote">两个主资源 volume 与英文 ZIP 的大小和 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。</span></p>
