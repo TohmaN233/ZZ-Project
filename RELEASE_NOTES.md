@@ -23,7 +23,8 @@
   not replace the separately downloaded asset directory.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
-  Private Codeman memory, training traces, and challenge data are excluded.
+  Private Codeman memory, training traces, challenge data, and local training
+  actors are excluded.
 
 ## Known limitations
 
@@ -46,9 +47,9 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, current runtime
    models, the desktop home background, and the top-bar BGM selector. Size:
-   `205083731` bytes.
+   `157812468` bytes.
    SHA-256:
-   `C152C69D61089FF18E0565538C832E6787F66BC415A0F645445624595619D914`.
+   `1BC8A8C8F19BE56A72D0B67021430B28AFDB60776E4FCB9E6DC77FBDD56EBDB2`.
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,

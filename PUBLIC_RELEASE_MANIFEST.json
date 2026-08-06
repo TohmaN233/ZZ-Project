@@ -28,8 +28,8 @@
   ],
   "windowsInstaller": {
     "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
-    "bytes": 205083731,
-    "sha256": "C152C69D61089FF18E0565538C832E6787F66BC415A0F645445624595619D914",
+    "bytes": 157812468,
+    "sha256": "1BC8A8C8F19BE56A72D0B67021430B28AFDB60776E4FCB9E6DC77FBDD56EBDB2",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",
@@ -37,7 +37,7 @@
       "current runtime AI models"
     ],
     "sampleDecks": "separate resources/data/decks directory; saved decks use the per-user game-data/decks directory",
-    "privateData": "data/codeman_ai, training traces, and challenge data are excluded",
+    "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe"
   },
@@ -68,25 +68,7 @@
   },
   "runtimeModels": [
     {
-      "role": "high_current_rl_actor",
-      "path": "local_ai_training/retained_mainline_20260630/cycle470_actor.json",
-      "bytes": 12826602,
-      "sha256": "3A60E592B89E388351DCD1725C9C050A11B018C3E7B65E84CE2243AF2A8EC57F"
-    },
-    {
-      "role": "medium_current_rl_actor",
-      "path": "local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json",
-      "bytes": 14263906,
-      "sha256": "D36E888F7B2FBF328A256429C375E2B9640D9A049A5095BB87128378AB570F94"
-    },
-    {
-      "role": "medium_rl_baseline",
-      "path": "local_ai_training/retained_mainline_20260630/deep_baseline_best_greedy.pt",
-      "bytes": 16784773,
-      "sha256": "A441B39A823108DF11240BFE0D9CF226800D5C950E6BC564F38A6BE6872EA882"
-    },
-    {
-      "role": "codeman_public_deep_fallback",
+      "role": "public_deep_fallback",
       "path": "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt",
       "bytes": 16784773,
       "sha256": "A441B39A823108DF11240BFE0D9CF226800D5C950E6BC564F38A6BE6872EA882"
@@ -104,6 +86,7 @@
     "design_bundle",
     "data/codeman_ai memories, traces, candidates, reports and champion models",
     "data/ai_challenges generated traces",
+    "local_ai_training and private training actors",
     "non-current local training runs and experiment outputs",
     "local settings, caches, node_modules and git history",
     "large media assets stored in the external asset pack"

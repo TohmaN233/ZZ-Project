@@ -18,7 +18,8 @@ class ReleasePackagingContractTests(unittest.TestCase):
         self.assertIn("image.png", package["build"]["files"])
         self.assertIn("!asserts{,/**/*}", package["build"]["files"])
         self.assertNotIn("data/**/*", package["build"]["files"])
-        self.assertIn({"from": "data/decks", "to": "data/decks"}, package["build"]["extraResources"])
+        self.assertIn({"from": "data/decks", "to": "data/decks"}, package["build"]["extraFiles"])
+        self.assertNotIn("local_ai_training/retained_mainline_20260630/**/*", package["build"]["files"])
         self.assertTrue(all("codeman_ai" not in pattern and "ai_challenges" not in pattern
                             for pattern in package["build"]["files"]))
         self.assertTrue(
@@ -34,6 +35,12 @@ class ReleasePackagingContractTests(unittest.TestCase):
         self.assertNotIn('add_data("data", "data")', windows_builder)
         self.assertIn("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt", windows_builder)
         self.assertNotIn('add_data("data/decks", "data/decks")', windows_builder)
+        self.assertNotIn('add_data("local_ai_training/retained_mainline_20260630", "local_ai_training/retained_mainline_20260630")', windows_builder)
+
+        installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
+        self.assertIn("!macro customRemoveFiles", installer)
+        self.assertIn('Rename "$INSTDIR\\asserts" "$R9\\asserts"', installer)
+        self.assertIn('Rename "$R9\\asserts" "$INSTDIR\\asserts"', installer)
 
         server = (PROJECT_ROOT / "zz" / "web" / "server.py").read_text(encoding="utf-8")
         self.assertIn('parser.add_argument("--bundled-deck-root", default=None)', server)

@@ -59,16 +59,17 @@ The installer may include the default sample decks as a separate
 `resources/data/decks/` folder, never inside `ZZ-Project.exe`. Saved and edited
 decks are stored in the per-user `game-data/decks/` directory, outside the
 application files, so application updates do not replace them. Private
-`data/codeman_ai/`, training traces, and challenge data are not packaged.
+`data/codeman_ai/`, `ai_challenges/`, training traces, and local Codeman
+training actors are not packaged.
 
 English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `205083731` bytes.
+Installer size: `157812468` bytes.
 
 Installer SHA-256:
-`C152C69D61089FF18E0565538C832E6787F66BC415A0F645445624595619D914`.
+`1BC8A8C8F19BE56A72D0B67021430B28AFDB60776E4FCB9E6DC77FBDD56EBDB2`.
 
 ## 4. Linux portable bundle
 

@@ -44,7 +44,6 @@
       "data/*.tsv",
       "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt",
       "data/ai_training/quality_tactical_latest/best_league.json",
-      "local_ai_training/retained_mainline_20260630/**/*",
       "docs/rules/**/*",
       "image.png",
       "package.json",
@@ -55,7 +54,9 @@
       {
         "from": "packaging/server-dist/zz-server.exe",
         "to": "server/zz-server.exe"
-      },
+      }
+    ],
+    "extraFiles": [
       {
         "from": "data/decks",
         "to": "data/decks"

@@ -70,8 +70,6 @@ def main() -> None:
         "--add-data",
         add_data("data/ai_training/quality_tactical_latest/best_league.json", "data/ai_training/quality_tactical_latest"),
         "--add-data",
-        add_data("local_ai_training/retained_mainline_20260630", "local_ai_training/retained_mainline_20260630"),
-        "--add-data",
         add_data("image.png", "."),
     ]
     for module_name in (

@@ -11,7 +11,6 @@ from zz.ai import PassOnlyPolicy
 from zz.ai_registry import resolve_battle_policy
 from zz.ai_runtime_stack import current_tree_baseline_runtime_weights
 from zz.codeman_memory import CodemanMemoryStore
-from zz.policy_factories import create_current_policy_actor_rollout_policy
 from zz.decks import (
     DECKCODE0_GREEN_FORCES,
     DECKCODE0_YELLOW_FORCES,
@@ -32,20 +31,6 @@ from zz.web.serialize import serialize_card, serialize_force, serialize_state
 
 
 USER_CONTROLLED_MODES = {"human-vs-ai", "god", "debug-card-lab"}
-
-LOCAL_GAME_DEEP_ACTOR_POLICY_ID = (
-    "ygo_cloud_incremental_20260630T171443Z_block0500_0020"
-)
-LOCAL_GAME_DEEP_ACTOR_SOURCE_POLICY_ID = (
-    "ygo_cloud_incremental_20260630T171443Z_block0500_0019"
-)
-LOCAL_GAME_DEEP_ACTOR_MODEL_PATH = Path(
-    "local_ai_training/retained_mainline_20260630/cycle470_actor.json"
-)
-LOCAL_GAME_MEDIUM_DEEP_ACTOR_MODEL_PATH = Path(
-    "local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json"
-)
-
 
 TARGETED_CARD_KINDS = {}
 
@@ -71,20 +56,11 @@ MANA_COLOR_CHOICES = [
 
 
 def _local_game_deep_policy(seed: int) -> Any:
-    if not LOCAL_GAME_DEEP_ACTOR_MODEL_PATH.exists():
-        return resolve_battle_policy(
-            "deep",
-            seed=seed,
-            runtime_prior_weights=current_tree_baseline_runtime_weights(),
-        ).policy
-    return create_current_policy_actor_rollout_policy(
-        model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
+    return resolve_battle_policy(
+        "deep",
         seed=seed,
-        policy_id=LOCAL_GAME_DEEP_ACTOR_POLICY_ID,
-        expected_candidate_policy_ids=[LOCAL_GAME_DEEP_ACTOR_POLICY_ID],
-        expected_source_actor_policy_id=LOCAL_GAME_DEEP_ACTOR_SOURCE_POLICY_ID,
-        min_source_rows=0,
-    )
+        runtime_prior_weights=current_tree_baseline_runtime_weights(),
+    ).policy
 
 EFFECT_TARGET_FILTER_PARAMS = {
     "card_id",
@@ -241,7 +217,6 @@ class GameSession:
                 seed=seed,
                 codeman_id=str(codeman_id),
                 data_root=self.codeman_memory_store.root,
-                deep_model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return self._policy_for_difficulty(default_kind, seed=seed)
 
@@ -253,7 +228,6 @@ class GameSession:
                 seed=seed,
                 codeman_id=str(codeman_id),
                 data_root=self.codeman_memory_store.root,
-                deep_model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return self._policy_for_difficulty(self.opponent_ai_difficulty, seed=seed)
 
@@ -263,9 +237,8 @@ class GameSession:
             return _local_game_deep_policy(seed)
         if resolved == "normal":
             return resolve_battle_policy(
-                "deep",
+                "normal",
                 seed=seed,
-                deep_model_path=LOCAL_GAME_MEDIUM_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return resolve_battle_policy(
             resolved,

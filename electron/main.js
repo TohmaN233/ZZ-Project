@@ -57,7 +57,7 @@ function packagedAssetRoot() {
 }
 
 function packagedDeckRoot() {
-  return path.join(process.resourcesPath, "data", "decks");
+  return path.join(path.dirname(process.execPath), "data", "decks");
 }
 
 function packagedUserDataRoot() {
