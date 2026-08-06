@@ -1,40 +1,73 @@
-# 安装说明
+# Installation Guide
 
-当前发布把 **可直接运行的 Windows 桌面程序、源码与默认模型** 放在 GitHub，把 **卡图、角色图、卡垫、视频与 BGM** 放在独立资源包中。英文卡图也单独提供一个覆盖包。程序包与资源包都准备好后，桌面客户端才能显示完整内容。
+[Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
-## 1. 系统要求
+This release separates the playable program from the large visual and audio
+asset pack. Install or extract the program first, then place the downloaded
+`asserts/` directory beside it. English card faces are distributed as a
+separate overlay pack.
 
-- Windows 10 或 Windows 11
-- Linux 提供可下载的 portable `tar.gz` 包；macOS 仍从源码启动，目前都属于实验支持，尚不提供原生系统安装器
-- Windows 安装包用户不需要预装 Python 或 Node.js
-- 源码启动用户需要 Python 3.10 或更高版本、Node.js 20 或更高版本
-- Git LFS（仅在使用 `git clone` 时需要）
-- 7-Zip（从 Google Drive 下载主资源包的两个 ZIP volumes 时需要）
-- 普通游玩不要求独立显卡
-- 本地 AI 训练需要 NVIDIA GPU、匹配的驱动与 CUDA 版 PyTorch
+## 1. Choose a distribution
 
-## 2. Windows 安装包（推荐）
+- **Windows players:** use the installable desktop package. It includes
+  Electron, the frozen Python server, the PC02 rules runtime, the current
+  runtime models, and the desktop home background `image.png`.
+- **Linux players:** use the portable `tar.gz` bundle. It includes the source
+  runtime, `image.png`, and an executable `launch-electron.sh`. It is not an
+  AppImage or a native distribution package.
+- **macOS players and developers:** use the source ZIP or clone the repository.
+- **All players:** download the external asset pack from Google Drive.
 
-Windows 玩家直接下载并运行 [ZZ-Project-v0.2.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe)。安装器已经包含 Electron 桌面客户端、冻结后的 Python server、规则代码和当前默认模型，不需要安装 Python、Node.js 或执行 `npm install`。安装完成后，从开始菜单或桌面快捷方式启动 `ZZ-Project`。
+## 2. Requirements
 
-安装器不包含大型 `asserts/` 资源。请继续按照第 5 节下载主资源包；用 7-Zip 解压后，把得到的 `asserts/` 文件夹放到安装目录中，与 `ZZ-Project.exe` 同级：
+- Windows 10 or Windows 11 for the installer.
+- A Linux system that can run the portable launcher. The Linux bundle prepares
+  Node.js, Electron, and Python in the user cache on first launch.
+- Python 3.10+ and Node.js 20+ only for source launches.
+- 7-Zip for the two-volume main asset archive.
+- Normal play does not require a dedicated GPU.
+- Local AI training requires an NVIDIA GPU, compatible drivers, and CUDA
+  PyTorch. Training dependencies are not included in the playable packages.
+
+## 3. Windows installer
+
+Download and run
+[`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe).
+Python, Node.js, and `npm install` are not required. Start the installed game
+from the Start menu or the desktop shortcut.
+
+The large `asserts/` directory is intentionally external. Download the two
+main asset volumes described in [Section 5](#5-download-the-asset-pack),
+extract them with 7-Zip, and place the resulting directory beside
+`ZZ-Project.exe`:
 
 ```text
-<安装目录>/
-├─ ZZ-Project.exe
-└─ asserts/
-   ├─ ZENONZARD_CARDLIST/
-   ├─ images/
-   └─ ...
+<installation directory>/
+|- ZZ-Project.exe
+`- asserts/
+   |- ZENONZARD_CARDLIST/
+   |- images/
+   `- ...
 ```
 
-英文版玩家再把 `ZZ-Assets-PC02-English-v1.zip` 解压到同一个 `asserts/`，使其写入 `asserts/Eng-cards/`。如果安装器安装到了没有写入权限的目录，请在安装时选择一个你有权限的目录，或先在其他位置解压后将 `asserts/` 复制进去。
+The installer keeps `image.png` inside the application resources and the
+frozen server bundle; it is already included and does not need to be copied by
+the player.
 
-安装器 SHA-256：`404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667`；文件大小：`197377656` bytes。
+English players should then extract
+`ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
+`asserts/Eng-cards/` and does not replace the main asset pack.
 
-## 3. 下载源码
+Installer size: `205198322` bytes.
 
-Linux 玩家推荐下载 [ZZ-Project-v0.2.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz)。这是可直接解压运行的 portable bundle，不需要 npm 预装依赖；首次启动时 `launch-electron.sh` 会在用户缓存目录准备 Node.js、Electron 和 Python runtime。解压后进入目录，先检查再启动：
+Installer SHA-256:
+`1D12DC699CB02E62C6AA93A6E4B3DBC20960ABC79CCEB32E342FFFA948E887BE`.
+
+## 4. Linux portable bundle
+
+Download
+[`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz),
+then extract and run:
 
 ```bash
 tar -xzf ZZ-Project-v0.2.0-Linux.tar.gz
@@ -43,67 +76,95 @@ cd ZZ-Project-v0.2.0
 ./launch-electron.sh
 ```
 
-Linux bundle 不包含大型 `asserts/`，请把资源包解压出的 `asserts/` 放到 bundle 根目录，与 `launch-electron.sh` 同级。需要英文卡图时，再叠加英文 ZIP。
+The bundle contains `image.png` at its root, so the desktop home screen does
+not depend on the external asset pack. Put the extracted `asserts/` directory
+at the bundle root, beside `launch-electron.sh`; add the English ZIP on top if
+English card faces are needed.
 
-macOS 玩家与开发者使用下面的源码 ZIP：
+On first launch the existing launcher downloads or prepares the user-scoped
+Node.js, Electron, and Python runtime. A network connection is therefore
+needed for the first bootstrap unless those runtime files are already cached.
 
-推荐从 GitHub Releases 下载明确标注的
-[`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)。
-该附件包含本次 v0.2.0 发布快照的实际默认模型；不要使用页面底部由旧版 tag 自动生成的
-`Source code` 压缩包。开发者也可以使用：
+Bundle size: `45917128` bytes.
 
-```powershell
-git lfs install
-git clone https://github.com/TohmaN233/ZZ-Project.git
-cd ZZ-Project
-```
+Bundle SHA-256:
+`9ABFE2C4F016DA1CEBEABB2429E2029C38E723E9E94425D6D6D686391931F45C`.
 
-`.pt` 默认模型由 Git LFS 管理。克隆后如果模型文件只有几百字节，请执行：
+## 5. Source launch and macOS
 
-```powershell
-git lfs pull
-```
+Download the explicitly named
+[`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip).
+Do not use the smaller source archive generated automatically by an old GitHub
+tag. The named archive contains the release snapshot, runtime models, tests,
+documentation, and `image.png`.
 
-## 4. 安装依赖
-
-在项目根目录打开 PowerShell：
+Install the runtime dependencies from the project root:
 
 ```powershell
 python -m pip install -r requirements-runtime.txt
 npm install
 ```
 
-默认的 PyTorch 包可在 CPU 上运行对战 AI。需要 CUDA 时，请按照 [PyTorch 官方安装选择器](https://pytorch.org/get-started/locally/) 安装与你的显卡驱动匹配的版本，再执行其余依赖安装。
+Then put the external `asserts/` directory in the project root and launch with
+the platform script:
 
-## 5. 安装资源包
+```powershell
+# Windows source launch
+.\launch-electron.cmd
+```
 
-从 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)下载主资源包的两个 volumes：`ZZ-Assets-PC02-v1.zip.001` 与 `ZZ-Assets-PC02-v1.zip.002`。两个文件都下载完成后，用 7-Zip 打开 `.001`，它会自动读取 `.002`，并将内容解压到项目根目录。不要只下载其中一个 volume。需要英文卡图的玩家再下载单独的 `ZZ-Assets-PC02-English-v1.zip`，同样在项目根目录解压。英文包会写入 `asserts/Eng-cards/`，不会覆盖主资源包。正确结构如下：
+```bash
+# Linux or macOS source launch
+./launch-electron.sh
+```
+
+The removed `launch-electron.command` file is not required. The `.cmd` and
+`.sh` launchers are the supported launch paths. Developers may also use
+`npm run electron:dev`.
+
+If Git LFS is used for a clone, run:
+
+```powershell
+git lfs install
+git lfs pull
+```
+
+## 6. Download the asset pack
+
+Use the [Google Drive asset folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)
+to download all required files:
+
+- `ZZ-Assets-PC02-v1.zip.001` - `629145600` bytes.
+- `ZZ-Assets-PC02-v1.zip.002` - `576401952` bytes.
+- `ZZ-Assets-PC02-English-v1.zip` - `195374917` bytes.
+
+Download both main volumes before extracting. Open `.001` with 7-Zip; it will
+read `.002` automatically. Extract the result to the program root, not to an
+additional nested `asserts/asserts/` directory. The English ZIP is optional
+and should be extracted into the same `asserts/` directory after the main pack.
+
+The expected layout is:
 
 ```text
 ZZ-Project/
-├─ asserts/
-│  ├─ ZENONZARD_CARDLIST/
-│  ├─ Eng-cards/              # optional English card/Force/Mana faces
-│  ├─ audio/
-│  │  ├─ battle_sfx/
-│  │  └─ bgm/
-│  ├─ card_back/
-│  ├─ images/
-│  │  └─ clean_graph/
-│  │     ├─ characters/
-│  │     ├─ playmats/
-│  │     └─ ui/
-│  └─ video/
-├─ data/
-├─ electron/
-├─ zz/
-├─ launch-electron.cmd
-└─ launch-electron.sh
+|- image.png
+|- asserts/
+|  |- ZENONZARD_CARDLIST/
+|  |- Eng-cards/              # optional English card, Force, and Mana faces
+|  |- audio/
+|  |- card_back/
+|  |- images/
+|  `- video/
+|- data/
+|- electron/
+|- zz/
+|- launch-electron.cmd
+`- launch-electron.sh
 ```
 
-资源包中的目录名与程序引用路径全部使用 ASCII 英文字符，避免不同系统区域设置导致的路径乱码。
-
-发布页面会列出两个资源包的大小和 SHA-256。下载后可以验证：
+The exact sizes, file counts, and hashes are recorded in
+[`ASSET_PACK_MANIFEST.json`](ASSET_PACK_MANIFEST.json). On Windows, verify
+downloads with:
 
 ```powershell
 Get-FileHash .\ZZ-Assets-PC02-v1.zip.001 -Algorithm SHA256
@@ -111,99 +172,64 @@ Get-FileHash .\ZZ-Assets-PC02-v1.zip.002 -Algorithm SHA256
 Get-FileHash .\ZZ-Assets-PC02-English-v1.zip -Algorithm SHA256
 ```
 
-输出应与发布页面和 `ASSET_PACK_MANIFEST.json` 中的 volume/archive 值一致。主资源包两个 volume 的大小分别为 629145600 bytes 和 576401952 bytes；英文包为 195374917 bytes。
+## 7. Launch and settings
 
-## 6. 启动桌面客户端
+The Windows installer starts from the Start menu or desktop shortcut. Source
+and Linux builds use the launchers above. Once the client is running, Settings
+can switch between Simplified Chinese, Japanese, and English, and can select
+the battle BGM.
 
-使用 Windows 安装包时，直接从开始菜单或桌面快捷方式启动 `ZZ-Project`。下面的 launcher 仅用于源码版本：
+The application checks GitHub Releases for newer versions. A failed update
+check does not prevent offline play; diagnostics are written to the Electron
+log.
 
-Windows 双击或在 PowerShell 运行：
+## 8. Online play
 
-```text
-launch-electron.cmd
-```
+- **LAN:** create a room in Online Game and let other players join using the
+  address shown by the host.
+- **Internet:** the default personal server is in Canada. Cross-region
+  stability has not been fully verified; users in mainland China may need a
+  proxy.
 
-Linux 在终端运行：
+See [docs/ONLINE.md](docs/ONLINE.md) for the full online-play notes.
 
-```bash
-./launch-electron.sh
-```
+## 9. AI and local training
 
-macOS 也可以在终端运行同一个 `.sh` launcher：
+Local training is optional and is not required to play. The current computer AI
+was trained only with the PC01 card pool. PC01R, EX01, and PC02 are playable
+rules content but were not included in the current training data. Do not treat
+the AI as a strength guarantee for the newer packs.
 
-```bash
-./launch-electron.sh
-```
+Windows and Linux playable packages omit CUDA/PyTorch training dependencies.
+Use the source package, install the CUDA-compatible PyTorch build, and use the
+tools under `ai_training/` for experiments. Training may require substantial
+GPU memory, time, and disk space.
 
-Linux/macOS 启动器会优先使用 `python3`，也可以提前设置 `ZZ_PYTHON` 指定解释器。若下载工具移除了执行权限，先运行：
+## 10. Troubleshooting
 
-```bash
-chmod +x launch-electron.sh
-```
+### Missing cards, characters, music, or video
 
-所有平台也都可以直接运行：
+Confirm that both main asset volumes were downloaded and that `.001` was
+opened with 7-Zip. Confirm that `asserts/` is directly beside `ZZ-Project.exe`
+for Windows or directly inside the Linux/source project root.
 
-```powershell
-npm run electron:dev
-```
+### Missing English card faces
 
-桌面客户端启动后会自动读取 GitHub 最新 Release。仅在发现更高版本时显示更新提示；网络检查失败不会阻止离线游玩，诊断信息会写入 Electron 日志。原生 `Help` 菜单提供项目发布页与最新 Release 入口。
+Extract `ZZ-Assets-PC02-English-v1.zip` into the existing `asserts/` directory
+and confirm that `asserts/Eng-cards/` exists.
 
-首次进入后可以在 `Setting` 中切换中文、日本语、English 和对战 BGM。
+### High AI reports a model error
 
-开发者模式默认关闭且没有内置密码。确实需要调试功能时，请在启动前设置仅本机使用的环境变量：
+For a source clone, run `git lfs pull` and confirm that the model files are not
+small LFS pointer files. The playable installers do not include the training
+stack.
 
-```powershell
-$env:ZZ_DEV_MODE_PASSWORD = "请替换为你自己的密码"
-npm run electron:dev
-```
+### Online Game cannot connect
 
-不要把这个值写入仓库或公开的启动脚本。
+Try LAN mode first to separate local firewall issues from Internet routing.
+The public server is in Canada and cross-region connections may be unstable.
 
-## 7. 仅运行浏览器前端
+## Acknowledgements
 
-```powershell
-python -m zz.web.server --host 127.0.0.1 --port 8765 --asset-root .\asserts
-```
-
-然后访问 `http://127.0.0.1:8765/`。
-
-## 8. 联机
-
-- **LAN**：房主在 Online Game 中启动局域网房间，同一网络的玩家使用界面显示的地址加入。
-- **Internet**：默认个人服务器位于加拿大，其他地区稳定性未经充分验证；中国大陆通常需要代理。
-
-完整说明见 [docs/ONLINE.md](docs/ONLINE.md)。
-
-## 9. 可选：本地 AI 训练
-
-本地训练是实验与娱乐功能，不是正常游玩的必需步骤。
-
-Windows 安装包是面向直接游玩的精简版本，不携带训练依赖；需要运行训练时请下载源码包，并按本节安装 CUDA 版 PyTorch。
-
-当前发布的电脑 AI 训练只使用 PC01 卡池。PC01R、EX01 和 PC02 的规则已经可以游玩，但没有进入当前模型的训练数据，因此不要把新增卡包的电脑 AI 表现当作强度保证。
-
-1. 安装 NVIDIA 驱动与 CUDA 版 PyTorch。
-2. 在 Replay & Training 中积累本机对局记录。
-3. 从客户端训练入口启动任务，或使用 `ai_training/` 下的命令行工具。
-4. 某个 Codeman 的专门训练若成功生成 `.pt`，运行时会优先加载其专属模型。
-
-训练可能消耗大量显存、时间与磁盘空间。不要把本机生成的 `data/codeman_ai/`、`data/ai_challenges/` 或训练目录提交到公共仓库。
-
-## 10. 常见问题
-
-### 卡图、角色或音乐缺失
-
-确认两个主资源 volume 都已下载，并且使用 7-Zip 打开 `.001`，而不是只解压单个 volume。源码版本中确认 `asserts/` 是项目根目录的直接子目录；Windows 安装包版本中确认它与 `ZZ-Project.exe` 同级，而不是 `asserts/asserts/`。检查 `asserts/images` 和 `asserts/ZENONZARD_CARDLIST` 是否存在。
-
-### 英文卡图缺失
-
-确认已经额外下载并解压 `ZZ-Assets-PC02-English-v1.zip`，且路径为 `asserts/Eng-cards/`。本地包未覆盖的卡仍可能使用官网 URL，存在图片与卡牌没有正确对齐的现象。
-
-### High AI 启动时报模型错误
-
-确认 Git LFS 已完整下载模型，并重新执行 `git lfs pull`。不要用空文件或其他模型覆盖清单中的默认模型。
-
-### Online Game 无法连接
-
-先用 LAN 模式排除本机防火墙问题。公网服务器位于加拿大，跨地区网络可能不稳定；详见联机文档。
+Special thanks to theFeri for providing 50+ high-resolution playmat images, and
+to **Valkyrie** for providing the English text.

@@ -44,6 +44,7 @@
       "data/**/*",
       "local_ai_training/retained_mainline_20260630/**/*",
       "docs/rules/**/*",
+      "image.png",
       "package.json",
       "node_modules/**/*"
     ],

@@ -32,8 +32,8 @@ def tracked_files() -> list[Path]:
     ]
 
 
-def copy_release_tree(destination: Path) -> None:
-    for relative in tracked_files():
+def copy_release_tree(destination: Path, files: list[Path]) -> None:
+    for relative in files:
         source = ROOT / relative
         if not source.is_file():
             continue
@@ -57,7 +57,11 @@ def main() -> None:
     STAGING.mkdir(parents=True)
     bundle_root = STAGING / f"ZZ-Project-v{version}"
     bundle_root.mkdir()
-    copy_release_tree(bundle_root)
+    files = tracked_files()
+    for required in (Path("image.png"), Path("launch-electron.sh")):
+        if required not in files or not (ROOT / required).is_file():
+            raise FileNotFoundError(f"Required Linux bundle file is missing: {required}")
+    copy_release_tree(bundle_root, files)
     launcher = bundle_root / "launch-electron.sh"
     if not launcher.is_file():
         raise FileNotFoundError(launcher)

@@ -17,10 +17,19 @@
     "focused tests, rulebooks and deployment examples",
     "GitHub Pages release site"
   ],
+  "runtimeRootFiles": [
+    {
+      "path": "image.png",
+      "bytes": 3869029,
+      "sha256": "26D77B50CB3D29C5D27FD6F71115F4D1B439673CAA2B581F1B4535B3D85F342F",
+      "role": "desktop home background",
+      "requiredBy": "/image.png"
+    }
+  ],
   "windowsInstaller": {
     "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
-    "bytes": 197377656,
-    "sha256": "404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667",
+    "bytes": 205198322,
+    "sha256": "1D12DC699CB02E62C6AA93A6E4B3DBC20960ABC79CCEB32E342FFFA948E887BE",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",
@@ -32,8 +41,8 @@
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.2.0-Linux.tar.gz",
-    "bytes": 42045686,
-    "sha256": "E0D00C2EDEF91FCC30354F0DD23FBE6DD0BE1A7FD6569444A5369E6324B7E50E",
+    "bytes": 45917128,
+    "sha256": "9ABFE2C4F016DA1CEBEABB2429E2029C38E723E9E94425D6D6D686391931F45C",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"

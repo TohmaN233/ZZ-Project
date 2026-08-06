@@ -1,47 +1,73 @@
 # v0.2.0 - PC02 CONTRACT
 
-## 本版内容
+[Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
-- 完整的 Game Lobby、卡组制作与本地卡牌对战流程。
-- 卡池扩展为基本卡、EX01、PC01、PC01R 与 PC02 CONTRACT。
-- PC02 的 100 张卡、Bless 机制、目标选择、触发器与边界流程已加入运行时。
-- 人 VS AI、神视点、AI VS AI 三种单机模式。
-- Easy Greedy CPU，以及 Medium / High 两档强化学习模型。
-- Codeman 近期对战记忆、专属模型优先加载与局内 AI 建议。
-- Replay 回看与本地实验训练入口。
-- LAN 与个人服务器 Online Game。
-- 中文、日本语、English 界面和三语规则书。
-- 可选战斗 BGM、Codeman 与卡垫配置。
+## Highlights
 
-## 已知限制
+- Complete Game Lobby, deck building, and local card-battle flow.
+- Card pool expanded to Basic, EX01, PC01, PC01R, and PC02 CONTRACT.
+- All 100 PC02 cards, Boost effects, target selection, triggers, and boundary
+  cases are included in the runtime.
+- Human VS AI, omniscient, and AI VS AI offline modes.
+- Easy Greedy CPU plus Medium and High experimental reinforcement-learning
+  models.
+- Codeman recent-match memory, dedicated-model preference, and in-game advice.
+- Replay review, local training entrypoints, LAN play, and personal-server
+  online play.
+- Simplified Chinese, Japanese, and English UI plus a trilingual rulebook.
+- Optional battle BGM, Codeman profiles, and playmat profiles.
+- The desktop home background `image.png` is included in the program packages;
+  the large `asserts/` media pack remains a separate download.
 
-- PC02 已加入，但个人测试无法覆盖所有卡牌组合，可能仍有小型规则或界面 Bug。
-- AI 训练规模有限，强度与原版正式运营 AI 有明显差距。
-- 电脑 AI 的训练数据和训练卡池目前只覆盖 PC01；PC01R、EX01、PC02 没有进入当前训练流程，不应期待电脑 AI 对新增卡包有可靠水平。
-- Windows 安装包面向直接游玩，不包含 CUDA/PyTorch 训练依赖；本地训练请使用源码包。
-- 英文卡图和英文文本作为独立资源包发布；未覆盖的卡图仍可能回退到官网 URL，图片与卡牌错位问题仍可能存在。
-- 公网服务器位于加拿大，跨地区稳定性没有充分验证；中国大陆通常需要代理。
-- Story Mode 是未来目标，本版尚未实现。
+## Known limitations
 
-## 下载组成
+- PC02 is implemented, but a personal project cannot cover every card
+  combination. Small rules or interface bugs may remain.
+- The computer AI was trained only with the PC01 card pool. PC01R, EX01, and
+  PC02 were not included in the current training data. Do not expect the AI to
+  understand the newer packs reliably.
+- The Windows installer and Linux bundle are for playing. CUDA/PyTorch
+  training dependencies are available only through the source setup.
+- English card art and English text are distributed as a separate overlay pack.
+  Cards not covered locally may still fall back to official URLs.
+- The public server is in Canada, and cross-region stability has not been fully
+  verified. Mainland China users may need a proxy.
+- Story Mode is a future goal and is not included in this release.
 
-1. [`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe)：可直接安装和游玩的 Windows 桌面版本，包含 Electron 客户端、冻结后的 Python server、PC02 规则运行时和当前默认模型。文件大小 `197377656` bytes，SHA-256 `404889972E070EB5D5A77CCC4B81763390237C51F68541D467006919C8808667`。
-2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz)：Linux portable bundle。解压后运行 `./launch-electron.sh`，首次启动会在用户缓存目录准备 Node.js、Electron 和 Python runtime；`asserts/` 仍单独放在 bundle 根目录。文件大小 `42045686` bytes，SHA-256 `E0D00C2EDEF91FCC30354F0DD23FBE6DD0BE1A7FD6569444A5369E6324B7E50E`。
-3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)：v0.2.0 发布快照的源码、测试、文档与默认模型，供 macOS 和开发者使用。
-4. [`ZZ-Assets-PC02-v1.zip.001` 与 `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：主卡图、角色、卡垫、视频、音效与 BGM。两个 volume 都下载后，用 7-Zip 打开 `.001` 解压；Windows 安装包用户把得到的 `asserts/` 放到 `ZZ-Project.exe` 同级，Linux bundle 用户放到 bundle 根目录。
-5. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)：英文卡图、Force 与 Mana 卡面；英语用户将它叠加到主资源包上。
+## Download contents
 
-资源包校验：
+1. [`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe):
+   directly installable and playable Windows desktop package. It contains
+   Electron, the frozen Python server, the PC02 runtime, current runtime
+   models, and the desktop home background. Size: `205198322` bytes.
+   SHA-256:
+   `1D12DC699CB02E62C6AA93A6E4B3DBC20960ABC79CCEB32E342FFFA948E887BE`.
+2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
+   portable Linux source/runtime bundle. Extract it and run
+   `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
+   Electron, and Python runtime files. Size: `45917128` bytes.
+   SHA-256:
+   `9ABFE2C4F016DA1CEBEABB2429E2029C38E723E9E94425D6D6D686391931F45C`.
+3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip):
+   source, tests, documentation, runtime models, and `image.png` for macOS
+   players and developers.
+4. [`ZZ-Assets-PC02-v1.zip.001` and `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
+   main card art, characters, playmats, video, sound effects, and BGM. Download
+   both volumes, open `.001` with 7-Zip, and place the resulting `asserts/`
+   beside `ZZ-Project.exe` for Windows or at the bundle/project root for Linux
+   and source launches.
+5. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
+   English card, Force, and Mana faces. Extract it on top of the main
+   `asserts/` directory.
 
-```text
-主资源包和英文资源包的 Bytes、文件数与 SHA-256 见
-[`ASSET_PACK_MANIFEST.json`](ASSET_PACK_MANIFEST.json)。
-```
+The main asset volumes are intentionally at least about 500 MB each for a more
+reliable download. The English pack remains one ZIP. Exact sizes, file counts,
+and hashes are recorded in
+[`ASSET_PACK_MANIFEST.json`](ASSET_PACK_MANIFEST.json).
 
-资源包使用同一个 Google Drive 文件夹，主资源包的两个 volume 均不小于约 500 MB，便于稳定下载；英文包保持单个 ZIP。下载完整性与准确大小见 `ASSET_PACK_MANIFEST.json`。
+## Credits
 
-## 致谢
+Special thanks to theFeri for providing 50+ high-resolution playmat images, and
+to **Valkyrie** for providing the English text.
 
-特别感谢 theFeri 提供的 50+ 张高清 playmat 图，以及 **Valkyrie** 提供的英文文本。
-
-详细步骤见 [INSTALL.md](INSTALL.md)。
+See [INSTALL.md](INSTALL.md) for the complete English installation guide.
