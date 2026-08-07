@@ -25,6 +25,7 @@ from zz.current_policy_runtime import (
     actor_logits_from_runtime_scores,
     select_current_policy_top,
 )
+from zz.deep_runtime import NumpyActionValueModel
 from zz.rl_action_vocab import decision_kind_for_action
 from zz.runtime_aux_compose import clamp_runtime_aux_residual, runtime_aux_max_correction_for_scorer
 from zz.sim import play_one_game
@@ -51,6 +52,7 @@ PUBLIC_DEEP_V2_UNDERSTANDING_RUNTIME_VERSION = "public_deep_v2_understanding_run
 PUBLIC_DEEP_V2_UNDERSTANDING_MAX_RUNTIME_WEIGHT = 0.5
 
 DEFAULT_BATTLE_MODEL_CANDIDATES = [
+    Path("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.runtime.npz"),
     Path("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt"),
     Path("data/ai_training/deep_weak_chimera_distilled_wide_v1/latest.pt"),
     Path("data/ai_training/quality_tactical_latest/best_league.json"),
@@ -13320,6 +13322,21 @@ def default_battle_model_path(*, root: str | Path | None = None) -> Path | None:
 def make_battle_policy(seed: int, *, model_path: str | Path | None = None) -> Any:
     for path in _battle_model_candidate_paths(model_path=model_path):
         try:
+            if path.name.lower().endswith(".runtime.npz"):
+                model = NumpyActionValueModel.load(path)
+                if _is_rejected_public_deep_v2_candidate(model):
+                    continue
+                return LookaheadRLPolicy(
+                    model=model,
+                    rng=random.Random(seed),
+                    epsilon=0.0,
+                    lookahead_weight=DEEP_LOOKAHEAD_WEIGHT,
+                    max_lookahead_actions=DEEP_MAX_LOOKAHEAD_ACTIONS,
+                    lookahead_depth=DEEP_LOOKAHEAD_DEPTH,
+                    lookahead_branch_width=DEEP_LOOKAHEAD_BRANCH_WIDTH,
+                    lookahead_key_decisions_only=DEEP_LOOKAHEAD_KEY_DECISIONS_ONLY,
+                    humanlike_prior_weight=DEEP_HUMANLIKE_PRIOR_WEIGHT,
+                )
             if path.suffix.lower() == ".pt":
                 from zz.deep_rl import TorchActionValueModel
 

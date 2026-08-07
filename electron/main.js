@@ -1,5 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu, net, session, shell } = require("electron");
 const { spawn } = require("node:child_process");
+const fsSync = require("node:fs");
 const fs = require("node:fs/promises");
 const http = require("node:http");
 const path = require("node:path");
@@ -53,7 +54,24 @@ function packagedServerPath() {
 function packagedAssetRoot() {
   const configured = process.env.ZZ_ASSET_ROOT;
   if (configured) return path.resolve(projectRoot(), configured);
-  return path.join(path.dirname(process.execPath), "asserts");
+  const primary = path.join(path.dirname(process.execPath), "asserts");
+  const candidates = [
+    primary,
+    path.join(primary, "asserts"),
+    path.join(process.resourcesPath, "asserts"),
+    path.join(projectRoot(), "asserts"),
+  ];
+  return candidates.find(assetRootLooksValid) || primary;
+}
+
+function assetRootLooksValid(candidate) {
+  try {
+    return ["ZENONZARD_CARDLIST", "audio", "video"].every((name) =>
+      fsSync.statSync(path.join(candidate, name)).isDirectory()
+    );
+  } catch (_error) {
+    return false;
+  }
 }
 
 function packagedDeckRoot() {
@@ -317,8 +335,12 @@ function waitForHttp(url, timeoutMs = 15000) {
 }
 
 function pythonArgs(port) {
+  const assetRoot = app.isPackaged ? packagedAssetRoot() : null;
+  if (assetRoot && app.isPackaged) {
+    appendLog(`Packaged asset root: ${assetRoot}${assetRootLooksValid(assetRoot) ? "" : " (expected folders not found)"}`);
+  }
   const args = app.isPackaged
-    ? ["--host", "127.0.0.1", "--port", String(port), "--asset-root", packagedAssetRoot(),
+    ? ["--host", "127.0.0.1", "--port", String(port), "--asset-root", assetRoot,
       "--user-data-root", packagedUserDataRoot(), "--bundled-deck-root", packagedDeckRoot()]
     : ["-m", "zz.web.server", "--host", "127.0.0.1", "--port", String(port)];
   if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);

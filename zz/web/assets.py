@@ -74,13 +74,31 @@ BATTLE_SFX_AUDIO_NAMES = {
 
 def resolve_asset_root(value: str | os.PathLike | None = None) -> Path | None:
     if value:
-        return Path(value).expanduser().resolve()
+        configured = Path(value).expanduser().resolve()
+        for candidate in (configured, configured / "asserts"):
+            if _looks_like_asset_root(candidate):
+                return candidate.resolve()
+        raise FileNotFoundError(
+            f"asset root not found or incomplete: {configured} "
+            "(expected ZENONZARD_CARDLIST/, audio/, and video/)"
+        )
     env_value = os.environ.get("ZENONZARD_ASSET_ROOT")
     if env_value:
-        return Path(env_value).expanduser().resolve()
-    if DEFAULT_ASSET_ROOT.exists():
-        return DEFAULT_ASSET_ROOT.resolve()
+        configured = Path(env_value).expanduser().resolve()
+        for candidate in (configured, configured / "asserts"):
+            if _looks_like_asset_root(candidate):
+                return candidate.resolve()
+        raise FileNotFoundError(
+            f"ZENONZARD_ASSET_ROOT is not a complete asset root: {configured}"
+        )
+    for candidate in (DEFAULT_ASSET_ROOT, DEFAULT_ASSET_ROOT / "asserts"):
+        if _looks_like_asset_root(candidate):
+            return candidate.resolve()
     return None
+
+
+def _looks_like_asset_root(path: Path) -> bool:
+    return path.is_dir() and all((path / name).is_dir() for name in ("ZENONZARD_CARDLIST", "audio", "video"))
 
 
 def resolve_official_cardlist(value: str | os.PathLike | None = None) -> Path | None:

@@ -28,8 +28,8 @@
   ],
   "windowsInstaller": {
     "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
-    "bytes": 157812468,
-    "sha256": "1BC8A8C8F19BE56A72D0B67021430B28AFDB60776E4FCB9E6DC77FBDD56EBDB2",
+    "bytes": 142408978,
+    "sha256": "1436EB26770DE26CDF8AF980034E5082AB3199B815897AF759308D86DF89E76E",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",
@@ -43,8 +43,8 @@
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.2.0-Linux.tar.gz",
-    "bytes": 45913729,
-    "sha256": "EA2AE167D1F6466E5B2EDDA972CF964E95963546A8E9F7698CDDF4CA57F8461E",
+    "bytes": 21463906,
+    "sha256": "4668784396F49E29F43EA2F2494757D25A42E43497A859465D7B72E0EAB741F8",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
@@ -69,9 +69,9 @@
   "runtimeModels": [
     {
       "role": "public_deep_fallback",
-      "path": "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt",
-      "bytes": 16784773,
-      "sha256": "A441B39A823108DF11240BFE0D9CF226800D5C950E6BC564F38A6BE6872EA882"
+      "path": "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.runtime.npz",
+      "bytes": 15559037,
+      "sha256": "2D51B07EE06B5BE54AD622919F3681B2B37DFF711C34B4AF6EF28359BF549490"
     },
     {
       "role": "public_normal_fallback",
