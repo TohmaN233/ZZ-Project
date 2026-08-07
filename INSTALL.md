@@ -24,7 +24,6 @@ separate overlay pack.
 - A Linux system that can run the portable launcher. The Linux bundle prepares
   Node.js, Electron, and Python in the user cache on first launch.
 - Python 3.10+ and Node.js 20+ only for source launches.
-- 7-Zip for the two-volume main asset archive.
 - Normal play does not require a dedicated GPU.
 - Local AI training requires an NVIDIA GPU, compatible drivers, and CUDA
   PyTorch. Training dependencies are not included in the playable packages.
@@ -38,7 +37,7 @@ from the Start menu or the desktop shortcut.
 
 The large `asserts/` directory is intentionally external. Download the two
 main asset volumes described in [Section 5](#5-download-the-asset-pack),
-extract them with 7-Zip, and place the resulting directory beside
+extract them, and place the resulting directory beside
 `ZZ-Project.exe`:
 
 ```text
@@ -126,10 +125,6 @@ the platform script:
 ./launch-electron.sh
 ```
 
-The removed `launch-electron.command` file is not required. The `.cmd` and
-`.sh` launchers are the supported launch paths. Developers may also use
-`npm run electron:dev`.
-
 If Git LFS is used for a clone, run:
 
 ```powershell
@@ -146,7 +141,7 @@ to download all required files:
 - `ZZ-Assets-PC02-v1.zip.002` - `576401952` bytes.
 - `ZZ-Assets-PC02-English-v1.zip` - `195374917` bytes.
 
-Download both main volumes before extracting. Open `.001` with 7-Zip; it will
+Download both main volumes before extracting. Open `.001`; it will
 read `.002` automatically. Extract the result to the program root, not to an
 additional nested `asserts/asserts/` directory. The English ZIP is optional
 and should be extracted into the same `asserts/` directory after the main pack.
@@ -218,7 +213,7 @@ GPU memory, time, and disk space.
 ### Missing cards, characters, music, or video
 
 Confirm that both main asset volumes were downloaded and that `.001` was
-opened with 7-Zip. Confirm that `asserts/` is directly beside `ZZ-Project.exe`
+opened. Confirm that `asserts/` is directly beside `ZZ-Project.exe`
 for Windows or directly inside the Linux/source project root.
 
 ### Missing English card faces
