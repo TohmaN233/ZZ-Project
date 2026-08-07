@@ -17,6 +17,7 @@ class ReleasePackagingContractTests(unittest.TestCase):
         package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
         self.assertIn("image.png", package["build"]["files"])
         self.assertIn("!asserts{,/**/*}", package["build"]["files"])
+        self.assertTrue(package["build"]["nsis"]["perMachine"])
         self.assertNotIn("data/**/*", package["build"]["files"])
         self.assertIn({"from": "data/decks", "to": "data/decks"}, package["build"]["extraFiles"])
         self.assertNotIn("local_ai_training/retained_mainline_20260630/**/*", package["build"]["files"])
