@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import json
+import os
 import random
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from zz.greedy_ai import GreedyLegalPolicy
+from zz.deep_runtime import NumpyActionValueModel
 from zz.rl_ai import (
     DEEP_HUMANLIKE_PRIOR_WEIGHT,
     DEEP_LOOKAHEAD_BRANCH_WIDTH,
@@ -22,7 +24,19 @@ from zz.rl_ai import (
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATA_ROOT = PROJECT_ROOT / "data"
 DEFAULT_NORMAL_MODEL_PATH = PROJECT_ROOT / "data" / "ai_training" / "quality_tactical_latest" / "best_league.json"
-DEFAULT_DEEP_MODEL_PATH = PROJECT_ROOT / "data" / "ai_training" / "deep_p2_specialist_v1_latest" / "best_greedy.pt"
+
+
+def _default_deep_model_path() -> Path:
+    configured = os.environ.get("ZENONZARD_DEEP_MODEL_PATH")
+    if configured:
+        return Path(configured).expanduser().resolve()
+    runtime_path = PROJECT_ROOT / "data" / "ai_training" / "deep_p2_specialist_v1_latest" / "best_greedy.runtime.npz"
+    if runtime_path.exists():
+        return runtime_path
+    return PROJECT_ROOT / "data" / "ai_training" / "deep_p2_specialist_v1_latest" / "best_greedy.pt"
+
+
+DEFAULT_DEEP_MODEL_PATH = _default_deep_model_path()
 
 
 @dataclass(frozen=True)
@@ -206,6 +220,25 @@ def _load_checkpoint_policy(
                     expected_source_actor_policy_id=str(payload.get("sourceActorPolicyId") or ""),
                     min_source_rows=0,
                 )
+        if path.name.lower().endswith(".runtime.npz"):
+            model = NumpyActionValueModel.load(path)
+            if not allow_unpromoted_public_deep_v2 and _is_rejected_public_deep_v2_candidate(model):
+                raise ValueError(f"{checkpoint_kind} checkpoint not promoted: {path}")
+            policy_kwargs = {
+                "lookahead_weight": DEEP_LOOKAHEAD_WEIGHT,
+                "max_lookahead_actions": DEEP_MAX_LOOKAHEAD_ACTIONS,
+                "lookahead_depth": DEEP_LOOKAHEAD_DEPTH,
+                "lookahead_branch_width": DEEP_LOOKAHEAD_BRANCH_WIDTH,
+                "lookahead_key_decisions_only": DEEP_LOOKAHEAD_KEY_DECISIONS_ONLY,
+                "humanlike_prior_weight": DEEP_HUMANLIKE_PRIOR_WEIGHT,
+            }
+            policy_kwargs.update(_runtime_prior_kwargs(runtime_prior_weights))
+            return LookaheadRLPolicy(
+                model=model,
+                rng=random.Random(seed),
+                epsilon=0.0,
+                **policy_kwargs,
+            )
         if path.suffix.lower() == ".pt":
             from zz.deep_rl import TorchActionValueModel
 

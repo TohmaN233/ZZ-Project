@@ -42,7 +42,6 @@
       "electron/**/*",
       "zz/**/*",
       "data/*.tsv",
-      "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt",
       "data/ai_training/quality_tactical_latest/best_league.json",
       "docs/rules/**/*",
       "image.png",
