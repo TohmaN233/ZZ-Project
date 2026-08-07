@@ -11,8 +11,30 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "dist" / "linux"
 STAGING = OUTPUT / "staging"
-EXCLUDED_ROOTS = {".git", "asserts", "dist", "node_modules", "__pycache__"}
-EXCLUDED_FILES = {"PUBLIC_RELEASE_MANIFEST.json", "RELEASE_NOTES.md", "INSTALL.md"}
+EXCLUDED_ROOTS = {
+    ".agents",
+    ".codex",
+    ".git",
+    "ai_training",
+    "asserts",
+    "build",
+    "dist",
+    "local_ai_training",
+    "node_modules",
+    "packaging",
+    "project_memory",
+    "tests",
+    "tools",
+    "__pycache__",
+}
+EXCLUDED_FILES = {
+    "PUBLIC_RELEASE_MANIFEST.json",
+    "RELEASE_NOTES.md",
+    "INSTALL.md",
+    "data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt",
+}
+DEEP_MODEL_SOURCE = ROOT / "data" / "ai_training" / "deep_p2_specialist_v1_latest" / "best_greedy.pt"
+DEEP_RUNTIME_RELATIVE = Path("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.runtime.npz")
 
 
 def tracked_files() -> list[Path]:
@@ -62,6 +84,11 @@ def main() -> None:
         if required not in files or not (ROOT / required).is_file():
             raise FileNotFoundError(f"Required Linux bundle file is missing: {required}")
     copy_release_tree(bundle_root, files)
+    if str(Path(__file__).resolve().parent) not in sys.path:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from runtime_model_export import export_deep_runtime_model
+
+    export_deep_runtime_model(DEEP_MODEL_SOURCE, bundle_root / DEEP_RUNTIME_RELATIVE)
     launcher = bundle_root / "launch-electron.sh"
     if not launcher.is_file():
         raise FileNotFoundError(launcher)

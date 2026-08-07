@@ -28,14 +28,24 @@ class ReleasePackagingContractTests(unittest.TestCase):
         )
         main = (PROJECT_ROOT / "electron" / "main.js").read_text(encoding="utf-8")
         self.assertIn('path.join(path.dirname(process.execPath), "asserts")', main)
+        self.assertIn('path.join(primary, "asserts")', main)
         windows_builder = (PROJECT_ROOT / "packaging" / "build_windows_package.py").read_text(
             encoding="utf-8"
         )
         self.assertIn('add_data("image.png", ".")', windows_builder)
         self.assertNotIn('add_data("data", "data")', windows_builder)
         self.assertIn("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt", windows_builder)
+        self.assertIn("best_greedy.runtime.npz", windows_builder)
         self.assertNotIn('add_data("data/decks", "data/decks")', windows_builder)
         self.assertNotIn('add_data("local_ai_training/retained_mainline_20260630", "local_ai_training/retained_mainline_20260630")', windows_builder)
+
+        linux_builder = (PROJECT_ROOT / "packaging" / "build_linux_bundle.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("best_greedy.pt", linux_builder)
+        self.assertIn("best_greedy.runtime.npz", linux_builder)
+        self.assertIn('"local_ai_training"', linux_builder)
+        self.assertIn('"ai_training"', linux_builder)
 
         installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
         self.assertIn("!macro customCheckAppRunning", installer)

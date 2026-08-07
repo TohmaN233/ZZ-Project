@@ -13,8 +13,8 @@ separate overlay pack.
   Electron, the frozen Python server, the PC02 rules runtime, the current
   runtime models, and the desktop home background `image.png`.
 - **Linux players:** use the portable `tar.gz` bundle. It includes the source
-  runtime, `image.png`, and an executable `launch-electron.sh`. It is not an
-  AppImage or a native distribution package.
+  runtime, a Torch-free inference model, `image.png`, and an executable
+  `launch-electron.sh`. It is not an AppImage or a native distribution package.
 - **macOS players and developers:** use the source ZIP or clone the repository.
 - **All players:** download the external asset pack from Google Drive.
 
@@ -65,10 +65,10 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `157812468` bytes.
+Installer size: `142408978` bytes.
 
 Installer SHA-256:
-`1BC8A8C8F19BE56A72D0B67021430B28AFDB60776E4FCB9E6DC77FBDD56EBDB2`.
+`1436EB26770DE26CDF8AF980034E5082AB3199B815897AF759308D86DF89E76E`.
 
 ## 4. Linux portable bundle
 
@@ -92,10 +92,10 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `45913729` bytes.
+Bundle size: `21463906` bytes.
 
 Bundle SHA-256:
-`EA2AE167D1F6466E5B2EDDA972CF964E95963546A8E9F7698CDDF4CA57F8461E`.
+`4668784396F49E29F43EA2F2494757D25A42E43497A859465D7B72E0EAB741F8`.
 
 ## 5. Source launch and macOS
 
