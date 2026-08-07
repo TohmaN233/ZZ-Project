@@ -53,7 +53,16 @@ function packagedServerPath() {
 
 function packagedAssetRoot() {
   const configured = process.env.ZZ_ASSET_ROOT;
-  if (configured) return path.resolve(projectRoot(), configured);
+  if (configured) {
+    const configuredCandidates = [
+      path.resolve(configured),
+      path.resolve(projectRoot(), configured),
+      path.resolve(path.dirname(process.execPath), configured),
+    ];
+    const configuredRoot = configuredCandidates.find(assetRootLooksValid);
+    if (configuredRoot) return configuredRoot;
+    appendLog(`Ignoring invalid ZZ_ASSET_ROOT: ${configured}`);
+  }
   const primary = path.join(path.dirname(process.execPath), "asserts");
   const candidates = [
     primary,
@@ -136,6 +145,15 @@ function appendLog(chunk) {
   if (!text) return;
   serverLog.push(text);
   if (serverLog.length > 40) serverLog.splice(0, serverLog.length - 40);
+  try {
+    if (app.isReady()) {
+      const logPath = path.join(app.getPath("userData"), "server.log");
+      fsSync.mkdirSync(path.dirname(logPath), { recursive: true });
+      fsSync.appendFileSync(logPath, `${new Date().toISOString()} ${text}\n`, "utf8");
+    }
+  } catch (error) {
+    console.error(`Failed to persist server log: ${error.message || error}`);
+  }
 }
 
 function statusSnapshot() {

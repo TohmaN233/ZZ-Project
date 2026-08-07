@@ -29,6 +29,8 @@ class ReleasePackagingContractTests(unittest.TestCase):
         main = (PROJECT_ROOT / "electron" / "main.js").read_text(encoding="utf-8")
         self.assertIn('path.join(path.dirname(process.execPath), "asserts")', main)
         self.assertIn('path.join(primary, "asserts")', main)
+        self.assertIn("configuredCandidates", main)
+        self.assertIn('"server.log"', main)
         windows_builder = (PROJECT_ROOT / "packaging" / "build_windows_package.py").read_text(
             encoding="utf-8"
         )

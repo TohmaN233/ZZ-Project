@@ -65,10 +65,10 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `142408978` bytes.
+Installer size: `142406863` bytes.
 
 Installer SHA-256:
-`1436EB26770DE26CDF8AF980034E5082AB3199B815897AF759308D86DF89E76E`.
+`B5B5D8A99659D80EA79491AD65C7FE9F0BD59F7B5B0D7E58FFA54C8B7FDF2E18`.
 
 ## 4. Linux portable bundle
 
@@ -92,10 +92,10 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `21463906` bytes.
+Bundle size: `21464081` bytes.
 
 Bundle SHA-256:
-`4668784396F49E29F43EA2F2494757D25A42E43497A859465D7B72E0EAB741F8`.
+`60D32FC4DCCE78BFB4D577F5A726BEFE515BEA55395B7327A2658C4F1896E297`.
 
 ## 5. Source launch and macOS
 
@@ -215,6 +215,10 @@ GPU memory, time, and disk space.
 Confirm that both main asset volumes were downloaded and that `.001` was
 opened. Confirm that `asserts/` is directly beside `ZZ-Project.exe`
 for Windows or directly inside the Linux/source project root.
+
+The Windows client also writes the selected asset root and Python server errors
+to `%APPDATA%\ZZ-Project\server.log`. If the directory layout is correct but
+the game is still empty, attach that file instead of moving the asset pack.
 
 ### Missing English card faces
 
