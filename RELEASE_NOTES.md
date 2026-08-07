@@ -47,9 +47,9 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142406863` bytes.
+   Size: `142393755` bytes.
    SHA-256:
-   `B5B5D8A99659D80EA79491AD65C7FE9F0BD59F7B5B0D7E58FFA54C8B7FDF2E18`.
+   `03E055413AE859F461BD0D0354B5A84EBA9E3B2145914079FF88791423C80D6D`.
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
