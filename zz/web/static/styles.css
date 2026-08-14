@@ -20,7 +20,7 @@
   --field-h: calc(var(--field-w) * 1.42);
   --mini-w: clamp(42px, 3.2vw, 54px);
   --mini-h: calc(var(--mini-w) * 1.42);
-  --hand-w: clamp(50px, 3.8vw, 66px);
+  --hand-w: clamp(72px, 6vw, 104px);
   --hand-h: calc(var(--hand-w) * 1.42);
 }
 
@@ -338,12 +338,16 @@ button:disabled {
   position: relative;
 }
 
+.cockpit-command-row:has(.prompt.has-floating-actions) {
+  min-height: clamp(88px, 7.2vw, 110px);
+}
+
 .cockpit-hud .hand-count {
   line-height: 1;
 }
 
 .cockpit-hud .hand-cards {
-  padding: 2px 8px 8px 30px;
+  padding: 2px 12px 10px;
 }
 
 .cockpit-hud .hand-fan.bottom {
@@ -367,7 +371,7 @@ button:disabled {
 .cockpit-command-row .prompt.has-floating-actions {
   position: relative;
   display: block;
-  min-height: 48px;
+  min-height: clamp(88px, 7.2vw, 110px);
   margin-right: clamp(98px, 8.2vw, 126px);
   padding: 6px 10px;
 }
@@ -375,7 +379,7 @@ button:disabled {
 .cockpit-command-row .prompt-floating-actions {
   position: absolute;
   right: calc(-1 * clamp(102px, 8.5vw, 130px));
-  bottom: -4px;
+  bottom: 0;
   z-index: 9;
   overflow: visible;
   justify-content: center;
@@ -1460,9 +1464,10 @@ button:disabled {
   min-height: 0;
   display: flex;
   align-items: end;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 8px 10px 14px 34px;
+  justify-content: center;
+  overflow: visible;
+  gap: 0;
+  padding: 8px 14px 14px;
 }
 
 .hand-fan.bottom {
@@ -1470,6 +1475,11 @@ button:disabled {
 }
 
 .hand-fan.bottom .hand-cards {
+  --hand-overlap: clamp(
+    14px,
+    calc(var(--hand-w) - (100% - 28px) / (var(--hand-count) - 1)),
+    48px
+  );
   min-height: calc(var(--hand-h) + 18px);
   overflow: visible;
 }
@@ -1486,25 +1496,37 @@ button:disabled {
 
 .hand-slot {
   flex: 0 0 auto;
-  margin-left: -24px;
-  transition: transform 140ms ease, margin 140ms ease;
+  margin-left: -14px;
+  position: relative;
+  z-index: calc(1 + var(--i));
+  transition: transform 140ms ease;
 }
 
 .hand-slot:first-child {
   margin-left: 0;
 }
 
-.hand-slot:hover,
-.hand-slot:focus-within {
-  z-index: 10;
-  transform: none;
-  margin-right: 18px;
+.hand-fan.bottom .hand-slot:hover,
+.hand-fan.bottom .hand-slot:focus-within {
+  z-index: 100;
+  transform: translateY(-10px) rotate(0deg);
 }
 
-.hand-slot:hover .card.hand-card,
-.hand-slot:focus-within .card.hand-card {
-  transform: scale(1.8);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.48), 0 0 0 2px rgba(50, 213, 200, 0.58);
+.hand-fan.bottom .hand-slot:hover .card.hand-card,
+.hand-fan.bottom .hand-slot:focus-within .card.hand-card {
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.48), 0 0 0 2px rgba(50, 213, 200, 0.58);
+}
+
+.hand-fan.bottom .hand-slot {
+  flex-basis: var(--hand-w);
+  min-height: var(--hand-h);
+  margin-left: calc(-1 * var(--hand-overlap));
+  transform: rotate(var(--fan-angle, 0deg));
+  transform-origin: bottom center;
+}
+
+.hand-fan.bottom .hand-slot:first-child {
+  margin-left: 0;
 }
 
 .hand-fan.top .hand-cards {
@@ -5799,6 +5821,7 @@ button.end-turn-action {
     pointer-events: auto;
     transform: none;
   }
+
 }
 
 /* Release frontend shell */

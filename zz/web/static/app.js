@@ -402,6 +402,7 @@ const UI_TEXT = {
     inspectTopCardsNote: "查看卡组上方 {count} 张。可以加入手牌的卡会高亮。",
     lookTop3MagicNote: "查看卡组上方 3 张，仅选择要公开并加入手牌的魔法卡。",
     addNoMagicCards: "不加入魔法卡",
+    finishInspect: "查看完成",
     deckBaseNote: "从卡组中选择可选数量的 Base Minion，公开后放入费用区。",
     oneTargetNote: "选择一个效果目标。",
     deckTopOrBottomNote: "查看自己的卡组顶牌，然后选择放回牌顶或牌底。",
@@ -653,6 +654,7 @@ const UI_TEXT = {
     inspectTopCardsNote: "デッキの上から{count}枚を確認します。手札に加えられるカードが強調表示されます。",
     lookTop3MagicNote: "デッキの上から3枚を確認し、公開して手札に加えるマジックカードを選択します。",
     addNoMagicCards: "マジックカードを加えない",
+    finishInspect: "確認完了",
     deckBaseNote: "デッキから任意の数のベース・ミニオンを選び、公開してベースに置きます。",
     oneTargetNote: "効果対象を1つ選択してください。",
     deckTopOrBottomNote: "自分のデッキの一番上を確認し、デッキの上か下に戻します。",
@@ -904,6 +906,7 @@ const UI_TEXT = {
     inspectTopCardsNote: "Inspect the top {count} cards of the deck. Eligible cards are highlighted.",
     lookTop3MagicNote: "Inspect the top 3 cards. Choose which Magic cards to reveal and add to hand.",
     addNoMagicCards: "Add no Magic cards",
+    finishInspect: "Done inspecting",
     deckBaseNote: "Choose up to the allowed number of Base Minions from the deck, reveal them, and put them into base.",
     oneTargetNote: "Choose one effect target.",
     deckTopOrBottomNote: "Inspect the top card of your deck, then return it to the top or bottom.",
@@ -4738,6 +4741,10 @@ function promptOptionLabel(option) {
   if (option.kind === "effect_target_skip") {
     const prompt = activePrompt();
     if (prompt && prompt.choiceKind === "top3_magic") return t("addNoMagicCards");
+    if (prompt && (prompt.revealedCards || []).length &&
+        !(prompt.options || []).some(isRenderableEffectPromptTarget)) {
+      return t("finishInspect");
+    }
   }
   if (option.reorderPosition === "top") return t("deckTopChoice");
   if (option.reorderPosition === "bottom") return t("deckBottomChoice");
@@ -4924,9 +4931,13 @@ function renderBattlefield(player, side) {
 }
 
 function renderHandFan(player, side) {
+  const handCount = player.hand.length;
+  const handFanStyle = side === "bottom"
+    ? ` style="--hand-count:${Math.max(2, handCount)}"`
+    : "";
   const cards = player.hand.length
     ? player.hand.map((card, index) => `
-        <div class="hand-slot" style="--i:${index}; --n:${player.hand.length}">
+        <div class="hand-slot" style="--i:${index}; --n:${handCount}; --fan-angle:${side === "bottom" ? ((index - (handCount - 1) / 2) * 1.6).toFixed(2) : "0"}deg">
           ${renderCard(card, side === "bottom" ? "hand-card" : "opponent-hand-card")}
         </div>
       `).join("")
@@ -4934,7 +4945,7 @@ function renderHandFan(player, side) {
   return `
     <div class="hand-fan ${side}" data-board-anchor="${esc(boardAnchorKey(player.side, "hand"))}">
       <div class="hand-count">${esc(t("zoneHand"))} ${esc(player.handCount)}</div>
-      <div class="hand-cards">${cards}</div>
+      <div class="hand-cards"${handFanStyle}>${cards}</div>
     </div>
   `;
 }
@@ -6544,6 +6555,10 @@ function renderHome(error = null) {
             <strong>${esc(t("gameLobby"))}</strong>
             <span>${esc(t("battle"))}</span>
           </button>
+          <button class="home-menu-button" data-view="deckbuilder">
+            <strong>${esc(t("deckBuilder"))}</strong>
+            <span>${esc(t("deckBuilderShort"))}</span>
+          </button>
           <button class="home-menu-button" data-view="ai-training">
             <strong>${esc(t("replayTraining"))}</strong>
             <span>${esc(t("replayTrainingShort"))}</span>
@@ -7881,10 +7896,14 @@ function consumePendingDuelLaunch() {
   }
 }
 
-function startNew(mode, launchPayload = selectedBattlePayload()) {
+function startNew(mode, launchPayload = null) {
   stopHomeThemeVideo(false);
   clearDuelUiState();
-  const payload = cloneLaunchPayload({ ...profilePayload(), ...launchPayload });
+  const payload = cloneLaunchPayload({
+    ...profilePayload(),
+    ...selectedBattlePayload(),
+    ...(launchPayload || {}),
+  });
   activeMatchPayload = cloneLaunchPayload(payload);
   if (deferDuelLaunch(mode, payload)) return;
   if (mode !== "ai-vs-ai") stopAuto();
@@ -8731,7 +8750,7 @@ app.addEventListener("click", async (event) => {
   }
   const newGame = event.target.closest("[data-new]");
   if (newGame) {
-    startNew(newGame.dataset.new);
+    startNew(newGame.dataset.new, activeMatchPayload);
     return;
   }
   const concede = event.target.closest("[data-concede]");

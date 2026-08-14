@@ -2315,9 +2315,10 @@ class GameSession:
             return True
         kind = effect.target_kind
         eligible = self._eligible_targets(player, kind, None, effect, source_ci=source)
-        if not eligible:
+        look_window = self._revealed_cards_for_effect(player, kind)
+        if not eligible and not look_window:
             return False
-        target_count = min(self._target_count_for_effect(player, effect), len(eligible))
+        target_count = min(self._target_count_for_effect(player, effect), len(eligible)) if eligible else 1
         self._pending_effect = {
             "mode": "trigger_deferred",
             "player": player,
@@ -2396,7 +2397,7 @@ class GameSession:
                 None,
                 effect,
                 source_ci=source,
-            ):
+            ) or self._revealed_cards_for_effect(source.owner, "pc02_fossil_dragon"):
                 sequence.append("pc02_fossil_dragon")
             return sequence
         return []
@@ -2476,9 +2477,10 @@ class GameSession:
             return False
         kind = effect.target_kind
         eligible = self._eligible_targets(player, kind, None, effect, source_ci=source)
-        if not eligible:
+        look_window = self._revealed_cards_for_effect(player, kind)
+        if not eligible and not look_window:
             return False
-        target_count = min(self._target_count_for_effect(player, effect), len(eligible))
+        target_count = min(self._target_count_for_effect(player, effect), len(eligible)) if eligible else 1
         self._pending_effect = {
             "mode": "source_deferred",
             "player": player,
@@ -2535,7 +2537,10 @@ class GameSession:
             source = self._pending_effect_source(pending)
             while next_index < len(sequence):
                 kind = sequence[next_index]
-                if source is not None and self._eligible_targets(player, kind, None, pending.get("effect"), source_ci=source):
+                if source is not None and (
+                    self._eligible_targets(player, kind, None, pending.get("effect"), source_ci=source)
+                    or self._revealed_cards_for_effect(player, kind)
+                ):
                     self._pending_effect = {
                         **pending,
                         "target_sequence_index": next_index,
@@ -3336,7 +3341,7 @@ class GameSession:
             return
         eligible_targets = self._eligible_targets(player, kind, None, effect, source_ci=ci)
         if not eligible_targets:
-            if kind == "top3_magic" and player.deck[:3]:
+            if self._revealed_cards_for_effect(player, kind):
                 self._pending_effect = {
                     "mode": pending_mode,
                     "player": player,
@@ -3394,9 +3399,10 @@ class GameSession:
     def _action_needs_effect_target(self, action: Action, player: Player) -> bool:
         kind = self._target_kind_for_action(action, player)
         effect = self._targeted_effect_for_action(action, player)
-        if kind == "top3_magic":
-            return bool(player.deck[:3])
-        return kind is not None and bool(self._eligible_targets(player, kind, action, effect))
+        return kind is not None and bool(
+            self._eligible_targets(player, kind, action, effect)
+            or self._revealed_cards_for_effect(player, kind)
+        )
 
     def _play_effect_timing_for_card(self, card) -> EffectTiming | None:
         if card.type is CardType.F_MINION:
@@ -3560,7 +3566,13 @@ class GameSession:
                     },
                 ),
             ])
-        optional_choice = kind in OPTIONAL_EFFECT_TARGET_KINDS or bool(effect and effect.optional)
+        revealed = self._revealed_cards_for_effect(player, kind)
+        no_target_look = bool(revealed) and not eligible_targets
+        optional_choice = (
+            kind in OPTIONAL_EFFECT_TARGET_KINDS
+            or bool(effect and effect.optional)
+            or no_target_look
+        )
         exact_dynamic_targets = bool(effect and effect.params.get("exact_target_count_from_own_destroyed_forces"))
         variable_targets = bool(
             effect and (
@@ -3614,7 +3626,6 @@ class GameSession:
                 text = self._effect_event_text(source_ci, effect, Context(controller=player, source=source_ci))
                 if text:
                     self.prompt["effectText"] = text
-        revealed = self._revealed_cards_for_effect(player, kind)
         if revealed:
             self.prompt["revealedCards"] = [
                 self._effect_target_meta(target) for target in revealed
@@ -3732,7 +3743,9 @@ class GameSession:
             "targetLabel": str(target),
         }
 
-    def _revealed_cards_for_effect(self, player: Player, kind: str) -> list[CardInstance]:
+    def _revealed_cards_for_effect(self, player: Player, kind: str | None) -> list[CardInstance]:
+        if not kind:
+            return []
         count = LOOK_WINDOW_SIZES.get(kind)
         if count is None:
             if not kind.startswith("top"):
