@@ -19,6 +19,8 @@
   profiles, and playmat profiles.
 - The desktop home background `image.png` is included in the program packages;
   the large `asserts/` media pack remains a separate download.
+- Starting a new game from the game-over screen keeps the finished match's
+  selected player and opponent decks.
 - The Windows installer explicitly excludes `asserts/`; updating the EXE does
   not replace the separately downloaded asset directory.
 - Default sample decks are installed as `resources/data/decks/`, outside the
@@ -47,16 +49,16 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142393755` bytes.
+   Size: `142391976` bytes.
    SHA-256:
-   `03E055413AE859F461BD0D0354B5A84EBA9E3B2145914079FF88791423C80D6D`.
+   `3DFB1EF17F9327E9452C5924FF6A56CDE3FB07FD9ADFE5F883EA8A426BC3FB71`.
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `21464081` bytes.
+   Size: `21464428` bytes.
    SHA-256:
-   `60D32FC4DCCE78BFB4D577F5A726BEFE515BEA55395B7327A2658C4F1896E297`.
+   `156CE7F6C1BFAFB8C5A0D55BA3267AE6FF97CBFEA85B017244A3EEC07B5375BF`.
 3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.

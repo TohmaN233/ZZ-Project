@@ -65,10 +65,10 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `142406863` bytes.
+Installer size: `142391976` bytes.
 
 Installer SHA-256:
-`B5B5D8A99659D80EA79491AD65C7FE9F0BD59F7B5B0D7E58FFA54C8B7FDF2E18`.
+`3DFB1EF17F9327E9452C5924FF6A56CDE3FB07FD9ADFE5F883EA8A426BC3FB71`.
 
 ## 4. Linux portable bundle
 
@@ -92,10 +92,10 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `21464081` bytes.
+Bundle size: `21464428` bytes.
 
 Bundle SHA-256:
-`60D32FC4DCCE78BFB4D577F5A726BEFE515BEA55395B7327A2658C4F1896E297`.
+`156CE7F6C1BFAFB8C5A0D55BA3267AE6FF97CBFEA85B017244A3EEC07B5375BF`.
 
 ## 5. Source launch and macOS
 
