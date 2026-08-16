@@ -663,6 +663,11 @@ function registerIpc() {
     multiplayerClient.leaveRoom();
     return multiplayerSnapshot();
   });
+  ipcMain.handle("multiplayer:dismissMatchResult", async (_event) => {
+    assertTrustedSender(_event);
+    multiplayerClient.dismissMatchResult();
+    return multiplayerSnapshot();
+  });
   ipcMain.handle("multiplayer:lanStatus", async (_event) => {
     assertTrustedSender(_event);
     return multiplayerSnapshot().lan;

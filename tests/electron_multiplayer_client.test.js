@@ -249,7 +249,7 @@ test("opening choice is allowed only while the match is starting", () => {
   assert.throws(() => client.selectOpeningChoice({ choice: "fire" }), /rock, paper, or scissors/);
 });
 
-test("ready-check after a finished match keeps the room and clears stale match state", () => {
+test("ready-check after a finished match keeps the result until the player returns", () => {
   const { client, socket } = makeClient();
   connectClient(client, socket);
   enterRoom(client, socket);
@@ -261,9 +261,12 @@ test("ready-check after a finished match keeps the room and clears stale match s
 
   enterRoom(client, socket, "READY_CHECK");
 
-  assert.equal(client.state, MultiplayerClientState.IN_ROOM);
+  assert.equal(client.state, MultiplayerClientState.MATCH_FINISHED);
   assert.equal(client.room.roomCode, "ABC123");
-  assert.equal(client.matchId, null);
+  assert.deepEqual(client.view, { revision: 3, gameOver: true });
+
+  client.dismissMatchResult();
+  assert.equal(client.state, MultiplayerClientState.IN_ROOM);
   assert.equal(client.view, null);
 });
 
@@ -599,7 +602,41 @@ test("duplicate seat is retryable while an invalid reconnect token clears recove
     message: "token rejected",
     fatal: false,
   }));
-  assert.equal(invalid.client.state, MultiplayerClientState.ERROR);
+  assert.equal(invalid.client.state, MultiplayerClientState.OFFLINE);
   assert.equal(invalid.client.getSnapshot().canReconnect, false);
   assert.equal(invalid.client.getRecoverySession(), null);
+  assert.equal(invalid.client.error, null);
+});
+
+test("socket error during a recoverable match starts reconnect instead of dropping the room", () => {
+  const { client, socket } = makeClient();
+  connectClient(client, socket);
+  enterRecoverableRoom(client, socket);
+  startMatch(client, socket, 5);
+
+  socket().emit("error", { error: new Error("read ECONNRESET") });
+
+  assert.equal(client.state, MultiplayerClientState.RECONNECTING);
+  assert.equal(client.getSnapshot().canReconnect, true);
+  assert.equal(client.room.roomCode, "ABC123");
+  assert.equal(client.view.revision, 5);
+  assert.equal(client.error.code, "RECONNECT_REQUIRED");
+});
+
+test("five failed reconnect attempts give up after a recoverable drop", () => {
+  const { client, socket, sockets } = makeClient();
+  connectClient(client, socket);
+  enterRecoverableRoom(client, socket);
+  startMatch(client, socket, 5);
+  socket().emit("error", { error: new Error("read ECONNRESET") });
+  assert.equal(client.state, MultiplayerClientState.RECONNECTING);
+
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    client.reconnect();
+    sockets()[attempt + 1].emit("close", { code: 1006, reason: "still down" });
+  }
+
+  assert.equal(client.state, MultiplayerClientState.ERROR);
+  assert.equal(client.error.code, "RECONNECT_EXHAUSTED");
+  assert.equal(client.getSnapshot().reconnectFailures, 5);
 });

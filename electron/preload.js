@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld("zzMultiplayer", {
   surrender: () => ipcRenderer.invoke("multiplayer:surrender"),
   requestSync: () => ipcRenderer.invoke("multiplayer:requestSync"),
   leaveRoom: () => ipcRenderer.invoke("multiplayer:leaveRoom"),
+  dismissMatchResult: () => ipcRenderer.invoke("multiplayer:dismissMatchResult"),
   lanStatus: () => ipcRenderer.invoke("multiplayer:lanStatus"),
   startLanHost: (options) => ipcRenderer.invoke("multiplayer:startLanHost", options),
   stopLanHost: () => ipcRenderer.invoke("multiplayer:stopLanHost"),

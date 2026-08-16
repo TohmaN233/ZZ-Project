@@ -54,6 +54,10 @@
 - Online views no longer carry card, playmat, or portrait URLs. Clients load
   those images from the local `/assets/<id>` catalog. Official website image
   URLs are no longer used as a fallback.
+- Online rock-paper-scissors no longer flickers the waiting player when the
+  opponent submits. Force and mana target art uses local card/force ids.
+  A finished match shows the same win/lose overlay as offline play until the
+  player clicks return.
 - Transport/lobby errors no longer stick on the duel prompt after entering a
   match.
 - Default sample decks are installed as `resources/data/decks/`, outside the

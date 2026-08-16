@@ -329,6 +329,18 @@ class MultiplayerDesktopClient {
     this.#sendCommand("REQUEST_SYNC", payload);
   }
 
+  dismissMatchResult() {
+    if (this.#view && this.#view.gameOver) {
+      this.#view = null;
+      this.#pendingAction = null;
+      this.#pendingActionNeedsReplay = false;
+    }
+    if (this.#room && !["STARTING", "RUNNING", "FINISHED"].includes(this.#room.status)) {
+      this.#applyRoomStatus(this.#room.status);
+    }
+    return this.getSnapshot();
+  }
+
   leaveRoom() {
     this.#requireState("LEAVE_ROOM", ROOM_COMMAND_STATES);
     this.#sendCommand("LEAVE_ROOM", {});
@@ -484,6 +496,8 @@ class MultiplayerDesktopClient {
           this.playerId = optionalString(payload.playerId) || this.playerId;
           if (["STARTING", "RUNNING", "FINISHED"].includes(payload.status)) {
             this.matchId = optionalString(payload.matchId) || this.matchId;
+          } else if (payload.status === "READY_CHECK" && this.#view && this.#view.gameOver) {
+            // Keep the finished view until the player dismisses the result screen.
           } else {
             this.matchId = null;
             this.#view = null;
@@ -575,6 +589,10 @@ class MultiplayerDesktopClient {
       return;
     }
     if (status === "FINISHED") {
+      this.#setState(MultiplayerClientState.MATCH_FINISHED);
+      return;
+    }
+    if (status === "READY_CHECK" && this.#view && this.#view.gameOver) {
       this.#setState(MultiplayerClientState.MATCH_FINISHED);
       return;
     }

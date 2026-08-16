@@ -1609,16 +1609,42 @@ function preferLocalAssetUrl(url, assetId) {
   return localAssetUrl(assetId);
 }
 
+function looksLikeAssetId(value) {
+  return typeof value === "string" && value.length > 2 && (value.includes("_") || value.includes(":"));
+}
+
 function localizedCardAssetUrl(card) {
-  const assetId = card && (card.assetId || card.cardId || card.id);
-  if (card && currentLanguage() === "en") {
+  if (!card) return null;
+  if (card.forceId || card.type === "force" || card.type === "force_ability") {
+    return localizedForceAssetUrl({
+      id: card.forceId || card.assetId,
+      assetId: card.assetId || card.forceId,
+      assetUrl: card.assetUrl,
+      assetUrlEn: card.assetUrlEn,
+    });
+  }
+  const assetId = card.faceDown
+    ? "card_back"
+    : card.cardId || (looksLikeAssetId(card.assetId) ? card.assetId : null) || (looksLikeAssetId(card.id) ? card.id : null);
+  if (card.type === "mana_token") {
+    const manaUrl = (catalog.manaAssets || {})[card.manaColor];
+    if (currentLanguage() === "en") {
+      return preferLocalAssetUrl(card.assetUrlEn || manaUrl || card.assetUrl, assetId);
+    }
+    return preferLocalAssetUrl(manaUrl || card.assetUrl, assetId);
+  }
+  if (currentLanguage() === "en") {
     return preferLocalAssetUrl(card.assetUrlEn || card.assetUrl, assetId);
   }
-  return preferLocalAssetUrl(card && card.assetUrl, assetId);
+  return preferLocalAssetUrl(card.assetUrl, assetId);
 }
 
 function localizedForceAssetUrl(force) {
-  const assetId = force && (force.assetId || force.id);
+  const assetId = force && (
+    force.assetId
+    || force.forceId
+    || (looksLikeAssetId(force.id) ? force.id : null)
+  );
   if (force && currentLanguage() === "en") {
     return preferLocalAssetUrl(force.assetUrlEn || force.assetUrl, assetId);
   }
@@ -1631,7 +1657,7 @@ function hydrateMultiplayerViewAssets(view) {
   const forcesById = new Map((catalog.forces || []).map((force) => [force.id, force]));
   const hydrateCard = (card) => {
     if (!card || typeof card !== "object") return;
-    const assetId = card.faceDown ? "card_back" : (card.assetId || card.cardId);
+    const assetId = card.faceDown ? "card_back" : (card.cardId || card.assetId || card.forceId);
     const localCard = cardsById.get(card.cardId || card.assetId);
     const localManaUrl = card.type === "mana_token" ? (catalog.manaAssets || {})[card.manaColor] : null;
     const assetUrl = card.faceDown
@@ -1649,7 +1675,19 @@ function hydrateMultiplayerViewAssets(view) {
       value.forEach(visitCards);
       return;
     }
-    if (Object.prototype.hasOwnProperty.call(value, "faceDown") && (value.assetId || value.cardId)) {
+    const isForceLike = Boolean(value.forceId || value.type === "force" || value.type === "force_ability");
+    const isCardLike = Boolean(
+      value.cardId
+      || Object.prototype.hasOwnProperty.call(value, "faceDown")
+      || value.type === "mana_token"
+    );
+    if (isForceLike && !value.cardId) {
+      const localForce = forcesById.get(value.forceId || value.assetId || value.id);
+      const assetId = value.assetId || value.forceId || (looksLikeAssetId(value.id) ? value.id : null);
+      value.assetId = assetId;
+      value.assetUrl = preferLocalAssetUrl(localForce && localForce.assetUrl, assetId);
+      value.assetUrlEn = preferLocalAssetUrl(localForce && localForce.assetUrlEn, assetId) || value.assetUrl;
+    } else if (isCardLike) {
       hydrateCard(value);
     }
     Object.values(value).forEach(visitCards);
@@ -2683,6 +2721,14 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
   if (!snapshot || typeof snapshot !== "object") return;
   const previousOnlineDuel = isOnlineDuel();
   const previousDisplayName = multiplayerUi.displayName;
+  const previousOpening = isOnlineOpeningChoice();
+  const previousOpeningPlayer = currentOnlineRoomPlayer();
+  const previousChoiceSubmitted = Boolean(previousOpeningPlayer && previousOpeningPlayer.openingChoiceSubmitted);
+  const previousOpeningTie = Boolean(
+    multiplayerUi.room
+    && multiplayerUi.room.lastOpeningResult
+    && multiplayerUi.room.lastOpeningResult.result === "tie"
+  );
   multiplayerUi = {
     ...multiplayerUi,
     ...snapshot,
@@ -2698,7 +2744,8 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     multiplayerUi.displayName = roomPlayer.displayName;
   }
   const openingVisible = multiplayerUi.status === "MATCH_STARTING";
-  const matchVisible = ["IN_MATCH", "MATCH_FINISHED"].includes(multiplayerUi.status);
+  const matchVisible = ["IN_MATCH", "MATCH_FINISHED"].includes(multiplayerUi.status)
+    || Boolean(multiplayerUi.view && multiplayerUi.view.gameOver);
   const reconnecting = multiplayerUi.status === "RECONNECTING";
   if (openingVisible) {
     if (!previousOnlineDuel) clearDuelUiState();
@@ -2746,6 +2793,18 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
       const pending = lanPendingJoin;
       lanPendingJoin = null;
       queueMicrotask(() => runMultiplayerCommand("joinRoom", pending));
+    }
+  }
+  if (rerender && previousOpening && isOnlineOpeningChoice()) {
+    const nextPlayer = currentOnlineRoomPlayer();
+    const nextChoiceSubmitted = Boolean(nextPlayer && nextPlayer.openingChoiceSubmitted);
+    const nextOpeningTie = Boolean(
+      multiplayerUi.room
+      && multiplayerUi.room.lastOpeningResult
+      && multiplayerUi.room.lastOpeningResult.result === "tie"
+    );
+    if (previousChoiceSubmitted === nextChoiceSubmitted && previousOpeningTie === nextOpeningTie) {
+      rerender = false;
     }
   }
   if (rerender) {
@@ -8106,12 +8165,18 @@ async function leaveCurrentGame() {
 }
 
 async function returnToOnlineRoom() {
+  const bridge = multiplayerBridge();
   clearDuelUiState();
   state = null;
   activeMatchPayload = {};
   pendingChoicePromptId = null;
   lastAppliedMultiplayerViewKey = null;
   appView = ONLINE_VIEW;
+  if (bridge && typeof bridge.dismissMatchResult === "function") {
+    const snapshot = await bridge.dismissMatchResult();
+    applyMultiplayerSnapshot(snapshot);
+    return;
+  }
   render();
   await refreshMultiplayerSnapshot();
 }
