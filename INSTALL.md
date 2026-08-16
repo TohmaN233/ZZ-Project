@@ -65,10 +65,10 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `142391976` bytes.
+Installer size: `142393615` bytes.
 
 Installer SHA-256:
-`3DFB1EF17F9327E9452C5924FF6A56CDE3FB07FD9ADFE5F883EA8A426BC3FB71`.
+`1077F62FFCD06869C4F70C7E611872CE482BA965B4A55FC428D48DA6E18A3294`.
 
 ## 4. Linux portable bundle
 

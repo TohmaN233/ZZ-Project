@@ -28,8 +28,8 @@
   ],
   "windowsInstaller": {
     "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
-    "bytes": 142391976,
-    "sha256": "3DFB1EF17F9327E9452C5924FF6A56CDE3FB07FD9ADFE5F883EA8A426BC3FB71",
+    "bytes": 142393615,
+    "sha256": "1077F62FFCD06869C4F70C7E611872CE482BA965B4A55FC428D48DA6E18A3294",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",

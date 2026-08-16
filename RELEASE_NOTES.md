@@ -23,6 +23,9 @@
   selected player and opponent decks.
 - The Windows installer explicitly excludes `asserts/`; updating the EXE does
   not replace the separately downloaded asset directory.
+- Online rooms now use the same duel renderer and local cosmetic assets as
+  offline play, preserve player display names, and show the authoritative D6
+  opening roll. Multiplayer compatibility is rules `0.0.3`.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
   Private Codeman memory, training traces, challenge data, and local training
@@ -49,9 +52,9 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142391976` bytes.
+   Size: `142393615` bytes.
    SHA-256:
-   `3DFB1EF17F9327E9452C5924FF6A56CDE3FB07FD9ADFE5F883EA8A426BC3FB71`.
+   `1077F62FFCD06869C4F70C7E611872CE482BA965B4A55FC428D48DA6E18A3294`.
 2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
