@@ -24,8 +24,12 @@
 - The Windows installer explicitly excludes `asserts/`; updating the EXE does
   not replace the separately downloaded asset directory.
 - Online rooms now use the same duel renderer and local cosmetic assets as
-  offline play, preserve player display names, and show the authoritative D6
-  opening roll. Multiplayer compatibility is rules `0.0.3`.
+  offline play and preserve player display names. Both players secretly choose
+  rock, paper, or scissors to decide who goes first; ties repeat and the winner
+  starts. Multiplayer compatibility is protocol `2`, rules `0.0.3`.
+- When an online match ends, both players return to the same room with their
+  seats and selected decks preserved. Either player can change decks, ready up,
+  and start another match without entering the room code again.
 - The refreshed `0.3.0` packages prevent privacy-redacted opponent hand cards
   from inheriting global actions such as `End Turn`, restrict online mulligan
   selection to the local hand, and load Mana faces through the same local
@@ -56,16 +60,16 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142395960` bytes.
+   Size: `142399041` bytes.
    SHA-256:
-   `1D64C2D459D50BFD9107B06667D51D51BFAE0086799059440185B8D36D1475C6`.
+   `E5E057E1FA83F1EDC2E9D6015DC140CC94A34B8D745BDAF92F83BCDAF455229E`.
 2. [`ZZ-Project-v0.3.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `21467342` bytes.
+   Size: `21469407` bytes.
    SHA-256:
-   `E143ABE6930234B6850C69928B5F6A339AB2656DE06D643EE9426569AB7D1532`.
+   `3B659DD0DC1E9014D45CF3963B245B7A08B3FDB46E7C87EC815B5BAE9E72CC8D`.
 3. [`ZZ-Project-v0.3.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.

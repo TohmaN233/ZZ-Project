@@ -15,7 +15,7 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an experimenta
 - **Codeman memory**: recent matches and Replays are stored locally. When a Codeman has a dedicated `.pt` model, that model is preferred for the opponent.
 - **AI suggestions**: click your Codeman during a match to see the AI's suggestion for the current decision.
 - **Replay & Training**: review recent matches and, with a suitable GPU / CUDA environment, run experimental local training.
-- **Online Game**: supports LAN play and online rooms through a personal server.
+- **Online Game**: supports LAN play and online rooms through a personal server, with rock-paper-scissors for first player and same-room deck changes and rematches.
 - **Trilingual UI**: Simplified Chinese, Japanese, and English.
 - **BGM settings**: the complete asset pack includes ZENONZARD character songs.
 - **Update checks**: the desktop client checks GitHub Releases at startup and can open the release page when a newer version is available.
