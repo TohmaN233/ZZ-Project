@@ -22,6 +22,7 @@
 *.pt filter=lfs diff=lfs merge=lfs -text
 local_ai_training/retained_mainline_20260630/cycle470_actor.json filter=lfs diff=lfs merge=lfs -text
 local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json filter=lfs diff=lfs merge=lfs -text
+local_ai_training/ export-ignore
 
 asserts/**/ELEMENTS*/*.wav filter=lfs diff=lfs merge=lfs -text
 asserts/video/*.mp4 filter=lfs diff=lfs merge=lfs -text
