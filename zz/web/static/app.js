@@ -2684,6 +2684,7 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
   }
   const openingVisible = multiplayerUi.status === "MATCH_STARTING";
   const matchVisible = ["IN_MATCH", "MATCH_FINISHED"].includes(multiplayerUi.status);
+  const reconnecting = multiplayerUi.status === "RECONNECTING";
   if (openingVisible) {
     if (!previousOnlineDuel) clearDuelUiState();
     state = null;
@@ -2708,7 +2709,13 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     activeMatchPayload = { multiplayer: true };
     pendingChoicePromptId = multiplayerUi.pendingAction && state.prompt ? state.prompt.id : null;
     appView = "duel";
-  } else if (previousOnlineDuel && !matchVisible) {
+  } else if (reconnecting && (previousOnlineDuel || state || multiplayerUi.view)) {
+    activeMatchPayload = { multiplayer: true };
+    appView = "duel";
+    if (!state && multiplayerUi.view) {
+      stageDuelState(multiplayerUi.view, null);
+    }
+  } else if (previousOnlineDuel && !matchVisible && !reconnecting) {
     clearDuelUiState();
     state = null;
     activeMatchPayload = {};

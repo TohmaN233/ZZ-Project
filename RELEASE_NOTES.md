@@ -47,6 +47,8 @@
 - Reopening the desktop client after a stale room or invalid reconnect token
   returns silently to the home page instead of showing an error or forcing a
   broken duel.
+- A mid-match network drop stays on the duel and retries reconnect five times
+  before returning to the lobby.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
   Private Codeman memory, training traces, challenge data, and local training

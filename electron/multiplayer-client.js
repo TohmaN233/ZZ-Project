@@ -37,6 +37,8 @@ const ROOM_COMMAND_STATES = new Set([
   MultiplayerClientState.MATCH_FINISHED,
 ]);
 
+const MAX_RECONNECT_FAILURES = 5;
+
 const SERVER_MESSAGE_TYPES = new Set([
   "WELCOME",
   "ROOM_STATE",
@@ -60,6 +62,7 @@ class MultiplayerDesktopClient {
   #pendingAction = null;
   #recovery = null;
   #pendingActionNeedsReplay = false;
+  #reconnectFailures = 0;
 
   constructor({ WebSocketImpl = globalThis.WebSocket, uuidFactory = randomUUID } = {}) {
     if (typeof WebSocketImpl !== "function") {
@@ -117,6 +120,7 @@ class MultiplayerDesktopClient {
       canSubmitAction: this.canSubmitAction,
       canReconnect: this.#recovery !== null,
       reconnectAttemptActive: this.state === MultiplayerClientState.RECONNECTING && this.#socket !== null,
+      reconnectFailures: this.#reconnectFailures,
     };
   }
 
@@ -223,6 +227,7 @@ class MultiplayerDesktopClient {
       ? cloneJson(this.#recovery.pendingAction)
       : null;
     this.#pendingActionNeedsReplay = false;
+    this.#reconnectFailures = 0;
     if (!preserveRecovery) this.#clearRecovery();
     this.#setState(MultiplayerClientState.OFFLINE);
     return this.getSnapshot();
@@ -420,7 +425,7 @@ class MultiplayerDesktopClient {
       if (this.state !== MultiplayerClientState.RECONNECTING) {
         this.#setState(MultiplayerClientState.RECONNECTING);
       } else {
-        this.#emitEvent("RECONNECT_FAILED");
+        this.#registerReconnectFailure();
       }
       return;
     }
@@ -435,9 +440,13 @@ class MultiplayerDesktopClient {
     try {
       socket.close();
     } finally {
-      if (this.#recovery !== null && this.state === MultiplayerClientState.RECONNECTING) {
-        this.#recordError("RECONNECT_FAILED", error, { causeCode: code });
-        this.#emitEvent("RECONNECT_FAILED");
+      if (this.#recovery !== null) {
+        this.#recordError("RECONNECT_REQUIRED", error, { causeCode: code });
+        if (this.state !== MultiplayerClientState.RECONNECTING) {
+          this.#setState(MultiplayerClientState.RECONNECTING);
+        } else {
+          this.#registerReconnectFailure();
+        }
       } else {
         this.#recordError(code, error);
         this.#setState(MultiplayerClientState.ERROR);
@@ -468,6 +477,7 @@ class MultiplayerDesktopClient {
         break;
       case "ROOM_STATE":
         {
+          this.#reconnectFailures = 0;
           const reconnectToken = optionalString(payload.reconnectToken);
           delete payload.reconnectToken;
           this.#room = payload;
@@ -486,6 +496,7 @@ class MultiplayerDesktopClient {
         }
         break;
       case "MATCH_STARTED":
+        this.#reconnectFailures = 0;
         this.matchId = optionalString(payload.matchId) || optionalString(message.matchId);
         this.playerId = optionalString(payload.playerId) || this.playerId;
         this.#view = requirePlainObjectClone(payload.view, "MATCH_STARTED view");
@@ -495,6 +506,7 @@ class MultiplayerDesktopClient {
         this.#setState(MultiplayerClientState.IN_MATCH);
         break;
       case "STATE_SNAPSHOT":
+        this.#reconnectFailures = 0;
         this.matchId = optionalString(payload.matchId) || optionalString(message.matchId) || this.matchId;
         this.playerId = optionalString(payload.playerId) || this.playerId;
         this.#view = requirePlainObjectClone(payload.view, "STATE_SNAPSHOT view");
@@ -523,7 +535,7 @@ class MultiplayerDesktopClient {
           if (socket !== null) socket.close();
           if (retryable) {
             this.#recordError(payload.code, new Error(payload.message || payload.code));
-            this.#emitEvent("RECONNECT_FAILED");
+            this.#registerReconnectFailure();
           } else {
             this.#clearRecovery();
             this.#error = null;
@@ -534,6 +546,7 @@ class MultiplayerDesktopClient {
             this.matchId = null;
             this.#pendingAction = null;
             this.#pendingActionNeedsReplay = false;
+            this.#reconnectFailures = 0;
             this.#setState(MultiplayerClientState.OFFLINE);
           }
           break;
@@ -647,6 +660,15 @@ class MultiplayerDesktopClient {
 
   #newId(label) {
     return requireNonBlankString(this.#uuidFactory(), label);
+  }
+
+  #registerReconnectFailure() {
+    this.#reconnectFailures += 1;
+    this.#emitEvent("RECONNECT_FAILED");
+    if (this.#reconnectFailures >= MAX_RECONNECT_FAILURES) {
+      this.#recordError("RECONNECT_EXHAUSTED", new Error("reconnect failed repeatedly"));
+      this.#setState(MultiplayerClientState.ERROR);
+    }
   }
 
   #setState(nextState) {
