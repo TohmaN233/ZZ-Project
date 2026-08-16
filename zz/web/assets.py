@@ -477,6 +477,13 @@ class AssetIndex:
             return None
         return self.asset_url(local_id)
 
+    def mana_asset_catalog(self) -> dict[str, str]:
+        return {
+            color: url
+            for color in sorted(self._mana_asset_ids)
+            if (url := self.mana_asset_url(color)) is not None
+        }
+
     def ui_asset_url(self, asset_id: str | None) -> str | None:
         if not asset_id or asset_id not in self._ui_asset_ids:
             return None

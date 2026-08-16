@@ -276,6 +276,7 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
         "characters": character_catalog(asset_index),
         "homeGuide": home_guide_catalog(asset_index),
         "playmats": asset_index.playmat_catalog(),
+        "manaAssets": asset_index.mana_asset_catalog(),
         "uiAssets": asset_index.ui_asset_catalog(),
         "filters": _read_filter_groups(DEFAULT_OFFICIAL_FILTERS),
         "effectTemplates": effect_template_catalog(),

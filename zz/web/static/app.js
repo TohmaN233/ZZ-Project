@@ -1,4 +1,6 @@
 const app = document.getElementById("app");
+const MultiplayerCardPolicy = window.ZZMultiplayerCardPolicy;
+if (!MultiplayerCardPolicy) throw new Error("multiplayer card policy failed to load");
 
 let appView = "home";
 let state = null;
@@ -10,6 +12,7 @@ let catalog = {
   characters: [],
   homeGuide: null,
   playmats: [],
+  manaAssets: {},
   uiAssets: {},
   devMode: false,
 };
@@ -1597,7 +1600,10 @@ function hydrateMultiplayerViewAssets(view) {
     if (!card || typeof card !== "object") return;
     const assetId = card.faceDown ? "card_back" : (card.assetId || card.cardId);
     const localCard = cardsById.get(card.cardId || card.assetId);
-    const assetUrl = card.faceDown ? localAssetUrl("card_back") : (localCard && localCard.assetUrl) || localAssetUrl(assetId);
+    const localManaUrl = card.type === "mana_token" ? (catalog.manaAssets || {})[card.manaColor] : null;
+    const assetUrl = card.faceDown
+      ? localAssetUrl("card_back")
+      : localManaUrl || (localCard && localCard.assetUrl) || localAssetUrl(assetId);
     card.assetId = assetId;
     card.assetUrl = assetUrl;
     if (!card.faceDown) {
@@ -3439,14 +3445,7 @@ function actionOptionsForCard(card) {
   if (replayReadonlyMode) return [];
   const prompt = activePrompt();
   if (!prompt) return [];
-  return prompt.options.filter((option) => {
-    if (option.cardIid === card.iid || option.attacker_iid === card.iid) return true;
-    if (option.kind === "bless") return option.mana_iid === card.iid;
-    if (["play_card", "play_to_base", "move_card", "activate_flash_ability"].includes(option.kind)) {
-      return option.iid === card.iid;
-    }
-    return false;
-  }).sort(cardActionPriority);
+  return MultiplayerCardPolicy.actionOptionsForCard(card, prompt.options).sort(cardActionPriority);
 }
 
 function blessActionsForMana(card) {
@@ -3889,8 +3888,7 @@ function toggleMulliganSelection(iid) {
 
 function canMulliganSelect(card) {
   if (replayReadonlyMode) return false;
-  const side = promptPlayerSide();
-  return isMulliganPrompt() && !card.faceDown && card.area === "hand" && (!side || card.ownerSide === side);
+  return MultiplayerCardPolicy.canMulliganSelect(card, activePrompt(), state && state.humanSide, isOnlineDuel());
 }
 
 function cardTitle(card) {
@@ -4856,7 +4854,7 @@ function isActiveZoneMoveSourceCard(card) {
 }
 
 function renderCard(card, size = "") {
-  const interactive = !card.faceDown;
+  const interactive = MultiplayerCardPolicy.isCardInteractive(card, state && state.humanSide, isOnlineDuel());
   const actions = actionOptionsForCard(card);
   const blessSourceActions = blessActionsForMana(card);
   const blessTargetActions = blessActionsForTarget(card);
