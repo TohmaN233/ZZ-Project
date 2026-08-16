@@ -53,6 +53,7 @@ class InitialMatchSpec:
     player_1_name: str = "Player 1"
     player_2_name: str = "Player 2"
     opening_roll: int | None = None
+    opening_contest: Mapping[str, Any] | None = None
     rules_version: str = RULES_VERSION
 
     def __post_init__(self) -> None:
@@ -71,6 +72,19 @@ class InitialMatchSpec:
         if self.opening_roll is not None:
             if first_player_id_for_roll(self.opening_roll) != self.first_player_id:
                 raise ValueError("opening roll parity does not match first_player_id")
+        if self.opening_contest is not None:
+            contest = dict(self.opening_contest)
+            choices = contest.get("choices")
+            if not isinstance(choices, Mapping) or set(choices) != set(PLAYER_IDS):
+                raise ValueError("opening contest must contain both player choices")
+            if any(choice not in {"rock", "paper", "scissors"} for choice in choices.values()):
+                raise ValueError("opening contest contains an invalid choice")
+            if contest.get("winnerPlayerId") != self.first_player_id:
+                raise ValueError("opening contest winner must match first_player_id")
+            object.__setattr__(self, "opening_contest", MappingProxyType({
+                "choices": MappingProxyType(dict(choices)),
+                "winnerPlayerId": self.first_player_id,
+            }))
         object.__setattr__(self, "player_1_deck", MappingProxyType(dict(self.player_1_deck)))
         object.__setattr__(self, "player_2_deck", MappingProxyType(dict(self.player_2_deck)))
         object.__setattr__(self, "player_1_forces", tuple(self.player_1_forces))
@@ -108,6 +122,10 @@ class InitialMatchSpec:
             "player1Name": self.player_1_name,
             "player2Name": self.player_2_name,
             "openingRoll": self.opening_roll,
+            "openingContest": None if self.opening_contest is None else {
+                "choices": dict(self.opening_contest["choices"]),
+                "winnerPlayerId": self.opening_contest["winnerPlayerId"],
+            },
             "rulesVersion": self.rules_version,
         }
 
@@ -150,6 +168,13 @@ class AuthoritativeMatch:
             actual_first_player_id = "player_1" if player_1.is_first_player else "player_2"
             if actual_first_player_id != spec.first_player_id:
                 raise RuntimeError("authoritative first player did not match opening roll parity")
+        if spec.opening_contest is not None:
+            choices = spec.opening_contest["choices"]
+            self.session._animation_events.insert(0, {
+                "type": "rock_paper_scissors",
+                "choices": {"P1": choices["player_1"], "P2": choices["player_2"]},
+                "winnerSide": "P1" if spec.first_player_id == "player_1" else "P2",
+            })
         self.revision = 0
         self._animation_events = tuple(deepcopy(self.session._animation_events))
         self._public_reveals = tuple(deepcopy(self.session._public_reveals))

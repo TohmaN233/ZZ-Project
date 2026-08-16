@@ -30,6 +30,7 @@ _CLIENT_MESSAGE_TYPES = {
     "RECONNECT",
     "SELECT_DECK",
     "SET_READY",
+    "SELECT_OPENING_CHOICE",
     "SUBMIT_ACTION",
     "REQUEST_SYNC",
     "LEAVE_ROOM",
@@ -317,6 +318,16 @@ def _validate_set_ready(payload: Mapping[str, Any]) -> None:
         _invalid("ready must be a boolean")
 
 
+def _validate_select_opening_choice(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(
+        payload,
+        required={"choice"},
+        label="SELECT_OPENING_CHOICE payload",
+    )
+    if value["choice"] not in {"rock", "paper", "scissors"}:
+        _invalid("choice must be rock, paper, or scissors")
+
+
 def _validate_submit_action(payload: Mapping[str, Any]) -> None:
     value = _strict_object(
         payload,
@@ -428,7 +439,7 @@ def _validate_room_state(payload: Mapping[str, Any]) -> None:
             "players",
             "playerId",
         },
-        optional={"matchId", "reconnectToken"},
+        optional={"matchId", "reconnectToken", "openingRound", "lastOpeningResult"},
         label="ROOM_STATE payload",
     )
     _identifier(value["roomId"], "roomId")
@@ -458,6 +469,12 @@ def _validate_room_state(payload: Mapping[str, Any]) -> None:
         _identifier(value["matchId"], "matchId")
     if "reconnectToken" in value:
         _identifier(value["reconnectToken"], "reconnectToken")
+    if "openingRound" in value:
+        opening_round = value["openingRound"]
+        if isinstance(opening_round, bool) or not isinstance(opening_round, int) or opening_round < 1:
+            _invalid("openingRound must be a positive integer")
+    if "lastOpeningResult" in value and value["lastOpeningResult"] is not None:
+        _json_object(value["lastOpeningResult"], "lastOpeningResult")
 
 
 def _validate_room_player(player: Mapping[str, Any]) -> None:
@@ -471,7 +488,7 @@ def _validate_room_player(player: Mapping[str, Any]) -> None:
             "deckSelected",
             "ready",
         },
-        optional={"connected", "disconnectedAt"},
+        optional={"connected", "disconnectedAt", "openingChoiceSubmitted"},
         label="room player",
     )
     _identifier(value["playerId"], "playerId")
@@ -484,6 +501,8 @@ def _validate_room_player(player: Mapping[str, Any]) -> None:
         _invalid("connected must be a boolean")
     if "disconnectedAt" in value:
         _optional_number(value["disconnectedAt"], "disconnectedAt")
+    if "openingChoiceSubmitted" in value and not isinstance(value["openingChoiceSubmitted"], bool):
+        _invalid("openingChoiceSubmitted must be a boolean")
 
 
 def _validate_match_started(payload: Mapping[str, Any]) -> None:
@@ -583,6 +602,7 @@ _CLIENT_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
     "RECONNECT": _validate_reconnect,
     "SELECT_DECK": _validate_select_deck,
     "SET_READY": _validate_set_ready,
+    "SELECT_OPENING_CHOICE": _validate_select_opening_choice,
     "SUBMIT_ACTION": _validate_submit_action,
     "REQUEST_SYNC": _validate_request_sync,
     "LEAVE_ROOM": _validate_leave_room,

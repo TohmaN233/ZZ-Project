@@ -233,6 +233,40 @@ test("room commands are state-gated and use only the protocol command set", () =
   assert.throws(() => client.createRoom({ displayName: "Again" }), /not allowed from IN_ROOM/);
 });
 
+test("opening choice is allowed only while the match is starting", () => {
+  const { client, socket } = makeClient();
+  connectClient(client, socket);
+  enterRoom(client, socket, "STARTING");
+
+  client.selectOpeningChoice({ choice: "rock" });
+
+  assert.deepEqual(JSON.parse(socket().sent.at(-1)), {
+    protocolVersion: LOCAL_COMPATIBILITY.protocolVersion,
+    messageId: "id-2",
+    type: "SELECT_OPENING_CHOICE",
+    payload: { choice: "rock" },
+  });
+  assert.throws(() => client.selectOpeningChoice({ choice: "fire" }), /rock, paper, or scissors/);
+});
+
+test("ready-check after a finished match keeps the room and clears stale match state", () => {
+  const { client, socket } = makeClient();
+  connectClient(client, socket);
+  enterRoom(client, socket);
+  startMatch(client, socket, 2);
+  socket().receive(serverMessage("STATE_SNAPSHOT", {
+    matchId: "match-1",
+    view: { revision: 3, gameOver: true },
+  }, { matchId: "match-1", revision: 3 }));
+
+  enterRoom(client, socket, "READY_CHECK");
+
+  assert.equal(client.state, MultiplayerClientState.IN_ROOM);
+  assert.equal(client.room.roomCode, "ABC123");
+  assert.equal(client.matchId, null);
+  assert.equal(client.view, null);
+});
+
 test("room start, match start and finish drive the explicit state machine", () => {
   const { client, socket } = makeClient();
   connectClient(client, socket);
@@ -434,7 +468,7 @@ test("recoverable close reconnects with a private rotated token and canonical sn
   assert.equal(JSON.parse(reconnectSocket.sent[0]).type, "HELLO");
   reconnectSocket.receive(serverMessage("WELCOME", { connectionId: "connection-2" }));
   assert.deepEqual(JSON.parse(reconnectSocket.sent.at(-1)), {
-    protocolVersion: 1,
+    protocolVersion: LOCAL_COMPATIBILITY.protocolVersion,
     messageId: "id-3",
     type: "RECONNECT",
     payload: { roomCode: "ABC123", playerId: "player-1", reconnectToken: "token-1" },

@@ -3,12 +3,13 @@ from __future__ import annotations
 import time
 from threading import Barrier, Lock, Thread
 
+from zz.multiplayer.protocol import PROTOCOL_VERSION
 from zz.multiplayer.service import MultiplayerServer
 
 
 def _message(message_id: str, message_type: str, payload: dict | None = None) -> dict:
     return {
-        "protocolVersion": 1,
+        "protocolVersion": PROTOCOL_VERSION,
         "messageId": message_id,
         "type": message_type,
         "payload": payload or {},

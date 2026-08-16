@@ -20,6 +20,7 @@ from zz.multiplayer.compatibility import (
     hello_compatibility_payload,
 )
 from zz.multiplayer.protocol import (
+    PROTOCOL_VERSION,
     parse_server_message,
     serialize_client_hello,
     serialize_client_message,
@@ -98,6 +99,12 @@ def test_two_websocket_clients_complete_authoritative_room_flow() -> None:
             first.set_ready(True)
             second.set_ready(True)
             _wait_until(lambda: (
+                first.status is ClientConnectionState.MATCH_STARTING
+                and second.status is ClientConnectionState.MATCH_STARTING
+            ))
+            first.select_opening_choice("rock")
+            second.select_opening_choice("scissors")
+            _wait_until(lambda: (
                 first.status is ClientConnectionState.IN_MATCH
                 and second.status is ClientConnectionState.IN_MATCH
                 and first.gameplay_view is not None
@@ -116,12 +123,12 @@ def test_two_websocket_clients_complete_authoritative_room_flow() -> None:
 
             first.surrender(client_action_id="ws-surrender")
             _wait_until(lambda: (
-                first.status is ClientConnectionState.MATCH_FINISHED
-                and second.status is ClientConnectionState.MATCH_FINISHED
+                first.status is ClientConnectionState.IN_ROOM
+                and second.status is ClientConnectionState.IN_ROOM
             ))
-            assert first.gameplay_view["stateHash"] == second.gameplay_view["stateHash"]
-            assert first.gameplay_view["gameOver"] is not None
-            assert second.gameplay_view["gameOver"] is not None
+            assert first.gameplay_view is None
+            assert second.gameplay_view is None
+            assert first.room_state["roomCode"] == second.room_state["roomCode"] == "WS1234"
 
             core.close_room("WS1234")
             _wait_until(lambda: (
@@ -150,7 +157,7 @@ def test_handshake_version_mismatch_and_unknown_message_are_explicit() -> None:
 
         with websocket_connect(url, proxy=None) as socket:
             socket.send(serialize_client_hello({
-                "protocolVersion": 1,
+                "protocolVersion": PROTOCOL_VERSION,
                 "messageId": "hello",
                 "type": "HELLO",
                 "payload": {},
@@ -159,7 +166,7 @@ def test_handshake_version_mismatch_and_unknown_message_are_explicit() -> None:
             assert welcome["type"] == "WELCOME"
             assert welcome["payload"]["compatibility"] == compatibility_payload()
             socket.send(json.dumps({
-                "protocolVersion": 1,
+                "protocolVersion": PROTOCOL_VERSION,
                 "messageId": "unknown",
                 "type": "REMOTE_SHELL",
                 "payload": {},
@@ -169,7 +176,7 @@ def test_handshake_version_mismatch_and_unknown_message_are_explicit() -> None:
             assert error["payload"]["fatal"] is False
 
             socket.send(serialize_client_message({
-                "protocolVersion": 1,
+                "protocolVersion": PROTOCOL_VERSION,
                 "messageId": "create",
                 "type": "CREATE_ROOM",
                 "payload": {"displayName": "Alice"},
@@ -196,7 +203,7 @@ def test_gateway_rejects_game_compatibility_mismatch_before_connect(
         with websocket_connect(url, proxy=None) as socket:
             payload = {**hello_compatibility_payload(), field: value}
             socket.send(json.dumps({
-                "protocolVersion": 1,
+                "protocolVersion": PROTOCOL_VERSION,
                 "messageId": f"mismatch-{field}",
                 "type": "HELLO",
                 "payload": payload,
@@ -204,7 +211,7 @@ def test_gateway_rejects_game_compatibility_mismatch_before_connect(
             error = parse_server_message(socket.recv())
 
             assert error == {
-                "protocolVersion": 1,
+                "protocolVersion": PROTOCOL_VERSION,
                 "messageId": error["messageId"],
                 "type": "ERROR",
                 "payload": {
@@ -254,6 +261,12 @@ def test_websocket_disconnect_reconnect_restores_private_snapshot() -> None:
             first.set_ready(True)
             second.set_ready(True)
             _wait_until(lambda: (
+                first.status is ClientConnectionState.MATCH_STARTING
+                and second.status is ClientConnectionState.MATCH_STARTING
+            ))
+            first.select_opening_choice("rock")
+            second.select_opening_choice("scissors")
+            _wait_until(lambda: (
                 first.status is ClientConnectionState.IN_MATCH
                 and second.status is ClientConnectionState.IN_MATCH
                 and first.gameplay_view is not None
@@ -267,14 +280,14 @@ def test_websocket_disconnect_reconnect_restores_private_snapshot() -> None:
 
             with websocket_connect(url, proxy=None) as recovered:
                 recovered.send(serialize_client_hello({
-                    "protocolVersion": 1,
+                    "protocolVersion": PROTOCOL_VERSION,
                     "messageId": "reconnect-hello",
                     "type": "HELLO",
                     "payload": {},
                 }))
                 assert parse_server_message(recovered.recv())["type"] == "WELCOME"
                 recovered.send(serialize_client_message({
-                    "protocolVersion": 1,
+                    "protocolVersion": PROTOCOL_VERSION,
                     "messageId": "reconnect-seat",
                     "type": "RECONNECT",
                     "payload": {

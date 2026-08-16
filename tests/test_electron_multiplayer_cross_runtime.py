@@ -81,17 +81,19 @@ const waitFor = async (predicate, label) => {
     second.selectDeck(decks.second);
     first.setReady({ ready: true });
     second.setReady({ ready: true });
+    await waitFor(() => first.state === "MATCH_STARTING" && second.state === "MATCH_STARTING", "opening choice");
+    first.selectOpeningChoice({ choice: "rock" });
+    second.selectOpeningChoice({ choice: "scissors" });
     await waitFor(() => first.state === "IN_MATCH" && second.state === "IN_MATCH", "match start");
     if (first.view.stateHash !== second.view.stateHash) throw new Error("state hash mismatch");
     if (first.view.players.opponent.hand.some((card) => Object.hasOwn(card, "iid"))) throw new Error("first hidden hand leaked");
     if (second.view.players.opponent.hand.some((card) => Object.hasOwn(card, "iid"))) throw new Error("second hidden hand leaked");
     first.surrender({ clientActionId: "electron-surrender" });
-    await waitFor(() => first.state === "MATCH_FINISHED" && second.state === "MATCH_FINISHED", "match finish");
+    await waitFor(() => first.state === "IN_ROOM" && second.state === "IN_ROOM", "return to room");
     process.stdout.write(JSON.stringify({
-      firstHash: first.view.stateHash,
-      secondHash: second.view.stateHash,
       firstState: first.state,
       secondState: second.state,
+      roomCode: first.room.roomCode,
     }));
   } finally {
     first.disconnect();
@@ -120,5 +122,5 @@ const waitFor = async (predicate, label) => {
         )
 
     result = json.loads(completed.stdout)
-    assert result["firstHash"] == result["secondHash"]
-    assert result["firstState"] == result["secondState"] == "MATCH_FINISHED"
+    assert result["firstState"] == result["secondState"] == "IN_ROOM"
+    assert result["roomCode"] == "EL1234"

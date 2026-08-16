@@ -10,6 +10,7 @@ import pytest
 
 from zz.multiplayer.compatibility import hello_compatibility_payload
 from zz.multiplayer.client import ClientConnectionState, MultiplayerClientStore
+from zz.multiplayer.protocol import PROTOCOL_VERSION
 import zz.multiplayer.transport as transport_module
 from zz.multiplayer.transport import WebSocketTransport
 
@@ -96,7 +97,7 @@ def test_connect_sends_one_hello_and_serializes_messages(
     assert transport.connected is True
     assert len(socket.sent) == 1
     hello = json.loads(socket.sent[0])
-    assert hello["protocolVersion"] == 1
+    assert hello["protocolVersion"] == PROTOCOL_VERSION
     assert hello["type"] == "HELLO"
     assert hello["messageId"]
     assert hello["payload"] == hello_compatibility_payload()

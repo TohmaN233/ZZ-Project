@@ -109,6 +109,8 @@ def test_server_emits_required_lifecycle_events_without_private_state() -> None:
     second.select_deck(DEMETE_GREEN_RECIPE, DECKCODE0_GREEN_FORCES)
     first.set_ready(True)
     second.set_ready(True)
+    first.select_opening_choice("rock")
+    second.select_opening_choice("scissors")
 
     assert first.gameplay_view is not None
     prompt = first.gameplay_view["prompt"]
@@ -180,20 +182,20 @@ def test_per_connection_token_bucket_limits_before_dispatch_and_refills() -> Non
     transport.connect()
 
     transport.send({
-        "protocolVersion": 1,
+        "protocolVersion": PROTOCOL_VERSION,
         "messageId": "create",
         "type": "CREATE_ROOM",
         "payload": {},
     })
     transport.send({
-        "protocolVersion": 1,
+        "protocolVersion": PROTOCOL_VERSION,
         "messageId": "sync-1",
         "type": "REQUEST_SYNC",
         "payload": {},
     })
     before = len(messages)
     transport.send({
-        "protocolVersion": 1,
+        "protocolVersion": PROTOCOL_VERSION,
         "messageId": "sync-limited",
         "type": "REQUEST_SYNC",
         "payload": {},
@@ -217,7 +219,7 @@ def test_per_connection_token_bucket_limits_before_dispatch_and_refills() -> Non
 
     now[0] += 0.5
     transport.send({
-        "protocolVersion": 1,
+        "protocolVersion": PROTOCOL_VERSION,
         "messageId": "sync-refilled",
         "type": "REQUEST_SYNC",
         "payload": {},

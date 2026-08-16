@@ -44,6 +44,7 @@ class RoomPlayer:
     force_ids: tuple[str, str] | None = field(default=None, repr=False)
     profile: dict[str, str | None] = field(default_factory=dict, repr=False)
     ready: bool = False
+    opening_choice: str | None = field(default=None, repr=False)
 
     @property
     def deck_selected(self) -> bool:
@@ -59,6 +60,7 @@ class RoomPlayer:
             "disconnectedAt": self.disconnected_at,
             "deckSelected": self.deck_selected,
             "ready": self.ready,
+            "openingChoiceSubmitted": self.opening_choice is not None,
         }
 
 
@@ -70,7 +72,7 @@ class Room:
         RoomStatus.READY_CHECK: RoomStatus.STARTING,
         RoomStatus.STARTING: RoomStatus.RUNNING,
         RoomStatus.RUNNING: RoomStatus.FINISHED,
-        RoomStatus.FINISHED: RoomStatus.CLOSED,
+        RoomStatus.FINISHED: RoomStatus.READY_CHECK,
     }
 
     def __init__(
@@ -99,6 +101,8 @@ class Room:
         self.started_at: float | None = None
         self.finished_at: float | None = None
         self.closed_at: float | None = None
+        self.opening_round = 1
+        self.last_opening_result: dict[str, Any] | None = None
         self._players: list[RoomPlayer] = []
         self._players.append(RoomPlayer(
             player_id=self.host_player_id,
@@ -204,6 +208,52 @@ class Room:
             raise RoomError("PLAYERS_NOT_READY", "both players must be ready")
         self._transition(RoomStatus.STARTING)
         self.started_at = self.updated_at
+        self.opening_round = 1
+        self.last_opening_result = None
+        for player in self._players:
+            player.opening_choice = None
+
+    def select_opening_choice(self, connection_id: str, choice: str) -> str | None:
+        self._require_status(RoomStatus.STARTING)
+        if choice not in {"rock", "paper", "scissors"}:
+            raise RoomError("INVALID_OPENING_CHOICE", "choice must be rock, paper, or scissors")
+        player = self.player_for_connection(connection_id)
+        if player.opening_choice is not None:
+            raise RoomError("OPENING_CHOICE_ALREADY_SUBMITTED", "opening choice is already submitted")
+        player.opening_choice = choice
+        self._touch()
+        if any(candidate.opening_choice is None for candidate in self._players):
+            return None
+        first, second = self._players
+        choices = {
+            first.player_id: str(first.opening_choice),
+            second.player_id: str(second.opening_choice),
+        }
+        if first.opening_choice == second.opening_choice:
+            self.last_opening_result = {"result": "tie", "choices": choices}
+            self.opening_round += 1
+            for candidate in self._players:
+                candidate.opening_choice = None
+            self._touch()
+            return None
+        first_wins = (first.opening_choice, second.opening_choice) in {
+            ("rock", "scissors"),
+            ("paper", "rock"),
+            ("scissors", "paper"),
+        }
+        winner = first if first_wins else second
+        self.last_opening_result = {
+            "result": "win",
+            "choices": choices,
+            "winnerPlayerId": winner.player_id,
+        }
+        self._touch()
+        return winner.player_id
+
+    def opening_choices(self) -> dict[str, str]:
+        if any(player.opening_choice is None for player in self._players):
+            raise RoomError("OPENING_CHOICES_INCOMPLETE", "both opening choices are required")
+        return {player.player_id: str(player.opening_choice) for player in self._players}
 
     def mark_running(self) -> None:
         self._transition(RoomStatus.RUNNING)
@@ -211,6 +261,16 @@ class Room:
     def finish(self) -> None:
         self._transition(RoomStatus.FINISHED)
         self.finished_at = self.updated_at
+
+    def prepare_rematch(self) -> None:
+        self._require_status(RoomStatus.FINISHED)
+        self._transition(RoomStatus.READY_CHECK)
+        self.started_at = None
+        self.opening_round = 1
+        self.last_opening_result = None
+        for player in self._players:
+            player.ready = False
+            player.opening_choice = None
 
     def mark_disconnected(self, connection_id: str) -> RoomPlayer:
         player = self.player_for_connection(connection_id)
@@ -273,7 +333,7 @@ class Room:
     def close(self) -> None:
         if self.status is RoomStatus.CLOSED:
             return
-        if self.status in {RoomStatus.STARTING, RoomStatus.RUNNING}:
+        if self.status is RoomStatus.RUNNING:
             self._raise_invalid_status("close an active room")
         for player in self._players:
             player.reconnect_token = None
@@ -319,6 +379,8 @@ class Room:
             "startedAt": self.started_at,
             "finishedAt": self.finished_at,
             "closedAt": self.closed_at,
+            "openingRound": self.opening_round,
+            "lastOpeningResult": self.last_opening_result,
             "players": [player.to_public_dict() for player in self._players],
         }
 

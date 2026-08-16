@@ -51,6 +51,7 @@ def _server(message_type: str, payload: dict | None = None) -> dict:
         ("JOIN_ROOM", {"roomCode": "ABC123", "displayName": "Bob"}),
         ("SELECT_DECK", {"deck": {"CARD_001": 3}, "forces": ["F01", "F02"], "profile": {"codemanId": "codeman-1", "playmatId": "playmat-1"}}),
         ("SET_READY", {"ready": True}),
+        ("SELECT_OPENING_CHOICE", {"choice": "rock"}),
         (
             "SUBMIT_ACTION",
             {
@@ -128,6 +129,7 @@ def test_client_envelope_rejects_invalid_shapes(message, code: str, fatal: bool)
         _client("JOIN_ROOM", {"roomCode": "ABC123", "extra": True}),
         _client("CREATE_ROOM", {"displayName": "x" * 41}),
         _client("SET_READY", {"ready": 1}),
+        _client("SELECT_OPENING_CHOICE", {"choice": "fire"}),
         _client("LEAVE_ROOM", {"roomCode": "ABC123"}),
     ],
 )

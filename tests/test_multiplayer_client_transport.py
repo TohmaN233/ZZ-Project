@@ -6,6 +6,7 @@ from typing import Any, Callable, Mapping
 import pytest
 
 from zz.multiplayer.client import ClientConnectionState, MultiplayerClientStore
+from zz.multiplayer.protocol import PROTOCOL_VERSION
 from zz.multiplayer.transport import InMemoryTransport
 from zz.deckcode0 import DECKCODE0_YELLOW_FORCES, KANATANA_YELLOW_RECIPE
 
@@ -162,7 +163,7 @@ def test_action_pending_until_matching_ack_and_snapshots_are_canonical() -> None
         store.surrender(client_action_id="action-2")
 
     _, submitted = endpoint.received[-1]
-    assert submitted["protocolVersion"] == 1
+    assert submitted["protocolVersion"] == PROTOCOL_VERSION
     assert submitted["messageId"]
     assert submitted["type"] == "SUBMIT_ACTION"
     assert submitted["payload"] == {

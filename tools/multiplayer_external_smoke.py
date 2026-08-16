@@ -65,6 +65,14 @@ def run_external_smoke(url: str, *, timeout: float = 20.0) -> dict[str, Any]:
         first.set_ready(True)
         second.set_ready(True)
         _wait_until(
+            lambda: first.status is ClientConnectionState.MATCH_STARTING
+            and second.status is ClientConnectionState.MATCH_STARTING,
+            clients,
+            timeout=timeout,
+        )
+        first.select_opening_choice("rock")
+        second.select_opening_choice("scissors")
+        _wait_until(
             lambda: first.status is ClientConnectionState.IN_MATCH
             and second.status is ClientConnectionState.IN_MATCH
             and first.gameplay_view is not None
@@ -84,14 +92,14 @@ def run_external_smoke(url: str, *, timeout: float = 20.0) -> dict[str, Any]:
 
         first.surrender(client_action_id=f"external-smoke-{uuid4()}")
         _wait_until(
-            lambda: first.status is ClientConnectionState.MATCH_FINISHED
-            and second.status is ClientConnectionState.MATCH_FINISHED,
+            lambda: first.status is ClientConnectionState.IN_ROOM
+            and second.status is ClientConnectionState.IN_ROOM,
             clients,
             timeout=timeout,
         )
-        final_hash = str(first.gameplay_view["stateHash"])
-        if final_hash != second.gameplay_view["stateHash"]:
-            raise AssertionError("clients disagree on the final state hash")
+        final_hash = str(first.last_action_result["result"]["stateHash"])
+        if first.room_state["roomCode"] != room_code or second.room_state["roomCode"] != room_code:
+            raise AssertionError("clients did not return to the same room")
 
         first_transport.send({
             "protocolVersion": PROTOCOL_VERSION,

@@ -26,7 +26,7 @@ const ALLOWED_TRANSITIONS = Object.freeze({
   MATCH_STARTING: new Set(["CONNECTED", "IN_MATCH", "MATCH_FINISHED", "RECONNECTING", "OFFLINE", "ERROR"]),
   IN_MATCH: new Set(["CONNECTED", "MATCH_FINISHED", "RECONNECTING", "OFFLINE", "ERROR"]),
   RECONNECTING: new Set(["CONNECTED", "IN_ROOM", "MATCH_STARTING", "IN_MATCH", "MATCH_FINISHED", "OFFLINE", "ERROR"]),
-  MATCH_FINISHED: new Set(["CONNECTED", "RECONNECTING", "OFFLINE", "ERROR"]),
+  MATCH_FINISHED: new Set(["CONNECTED", "IN_ROOM", "MATCH_STARTING", "RECONNECTING", "OFFLINE", "ERROR"]),
   ERROR: new Set(["OFFLINE", "RECONNECTING"]),
 });
 
@@ -275,6 +275,14 @@ class MultiplayerDesktopClient {
     this.#sendCommand("SET_READY", { ready });
   }
 
+  selectOpeningChoice({ choice } = {}) {
+    this.#requireState("SELECT_OPENING_CHOICE", new Set([MultiplayerClientState.MATCH_STARTING]));
+    if (!["rock", "paper", "scissors"].includes(choice)) {
+      throw new TypeError("choice must be rock, paper, or scissors");
+    }
+    this.#sendCommand("SELECT_OPENING_CHOICE", { choice });
+  }
+
   submitAction({ action, clientActionId } = {}) {
     if (!isPlainObject(action)) throw new TypeError("action must be an object");
     if (!this.canSubmitAction) {
@@ -464,9 +472,17 @@ class MultiplayerDesktopClient {
           delete payload.reconnectToken;
           this.#room = payload;
           this.playerId = optionalString(payload.playerId) || this.playerId;
-          this.matchId = optionalString(payload.matchId) || this.matchId;
+          if (["STARTING", "RUNNING", "FINISHED"].includes(payload.status)) {
+            this.matchId = optionalString(payload.matchId) || this.matchId;
+          } else {
+            this.matchId = null;
+            this.#view = null;
+            this.#pendingAction = null;
+            this.#pendingActionNeedsReplay = false;
+          }
           if (reconnectToken) this.#setRecoveryToken(reconnectToken);
           this.#applyRoomStatus(payload.status);
+          this.#syncRecoverySession();
         }
         break;
       case "MATCH_STARTED":

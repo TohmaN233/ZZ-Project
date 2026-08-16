@@ -15,6 +15,7 @@ def test_preload_exposes_only_narrow_multiplayer_commands() -> None:
         "joinRoom",
         "selectDeck",
         "setReady",
+        "selectOpeningChoice",
         "submitAction",
         "surrender",
         "requestSync",
@@ -43,6 +44,7 @@ def test_main_process_owns_socket_client_and_checks_ipc_sender() -> None:
         "multiplayer:joinRoom",
         "multiplayer:selectDeck",
         "multiplayer:setReady",
+        "multiplayer:selectOpeningChoice",
         "multiplayer:submitAction",
         "multiplayer:surrender",
         "multiplayer:requestSync",
@@ -72,6 +74,8 @@ def test_online_home_entry_and_duel_action_route_are_live() -> None:
     assert 'if (appView === ONLINE_VIEW)' in app
     assert 'runMultiplayerCommand("submitAction"' in app
     assert 'runMultiplayerCommand("surrender")' in app
+    assert 'runMultiplayerCommand("selectOpeningChoice", choice)' in app
+    assert 'data-online-opening-choice=' in app
     assert 'window.zzMultiplayer' in app
     assert 'data-multiplayer-tab="lan"' in app
     assert 'data-lan-host' in app
@@ -114,6 +118,7 @@ def test_online_duel_uses_local_assets_shared_visual_pipeline_and_inert_card_bac
     assert "hydrateMultiplayerViewAssets" in apply_snapshot
     assert "stageDuelState" in apply_snapshot
     assert "lastAppliedMultiplayerViewKey" in apply_snapshot
-    assert "card.faceDown ? localAssetUrl(\"card_back\")" in app
-    assert "const interactive = !card.faceDown" in render_card
+    assert "const localManaUrl" in app
+    assert '? localAssetUrl("card_back")' in app
+    assert "MultiplayerCardPolicy.isCardInteractive" in render_card
     assert "data-card-iid" in render_card and "interactive ?" in render_card

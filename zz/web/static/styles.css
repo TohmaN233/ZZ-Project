@@ -6187,6 +6187,39 @@ button.end-turn-action {
   color: #ffb0a8;
 }
 
+.online-opening-choice {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(300px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.online-opening-choice > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(86px, 1fr));
+  gap: 8px;
+}
+
+.online-opening-choice small {
+  color: var(--muted);
+}
+
+.opening-choice-card {
+  display: grid;
+  gap: 18px;
+  min-width: min(460px, 88vw);
+  text-align: center;
+}
+
+.opening-choice-card > div {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  font-size: 22px;
+}
+
 .lobby-launch-panel {
   background:
     linear-gradient(135deg, rgba(50, 213, 200, 0.08), rgba(255, 223, 128, 0.06)),
@@ -6726,10 +6759,15 @@ button.end-turn-action {
   .online-connect-grid,
   .online-room-entry,
   .online-room-actions,
+  .online-opening-choice,
   .lan-host-strip,
   .lan-discovery-row,
   .settings-grid {
     grid-template-columns: 1fr;
+  }
+
+  .online-opening-choice > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .lobby-launch-strip .opponent-deck-picker {

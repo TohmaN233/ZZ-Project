@@ -37,6 +37,8 @@ def _start_match(
     second.select_deck(DEMETE_GREEN_RECIPE, DECKCODE0_GREEN_FORCES)
     first.set_ready(True)
     second.set_ready(True)
+    first.select_opening_choice("scissors")
+    second.select_opening_choice("rock")
 
 
 def _prompt_action(client: MultiplayerClientStore) -> dict:
@@ -122,13 +124,12 @@ def test_two_independent_clients_join_ready_act_surrender_and_close() -> None:
     assert second.gameplay_view.get("prompt") is None
 
     first.surrender(client_action_id="surrender-a")
-    assert first.status is ClientConnectionState.MATCH_FINISHED
-    assert second.status is ClientConnectionState.MATCH_FINISHED
-    assert first.gameplay_view["stateHash"] == second.gameplay_view["stateHash"]
-    assert first.gameplay_view["gameOver"] is not None
-    assert second.gameplay_view["gameOver"] is not None
-    assert first.room_state["status"] == "FINISHED"
-    assert second.room_state["status"] == "FINISHED"
+    assert first.status is ClientConnectionState.IN_ROOM
+    assert second.status is ClientConnectionState.IN_ROOM
+    assert first.gameplay_view is None
+    assert second.gameplay_view is None
+    assert first.room_state["status"] == "READY_CHECK"
+    assert second.room_state["status"] == "READY_CHECK"
 
     server.close_room("ABC123")
     assert first.status is ClientConnectionState.CONNECTED
@@ -160,7 +161,7 @@ def test_invalid_room_third_player_and_private_loadouts() -> None:
     assert not any(card_id in encoded_room for card_id in DEMETE_GREEN_RECIPE)
 
 
-def test_online_match_preserves_cosmetics_names_and_seeded_opening_roll() -> None:
+def test_online_match_preserves_cosmetics_names_and_rps_first_player() -> None:
     server = MultiplayerServer(
         room_id_factory=lambda: "room-parity",
         room_code_factory=lambda: "PAR123",
@@ -191,6 +192,8 @@ def test_online_match_preserves_cosmetics_names_and_seeded_opening_roll() -> Non
     })
     first.set_ready(True)
     second.set_ready(True)
+    first.select_opening_choice("scissors")
+    second.select_opening_choice("rock")
 
     first_view = first.gameplay_view
     second_view = second.gameplay_view
@@ -205,7 +208,7 @@ def test_online_match_preserves_cosmetics_names_and_seeded_opening_roll() -> Non
     assert first_view["players"]["opponent"]["isFirstPlayer"] is True
     assert first_view["activeSide"] == second_view["activeSide"] == "P2"
     assert first_view["animationEvents"] == second_view["animationEvents"] == [{
-        "type": "dice_roll",
-        "value": 6,
-        "firstSeat": "right",
+        "type": "rock_paper_scissors",
+        "choices": {"P1": "scissors", "P2": "rock"},
+        "winnerSide": "P2",
     }]

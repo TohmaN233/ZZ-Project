@@ -636,6 +636,11 @@ function registerIpc() {
     multiplayerClient.setReady({ ready });
     return multiplayerSnapshot();
   });
+  ipcMain.handle("multiplayer:selectOpeningChoice", async (_event, choice) => {
+    assertTrustedSender(_event);
+    multiplayerClient.selectOpeningChoice({ choice });
+    return multiplayerSnapshot();
+  });
   ipcMain.handle("multiplayer:submitAction", async (_event, action) => {
     assertTrustedSender(_event);
     const clientActionId = multiplayerClient.submitAction({ action });

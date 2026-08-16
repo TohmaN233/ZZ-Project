@@ -13,8 +13,6 @@ from zz.multiplayer.actions import SURRENDER, ActionRejection, ActionResult, Sub
 from zz.multiplayer.match import (
     AuthoritativeMatch,
     InitialMatchSpec,
-    first_player_id_for_roll,
-    opening_roll_for_seed,
 )
 from zz.multiplayer.observability import null_event_sink
 from zz.multiplayer.protocol import (
@@ -295,6 +293,7 @@ class MultiplayerServer:
             "RECONNECT": self._reconnect,
             "SELECT_DECK": self._select_deck,
             "SET_READY": self._set_ready,
+            "SELECT_OPENING_CHOICE": self._select_opening_choice,
             "SUBMIT_ACTION": self._submit_action,
             "REQUEST_SYNC": self._request_sync,
             "LEAVE_ROOM": self._leave_room,
@@ -400,11 +399,27 @@ class MultiplayerServer:
         room.set_ready(connection.connection_id, ready)
         self._broadcast_room(room)
         if len(room.players) == Room.CAPACITY and all(player.ready for player in room.players):
-            self._start_match(room)
+            room.start()
+            self._broadcast_room(room)
 
-    def _start_match(self, room: Room) -> None:
+    def _select_opening_choice(self, connection: _Connection, payload: dict[str, Any]) -> None:
+        room = self._room_for_connection(connection)
+        choice = payload.get("choice")
+        if not isinstance(choice, str):
+            raise ValueError("choice must be a string")
+        winner_player_id = room.select_opening_choice(connection.connection_id, choice)
+        if winner_player_id is None:
+            self._broadcast_room(room)
+            return
+        self._start_match(room, winner_player_id, room.opening_choices())
+
+    def _start_match(
+        self,
+        room: Room,
+        first_player_id: str,
+        opening_choices: Mapping[str, str],
+    ) -> None:
         self._cancel_room_idle_timer(room.room_id)
-        room.start()
         player_1, player_2 = room.players
         if (
             player_1.deck_recipe is None
@@ -414,11 +429,10 @@ class MultiplayerServer:
         ):
             raise RuntimeError("ready room lost a validated loadout")
         seed = self._seed_factory()
-        opening_roll = opening_roll_for_seed(seed)
         match = AuthoritativeMatch(InitialMatchSpec(
             match_id=self._match_id_factory(),
             seed=seed,
-            first_player_id=first_player_id_for_roll(opening_roll),
+            first_player_id=first_player_id,
             player_1_deck=player_1.deck_recipe,
             player_1_forces=player_1.force_ids,
             player_2_deck=player_2.deck_recipe,
@@ -427,7 +441,10 @@ class MultiplayerServer:
             player_2_profile=player_2.profile,
             player_1_name=player_1.display_name,
             player_2_name=player_2.display_name,
-            opening_roll=opening_roll,
+            opening_contest={
+                "choices": dict(opening_choices),
+                "winnerPlayerId": first_player_id,
+            },
         ), asset_root=self._asset_root)
         self._matches[room.room_id] = match
         room.mark_running()
@@ -506,13 +523,15 @@ class MultiplayerServer:
         self._broadcast_snapshots(room, match)
         if match.session._game_over is not None:
             room.finish()
-            self._broadcast_room(room)
             self._observe(
                 "match_ended",
                 roomId=room.room_id,
                 matchId=match.match_id,
                 revision=match.revision,
             )
+            self._matches.pop(room.room_id, None)
+            room.prepare_rematch()
+            self._broadcast_room(room)
 
     def _request_sync(self, connection: _Connection, _payload: dict[str, Any]) -> None:
         room = self._room_for_connection(connection)
@@ -896,7 +915,6 @@ class MultiplayerServer:
         room.expire_reconnect(player_id)
         self._broadcast_snapshots(room, match)
         room.finish()
-        self._broadcast_room(room)
         self._observe(
             "match_ended",
             level="WARNING",
@@ -906,6 +924,8 @@ class MultiplayerServer:
             revision=match.revision,
             errorCode="RECONNECT_TIMEOUT",
         )
+        self._matches.pop(room.room_id, None)
+        self._close_room_locked(room)
 
     def _close_room_locked(self, room: Room) -> None:
         room.close()

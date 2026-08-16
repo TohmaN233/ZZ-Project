@@ -217,6 +217,12 @@ const UI_TEXT = {
     onlineConnectionStatus: "连接状态",
     onlineNetworkRoute: "网络路径",
     onlineWaitingOpponent: "等待对手",
+    onlineOpeningChoice: "石头剪刀布决定先手",
+    onlineOpeningWaiting: "已选择，等待对手",
+    onlineOpeningTie: "平局，请重新选择",
+    rock: "石头",
+    paper: "布",
+    scissors: "剪刀",
     onlineSelectDeck: "选择卡组",
     onlinePlayers: "玩家",
     onlineUnavailable: "联网对战需要桌面版运行环境。",
@@ -469,6 +475,12 @@ const UI_TEXT = {
     onlineConnectionStatus: "接続状態",
     onlineNetworkRoute: "ネットワーク経路",
     onlineWaitingOpponent: "対戦相手を待っています",
+    onlineOpeningChoice: "じゃんけんで先攻を決定",
+    onlineOpeningWaiting: "選択済み・相手を待っています",
+    onlineOpeningTie: "あいこです。もう一度選択してください",
+    rock: "グー",
+    paper: "パー",
+    scissors: "チョキ",
     onlineSelectDeck: "デッキ選択",
     onlinePlayers: "プレイヤー",
     onlineUnavailable: "オンライン対戦にはデスクトップ版が必要です。",
@@ -721,6 +733,12 @@ const UI_TEXT = {
     onlineConnectionStatus: "Connection Status",
     onlineNetworkRoute: "Network Route",
     onlineWaitingOpponent: "Waiting for opponent",
+    onlineOpeningChoice: "Rock paper scissors decides first player",
+    onlineOpeningWaiting: "Choice locked. Waiting for opponent",
+    onlineOpeningTie: "Tie. Choose again",
+    rock: "Rock",
+    paper: "Paper",
+    scissors: "Scissors",
     onlineSelectDeck: "Select Deck",
     onlinePlayers: "Players",
     onlineUnavailable: "Online play requires the desktop runtime.",
@@ -1243,7 +1261,7 @@ function promptWaitsForVisualSetup(prompt) {
 function animationEventBlocksPrompt(event, prompt = rawActivePrompt()) {
   if (!event) return false;
   if (promptWaitsForVisualSetup(prompt) && animationEventNeedsHeldState(event)) return true;
-  return ["dice_roll", "effect", "game_result"].includes(event.type);
+  return ["dice_roll", "rock_paper_scissors", "effect", "game_result"].includes(event.type);
 }
 
 function promptBlockedByAnimation(prompt = rawActivePrompt()) {
@@ -2676,7 +2694,7 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     activeMatchPayload = { multiplayer: true };
     pendingChoicePromptId = multiplayerUi.pendingAction && state.prompt ? state.prompt.id : null;
     appView = "duel";
-  } else if (previousOnlineDuel && !multiplayerUi.room) {
+  } else if (previousOnlineDuel && !matchVisible) {
     clearDuelUiState();
     state = null;
     activeMatchPayload = {};
@@ -2800,6 +2818,10 @@ function currentOnlineRoomPlayer() {
 function toggleOnlineReady() {
   const player = currentOnlineRoomPlayer();
   return runMultiplayerCommand("setReady", !Boolean(player && player.ready));
+}
+
+function submitOnlineOpeningChoice(choice) {
+  return runMultiplayerCommand("selectOpeningChoice", choice);
 }
 
 async function leaveOnlineRoom({ surrender = false } = {}) {
@@ -4009,6 +4031,7 @@ function animationEventDuration(event) {
   if (event.type === "turn_begin") return 760;
   if (event.type === "phase") return 920;
   if (event.type === "dice_roll") return 3200;
+  if (event.type === "rock_paper_scissors") return 2600;
   if (event.type === "effect") return 1200;
   if (event.type === "destroy") return 920;
   if (event.type === "draw") return 820;
@@ -4070,6 +4093,7 @@ function animationEventLabel(event) {
   if (event.type === "turn_begin") return "Turn Begin";
   if (event.type === "phase") return String(event.phase || "").toUpperCase();
   if (event.type === "dice_roll") return `D6 ${event.value} / ${event.firstSeat || ""}`;
+  if (event.type === "rock_paper_scissors") return t("onlineOpeningChoice");
   if (event.type === "damage") return `-${event.amount}`;
   if (event.type === "heal") return `+${event.amount}`;
   if (event.type === "effect") return cardTitle(event.card || {});
@@ -4773,11 +4797,29 @@ function renderGameResultOverlay(event) {
   `;
 }
 
+function renderRockPaperScissorsOverlay(event) {
+  const choices = event.choices || {};
+  const humanChoice = choices[state && state.humanSide] || "";
+  const opponentSide = state && state.humanSide === "P1" ? "P2" : "P1";
+  const opponentChoice = choices[opponentSide] || "";
+  const humanWon = event.winnerSide === (state && state.humanSide);
+  return `
+    <div class="visual-overlay opening-choice-overlay" aria-live="polite">
+      <div class="visual-overlay-card opening-choice-card">
+        <strong>${esc(t("onlineOpeningChoice"))}</strong>
+        <div><span>${esc(t(humanChoice))}</span><b>VS</b><span>${esc(t(opponentChoice))}</span></div>
+        <small>${esc(humanWon ? t("first") : t("second"))}</small>
+      </div>
+    </div>
+  `;
+}
+
 function renderAnimationOverlay() {
   const event = activeAnimationEvent;
   if (!event) return "";
   if (animationEventLayerMode(event) !== "overlay") return "";
   if (event.type === "dice_roll") return renderDiceRollOverlay(event);
+  if (event.type === "rock_paper_scissors") return renderRockPaperScissorsOverlay(event);
   if (event.type === "effect") return renderEffectTriggerOverlay(event);
   if (event.type === "destroy") return renderDestroyOverlay(event);
   if (event.type === "draw") return renderDrawOverlay(event);
@@ -5251,7 +5293,7 @@ function renderPrompt(error) {
         <section class="prompt">
           <div class="prompt-title">${esc(t("gameOver"))}</div>
           <div class="actions">
-            <button class="primary" data-view="${ONLINE_VIEW}">${esc(t("onlineGame"))}</button>
+            <button class="primary" data-online-return-room>${esc(t("onlineGame"))}</button>
           </div>
         </section>
       `;
@@ -6763,6 +6805,8 @@ function renderOnlineRoom() {
   if (!room) return "";
   const player = currentOnlineRoomPlayer();
   const canEditLoadout = ["WAITING_FOR_PLAYERS", "READY_CHECK"].includes(room.status);
+  const choosingFirstPlayer = room.status === "STARTING";
+  const choiceSubmitted = Boolean(player && player.openingChoiceSubmitted);
   return `
     <section class="home-panel online-room-panel">
       <div class="home-panel-head">
@@ -6789,6 +6833,19 @@ function renderOnlineRoom() {
           <button class="primary" data-online-ready ${player && player.deckSelected && room.status === "READY_CHECK" ? "" : "disabled"}>
             ${esc(player && player.ready ? t("onlineCancelReady") : t("onlineReady"))}
           </button>
+          <button class="danger" data-online-leave>${esc(t("onlineLeaveRoom"))}</button>
+        </div>
+      ` : ""}
+      ${choosingFirstPlayer ? `
+        <div class="online-opening-choice">
+          <strong>${esc(room.lastOpeningResult && room.lastOpeningResult.result === "tie" ? t("onlineOpeningTie") : t("onlineOpeningChoice"))}</strong>
+          <span>${esc(t("turn"))} ${esc(room.openingRound || 1)}</span>
+          <div>
+            ${["rock", "paper", "scissors"].map((choice) => `
+              <button data-online-opening-choice="${choice}" ${choiceSubmitted ? "disabled" : ""}>${esc(t(choice))}</button>
+            `).join("")}
+          </div>
+          ${choiceSubmitted ? `<small>${esc(t("onlineOpeningWaiting"))}</small>` : ""}
           <button class="danger" data-online-leave>${esc(t("onlineLeaveRoom"))}</button>
         </div>
       ` : ""}
@@ -7926,6 +7983,17 @@ async function leaveCurrentGame() {
   }
 }
 
+async function returnToOnlineRoom() {
+  clearDuelUiState();
+  state = null;
+  activeMatchPayload = {};
+  pendingChoicePromptId = null;
+  lastAppliedMultiplayerViewKey = null;
+  appView = ONLINE_VIEW;
+  render();
+  await refreshMultiplayerSnapshot();
+}
+
 function enterDuelPage() {
   if (window.location.pathname !== "/duel" && window.location.protocol !== "file:") {
     window.location.assign("/duel");
@@ -8519,9 +8587,20 @@ app.addEventListener("click", async (event) => {
     toggleOnlineReady();
     return;
   }
+  const openingChoice = event.target.closest("[data-online-opening-choice]");
+  if (openingChoice) {
+    event.preventDefault();
+    submitOnlineOpeningChoice(openingChoice.dataset.onlineOpeningChoice);
+    return;
+  }
   if (event.target.closest("[data-online-leave]")) {
     event.preventDefault();
     leaveOnlineRoom();
+    return;
+  }
+  if (event.target.closest("[data-online-return-room]")) {
+    event.preventDefault();
+    await returnToOnlineRoom();
     return;
   }
   const viewTarget = event.target.closest("[data-view]");

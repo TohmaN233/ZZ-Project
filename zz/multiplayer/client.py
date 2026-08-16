@@ -5,10 +5,8 @@ from enum import Enum
 from typing import Any, Mapping
 from uuid import uuid4
 
+from zz.multiplayer.compatibility import PROTOCOL_VERSION
 from zz.multiplayer.transport import MultiplayerTransport, Unsubscribe
-
-
-PROTOCOL_VERSION = 1
 
 
 class ClientConnectionState(str, Enum):
@@ -16,6 +14,7 @@ class ClientConnectionState(str, Enum):
     CONNECTING = "CONNECTING"
     CONNECTED = "CONNECTED"
     IN_ROOM = "IN_ROOM"
+    MATCH_STARTING = "MATCH_STARTING"
     IN_MATCH = "IN_MATCH"
     MATCH_FINISHED = "MATCH_FINISHED"
     ERROR = "ERROR"
@@ -132,6 +131,11 @@ class MultiplayerClientStore:
             raise TypeError("ready must be a boolean")
         self._send("SET_READY", {"ready": ready})
 
+    def select_opening_choice(self, choice: str) -> None:
+        if choice not in {"rock", "paper", "scissors"}:
+            raise ValueError("choice must be rock, paper, or scissors")
+        self._send("SELECT_OPENING_CHOICE", {"choice": choice})
+
     def submit_action(
         self,
         action: Mapping[str, Any],
@@ -233,13 +237,18 @@ class MultiplayerClientStore:
         self._room_state = payload
         self.player_id = _optional_string(payload.get("playerId")) or self.player_id
         phase = str(payload.get("status") or payload.get("phase") or "")
-        if phase == "RUNNING":
+        if phase == "STARTING":
+            self.status = ClientConnectionState.MATCH_STARTING
+        elif phase == "RUNNING":
             self.status = ClientConnectionState.IN_MATCH
         elif phase == "FINISHED":
             self.status = ClientConnectionState.MATCH_FINISHED
         elif phase == "CLOSED":
             self.status = ClientConnectionState.CONNECTED
         else:
+            self.match_id = None
+            self._gameplay_view = None
+            self._pending_action = None
             self.status = ClientConnectionState.IN_ROOM
 
     def _handle_match_started(

@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld("zzMultiplayer", {
   joinRoom: (payload) => ipcRenderer.invoke("multiplayer:joinRoom", payload),
   selectDeck: (payload) => ipcRenderer.invoke("multiplayer:selectDeck", payload),
   setReady: (ready) => ipcRenderer.invoke("multiplayer:setReady", ready),
+  selectOpeningChoice: (choice) => ipcRenderer.invoke("multiplayer:selectOpeningChoice", choice),
   submitAction: (action) => ipcRenderer.invoke("multiplayer:submitAction", action),
   surrender: () => ipcRenderer.invoke("multiplayer:surrender"),
   requestSync: () => ipcRenderer.invoke("multiplayer:requestSync"),

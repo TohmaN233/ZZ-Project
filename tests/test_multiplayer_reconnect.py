@@ -125,6 +125,8 @@ def _start_match(
     })
     _send(server, "a", "SET_READY", {"ready": True})
     _send(server, "b", "SET_READY", {"ready": True})
+    _send(server, "a", "SELECT_OPENING_CHOICE", {"choice": "rock"})
+    _send(server, "b", "SELECT_OPENING_CHOICE", {"choice": "scissors"})
     return tokens
 
 
@@ -348,7 +350,7 @@ def test_reconnect_with_stale_revision_receives_current_snapshot() -> None:
     assert snapshot["view"]["prompt"] is not None
 
 
-def test_finished_match_can_reconnect_and_restore_the_result() -> None:
+def test_finished_match_can_reconnect_to_the_same_ready_room() -> None:
     timer_factory = TimerFactory()
     server, messages = _connected_server(timer_factory)
     tokens = _start_match(server, messages)
@@ -360,7 +362,7 @@ def test_finished_match_can_reconnect_and_restore_the_result() -> None:
         "expectedRevision": 0,
         "action": {"kind": "SURRENDER"},
     })
-    assert server.room_for_code("ABC123").status.value == "FINISHED"
+    assert server.room_for_code("ABC123").status.value == "READY_CHECK"
 
     messages["new-b"] = []
     server.connect("new-b", messages["new-b"].append)
@@ -370,28 +372,23 @@ def test_finished_match_can_reconnect_and_restore_the_result() -> None:
         "reconnectToken": tokens["player_2"],
     })
 
-    assert _latest(messages["new-b"], "ROOM_STATE")["status"] == "FINISHED"
-    snapshot = _latest(messages["new-b"], "STATE_SNAPSHOT")
-    assert snapshot["playerId"] == "player_2"
-    assert snapshot["view"]["gameOver"] is not None
+    assert _latest(messages["new-b"], "ROOM_STATE")["status"] == "READY_CHECK"
+    assert not any(message["type"] == "STATE_SNAPSHOT" for message in messages["new-b"])
 
 
 def test_disconnect_timeout_forfeits_and_expires_that_seat() -> None:
     timer_factory = TimerFactory()
     server, messages = _connected_server(timer_factory)
     tokens = _start_match(server, messages)
+    room = server.room_for_code("ABC123")
     server.disconnect("a")
 
     timer_factory.timers[0].fire()
 
-    room = server.room_for_code("ABC123")
-    match = server.match_for_room("ABC123")
-    assert room.status.value == "FINISHED"
+    assert room.status.value == "CLOSED"
     assert room.host.reconnect_token is None
-    assert match is not None and match.revision == 1
-    assert match.get_view_for("player_2")["gameOver"] is not None
-    assert _latest(messages["b"], "ROOM_STATE")["status"] == "FINISHED"
     assert _latest(messages["b"], "STATE_SNAPSHOT")["view"]["gameOver"] is not None
+    assert _latest(messages["b"], "ROOM_CLOSED")["roomCode"] == "ABC123"
 
     messages["late"] = []
     server.connect("late", messages["late"].append)
@@ -400,7 +397,7 @@ def test_disconnect_timeout_forfeits_and_expires_that_seat() -> None:
         "playerId": "player_1",
         "reconnectToken": tokens["player_1"],
     })
-    assert _latest(messages["late"], "ERROR")["code"] == "INVALID_RECONNECT_TOKEN"
+    assert _latest(messages["late"], "ERROR")["code"] == "ROOM_NOT_FOUND"
 
 
 def test_both_disconnect_use_one_timer_per_seat_and_close_after_both_expire() -> None:
@@ -418,7 +415,7 @@ def test_both_disconnect_use_one_timer_per_seat_and_close_after_both_expire() ->
     assert all(timer.started for timer in timer_factory.timers)
 
     timer_factory.timers[0].fire()
-    assert room.status.value == "FINISHED"
+    assert room.status.value == "CLOSED"
     assert match.revision == 1
     timer_factory.timers[1].fire()
     assert room.status.value == "CLOSED"
