@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 import json
 import os
 import re
@@ -14,10 +13,6 @@ DEFAULT_OFFICIAL_CARDLIST = PROJECT_ROOT / "data" / "official_cardlist.tsv"
 DEFAULT_CLEAN_GRAPH_ROOT = PROJECT_ROOT / "asserts" / "images" / "clean_graph"
 LEGACY_CLEAN_GRAPH_ROOT = PROJECT_ROOT / "data" / "apk_images" / "clean_graph"
 LEGACY_BATTLE_SFX_AUDIO_ROOT = PROJECT_ROOT / "data" / "audio" / "battle_sfx"
-OFFICIAL_CARD_IMAGE_HOST = "www.aicarddass.com"
-OFFICIAL_CARD_IMAGE_PATH_PREFIX = "/zenonzard/images/cardlist/cards/"
-OFFICIAL_CARD_IMAGE_EN_PATH_PREFIX = "/zenonzard/en/images/cardlist/cards/"
-
 FORCE_IMAGE_NAMES = {
     asset_id: [f"{asset_id}.png"]
     for asset_id in (
@@ -125,7 +120,6 @@ class AssetIndex:
         self.clean_graph_root = self._resolve_clean_graph_root(clean_graph_root)
         self._manifest: dict[str, Path] = {}
         self._audio_manifest: dict[str, Path] = {}
-        self._official_urls: dict[str, str] = {}
         self._ui_asset_ids: set[str] = set()
         self._playmat_asset_ids: set[str] = set()
         self._playmat_catalog: list[dict[str, object]] = []
@@ -137,9 +131,6 @@ class AssetIndex:
         self._build_local_audio_manifest()
         if self.clean_graph_root is not None:
             self._build_clean_graph_manifest()
-        official_cardlist = resolve_official_cardlist(official_cardlist_path)
-        if official_cardlist is not None:
-            self._build_official_urls(official_cardlist)
 
     def _resolve_clean_graph_root(self, value: str | os.PathLike | None) -> Path | None:
         if value:
@@ -416,15 +407,6 @@ class AssetIndex:
             return True
         return False
 
-    def _build_official_urls(self, path: Path) -> None:
-        with path.open("r", encoding="utf-8-sig", newline="") as handle:
-            reader = csv.DictReader(handle, delimiter="\t")
-            for row in reader:
-                asset_id = (row.get("image_id") or "").strip()
-                url = (row.get("official_image_url_jp") or "").strip()
-                if self._safe_asset_id(asset_id) and self._is_official_card_image_url(url):
-                    self._official_urls[asset_id] = url
-
     def _is_under_root(self, path: Path) -> bool:
         roots = [
             root
@@ -455,20 +437,26 @@ class AssetIndex:
             return None
         return path
 
+    def _local_asset_url(self, asset_id: str) -> str:
+        return f"/assets/{quote(asset_id)}"
+
     def asset_url(self, asset_id: str | None) -> str | None:
         if not asset_id or not self._safe_asset_id(asset_id):
             return None
         if self.resolve_asset_id(asset_id) is not None:
-            return f"/assets/{quote(asset_id)}"
-        return self._official_urls.get(asset_id)
+            return self._local_asset_url(asset_id)
+        english_id = self._english_asset_ids.get(asset_id)
+        if english_id is not None:
+            return self._local_asset_url(english_id)
+        return self._local_asset_url(asset_id)
 
     def asset_url_en(self, asset_id: str | None) -> str | None:
         if not asset_id or not self._safe_asset_id(asset_id):
             return None
         local_id = self._english_asset_ids.get(asset_id)
         if local_id is not None:
-            return self.asset_url(local_id)
-        return self._english_official_card_url(self._official_urls.get(asset_id))
+            return self._local_asset_url(local_id)
+        return self.asset_url(asset_id)
 
     def mana_asset_url(self, color: str | None) -> str | None:
         normalized = str(color or "COLORLESS").upper()
@@ -533,21 +521,3 @@ class AssetIndex:
     def _character_asset_id(self, character_id: str, kind: str) -> str:
         return f"character:{character_id}:{kind}"
 
-    def _is_official_card_image_url(self, url: str) -> bool:
-        if not url:
-            return False
-        parsed = urlparse(url)
-        return (
-            parsed.scheme == "https"
-            and parsed.netloc == OFFICIAL_CARD_IMAGE_HOST
-            and parsed.path.startswith(OFFICIAL_CARD_IMAGE_PATH_PREFIX)
-            and parsed.path.endswith(".png")
-            and ".." not in parsed.path
-        )
-
-    def _english_official_card_url(self, url: str | None) -> str | None:
-        if not url or not self._is_official_card_image_url(url):
-            return None
-        parsed = urlparse(url)
-        path = parsed.path.replace(OFFICIAL_CARD_IMAGE_PATH_PREFIX, OFFICIAL_CARD_IMAGE_EN_PATH_PREFIX, 1)
-        return parsed._replace(path=path).geturl()

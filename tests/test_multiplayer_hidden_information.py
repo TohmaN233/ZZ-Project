@@ -10,8 +10,9 @@ def test_player_views_hide_opponent_private_information() -> None:
     player_1 = match.get_view_for("player_1")
     player_2 = match.get_view_for("player_2")
 
-    assert player_1["prompt"] is not None
-    assert player_2["prompt"] is None
+    assert player_1["prompt"]["kind"] == "mulligan"
+    assert player_2["prompt"]["kind"] == "mulligan"
+    assert player_1["prompt"]["id"] != player_2["prompt"]["id"]
     assert player_1["players"]["human"]["side"] == "P1"
     assert player_2["players"]["human"]["side"] == "P2"
 
@@ -39,8 +40,13 @@ def test_only_prompt_owner_receives_private_prompt_options() -> None:
 
     owner = match.prompt_owner_id()
     assert owner == "player_1"
-    assert match.get_view_for(owner)["prompt"]["options"]
-    assert match.get_view_for("player_2")["prompt"] is None
+    first_prompt = match.get_view_for("player_1")["prompt"]
+    second_prompt = match.get_view_for("player_2")["prompt"]
+    assert first_prompt["options"]
+    assert second_prompt["options"]
+    assert first_prompt["id"] != second_prompt["id"]
+    assert first_prompt["playerSide"] == "P1"
+    assert second_prompt["playerSide"] == "P2"
 
 
 def test_opponent_draw_animation_uses_only_the_local_card_back() -> None:
@@ -65,7 +71,47 @@ def test_opponent_draw_animation_uses_only_the_local_card_back() -> None:
         "ownerSide": "P1",
         "faceDown": True,
         "assetId": "card_back",
-        "assetUrl": match.session.asset_index.asset_url("card_back"),
         "area": "hand",
         "rested": False,
     }]
+
+
+def _collect_url_fields(value, acc=None):
+    acc = [] if acc is None else acc
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if "url" in key.lower():
+                acc.append((key, item))
+            _collect_url_fields(item, acc)
+    elif isinstance(value, list):
+        for item in value:
+            _collect_url_fields(item, acc)
+    return acc
+
+
+def test_player_views_keep_asset_ids_and_omit_image_urls() -> None:
+    match = AuthoritativeMatch(InitialMatchSpec.standard(match_id="local-assets", seed=104))
+    view = match.get_view_for("player_1")
+    human_card = view["players"]["human"]["hand"][0]
+    assert human_card["assetId"]
+    assert "assetUrl" not in human_card
+    assert "assetUrlEn" not in human_card
+    url_fields = _collect_url_fields(view)
+    assert url_fields == []
+    assert all(
+        not (isinstance(item, str) and item.startswith(("http://", "https://")))
+        for item in _walk_strings(view)
+    )
+
+
+def _walk_strings(value):
+    if isinstance(value, str):
+        yield value
+        return
+    if isinstance(value, dict):
+        for item in value.values():
+            yield from _walk_strings(item)
+        return
+    if isinstance(value, list):
+        for item in value:
+            yield from _walk_strings(item)

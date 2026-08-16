@@ -9,6 +9,13 @@ from zz.web.serialize import serialize_state
 
 PLAYER_SIDE_BY_ID = {"player_1": "P1", "player_2": "P2"}
 PRIVATE_AREAS = {"deck", "hand"}
+_WIRE_ASSET_URL_KEYS = (
+    "assetUrl",
+    "assetUrlEn",
+    "playmatUrl",
+    "portraitUrl",
+    "thumbnailUrl",
+)
 
 
 def player_for_id(session: Any, player_id: str) -> Any:
@@ -36,7 +43,6 @@ def _hidden_animation_card(
         "ownerSide": owner_side,
         "faceDown": True,
         "assetId": "card_back",
-        "assetUrl": asset_index.asset_url("card_back"),
         "area": area,
         "rested": bool(card.get("rested", False)),
     }
@@ -81,6 +87,19 @@ def _project_animation_events(
     return projected
 
 
+def _strip_wire_asset_urls(value: Any) -> Any:
+    if isinstance(value, dict):
+        for key in _WIRE_ASSET_URL_KEYS:
+            value.pop(key, None)
+        for item in value.values():
+            _strip_wire_asset_urls(item)
+        return value
+    if isinstance(value, list):
+        for item in value:
+            _strip_wire_asset_urls(item)
+    return value
+
+
 def build_player_view(
     session: Any,
     *,
@@ -120,4 +139,4 @@ def build_player_view(
         "pendingAttack": deepcopy(session._pending_attack_payload()),
         "publicReveals": deepcopy(list(public_reveals)),
     })
-    return state
+    return _strip_wire_asset_urls(state)

@@ -1596,18 +1596,33 @@ function localizedAbility(item) {
   return item.abilityJp || "";
 }
 
-function localizedCardAssetUrl(card) {
-  if (card && currentLanguage() === "en" && card.assetUrlEn) return card.assetUrlEn;
-  return card && card.assetUrl ? card.assetUrl : null;
-}
-
-function localizedForceAssetUrl(force) {
-  if (force && currentLanguage() === "en" && force.assetUrlEn) return force.assetUrlEn;
-  return force && force.assetUrl ? force.assetUrl : null;
+function isRemoteAssetUrl(url) {
+  return typeof url === "string" && /^https?:\/\//i.test(url);
 }
 
 function localAssetUrl(assetId) {
   return assetId ? `/assets/${encodeURIComponent(assetId)}` : null;
+}
+
+function preferLocalAssetUrl(url, assetId) {
+  if (url && !isRemoteAssetUrl(url)) return url;
+  return localAssetUrl(assetId);
+}
+
+function localizedCardAssetUrl(card) {
+  const assetId = card && (card.assetId || card.cardId || card.id);
+  if (card && currentLanguage() === "en") {
+    return preferLocalAssetUrl(card.assetUrlEn || card.assetUrl, assetId);
+  }
+  return preferLocalAssetUrl(card && card.assetUrl, assetId);
+}
+
+function localizedForceAssetUrl(force) {
+  const assetId = force && (force.assetId || force.id);
+  if (force && currentLanguage() === "en") {
+    return preferLocalAssetUrl(force.assetUrlEn || force.assetUrl, assetId);
+  }
+  return preferLocalAssetUrl(force && force.assetUrl, assetId);
 }
 
 function hydrateMultiplayerViewAssets(view) {
@@ -1621,11 +1636,11 @@ function hydrateMultiplayerViewAssets(view) {
     const localManaUrl = card.type === "mana_token" ? (catalog.manaAssets || {})[card.manaColor] : null;
     const assetUrl = card.faceDown
       ? localAssetUrl("card_back")
-      : localManaUrl || (localCard && localCard.assetUrl) || localAssetUrl(assetId);
+      : preferLocalAssetUrl(localManaUrl || (localCard && localCard.assetUrl), assetId);
     card.assetId = assetId;
     card.assetUrl = assetUrl;
     if (!card.faceDown) {
-      card.assetUrlEn = (localCard && localCard.assetUrlEn) || assetUrl;
+      card.assetUrlEn = preferLocalAssetUrl(localCard && localCard.assetUrlEn, assetId) || assetUrl;
     }
   };
   const visitCards = (value) => {
@@ -1644,14 +1659,14 @@ function hydrateMultiplayerViewAssets(view) {
     (player.forces || []).forEach((force) => {
       const localForce = forcesById.get(force.id);
       const assetId = force.assetId || force.id;
-      force.assetUrl = (localForce && localForce.assetUrl) || localAssetUrl(assetId);
-      force.assetUrlEn = (localForce && localForce.assetUrlEn) || force.assetUrl;
+      force.assetUrl = preferLocalAssetUrl(localForce && localForce.assetUrl, assetId);
+      force.assetUrlEn = preferLocalAssetUrl(localForce && localForce.assetUrlEn, assetId) || force.assetUrl;
     });
     const profile = player.profile || {};
     const codeman = characterById(profile.codemanId);
     const playmat = playmatById(profile.playmatId);
     profile.codeman = codeman || null;
-    profile.playmatUrl = playmat ? playmat.assetUrl : null;
+    profile.playmatUrl = playmat ? preferLocalAssetUrl(playmat.assetUrl, playmat.id || profile.playmatId) : null;
     player.profile = profile;
   });
   return view;
