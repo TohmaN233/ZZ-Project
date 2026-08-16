@@ -26,6 +26,10 @@
 - Online rooms now use the same duel renderer and local cosmetic assets as
   offline play, preserve player display names, and show the authoritative D6
   opening roll. Multiplayer compatibility is rules `0.0.3`.
+- The refreshed `0.3.0` packages prevent privacy-redacted opponent hand cards
+  from inheriting global actions such as `End Turn`, restrict online mulligan
+  selection to the local hand, and load Mana faces through the same local
+  `/assets/<assetId>` mapping used by offline play.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
   Private Codeman memory, training traces, challenge data, and local training
@@ -52,16 +56,16 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142395419` bytes.
+   Size: `142395960` bytes.
    SHA-256:
-   `C859E5ACDAD494F32A906C536FC39F9D65B019DB871C2B83A4CC7A376F24404C`.
+   `1D64C2D459D50BFD9107B06667D51D51BFAE0086799059440185B8D36D1475C6`.
 2. [`ZZ-Project-v0.3.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `21466502` bytes.
+   Size: `21467342` bytes.
    SHA-256:
-   `775D2F07C2025FED210BF8B5186FC890C5D46482F59CD00ABA377043AD756296`.
+   `E143ABE6930234B6850C69928B5F6A339AB2656DE06D643EE9426569AB7D1532`.
 3. [`ZZ-Project-v0.3.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
