@@ -28,8 +28,8 @@
   ],
   "windowsInstaller": {
     "filename": "ZZ-Project-v0.3.0-Windows-Setup.exe",
-    "bytes": 142403248,
-    "sha256": "09A403809656BF721277312073A735A7FB7EE0B9B30635399FB949A05F5FB46A",
+    "bytes": 142403034,
+    "sha256": "94E74DBEFB42EB237761AA60499D6E8A35E2BB05EEE3CE934B01C010D651EB13",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",
@@ -43,8 +43,8 @@
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.3.0-Linux.tar.gz",
-    "bytes": 21472499,
-    "sha256": "B8DB46C9F7E80972F23D031DCBD443BC8230854D90C948896C781669B287AE16",
+    "bytes": 21473121,
+    "sha256": "E5982181ECD6DF6AE06CFB390E205A2033593AA53458E9E10A307B1DEA2957AF",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
