@@ -2674,7 +2674,7 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     room: snapshot.room || null,
     view: hydrateMultiplayerViewAssets(snapshot.view || null),
     pendingAction: snapshot.pendingAction || null,
-    lastError: snapshot.lastError || multiplayerUi.lastError || null,
+    lastError: snapshot.lastError || null,
     lan: { ...(multiplayerUi.lan || {}), ...(snapshot.lan || {}) },
     displayName: previousDisplayName,
   };
@@ -2703,7 +2703,7 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
       if (previousOnlineDuel && pendingVisualState) {
         commitPendingVisualState({ rerender: false });
       }
-      stageDuelState(multiplayerUi.view, multiplayerUi.lastError);
+      stageDuelState(multiplayerUi.view, null);
       lastAppliedMultiplayerViewKey = viewKey;
     }
     activeMatchPayload = { multiplayer: true };

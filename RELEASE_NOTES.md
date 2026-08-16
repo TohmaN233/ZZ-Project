@@ -49,6 +49,10 @@
   broken duel.
 - A mid-match network drop stays on the duel and retries reconnect five times
   before returning to the lobby.
+- Gameplay snapshots may exceed the old 64KiB lobby cap; the default wire
+  limit is now 256KiB so a mid-game view is not treated as a fatal disconnect.
+- Transport/lobby errors no longer stick on the duel prompt after entering a
+  match.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
   Private Codeman memory, training traces, challenge data, and local training
