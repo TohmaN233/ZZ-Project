@@ -2726,7 +2726,10 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
       queueMicrotask(() => runMultiplayerCommand("joinRoom", pending));
     }
   }
-  if (rerender) render(multiplayerUi.lastError);
+  if (rerender) {
+    const hideRecoveryNoise = !multiplayerUi.room && ["RECONNECTING", "OFFLINE", "ERROR"].includes(multiplayerUi.status);
+    render(hideRecoveryNoise ? null : multiplayerUi.lastError);
+  }
 }
 
 async function refreshMultiplayerSnapshot({ rerender = true } = {}) {

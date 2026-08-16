@@ -240,6 +240,13 @@ def canonical_authoritative_state(
             "promptCounter": session._prompt_counter,
             "prompt": _runtime_value(session.prompt),
             "options": _runtime_value(session._options),
+            "pendingMulligans": {
+                side: {
+                    "prompt": _runtime_value(record["prompt"]),
+                    "options": _runtime_value(record["options"]),
+                }
+                for side, record in sorted(getattr(session, "_pending_mulligans", {}).items())
+            },
             "attack": _runtime_value(session._attack),
             "pendingEffect": _runtime_value(session._pending_effect),
             "promptedTriggerResolution": _runtime_value(session._prompted_trigger_resolution),

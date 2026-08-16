@@ -30,6 +30,20 @@ from zz.web.serialize import serialize_card, serialize_force, serialize_state
 
 USER_CONTROLLED_MODES = {"human-vs-ai", "god", "debug-card-lab"}
 
+LOCAL_GAME_DEEP_ACTOR_POLICY_ID = (
+    "ygo_cloud_incremental_20260630T171443Z_block0500_0020"
+)
+LOCAL_GAME_DEEP_ACTOR_SOURCE_POLICY_ID = (
+    "ygo_cloud_incremental_20260630T171443Z_block0500_0019"
+)
+LOCAL_GAME_DEEP_ACTOR_MODEL_PATH = Path(
+    "local_ai_training/retained_mainline_20260630/cycle470_actor.json"
+)
+LOCAL_GAME_MEDIUM_DEEP_ACTOR_MODEL_PATH = Path(
+    "local_ai_training/retained_mainline_20260630/source_v3_update30_actor.json"
+)
+
+
 TARGETED_CARD_KINDS = {}
 
 TARGETED_ATTACK_CARD_KINDS = {}
@@ -60,13 +74,24 @@ def _resolve_battle_policy(kind: str, **kwargs: Any) -> Any:
 
 
 def _local_game_deep_policy(seed: int) -> Any:
-    from zz.ai_runtime_stack import current_tree_baseline_runtime_weights
+    if not LOCAL_GAME_DEEP_ACTOR_MODEL_PATH.exists():
+        from zz.ai_runtime_stack import current_tree_baseline_runtime_weights
 
-    return _resolve_battle_policy(
-        "deep",
+        return _resolve_battle_policy(
+            "deep",
+            seed=seed,
+            runtime_prior_weights=current_tree_baseline_runtime_weights(),
+        ).policy
+    from zz.policy_factories import create_current_policy_actor_rollout_policy
+
+    return create_current_policy_actor_rollout_policy(
+        model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
         seed=seed,
-        runtime_prior_weights=current_tree_baseline_runtime_weights(),
-    ).policy
+        policy_id=LOCAL_GAME_DEEP_ACTOR_POLICY_ID,
+        expected_candidate_policy_ids=[LOCAL_GAME_DEEP_ACTOR_POLICY_ID],
+        expected_source_actor_policy_id=LOCAL_GAME_DEEP_ACTOR_SOURCE_POLICY_ID,
+        min_source_rows=0,
+    )
 
 EFFECT_TARGET_FILTER_PARAMS = {
     "card_id",
@@ -136,11 +161,13 @@ class GameSession:
                  opponent_profile: dict[str, Any] | None = None,
                  opponent_ai_difficulty: str = "deep",
                  ai_data_root: str | None = None,
-                 challenge_metadata: dict[str, Any] | None = None):
+                 challenge_metadata: dict[str, Any] | None = None,
+                 simultaneous_opening_mulligan: bool = False):
         if mode not in {"human-vs-ai", "ai-vs-ai", "god", "debug-card-lab"}:
             raise ValueError(f"unsupported mode {mode!r}")
         self.seed = seed
         self.mode = mode
+        self.simultaneous_opening_mulligan = bool(simultaneous_opening_mulligan)
         self.asset_index = AssetIndex(asset_root)
         self.rng = random.Random(seed)
         self.human_policy = _QueuedHumanPolicy()
@@ -176,6 +203,7 @@ class GameSession:
             ]
         self.prompt: dict | None = None
         self._options: dict[str, Any] = {}
+        self._pending_mulligans: dict[str, dict[str, Any]] = {}
         self._prompt_counter = 0
         self._log: list[str] = []
         self._log_events: list[dict[str, Any]] = []
@@ -223,6 +251,7 @@ class GameSession:
                 seed=seed,
                 codeman_id=str(codeman_id),
                 data_root=self.codeman_memory_store.root,
+                deep_model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return self._policy_for_difficulty(default_kind, seed=seed)
 
@@ -234,6 +263,7 @@ class GameSession:
                 seed=seed,
                 codeman_id=str(codeman_id),
                 data_root=self.codeman_memory_store.root,
+                deep_model_path=LOCAL_GAME_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return self._policy_for_difficulty(self.opponent_ai_difficulty, seed=seed)
 
@@ -243,8 +273,9 @@ class GameSession:
             return _local_game_deep_policy(seed)
         if resolved == "normal":
             return _resolve_battle_policy(
-                "normal",
+                "deep",
                 seed=seed,
+                deep_model_path=LOCAL_GAME_MEDIUM_DEEP_ACTOR_MODEL_PATH,
             ).policy
         return _resolve_battle_policy(
             resolved,
@@ -330,7 +361,10 @@ class GameSession:
             self.engine.mulligan(ai, self.engine.policy_for(ai).choose_mulligan(self.engine, ai))
             self._prompt_mulligan(p2 if self.human_side == "P2" else p1)
         elif self.mode == "god":
-            self._prompt_mulligan(p1)
+            if self.simultaneous_opening_mulligan:
+                self._queue_simultaneous_opening_mulligans()
+            else:
+                self._prompt_mulligan(p1)
         elif self.mode == "debug-card-lab":
             self.engine.mulligan(p2, [])
             self.prompt = None
@@ -1314,6 +1348,61 @@ class GameSession:
 
         self._visual_snapshot = current
 
+    def _make_mulligan_prompt_state(self, player: Player) -> dict[str, Any]:
+        prompt_id = self._next_prompt_id()
+        options = {
+            "keep": {"choice": "keep", "player": player},
+            "redraw_selected": {"choice": "selected", "player": player},
+        }
+        return {
+            "prompt": {
+                "id": prompt_id,
+                "kind": "mulligan",
+                "message": f"{player.name}: Opening hand",
+                "options": [
+                    {"id": "keep", "label": "Keep"},
+                    {"id": "redraw_selected", "label": "Redraw Selected"},
+                ],
+                "playerSide": player.side.name,
+            },
+            "options": options,
+        }
+
+    def _queue_simultaneous_opening_mulligans(self) -> None:
+        self.prompt = None
+        self._options = {}
+        self._pending_mulligans = {
+            player.side.name: self._make_mulligan_prompt_state(player)
+            for player in self.engine.state.players
+        }
+
+    def _prompt_record_for_id(self, prompt_id: str) -> tuple[dict | None, dict[str, Any] | None, str | None]:
+        if self.prompt is not None and prompt_id == self.prompt["id"]:
+            return self.prompt, self._options, None
+        for side, record in self._pending_mulligans.items():
+            if record["prompt"]["id"] == prompt_id:
+                return record["prompt"], record["options"], side
+        return None, None, None
+
+    def prompt_for_side(self, side: str) -> dict | None:
+        pending = self._pending_mulligans.get(side)
+        if pending is not None:
+            return pending["prompt"]
+        if self.prompt is not None and self.prompt_controller_side() == side:
+            return self.prompt
+        return None
+
+    def player_owns_prompt(self, side: str, prompt_id: str) -> bool:
+        prompt, _options, pending_side = self._prompt_record_for_id(prompt_id)
+        if prompt is None:
+            return False
+        if pending_side is not None:
+            return pending_side == side
+        return self.prompt_controller_side() == side
+
+    def pending_mulligan_sides(self) -> tuple[str, ...]:
+        return tuple(sorted(self._pending_mulligans))
+
     def _prompt_mulligan(self, player: Player) -> None:
         self._set_prompt("mulligan", f"{player.name}: Opening hand", [
             ("keep", "Keep", {"choice": "keep", "player": player}),
@@ -1509,16 +1598,17 @@ class GameSession:
             option_id: str,
             payload: dict | None = None,
     ) -> dict[str, str] | None:
-        if self.prompt is None or prompt_id != self.prompt["id"]:
+        prompt, options, _pending_side = self._prompt_record_for_id(prompt_id)
+        if prompt is None or options is None:
             return {"code": "stale_prompt", "message": "Prompt is no longer active."}
-        if option_id not in self._options:
+        if option_id not in options:
             return {"code": "illegal_choice", "message": f"Unknown option {option_id}."}
         if payload is not None and not isinstance(payload, dict):
             return {"code": "invalid_payload", "message": "Choice payload must be an object."}
 
         body = dict(payload or {})
-        kind = self.prompt["kind"]
-        value = self._options[option_id]
+        kind = prompt["kind"]
+        value = options[option_id]
         allowed_keys = {"promptId", "optionId"}
         if kind == "mulligan":
             allowed_keys.add("selectedCardIids")
@@ -1609,8 +1699,11 @@ class GameSession:
         validation_error = self.validate_choice(prompt_id, option_id, payload)
         if validation_error is not None:
             return self.state_dto(validation_error)
-        kind = self.prompt["kind"]
-        value = self._options[option_id]
+        prompt, options, pending_side = self._prompt_record_for_id(prompt_id)
+        if prompt is None or options is None:
+            return self.state_dto({"code": "stale_prompt", "message": "Prompt is no longer active."})
+        kind = prompt["kind"]
+        value = options[option_id]
         selected_effect_targets = None
         if kind == "effect_target" and payload and "selectedOptionIds" in payload:
             selected_ids = list(dict.fromkeys(str(option) for option in payload.get("selectedOptionIds", [])))
@@ -1640,7 +1733,10 @@ class GameSession:
                 })
             selected_effect_targets = [self._options[selected_id] for selected_id in selected_ids]
         value = self._apply_choice_payload(value, payload)
-        self._clear_prompt()
+        if pending_side is None:
+            self._clear_prompt()
+        else:
+            self._pending_mulligans.pop(pending_side, None)
         try:
             if kind == "mulligan":
                 player = value.get("player", self.human)
@@ -1661,7 +1757,10 @@ class GameSession:
                         "type": "shuffle",
                         "side": player.side.name,
                     })
-                if self.mode == "god" and player is self.engine.state.players[0]:
+                if pending_side is not None:
+                    if self._pending_mulligans:
+                        return self.state_dto()
+                elif self.mode == "god" and not self.simultaneous_opening_mulligan and player is self.engine.state.players[0]:
                     self._prompt_mulligan(self.engine.state.players[1])
                     return self.state_dto()
                 self._safe_begin_turn()

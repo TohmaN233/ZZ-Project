@@ -148,6 +148,7 @@ class AuthoritativeMatch:
             opponent_force_ids=list(spec.player_2_forces),
             player_profile=dict(spec.player_1_profile or {}),
             opponent_profile=dict(spec.player_2_profile or {}),
+            simultaneous_opening_mulligan=True,
         )
         player_1, player_2 = self.session.engine.state.players
         player_1.name = spec.player_1_name
@@ -227,6 +228,9 @@ class AuthoritativeMatch:
 
     def prompt_owner_id(self) -> str | None:
         side = self.session.prompt_controller_side()
+        if side is None:
+            pending = self.session.pending_mulligan_sides()
+            side = pending[0] if pending else None
         return None if side is None else player_id_for_side(side)
 
     def submit_controller_action(
@@ -347,7 +351,8 @@ class AuthoritativeMatch:
                 "INVALID_MESSAGE",
                 "action payload must be an object",
             )
-        if self.prompt_owner_id() != submitted.player_id:
+        submitter = player_for_id(self.session, submitted.player_id)
+        if not self.session.player_owns_prompt(submitter.side.name, prompt_id):
             return self._remember_rejection(
                 submitted,
                 "NOT_YOUR_TURN",

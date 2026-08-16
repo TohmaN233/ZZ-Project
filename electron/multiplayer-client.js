@@ -526,7 +526,15 @@ class MultiplayerDesktopClient {
             this.#emitEvent("RECONNECT_FAILED");
           } else {
             this.#clearRecovery();
-            this.#setState(MultiplayerClientState.ERROR);
+            this.#error = null;
+            this.#room = null;
+            this.#view = null;
+            this.connectionId = null;
+            this.playerId = null;
+            this.matchId = null;
+            this.#pendingAction = null;
+            this.#pendingActionNeedsReplay = false;
+            this.#setState(MultiplayerClientState.OFFLINE);
           }
           break;
         }

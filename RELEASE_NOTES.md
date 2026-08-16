@@ -41,6 +41,12 @@
   keeps a first/second badge on the cockpit.
 - The typed online display name is remembered across connect/create/join
   snapshot rerenders instead of snapping back to `Player`.
+- Online opening-hand scheduling is simultaneous: both seats get their own
+  mulligan prompt and either player may finish first. Local god mode stays
+  sequential.
+- Reopening the desktop client after a stale room or invalid reconnect token
+  returns silently to the home page instead of showing an error or forcing a
+  broken duel.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
   Private Codeman memory, training traces, challenge data, and local training

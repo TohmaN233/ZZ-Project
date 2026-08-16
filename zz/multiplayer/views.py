@@ -93,9 +93,7 @@ def build_player_view(
     if player_id not in PLAYER_IDS:
         raise ValueError(f"unknown player id {player_id!r}")
     player = player_for_id(session, player_id)
-    prompt = None
-    if session.prompt_controller_side() == player.side.name:
-        prompt = deepcopy(session.prompt)
+    prompt = deepcopy(session.prompt_for_side(player.side.name))
     state = serialize_state(
         session.engine,
         human=player,
