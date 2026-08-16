@@ -34,6 +34,13 @@
   from inheriting global actions such as `End Turn`, restrict online mulligan
   selection to the local hand, and load Mana faces through the same local
   `/assets/<assetId>` mapping used by offline play.
+- Offline `/duel` now loads the shared multiplayer card-policy script, so
+  local matches no longer open as a black screen.
+- Online first-player selection happens on the duel view instead of the room
+  lobby. After both players choose, the result shows first/second seats and
+  keeps a first/second badge on the cockpit.
+- The typed online display name is remembered across connect/create/join
+  snapshot rerenders instead of snapping back to `Player`.
 - Default sample decks are installed as `resources/data/decks/`, outside the
   executable. Saved decks live under the per-user `game-data/decks/` folder.
   Private Codeman memory, training traces, challenge data, and local training

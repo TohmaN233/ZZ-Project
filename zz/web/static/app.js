@@ -2667,6 +2667,7 @@ function multiplayerErrorText(error = multiplayerUi.lastError) {
 function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
   if (!snapshot || typeof snapshot !== "object") return;
   const previousOnlineDuel = isOnlineDuel();
+  const previousDisplayName = multiplayerUi.displayName;
   multiplayerUi = {
     ...multiplayerUi,
     ...snapshot,
@@ -2675,9 +2676,22 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     pendingAction: snapshot.pendingAction || null,
     lastError: snapshot.lastError || multiplayerUi.lastError || null,
     lan: { ...(multiplayerUi.lan || {}), ...(snapshot.lan || {}) },
+    displayName: previousDisplayName,
   };
+  const roomPlayer = currentOnlineRoomPlayer();
+  if (roomPlayer && roomPlayer.displayName) {
+    multiplayerUi.displayName = roomPlayer.displayName;
+  }
+  const openingVisible = multiplayerUi.status === "MATCH_STARTING";
   const matchVisible = ["IN_MATCH", "MATCH_FINISHED"].includes(multiplayerUi.status);
-  if (matchVisible && multiplayerUi.view) {
+  if (openingVisible) {
+    if (!previousOnlineDuel) clearDuelUiState();
+    state = null;
+    activeMatchPayload = { multiplayer: true };
+    pendingChoicePromptId = null;
+    lastAppliedMultiplayerViewKey = null;
+    appView = "duel";
+  } else if (matchVisible && multiplayerUi.view) {
     if (!previousOnlineDuel) clearDuelUiState();
     const viewKey = [
       multiplayerUi.matchId || "match",
@@ -2776,7 +2790,31 @@ function onlineInputValue(selector, fallback = "") {
   return input ? String(input.value || "").trim() : fallback;
 }
 
+const ONLINE_DISPLAY_NAME_KEY = "zz_online_display_name";
+
+function rememberedOnlineDisplayName() {
+  try {
+    const raw = window.localStorage.getItem(ONLINE_DISPLAY_NAME_KEY);
+    const name = String(raw || "").trim().slice(0, 40);
+    return name || "Player";
+  } catch (_) {
+    return "Player";
+  }
+}
+
+function persistOnlineDisplayName(name = onlineInputValue("[data-online-name]", multiplayerUi.displayName || "Player")) {
+  const trimmed = String(name || "").trim().slice(0, 40);
+  multiplayerUi.displayName = trimmed || "Player";
+  try {
+    window.localStorage.setItem(ONLINE_DISPLAY_NAME_KEY, multiplayerUi.displayName);
+  } catch (_) {
+    // Renderer storage is optional; the in-memory name still survives snapshot rerenders.
+  }
+  return multiplayerUi.displayName;
+}
+
 async function connectOnlineServer() {
+  persistOnlineDisplayName();
   const rawUrl = onlineInputValue("[data-online-url]", multiplayerUi.url);
   const url = multiplayerUi.mode === "lan" ? normalizeLanUrl(rawUrl) : rawUrl;
   if (url) multiplayerUi.url = url;
@@ -2787,14 +2825,12 @@ async function connectOnlineServer() {
 }
 
 function createOnlineRoom() {
-  const displayName = onlineInputValue("[data-online-name]", "Player") || "Player";
-  multiplayerUi.displayName = displayName;
+  const displayName = persistOnlineDisplayName();
   return runMultiplayerCommand("createRoom", { displayName });
 }
 
 function joinOnlineRoom() {
-  const displayName = onlineInputValue("[data-online-name]", "Player") || "Player";
-  multiplayerUi.displayName = displayName;
+  const displayName = persistOnlineDisplayName();
   const roomCode = onlineInputValue("[data-online-room-code]").toUpperCase();
   if (!roomCode) return null;
   return runMultiplayerCommand("joinRoom", { roomCode, displayName });
@@ -2852,7 +2888,7 @@ async function switchMultiplayerMode(mode) {
 
 async function startLanRoom() {
   const serverName = onlineInputValue("[data-lan-server-name]", "ZZ LAN Room") || "ZZ LAN Room";
-  multiplayerUi.displayName = onlineInputValue("[data-online-name]", "Player") || "Player";
+  persistOnlineDisplayName();
   const result = await runMultiplayerCommand("startLanHost", { port: 32145, serverName });
   if (!result) return null;
   const localUrl = (result && result.lan && result.lan.localUrl)
@@ -2872,7 +2908,7 @@ async function stopLanHost() {
 async function discoverLanRooms() {
   const bridge = multiplayerBridge();
   if (!bridge || typeof bridge.discoverLan !== "function") return null;
-  multiplayerUi.displayName = onlineInputValue("[data-online-name]", "Player") || "Player";
+  persistOnlineDisplayName();
   multiplayerUi.lan = { ...(multiplayerUi.lan || {}), discovering: true };
   render();
   try {
@@ -2897,9 +2933,8 @@ function joinDiscoveredLanRoom(target) {
   const port = Number(target.dataset.lanPort || 32145);
   const roomCode = String(target.dataset.lanRoomCode || "");
   if (!host || !roomCode) return null;
-  const displayName = onlineInputValue("[data-online-name]", "Player") || "Player";
+  const displayName = persistOnlineDisplayName();
   multiplayerUi.url = `ws://${host}:${port}`;
-  multiplayerUi.displayName = displayName;
   lanPendingJoin = { roomCode, displayName };
   return runMultiplayerCommand("connect", { url: multiplayerUi.url });
 }
@@ -4031,7 +4066,7 @@ function animationEventDuration(event) {
   if (event.type === "turn_begin") return 760;
   if (event.type === "phase") return 920;
   if (event.type === "dice_roll") return 3200;
-  if (event.type === "rock_paper_scissors") return 2600;
+  if (event.type === "rock_paper_scissors") return 3200;
   if (event.type === "effect") return 1200;
   if (event.type === "destroy") return 920;
   if (event.type === "draw") return 820;
@@ -4799,16 +4834,35 @@ function renderGameResultOverlay(event) {
 
 function renderRockPaperScissorsOverlay(event) {
   const choices = event.choices || {};
-  const humanChoice = choices[state && state.humanSide] || "";
-  const opponentSide = state && state.humanSide === "P1" ? "P2" : "P1";
-  const opponentChoice = choices[opponentSide] || "";
-  const humanWon = event.winnerSide === (state && state.humanSide);
+  const humanSide = (state && state.humanSide) || "P1";
+  const opponentSide = humanSide === "P1" ? "P2" : "P1";
+  const humanFirst = state && state.players && state.players.human
+    ? state.players.human.isFirstPlayer
+    : event.winnerSide === humanSide;
+  const opponentFirst = state && state.players && state.players.opponent
+    ? state.players.opponent.isFirstPlayer
+    : event.winnerSide === opponentSide;
+  const firstArt = uiAssetUrl("turn_first");
+  const secondArt = uiAssetUrl("turn_second");
+  const seat = (label, first, choice) => `
+    <div class="dice-seat ${first ? "first" : "second"}">
+      ${first && firstArt
+        ? `<img src="${esc(firstArt)}" alt="first">`
+        : !first && secondArt
+          ? `<img src="${esc(secondArt)}" alt="second">`
+          : `<span>${esc(t(first ? "first" : "second"))}</span>`}
+      <b>${esc(label)}</b>
+      <span>${esc(choice ? t(choice) : "-")}</span>
+    </div>
+  `;
   return `
-    <div class="visual-overlay opening-choice-overlay" aria-live="polite">
-      <div class="visual-overlay-card opening-choice-card">
-        <strong>${esc(t("onlineOpeningChoice"))}</strong>
-        <div><span>${esc(t(humanChoice))}</span><b>VS</b><span>${esc(t(opponentChoice))}</span></div>
-        <small>${esc(humanWon ? t("first") : t("second"))}</small>
+    <div class="visual-overlay dice-roll-overlay opening-choice-overlay" aria-live="polite">
+      <div class="visual-overlay-card dice-roll-card">
+        <div class="dice-roll-value">${esc(t("onlineOpeningChoice"))}</div>
+        <div class="dice-seat-row">
+          ${seat(diceRollSeatLabel("human"), humanFirst, choices[humanSide])}
+          ${seat(diceRollSeatLabel("opponent"), opponentFirst, choices[opponentSide])}
+        </div>
       </div>
     </div>
   `;
@@ -5135,6 +5189,11 @@ function renderDuelBrand() {
   `;
 }
 
+function onlineTurnOrderBadge(player) {
+  if (!isOnlineDuel() || !player || typeof player.isFirstPlayer !== "boolean") return "";
+  return `<em class="turn-order-badge ${player.isFirstPlayer ? "first" : "second"}">${esc(t(player.isFirstPlayer ? "first" : "second"))}</em>`;
+}
+
 function renderAvatar(player, top = false) {
   const option = optionForPlayer(player);
   const click = ` role="button" tabindex="0" data-player-side="${esc(player.side)}" data-board-anchor="${esc(boardAnchorKey(player.side, "player"))}"${option ? ` data-option="${esc(option.id)}"` : ""}`;
@@ -5146,6 +5205,7 @@ function renderAvatar(player, top = false) {
       </div>
       <div class="avatar-info">
         <b>${esc(player.name)}</b>
+        ${onlineTurnOrderBadge(player)}
         <span>${esc(t("life"))} ${esc(player.life)}/${esc(lifeMax(player))}</span>
       </div>
     </div>
@@ -5182,6 +5242,7 @@ function renderPilotIdentity(player, top = false) {
         <strong>${esc(characterTitle(codeman))}</strong>
       </div>
       <div class="pilot-status-badge pilot-life-badge">
+        ${onlineTurnOrderBadge(player)}
         <span>${esc(t("life"))} ${esc(player.life)}/${esc(lifeMax(player))}</span>
       </div>
     </div>
@@ -6800,13 +6861,58 @@ function renderOnlineDeckPicker() {
   `;
 }
 
+function isOnlineOpeningChoice() {
+  return multiplayerUi.status === "MATCH_STARTING"
+    || Boolean(multiplayerUi.room && multiplayerUi.room.status === "STARTING");
+}
+
+function renderOnlineOpeningDuelView(error = null) {
+  const room = multiplayerUi.room || {};
+  const player = currentOnlineRoomPlayer();
+  const choiceSubmitted = Boolean(player && player.openingChoiceSubmitted);
+  const tied = Boolean(room.lastOpeningResult && room.lastOpeningResult.result === "tie");
+  const names = (room.players || []).map((item) => item.displayName || item.playerId).filter(Boolean);
+  const logo = uiAssetUrl("logo_zztitle");
+  return `
+    <header class="topbar">
+      <div class="brand duel-brand">
+        ${logo
+          ? `<img class="brand-logo duel-brand-logo" src="${esc(logo)}" alt="ZENONZARD">`
+          : `<strong>ZENONZARD</strong>`}
+        <div class="meta duel-status-meta">
+          <span>${esc(t("onlineGame"))}</span>
+          <span>${esc(t("onlineOpeningChoice"))}</span>
+        </div>
+      </div>
+      <div class="controls">
+        ${renderLanguageSwitch()}
+        <button data-view="home">${esc(t("home"))}</button>
+        <button class="danger" data-online-leave>${esc(t("onlineLeaveRoom"))}</button>
+      </div>
+    </header>
+    ${error ? `<div class="online-reconnect-banner" role="alert">${esc(multiplayerErrorText(error))}</div>` : ""}
+    <div class="duel-board online-opening-board">
+      <div class="visual-overlay dice-roll-overlay opening-choice-overlay interactive" aria-live="polite">
+        <div class="visual-overlay-card dice-roll-card opening-choice-card">
+          <div class="dice-roll-value">${esc(tied ? t("onlineOpeningTie") : t("onlineOpeningChoice"))}</div>
+          <div class="dice-roll-rule">${esc(names.join(" VS "))}</div>
+          <div class="online-opening-choice-buttons">
+            ${["rock", "paper", "scissors"].map((choice) => `
+              <button data-online-opening-choice="${choice}" ${choiceSubmitted ? "disabled" : ""}>${esc(t(choice))}</button>
+            `).join("")}
+          </div>
+          ${choiceSubmitted ? `<small>${esc(t("onlineOpeningWaiting"))}</small>` : ""}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function renderOnlineRoom() {
   const room = multiplayerUi.room;
   if (!room) return "";
   const player = currentOnlineRoomPlayer();
   const canEditLoadout = ["WAITING_FOR_PLAYERS", "READY_CHECK"].includes(room.status);
-  const choosingFirstPlayer = room.status === "STARTING";
-  const choiceSubmitted = Boolean(player && player.openingChoiceSubmitted);
   return `
     <section class="home-panel online-room-panel">
       <div class="home-panel-head">
@@ -6833,19 +6939,6 @@ function renderOnlineRoom() {
           <button class="primary" data-online-ready ${player && player.deckSelected && room.status === "READY_CHECK" ? "" : "disabled"}>
             ${esc(player && player.ready ? t("onlineCancelReady") : t("onlineReady"))}
           </button>
-          <button class="danger" data-online-leave>${esc(t("onlineLeaveRoom"))}</button>
-        </div>
-      ` : ""}
-      ${choosingFirstPlayer ? `
-        <div class="online-opening-choice">
-          <strong>${esc(room.lastOpeningResult && room.lastOpeningResult.result === "tie" ? t("onlineOpeningTie") : t("onlineOpeningChoice"))}</strong>
-          <span>${esc(t("turn"))} ${esc(room.openingRound || 1)}</span>
-          <div>
-            ${["rock", "paper", "scissors"].map((choice) => `
-              <button data-online-opening-choice="${choice}" ${choiceSubmitted ? "disabled" : ""}>${esc(t(choice))}</button>
-            `).join("")}
-          </div>
-          ${choiceSubmitted ? `<small>${esc(t("onlineOpeningWaiting"))}</small>` : ""}
           <button class="danger" data-online-leave>${esc(t("onlineLeaveRoom"))}</button>
         </div>
       ` : ""}
@@ -7772,6 +7865,10 @@ function render(error = null) {
   }
   if (appView === CODEMAN_REPLAY_VIEW) {
     setAppHtml(renderCodemanReplayPage(error));
+    return;
+  }
+  if (isOnlineOpeningChoice()) {
+    setAppHtml(renderOnlineOpeningDuelView(error));
     return;
   }
   if (!state) {
@@ -8925,6 +9022,11 @@ app.addEventListener("click", async (event) => {
 });
 
 app.addEventListener("input", (event) => {
+  const onlineName = event.target.closest("[data-online-name]");
+  if (onlineName) {
+    persistOnlineDisplayName(onlineName.value);
+    return;
+  }
   const replayScrub = event.target.closest("[data-codeman-replay-scrub]");
   if (replayScrub) {
     setCodemanReplayIndex(Number(event.target.value || 0), { animate: false });
@@ -9224,6 +9326,7 @@ window.addEventListener("pagehide", () => {
 });
 
 function bootApp(initialView = "home") {
+  multiplayerUi.displayName = rememberedOnlineDisplayName();
   appView = initialView;
   if (!handleCodemanReplayRoute()) render();
   return Promise.all([

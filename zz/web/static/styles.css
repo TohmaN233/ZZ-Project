@@ -6220,6 +6220,50 @@ button.end-turn-action {
   font-size: 22px;
 }
 
+.visual-overlay.interactive {
+  pointer-events: auto;
+}
+
+.online-opening-board {
+  min-height: calc(100vh - 72px);
+  background: #05080a;
+}
+
+.online-opening-choice-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(86px, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.dice-seat span {
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.turn-order-badge {
+  display: inline-block;
+  border: 1px solid rgba(238, 248, 245, 0.18);
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.turn-order-badge.first {
+  border-color: rgba(224, 181, 90, 0.8);
+  color: #e0b55a;
+}
+
+.turn-order-badge.second {
+  border-color: rgba(50, 213, 200, 0.45);
+  color: var(--cyan);
+}
+
 .lobby-launch-panel {
   background:
     linear-gradient(135deg, rgba(50, 213, 200, 0.08), rgba(255, 223, 128, 0.06)),
