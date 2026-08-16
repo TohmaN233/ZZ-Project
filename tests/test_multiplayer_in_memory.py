@@ -105,8 +105,8 @@ def test_two_independent_clients_join_ready_act_surrender_and_close() -> None:
     second.submit_action(_prompt_action(second), client_action_id="keep-b")
     assert first.gameplay_view["revision"] == 2
     assert second.gameplay_view["revision"] == 2
-    assert first.gameplay_view.get("prompt") is not None
-    assert second.gameplay_view.get("prompt") is None
+    assert first.gameplay_view.get("prompt") is None
+    assert second.gameplay_view.get("prompt") is not None
 
     active_sides = [first.gameplay_view["activeSide"]]
     for index in range(8):
@@ -158,3 +158,54 @@ def test_invalid_room_third_player_and_private_loadouts() -> None:
     encoded_room = repr(first.room_state)
     assert not any(card_id in encoded_room for card_id in KANATANA_YELLOW_RECIPE)
     assert not any(card_id in encoded_room for card_id in DEMETE_GREEN_RECIPE)
+
+
+def test_online_match_preserves_cosmetics_names_and_seeded_opening_roll() -> None:
+    server = MultiplayerServer(
+        room_id_factory=lambda: "room-parity",
+        room_code_factory=lambda: "PAR123",
+        match_id_factory=lambda: "match-parity",
+        seed_factory=lambda: 701,
+    )
+    first = MultiplayerClientStore(InMemoryTransport(server, "connection-host"))
+    second = MultiplayerClientStore(InMemoryTransport(server, "connection-guest"))
+    first.connect()
+    second.connect()
+    first.create_room(display_name="Alice")
+    second.join_room("PAR123", display_name="Bob")
+    first._send("SELECT_DECK", {
+        "deck": dict(KANATANA_YELLOW_RECIPE),
+        "forces": list(DECKCODE0_YELLOW_FORCES),
+        "profile": {
+            "codemanId": "codeman_01_ash_claude",
+            "playmatId": "playmat_illust_767258",
+        },
+    })
+    second._send("SELECT_DECK", {
+        "deck": dict(DEMETE_GREEN_RECIPE),
+        "forces": list(DECKCODE0_GREEN_FORCES),
+        "profile": {
+            "codemanId": "codeman_02_eilietta_lash",
+            "playmatId": "playmat_illust_767258",
+        },
+    })
+    first.set_ready(True)
+    second.set_ready(True)
+
+    first_view = first.gameplay_view
+    second_view = second.gameplay_view
+    assert first_view is not None and second_view is not None
+    assert first_view["players"]["human"]["name"] == "Alice"
+    assert first_view["players"]["opponent"]["name"] == "Bob"
+    assert second_view["players"]["human"]["name"] == "Bob"
+    assert first_view["players"]["human"]["profile"]["codemanId"] == "codeman_01_ash_claude"
+    assert first_view["players"]["human"]["profile"]["playmatId"] == "playmat_illust_767258"
+    assert second_view["players"]["human"]["profile"]["codemanId"] == "codeman_02_eilietta_lash"
+    assert first_view["players"]["human"]["isFirstPlayer"] is False
+    assert first_view["players"]["opponent"]["isFirstPlayer"] is True
+    assert first_view["activeSide"] == second_view["activeSide"] == "P2"
+    assert first_view["animationEvents"] == second_view["animationEvents"] == [{
+        "type": "dice_roll",
+        "value": 6,
+        "firstSeat": "right",
+    }]

@@ -10,7 +10,12 @@ from threading import RLock, Timer
 from typing import Any
 
 from zz.multiplayer.actions import SURRENDER, ActionRejection, ActionResult, SubmittedAction
-from zz.multiplayer.match import AuthoritativeMatch, InitialMatchSpec
+from zz.multiplayer.match import (
+    AuthoritativeMatch,
+    InitialMatchSpec,
+    first_player_id_for_roll,
+    opening_roll_for_seed,
+)
 from zz.multiplayer.observability import null_event_sink
 from zz.multiplayer.protocol import (
     PROTOCOL_VERSION,
@@ -408,16 +413,21 @@ class MultiplayerServer:
             or player_2.force_ids is None
         ):
             raise RuntimeError("ready room lost a validated loadout")
+        seed = self._seed_factory()
+        opening_roll = opening_roll_for_seed(seed)
         match = AuthoritativeMatch(InitialMatchSpec(
             match_id=self._match_id_factory(),
-            seed=self._seed_factory(),
-            first_player_id="player_1",
+            seed=seed,
+            first_player_id=first_player_id_for_roll(opening_roll),
             player_1_deck=player_1.deck_recipe,
             player_1_forces=player_1.force_ids,
             player_2_deck=player_2.deck_recipe,
             player_2_forces=player_2.force_ids,
             player_1_profile=player_1.profile,
             player_2_profile=player_2.profile,
+            player_1_name=player_1.display_name,
+            player_2_name=player_2.display_name,
+            opening_roll=opening_roll,
         ), asset_root=self._asset_root)
         self._matches[room.room_id] = match
         room.mark_running()

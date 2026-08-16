@@ -100,3 +100,20 @@ def test_online_home_entry_and_duel_action_route_are_live() -> None:
         "function joinDiscoveredLanRoom", 1
     )[0]
     assert 'multiplayerUi.displayName = onlineInputValue("[data-online-name]"' in discover_lan_rooms
+
+
+def test_online_duel_uses_local_assets_shared_visual_pipeline_and_inert_card_backs() -> None:
+    app = (ROOT / "zz" / "web" / "static" / "app.js").read_text(encoding="utf-8")
+    apply_snapshot = app.split("function applyMultiplayerSnapshot", 1)[1].split(
+        "async function refreshMultiplayerSnapshot", 1
+    )[0]
+    render_card = app.split("function renderCard(card", 1)[1].split(
+        "function renderForce", 1
+    )[0]
+
+    assert "hydrateMultiplayerViewAssets" in apply_snapshot
+    assert "stageDuelState" in apply_snapshot
+    assert "lastAppliedMultiplayerViewKey" in apply_snapshot
+    assert "card.faceDown ? localAssetUrl(\"card_back\")" in app
+    assert "const interactive = !card.faceDown" in render_card
+    assert "data-card-iid" in render_card and "interactive ?" in render_card

@@ -103,7 +103,7 @@ class Room:
         self._players.append(RoomPlayer(
             player_id=self.host_player_id,
             connection_id=host_connection_id,
-            display_name=str(host_name or "Host"),
+            display_name=self._require_display_name(host_name or "Host"),
             is_host=True,
             joined_at=self.created_at,
             reconnect_token=self._new_reconnect_token(),
@@ -131,7 +131,7 @@ class Room:
         player = RoomPlayer(
             player_id="player_2",
             connection_id=connection_id,
-            display_name=str(display_name or "Guest"),
+            display_name=self._require_display_name(display_name or "Guest"),
             is_host=False,
             joined_at=self._now(),
             reconnect_token=self._new_reconnect_token(),
@@ -369,3 +369,12 @@ class Room:
     def _require_identifier(value: str, field_name: str) -> None:
         if not isinstance(value, str) or not value:
             raise RoomError("INVALID_ROOM", f"{field_name} must be a non-empty string")
+
+    @staticmethod
+    def _require_display_name(value: str) -> str:
+        if not isinstance(value, str) or not value.strip() or len(value) > 40:
+            raise RoomError(
+                "INVALID_PLAYER_NAME",
+                "displayName must contain 1-40 characters",
+            )
+        return value.strip()

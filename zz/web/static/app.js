@@ -76,6 +76,7 @@ let animationOverlayTimer = null;
 let pendingVisualState = null;
 let visualStateStaged = false;
 let hiddenZoneMoveSourceKeys = new Set();
+let lastAppliedMultiplayerViewKey = null;
 let effectTargetSelectionIds = new Set();
 let selectedCatalogCardId = null;
 let battleDebugOpen = false;
@@ -1401,26 +1402,30 @@ function commitPendingVisualState({ rerender = true } = {}) {
   return true;
 }
 
+function stageDuelState(nextState, nextError = null) {
+  const previousState = state;
+  const animationEvents = (nextState && nextState.animationEvents) || [];
+  const holdPreviousState = shouldHoldStateForAnimationEvents(previousState, nextState, animationEvents);
+  if (holdPreviousState) {
+    pendingVisualState = { state: nextState, error: nextError };
+    visualStateStaged = false;
+    state = previousState;
+  } else {
+    pendingVisualState = null;
+    visualStateStaged = false;
+    state = nextState;
+  }
+  enqueueAnimationEvents(animationEvents);
+  enqueuePublicReveals((nextState && nextState.publicReveals) || []);
+  syncUiStateFromCurrentState();
+}
+
 function api(path, body = null) {
   commitPendingVisualState({ rerender: false });
-  const previousState = state;
   return ZZApi.request(path, body).then((payload) => {
     const nextState = payload.state || state;
-    const animationEvents = (nextState && nextState.animationEvents) || [];
     const nextError = payload.error || (nextState && nextState.error);
-    const holdPreviousState = shouldHoldStateForAnimationEvents(previousState, nextState, animationEvents);
-    if (holdPreviousState) {
-      pendingVisualState = { state: nextState, error: nextError };
-      visualStateStaged = false;
-      state = previousState;
-    } else {
-      pendingVisualState = null;
-      visualStateStaged = false;
-      state = nextState;
-    }
-    enqueueAnimationEvents(animationEvents);
-    enqueuePublicReveals((nextState && nextState.publicReveals) || []);
-    syncUiStateFromCurrentState();
+    stageDuelState(nextState, nextError);
     render(nextError);
     if (!hasBlockingAutoVisuals()) scheduleAutoStep(AI_AUTO_VISUAL_POLL_MS);
     return payload;
@@ -1439,6 +1444,7 @@ async function loadCatalog() {
   const payload = await ZZApi.request("/api/catalog");
   if (payload.ok) {
     catalog = payload;
+    if (multiplayerUi.view) hydrateMultiplayerViewAssets(multiplayerUi.view);
   }
   render();
 }
@@ -1577,6 +1583,54 @@ function localizedCardAssetUrl(card) {
 function localizedForceAssetUrl(force) {
   if (force && currentLanguage() === "en" && force.assetUrlEn) return force.assetUrlEn;
   return force && force.assetUrl ? force.assetUrl : null;
+}
+
+function localAssetUrl(assetId) {
+  return assetId ? `/assets/${encodeURIComponent(assetId)}` : null;
+}
+
+function hydrateMultiplayerViewAssets(view) {
+  if (!view || typeof view !== "object") return view;
+  const cardsById = new Map((catalog.cards || []).map((card) => [card.id, card]));
+  const forcesById = new Map((catalog.forces || []).map((force) => [force.id, force]));
+  const hydrateCard = (card) => {
+    if (!card || typeof card !== "object") return;
+    const assetId = card.faceDown ? "card_back" : (card.assetId || card.cardId);
+    const localCard = cardsById.get(card.cardId || card.assetId);
+    const assetUrl = card.faceDown ? localAssetUrl("card_back") : (localCard && localCard.assetUrl) || localAssetUrl(assetId);
+    card.assetId = assetId;
+    card.assetUrl = assetUrl;
+    if (!card.faceDown) {
+      card.assetUrlEn = (localCard && localCard.assetUrlEn) || assetUrl;
+    }
+  };
+  const visitCards = (value) => {
+    if (!value || typeof value !== "object") return;
+    if (Array.isArray(value)) {
+      value.forEach(visitCards);
+      return;
+    }
+    if (Object.prototype.hasOwnProperty.call(value, "faceDown") && (value.assetId || value.cardId)) {
+      hydrateCard(value);
+    }
+    Object.values(value).forEach(visitCards);
+  };
+  visitCards(view);
+  Object.values(view.players || {}).forEach((player) => {
+    (player.forces || []).forEach((force) => {
+      const localForce = forcesById.get(force.id);
+      const assetId = force.assetId || force.id;
+      force.assetUrl = (localForce && localForce.assetUrl) || localAssetUrl(assetId);
+      force.assetUrlEn = (localForce && localForce.assetUrlEn) || force.assetUrl;
+    });
+    const profile = player.profile || {};
+    const codeman = characterById(profile.codemanId);
+    const playmat = playmatById(profile.playmatId);
+    profile.codeman = codeman || null;
+    profile.playmatUrl = playmat ? playmat.assetUrl : null;
+    player.profile = profile;
+  });
+  return view;
 }
 
 function forceTitle(force) {
@@ -2593,7 +2647,7 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     ...multiplayerUi,
     ...snapshot,
     room: snapshot.room || null,
-    view: snapshot.view || null,
+    view: hydrateMultiplayerViewAssets(snapshot.view || null),
     pendingAction: snapshot.pendingAction || null,
     lastError: snapshot.lastError || multiplayerUi.lastError || null,
     lan: { ...(multiplayerUi.lan || {}), ...(snapshot.lan || {}) },
@@ -2601,7 +2655,18 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
   const matchVisible = ["IN_MATCH", "MATCH_FINISHED"].includes(multiplayerUi.status);
   if (matchVisible && multiplayerUi.view) {
     if (!previousOnlineDuel) clearDuelUiState();
-    state = multiplayerUi.view;
+    const viewKey = [
+      multiplayerUi.matchId || "match",
+      multiplayerUi.view.revision,
+      multiplayerUi.view.stateHash,
+    ].join(":");
+    if (viewKey !== lastAppliedMultiplayerViewKey) {
+      if (previousOnlineDuel && pendingVisualState) {
+        commitPendingVisualState({ rerender: false });
+      }
+      stageDuelState(multiplayerUi.view, multiplayerUi.lastError);
+      lastAppliedMultiplayerViewKey = viewKey;
+    }
     activeMatchPayload = { multiplayer: true };
     pendingChoicePromptId = multiplayerUi.pendingAction && state.prompt ? state.prompt.id : null;
     appView = "duel";
@@ -2610,6 +2675,7 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     state = null;
     activeMatchPayload = {};
     pendingChoicePromptId = null;
+    lastAppliedMultiplayerViewKey = null;
     appView = ONLINE_VIEW;
   }
   if (multiplayerUi.status === "CONNECTED" && !multiplayerUi.room) {
@@ -4532,6 +4598,9 @@ function zoneMoveLabel(event) {
 
 function diceRollSeatLabel(kind) {
   const player = state && state.players ? state.players[kind] : null;
+  if (state && state.mode === "multiplayer" && player && player.name) {
+    return player.name;
+  }
   if (state && state.humanSide) {
     return kind === "human" ? t("player") : t("opponent");
   }
@@ -4787,6 +4856,7 @@ function isActiveZoneMoveSourceCard(card) {
 }
 
 function renderCard(card, size = "") {
+  const interactive = !card.faceDown;
   const actions = actionOptionsForCard(card);
   const blessSourceActions = blessActionsForMana(card);
   const blessTargetActions = blessActionsForTarget(card);
@@ -4824,9 +4894,12 @@ function renderCard(card, size = "") {
     ? `<button class="mulligan-toggle" data-mulligan-iid="${esc(card.iid)}" aria-label="${esc(t("selectForMulligan"))}"></button>`
     : "";
   const cardAnchor = boardCardAnchorAttr(card);
+  const interactionAttrs = interactive ?
+    `role="button" tabindex="0" data-card-iid="${esc(card.iid)}" title="${label}"`
+    : `aria-hidden="true"`;
   return `
-    <div class="card${classes}${legal}${playable}${blessSource}${blessTarget}${rested}${selected}${mulliganClass}${movingSource}" role="button" tabindex="0" ${cardAnchor}
-         data-card-iid="${esc(card.iid)}" ${blessDragAttrs} ${blessTargetAttr} title="${label}">
+    <div class="card${classes}${legal}${playable}${blessSource}${blessTarget}${rested}${selected}${mulliganClass}${movingSource}" ${cardAnchor}
+         ${interactionAttrs} ${blessDragAttrs} ${blessTargetAttr}>
       ${art}
       ${actionBadge}
       ${mulliganToggle}
@@ -7809,6 +7882,7 @@ function clearDuelUiState() {
   pendingVisualState = null;
   visualStateStaged = false;
   hiddenZoneMoveSourceKeys.clear();
+  lastAppliedMultiplayerViewKey = null;
   if (animationOverlayTimer) {
     clearTimeout(animationOverlayTimer);
     animationOverlayTimer = null;

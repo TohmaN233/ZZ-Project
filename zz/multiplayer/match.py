@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 from copy import deepcopy
 from dataclasses import dataclass
 from types import MappingProxyType
@@ -25,7 +26,17 @@ from zz.multiplayer.views import build_player_view, player_for_id, player_id_for
 from zz.web.session import GameSession
 
 
-RULES_VERSION = "0.0.2"
+RULES_VERSION = "0.0.3"
+
+
+def opening_roll_for_seed(seed: int) -> int:
+    return random.Random(seed).randint(1, 6)
+
+
+def first_player_id_for_roll(value: int) -> str:
+    if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= 6:
+        raise ValueError("opening roll must be an integer from 1 to 6")
+    return "player_1" if value % 2 == 1 else "player_2"
 
 
 @dataclass(frozen=True)
@@ -39,6 +50,9 @@ class InitialMatchSpec:
     player_2_forces: tuple[str, str]
     player_1_profile: Mapping[str, str | None] | None = None
     player_2_profile: Mapping[str, str | None] | None = None
+    player_1_name: str = "Player 1"
+    player_2_name: str = "Player 2"
+    opening_roll: int | None = None
     rules_version: str = RULES_VERSION
 
     def __post_init__(self) -> None:
@@ -48,6 +62,15 @@ class InitialMatchSpec:
             raise ValueError(f"invalid first player {self.first_player_id!r}")
         if isinstance(self.seed, bool) or not isinstance(self.seed, int):
             raise ValueError("seed must be an integer")
+        for field_name, value in (
+            ("player_1_name", self.player_1_name),
+            ("player_2_name", self.player_2_name),
+        ):
+            if not isinstance(value, str) or not value.strip() or len(value) > 40:
+                raise ValueError(f"{field_name} must contain 1-40 characters")
+        if self.opening_roll is not None:
+            if first_player_id_for_roll(self.opening_roll) != self.first_player_id:
+                raise ValueError("opening roll parity does not match first_player_id")
         object.__setattr__(self, "player_1_deck", MappingProxyType(dict(self.player_1_deck)))
         object.__setattr__(self, "player_2_deck", MappingProxyType(dict(self.player_2_deck)))
         object.__setattr__(self, "player_1_forces", tuple(self.player_1_forces))
@@ -82,6 +105,9 @@ class InitialMatchSpec:
             "player2Forces": list(self.player_2_forces),
             "player1Profile": dict(self.player_1_profile or {}),
             "player2Profile": dict(self.player_2_profile or {}),
+            "player1Name": self.player_1_name,
+            "player2Name": self.player_2_name,
+            "openingRoll": self.opening_roll,
             "rulesVersion": self.rules_version,
         }
 
@@ -93,7 +119,11 @@ class AuthoritativeMatch:
             seed=spec.seed,
             mode="god",
             asset_root=asset_root,
-            first_player="human" if spec.first_player_id == "player_1" else "ai",
+            first_player=(
+                "roll"
+                if spec.opening_roll is not None
+                else ("human" if spec.first_player_id == "player_1" else "ai")
+            ),
             player_recipe=dict(spec.player_1_deck),
             player_force_ids=list(spec.player_1_forces),
             opponent_recipe=dict(spec.player_2_deck),
@@ -101,12 +131,42 @@ class AuthoritativeMatch:
             player_profile=dict(spec.player_1_profile or {}),
             opponent_profile=dict(spec.player_2_profile or {}),
         )
+        player_1, player_2 = self.session.engine.state.players
+        player_1.name = spec.player_1_name
+        player_2.name = spec.player_2_name
+        self._preserve_multiplayer_profile_ids(player_1, spec.player_1_profile)
+        self._preserve_multiplayer_profile_ids(player_2, spec.player_2_profile)
+        if spec.opening_roll is not None:
+            dice_event = next(
+                (
+                    event
+                    for event in self.session._animation_events
+                    if event.get("type") == "dice_roll"
+                ),
+                None,
+            )
+            if dice_event is None or dice_event.get("value") != spec.opening_roll:
+                raise RuntimeError("authoritative opening roll did not match match specification")
+            actual_first_player_id = "player_1" if player_1.is_first_player else "player_2"
+            if actual_first_player_id != spec.first_player_id:
+                raise RuntimeError("authoritative first player did not match opening roll parity")
         self.revision = 0
+        self._animation_events = tuple(deepcopy(self.session._animation_events))
+        self._public_reveals = tuple(deepcopy(self.session._public_reveals))
+        self.session._animation_events.clear()
+        self.session._public_reveals.clear()
         self._processed: dict[
             tuple[str, str],
             tuple[SubmittedAction, ActionResult],
         ] = {}
         self._action_log: list[AppliedActionRecord] = []
+
+    @staticmethod
+    def _preserve_multiplayer_profile_ids(player: Any, raw_profile: Mapping[str, Any] | None) -> None:
+        profile = dict(player.profile or {})
+        profile["codemanId"] = (raw_profile or {}).get("codemanId")
+        profile["playmatId"] = (raw_profile or {}).get("playmatId")
+        player.profile = profile
 
     @property
     def match_id(self) -> str:
@@ -136,6 +196,8 @@ class AuthoritativeMatch:
             player_id=player_id,
             revision=self.revision,
             state_hash=self.state_hash(),
+            animation_events=self._animation_events,
+            public_reveals=self._public_reveals,
         )
 
     def prompt_owner_id(self) -> str | None:
@@ -296,6 +358,8 @@ class AuthoritativeMatch:
             before_active_side=before_active_side,
             before_game_over=before_game_over,
             prompt_kind=before_prompt_kind,
+            animation_events=state.get("animationEvents") or (),
+            public_reveals=state.get("publicReveals") or (),
         )
 
     def _submit_surrender(self, submitted: SubmittedAction) -> ActionResult:
@@ -307,13 +371,15 @@ class AuthoritativeMatch:
             )
         before_turn = self.session.engine.state.turn
         before_active_side = self.session.engine.state.active.side.name
-        self.session.surrender(player_for_id(self.session, submitted.player_id).side.name)
+        state = self.session.surrender(player_for_id(self.session, submitted.player_id).side.name)
         return self._accept(
             submitted,
             before_turn=before_turn,
             before_active_side=before_active_side,
             before_game_over=False,
             prompt_kind=None,
+            animation_events=state.get("animationEvents") or (),
+            public_reveals=state.get("publicReveals") or (),
         )
 
     def _accept(
@@ -324,8 +390,12 @@ class AuthoritativeMatch:
         before_active_side: str,
         before_game_over: bool,
         prompt_kind: str | None,
+        animation_events: Iterable[Mapping[str, Any]],
+        public_reveals: Iterable[Mapping[str, Any]],
     ) -> ActionResult:
         self.revision += 1
+        self._animation_events = tuple(deepcopy(list(animation_events)))
+        self._public_reveals = tuple(deepcopy(list(public_reveals)))
         events: list[dict[str, Any]] = [{
             "kind": "ACTION_RESOLVED",
             "playerId": submitted.player_id,
