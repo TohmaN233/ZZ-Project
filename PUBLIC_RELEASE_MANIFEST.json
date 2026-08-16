@@ -43,8 +43,8 @@
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.3.0-Linux.tar.gz",
-    "bytes": 21469407,
-    "sha256": "3B659DD0DC1E9014D45CF3963B245B7A08B3FDB46E7C87EC815B5BAE9E72CC8D",
+    "bytes": 21469540,
+    "sha256": "7838F918ACDA336A45C9165FF3B8939CDA6A6365A734816FE8D0A0231165241A",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
