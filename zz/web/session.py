@@ -8,8 +8,6 @@ from pathlib import Path
 from typing import Any
 
 from zz.ai import PassOnlyPolicy
-from zz.ai_registry import resolve_battle_policy
-from zz.ai_runtime_stack import current_tree_baseline_runtime_weights
 from zz.codeman_memory import CodemanMemoryStore
 from zz.decks import (
     DECKCODE0_GREEN_FORCES,
@@ -55,8 +53,16 @@ MANA_COLOR_CHOICES = [
 ]
 
 
+def _resolve_battle_policy(kind: str, **kwargs: Any) -> Any:
+    from zz.ai_registry import resolve_battle_policy
+
+    return resolve_battle_policy(kind, **kwargs)
+
+
 def _local_game_deep_policy(seed: int) -> Any:
-    return resolve_battle_policy(
+    from zz.ai_runtime_stack import current_tree_baseline_runtime_weights
+
+    return _resolve_battle_policy(
         "deep",
         seed=seed,
         runtime_prior_weights=current_tree_baseline_runtime_weights(),
@@ -212,7 +218,7 @@ class GameSession:
     def _policy_for_player_profile(self, profile: dict[str, Any], *, seed: int, default_kind: str) -> Any:
         codeman_id = profile.get("codemanId") if isinstance(profile, dict) else None
         if codeman_id:
-            return resolve_battle_policy(
+            return _resolve_battle_policy(
                 "codeman",
                 seed=seed,
                 codeman_id=str(codeman_id),
@@ -223,7 +229,7 @@ class GameSession:
     def _policy_for_opponent_profile(self, profile: dict[str, Any], *, seed: int) -> Any:
         codeman_id = profile.get("codemanId") if isinstance(profile, dict) else None
         if self.opponent_ai_difficulty == "deep" and codeman_id:
-            return resolve_battle_policy(
+            return _resolve_battle_policy(
                 "codeman",
                 seed=seed,
                 codeman_id=str(codeman_id),
@@ -236,11 +242,11 @@ class GameSession:
         if resolved == "deep":
             return _local_game_deep_policy(seed)
         if resolved == "normal":
-            return resolve_battle_policy(
+            return _resolve_battle_policy(
                 "normal",
                 seed=seed,
             ).policy
-        return resolve_battle_policy(
+        return _resolve_battle_policy(
             resolved,
             seed=seed,
             runtime_prior_weights=self._runtime_weights_for_difficulty(resolved),
@@ -248,7 +254,11 @@ class GameSession:
 
     @staticmethod
     def _runtime_weights_for_difficulty(kind: str) -> dict[str, Any] | None:
-        return current_tree_baseline_runtime_weights() if str(kind or "").lower() == "deep" else None
+        if str(kind or "").lower() != "deep":
+            return None
+        from zz.ai_runtime_stack import current_tree_baseline_runtime_weights
+
+        return current_tree_baseline_runtime_weights()
 
     def _build_game(self, first_player: str) -> None:
         p1_first, dice_event = self._resolve_first_player(first_player)
@@ -1419,7 +1429,7 @@ class GameSession:
                 player_index = self.engine.state.players.index(player)
             except ValueError:
                 player_index = 0
-            return resolve_battle_policy(
+            return _resolve_battle_policy(
                 "codeman",
                 seed=self.seed + 7000 + player_index,
                 codeman_id=codeman_id,

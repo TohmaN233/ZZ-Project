@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 
@@ -40,6 +42,26 @@ def test_python_package_discovery_excludes_non_package_release_directories() -> 
     assert 'include = ["zz*"]' in pyproject
     assert 'exclude = ["data*", "deploy*", "tests*", "tools*"]' in pyproject
     assert '"zz.multiplayer" = ["compatibility.json"]' in pyproject
+
+
+def test_authoritative_server_import_does_not_load_optional_ai_runtime() -> None:
+    script = """
+import sys
+import zz.multiplayer.deployment_server
+
+forbidden = {"numpy", "zz.deep_runtime", "zz.ai_registry", "zz.ai_runtime_stack"}
+loaded = forbidden.intersection(sys.modules)
+if loaded:
+    raise SystemExit(f"optional AI runtime imported by PvP server: {sorted(loaded)}")
+"""
+    result = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr or result.stdout
 
 
 def test_systemd_and_nginx_keep_internal_ports_private_and_enable_restart() -> None:
