@@ -1,6 +1,6 @@
 {
   "name": "zenonzard-clone",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Local Zenonzard clone and debugging client.",
   "main": "electron/main.js",

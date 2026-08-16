@@ -31,7 +31,7 @@ separate overlay pack.
 ## 3. Windows installer
 
 Download and run
-[`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe).
+[`ZZ-Project-v0.3.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Windows-Setup.exe).
 Python, Node.js, and `npm install` are not required. Start the installed game
 from the Start menu or the desktop shortcut.
 
@@ -65,20 +65,20 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `142393615` bytes.
+Installer size: `142395419` bytes.
 
 Installer SHA-256:
-`1077F62FFCD06869C4F70C7E611872CE482BA965B4A55FC428D48DA6E18A3294`.
+`C859E5ACDAD494F32A906C536FC39F9D65B019DB871C2B83A4CC7A376F24404C`.
 
 ## 4. Linux portable bundle
 
 Download
-[`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz),
+[`ZZ-Project-v0.3.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz),
 then extract and run:
 
 ```bash
-tar -xzf ZZ-Project-v0.2.0-Linux.tar.gz
-cd ZZ-Project-v0.2.0
+tar -xzf ZZ-Project-v0.3.0-Linux.tar.gz
+cd ZZ-Project-v0.3.0
 ./launch-electron.sh --check
 ./launch-electron.sh
 ```
@@ -92,15 +92,15 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `21464428` bytes.
+Bundle size: `21466502` bytes.
 
 Bundle SHA-256:
-`156CE7F6C1BFAFB8C5A0D55BA3267AE6FF97CBFEA85B017244A3EEC07B5375BF`.
+`775D2F07C2025FED210BF8B5186FC890C5D46482F59CD00ABA377043AD756296`.
 
 ## 5. Source launch and macOS
 
 Download the explicitly named
-[`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip).
+[`ZZ-Project-v0.3.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip).
 Do not use the smaller source archive generated automatically by an old GitHub
 tag. The named archive contains the release snapshot, runtime models, tests,
 documentation, and `image.png`.

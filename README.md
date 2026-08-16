@@ -33,9 +33,9 @@ AI 相关代码由 Codex 协助编写，并参考了 [sbl1996/ygo-agent](https:/
 
 ## 安装
 
-Windows 玩家推荐直接下载并运行 [ZZ-Project-v0.2.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe)。安装器已经包含可玩的桌面客户端、冻结后的 Python server、规则代码和默认模型，不需要 Python 或 Node.js。大型资源仍从 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing) 下载：主资源包的两个 ZIP volumes `ZZ-Assets-PC02-v1.zip.001` 与 `ZZ-Assets-PC02-v1.zip.002` 都下载后，用 7-Zip 打开 `.001`，将得到的 `asserts/` 放到安装目录，与 `ZZ-Project.exe` 同级。需要英文卡图的玩家再下载单独的 `ZZ-Assets-PC02-English-v1.zip`，解压到同一个 `asserts/`。完整步骤、目录结构和源码启动方式见 [INSTALL.md](INSTALL.md)。
+Windows 玩家推荐直接下载并运行 [ZZ-Project-v0.3.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Windows-Setup.exe)。安装器已经包含可玩的桌面客户端、冻结后的 Python server、规则代码和默认模型，不需要 Python 或 Node.js。大型资源仍从 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing) 下载：主资源包的两个 ZIP volumes `ZZ-Assets-PC02-v1.zip.001` 与 `ZZ-Assets-PC02-v1.zip.002` 都下载后，用 7-Zip 打开 `.001`，将得到的 `asserts/` 放到安装目录，与 `ZZ-Project.exe` 同级。需要英文卡图的玩家再下载单独的 `ZZ-Assets-PC02-English-v1.zip`，解压到同一个 `asserts/`。完整步骤、目录结构和源码启动方式见 [INSTALL.md](INSTALL.md)。
 
-Linux 玩家下载 [ZZ-Project-v0.2.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz)，解压后运行 `./launch-electron.sh`；首次启动会在用户缓存目录准备运行时。macOS 玩家与开发者使用 [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip)，再按安装说明安装依赖。
+Linux 玩家下载 [ZZ-Project-v0.3.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz)，解压后运行 `./launch-electron.sh`；首次启动会在用户缓存目录准备运行时。macOS 玩家与开发者使用 [ZZ-Project-v0.3.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip)，再按安装说明安装依赖。
 
 ```powershell
 python -m pip install -r requirements-runtime.txt

@@ -33,9 +33,9 @@ AI 関連コードは Codex の支援を受け、[sbl1996/ygo-agent](https://git
 
 ## インストール
 
-Windows のプレイヤーは [ZZ-Project-v0.2.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe) をダウンロードして実行してください。インストーラーには遊べるデスクトップクライアント、凍結済み Python server、ルールコード、既定モデルが含まれ、Python と Node.js は不要です。大型アセットは別配布のため、[Google Drive のアセットフォルダ](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)から主アセットの 2 つの ZIP volume、`ZZ-Assets-PC02-v1.zip.001` と `ZZ-Assets-PC02-v1.zip.002` を取得してください。`.001` を 7-Zip で開き、得られた `asserts/` をインストール先の `ZZ-Project.exe` と同じ階層へ配置します。英語カード画像が必要な場合は別ファイル `ZZ-Assets-PC02-English-v1.zip` も同じ `asserts/` に展開してください。詳しい手順は [INSTALL.md](INSTALL.md) にあります。
+Windows のプレイヤーは [ZZ-Project-v0.3.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Windows-Setup.exe) をダウンロードして実行してください。インストーラーには遊べるデスクトップクライアント、凍結済み Python server、ルールコード、既定モデルが含まれ、Python と Node.js は不要です。大型アセットは別配布のため、[Google Drive のアセットフォルダ](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing)から主アセットの 2 つの ZIP volume、`ZZ-Assets-PC02-v1.zip.001` と `ZZ-Assets-PC02-v1.zip.002` を取得してください。`.001` を 7-Zip で開き、得られた `asserts/` をインストール先の `ZZ-Project.exe` と同じ階層へ配置します。英語カード画像が必要な場合は別ファイル `ZZ-Assets-PC02-English-v1.zip` も同じ `asserts/` に展開してください。詳しい手順は [INSTALL.md](INSTALL.md) にあります。
 
-Linux のプレイヤーは [ZZ-Project-v0.2.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz) を展開して `./launch-electron.sh` を実行してください。初回起動時にユーザーキャッシュへランタイムを準備します。macOS のプレイヤーと開発者は [ZZ-Project-v0.2.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip) を使用し、下記のソースセットアップを行ってください。
+Linux のプレイヤーは [ZZ-Project-v0.3.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz) を展開して `./launch-electron.sh` を実行してください。初回起動時にユーザーキャッシュへランタイムを準備します。macOS のプレイヤーと開発者は [ZZ-Project-v0.3.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip) を使用し、下記のソースセットアップを行ってください。
 
 ```powershell
 python -m pip install -r requirements-runtime.txt

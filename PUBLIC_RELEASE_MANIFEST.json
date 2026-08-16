@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.2.0",
+  "releaseVersion": "0.3.0",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -27,9 +27,9 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.2.0-Windows-Setup.exe",
-    "bytes": 142393615,
-    "sha256": "1077F62FFCD06869C4F70C7E611872CE482BA965B4A55FC428D48DA6E18A3294",
+    "filename": "ZZ-Project-v0.3.0-Windows-Setup.exe",
+    "bytes": 142395419,
+    "sha256": "C859E5ACDAD494F32A906C536FC39F9D65B019DB871C2B83A4CC7A376F24404C",
     "contains": [
       "Electron desktop client",
       "frozen Python web server",
@@ -42,9 +42,9 @@
     "asserts": "external sibling directory next to ZZ-Project.exe"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.2.0-Linux.tar.gz",
-    "bytes": 21464428,
-    "sha256": "156CE7F6C1BFAFB8C5A0D55BA3267AE6FF97CBFEA85B017244A3EEC07B5375BF",
+    "filename": "ZZ-Project-v0.3.0-Linux.tar.gz",
+    "bytes": 21466502,
+    "sha256": "775D2F07C2025FED210BF8B5186FC890C5D46482F59CD00ABA377043AD756296",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"

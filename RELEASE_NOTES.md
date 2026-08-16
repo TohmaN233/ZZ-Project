@@ -1,4 +1,4 @@
-# v0.2.0 - PC02 CONTRACT
+# v0.3.0 - Online Duel Parity
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
@@ -48,21 +48,21 @@
 
 ## Download contents
 
-1. [`ZZ-Project-v0.2.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Windows-Setup.exe):
+1. [`ZZ-Project-v0.3.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Windows-Setup.exe):
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142393615` bytes.
+   Size: `142395419` bytes.
    SHA-256:
-   `1077F62FFCD06869C4F70C7E611872CE482BA965B4A55FC428D48DA6E18A3294`.
-2. [`ZZ-Project-v0.2.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-Linux.tar.gz):
+   `C859E5ACDAD494F32A906C536FC39F9D65B019DB871C2B83A4CC7A376F24404C`.
+2. [`ZZ-Project-v0.3.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `21464428` bytes.
+   Size: `21466502` bytes.
    SHA-256:
-   `156CE7F6C1BFAFB8C5A0D55BA3267AE6FF97CBFEA85B017244A3EEC07B5375BF`.
-3. [`ZZ-Project-v0.2.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.2.0/ZZ-Project-v0.2.0-source.zip):
+   `775D2F07C2025FED210BF8B5186FC890C5D46482F59CD00ABA377043AD756296`.
+3. [`ZZ-Project-v0.3.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
 4. [`ZZ-Assets-PC02-v1.zip.001` and `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
