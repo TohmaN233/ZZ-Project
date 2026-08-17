@@ -2181,7 +2181,13 @@ class GameSession:
             if self._is_user_controlled(fi.owner):
                 self._prompt_force_base_choice(fi)
                 return True
-            chosen = self.engine.resolve_force_base_choice(fi, None)
+            replace_base_iid = None
+            if (
+                self.engine.eligible_force_base_choices(fi.owner)
+                and len(fi.owner.base) >= BASE_CAP
+            ):
+                replace_base_iid = self.engine.choose_base_replacement_iid(fi.owner)
+            chosen = self.engine.resolve_force_base_choice(fi, None, replace_base_iid)
             label = "no B-Minion" if chosen is None else chosen.card.name_jp
             self._log_event(f"{fi.owner.name}: {fi.force.name_jp} placed {label}", {
                 "type": "force_base_choice",
@@ -2252,12 +2258,12 @@ class GameSession:
 
     def _prompt_force_base_choice(self, fi: ForceInstance) -> None:
         options = []
-        choices = self.engine.eligible_force_base_choices(fi.owner)
-        replacements = list(fi.owner.base) if len(fi.owner.base) >= BASE_CAP else [None]
-        option_index = 0
-        for card in choices:
-            for replacement in replacements:
-                meta = {
+        for index, card in enumerate(self.engine.eligible_force_base_choices(fi.owner)):
+            options.append((
+                f"fb{index}",
+                card.card.name_jp,
+                {"force": fi, "card": card},
+                {
                     "kind": "force_base_choice",
                     "cardIid": card.iid,
                     "cardId": card.card.id,
@@ -2267,16 +2273,8 @@ class GameSession:
                     "dp": card.card.dp,
                     "assetUrl": self.asset_index.asset_url(card.card.id),
                     "ownerSide": fi.owner.side.name,
-                }
-                label = card.card.name_jp
-                value = {"force": fi, "card": card}
-                if replacement is not None:
-                    label = f"{card.card.name_jp} / replace {replacement.card.name_jp}"
-                    value["replaceBaseIid"] = replacement.iid
-                    meta["replaceBaseIid"] = replacement.iid
-                    meta["replaceBaseCard"] = self._effect_target_meta(replacement)
-                options.append((f"fb{option_index}", label, value, meta))
-                option_index += 1
+                },
+            ))
         self._set_prompt(
             "force_base_choice",
             f"{fi.owner.name}: choose a Base Minion for {fi.force.name_jp}",
@@ -2287,8 +2285,25 @@ class GameSession:
     def _finish_force_base_choice(self, value: dict[str, Any]) -> None:
         fi = value["force"]
         card = value["card"]
+        if len(fi.owner.base) >= BASE_CAP:
+            self._pending_effect = {
+                "mode": "force_base",
+                "player": fi.owner,
+                "force": fi,
+                "card": card,
+            }
+            self._prompt_effect_target(fi.owner, "ally_base", None, 1)
+            return
+        self._apply_force_base_choice(fi, card, None)
+
+    def _apply_force_base_choice(
+        self,
+        fi: ForceInstance,
+        card: CardInstance,
+        replace_base_iid: int | None,
+    ) -> None:
         before = self._visual_state_snapshot()
-        chosen = self.engine.resolve_force_base_choice(fi, card.iid, value.get("replaceBaseIid"))
+        chosen = self.engine.resolve_force_base_choice(fi, card.iid, replace_base_iid)
         self._record_visual_changes(before)
         self._log_event(f"{fi.owner.name}: {fi.force.name_jp} placed {chosen.card.name_jp}", {
             "type": "force_base_choice",
@@ -2622,6 +2637,12 @@ class GameSession:
             queued_targets = [item for item in target if item is not None]
         else:
             queued_targets = [] if target is None else [target]
+        if pending.get("mode") == "force_base":
+            replacement = queued_targets[0] if queued_targets else None
+            if not isinstance(replacement, CardInstance):
+                raise IllegalActionError("choose a base card to replace")
+            self._apply_force_base_choice(pending["force"], pending["card"], replacement.iid)
+            return
         if pending.get("stage") == "mana_color_choice":
             color_target = queued_targets[0] if queued_targets else None
             if not isinstance(color_target, Color):

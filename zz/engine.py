@@ -2869,12 +2869,27 @@ class Engine:
     def eligible_force_base_choices(self, player: Player) -> list[CardInstance]:
         return [ci for ci in player.deck if ci.card.type is CardType.B_MINION]
 
+    def choose_base_replacement_iid(self, player: Player) -> int:
+        selected = self.policy_for(player).choose_target(
+            self,
+            "ally_base",
+            1,
+            1,
+            list(player.base),
+        )
+        if not selected:
+            raise IllegalActionError(f"base cap {BASE_CAP} reached; choose a replacement")
+        return selected[0].iid
+
     def handle_force_destroy_base_search(self, fi: ForceInstance) -> None:
         if self.defer_force_base_choice(fi.owner) and self.eligible_force_base_choices(fi.owner):
             if fi not in self.pending_force_base_choices:
                 self.pending_force_base_choices.append(fi)
             return
-        self.resolve_force_base_choice(fi, None)
+        replace_base_iid = None
+        if self.eligible_force_base_choices(fi.owner) and len(fi.owner.base) >= BASE_CAP:
+            replace_base_iid = self.choose_base_replacement_iid(fi.owner)
+        self.resolve_force_base_choice(fi, None, replace_base_iid)
 
     def resolve_force_base_choice(
             self,
@@ -2897,8 +2912,6 @@ class Engine:
             if chosen.card.type is not CardType.B_MINION:
                 raise IllegalActionError("force base choice must be a B-Minion")
         if chosen is not None:
-            if len(owner.base) >= BASE_CAP and replace_base_iid is None:
-                replace_base_iid = owner.base[0].iid
             self._make_base_space(owner, replace_base_iid)
             owner.deck.remove(chosen)
             chosen.area = AreaType.BASE
