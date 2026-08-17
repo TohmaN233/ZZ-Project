@@ -1596,115 +1596,71 @@ function localizedAbility(item) {
   return item.abilityJp || "";
 }
 
-function isRemoteAssetUrl(url) {
-  return typeof url === "string" && /^https?:\/\//i.test(url);
-}
-
 function localAssetUrl(assetId) {
   return assetId ? `/assets/${encodeURIComponent(assetId)}` : null;
 }
 
-function preferLocalAssetUrl(url, assetId) {
-  if (url && !isRemoteAssetUrl(url)) return url;
-  return localAssetUrl(assetId);
-}
-
-function looksLikeAssetId(value) {
-  return typeof value === "string" && value.length > 2 && (value.includes("_") || value.includes(":"));
-}
-
 function localizedCardAssetUrl(card) {
-  if (!card) return null;
-  if (card.forceId || card.type === "force" || card.type === "force_ability") {
-    return localizedForceAssetUrl({
-      id: card.forceId || card.assetId,
-      assetId: card.assetId || card.forceId,
-      assetUrl: card.assetUrl,
-      assetUrlEn: card.assetUrlEn,
-    });
-  }
-  const assetId = card.faceDown
-    ? "card_back"
-    : card.cardId || (looksLikeAssetId(card.assetId) ? card.assetId : null) || (looksLikeAssetId(card.id) ? card.id : null);
-  if (card.type === "mana_token") {
-    const manaUrl = (catalog.manaAssets || {})[card.manaColor];
-    if (currentLanguage() === "en") {
-      return preferLocalAssetUrl(card.assetUrlEn || manaUrl || card.assetUrl, assetId);
-    }
-    return preferLocalAssetUrl(manaUrl || card.assetUrl, assetId);
-  }
-  if (currentLanguage() === "en") {
-    return preferLocalAssetUrl(card.assetUrlEn || card.assetUrl, assetId);
-  }
-  return preferLocalAssetUrl(card.assetUrl, assetId);
+  if (card && currentLanguage() === "en" && card.assetUrlEn) return card.assetUrlEn;
+  return card && card.assetUrl ? card.assetUrl : null;
 }
 
 function localizedForceAssetUrl(force) {
-  const assetId = force && (
-    force.assetId
-    || force.forceId
-    || (looksLikeAssetId(force.id) ? force.id : null)
-  );
-  if (force && currentLanguage() === "en") {
-    return preferLocalAssetUrl(force.assetUrlEn || force.assetUrl, assetId);
-  }
-  return preferLocalAssetUrl(force && force.assetUrl, assetId);
+  if (force && currentLanguage() === "en" && force.assetUrlEn) return force.assetUrlEn;
+  return force && force.assetUrl ? force.assetUrl : null;
 }
 
 function hydrateMultiplayerViewAssets(view) {
   if (!view || typeof view !== "object") return view;
   const cardsById = new Map((catalog.cards || []).map((card) => [card.id, card]));
   const forcesById = new Map((catalog.forces || []).map((force) => [force.id, force]));
-  const hydrateCard = (card) => {
+  const fillCardUrls = (card) => {
     if (!card || typeof card !== "object") return;
-    const assetId = card.faceDown ? "card_back" : (card.cardId || card.assetId || card.forceId);
-    const localCard = cardsById.get(card.cardId || card.assetId);
-    const localManaUrl = card.type === "mana_token" ? (catalog.manaAssets || {})[card.manaColor] : null;
-    const assetUrl = card.faceDown
-      ? localAssetUrl("card_back")
-      : preferLocalAssetUrl(localManaUrl || (localCard && localCard.assetUrl), assetId);
-    card.assetId = assetId;
-    card.assetUrl = assetUrl;
-    if (!card.faceDown) {
-      card.assetUrlEn = preferLocalAssetUrl(localCard && localCard.assetUrlEn, assetId) || assetUrl;
-    }
-  };
-  const visitCards = (value) => {
-    if (!value || typeof value !== "object") return;
-    if (Array.isArray(value)) {
-      value.forEach(visitCards);
+    if (card.faceDown) {
+      card.assetId = "card_back";
+      card.assetUrl = localAssetUrl("card_back");
       return;
     }
-    const isForceLike = Boolean(value.forceId || value.type === "force" || value.type === "force_ability");
-    const isCardLike = Boolean(
-      value.cardId
-      || Object.prototype.hasOwnProperty.call(value, "faceDown")
-      || value.type === "mana_token"
-    );
-    if (isForceLike && !value.cardId) {
-      const localForce = forcesById.get(value.forceId || value.assetId || value.id);
-      const assetId = value.assetId || value.forceId || (looksLikeAssetId(value.id) ? value.id : null);
-      value.assetId = assetId;
-      value.assetUrl = preferLocalAssetUrl(localForce && localForce.assetUrl, assetId);
-      value.assetUrlEn = preferLocalAssetUrl(localForce && localForce.assetUrlEn, assetId) || value.assetUrl;
-    } else if (isCardLike) {
-      hydrateCard(value);
+    if (card.type === "mana_token") {
+      const manaUrl = (catalog.manaAssets || {})[card.manaColor]
+        || localAssetUrl(card.manaColor ? `mana:${card.manaColor}` : null);
+      card.assetUrl = manaUrl;
+      card.assetUrlEn = manaUrl;
+      return;
     }
-    Object.values(value).forEach(visitCards);
+    const localCard = cardsById.get(card.cardId || card.assetId);
+    const assetId = card.assetId || card.cardId;
+    card.assetUrl = (localCard && localCard.assetUrl) || localAssetUrl(assetId);
+    card.assetUrlEn = (localCard && localCard.assetUrlEn) || card.assetUrl;
   };
-  visitCards(view);
+  const fillForceUrls = (force) => {
+    if (!force || typeof force !== "object") return;
+    const localForce = forcesById.get(force.forceId || force.id || force.assetId);
+    const assetId = force.assetId || force.forceId || force.id;
+    force.assetUrl = (localForce && localForce.assetUrl) || localAssetUrl(assetId);
+    force.assetUrlEn = (localForce && localForce.assetUrlEn) || force.assetUrl;
+  };
+  const visit = (value) => {
+    if (!value || typeof value !== "object") return;
+    if (Array.isArray(value)) {
+      value.forEach(visit);
+      return;
+    }
+    if (value.forceId || value.type === "force" || value.type === "force_ability") {
+      fillForceUrls(value);
+    } else if (value.cardId || value.type === "mana_token" || Object.prototype.hasOwnProperty.call(value, "faceDown")) {
+      fillCardUrls(value);
+    }
+    Object.values(value).forEach(visit);
+  };
+  visit(view);
   Object.values(view.players || {}).forEach((player) => {
-    (player.forces || []).forEach((force) => {
-      const localForce = forcesById.get(force.id);
-      const assetId = force.assetId || force.id;
-      force.assetUrl = preferLocalAssetUrl(localForce && localForce.assetUrl, assetId);
-      force.assetUrlEn = preferLocalAssetUrl(localForce && localForce.assetUrlEn, assetId) || force.assetUrl;
-    });
+    (player.forces || []).forEach(fillForceUrls);
     const profile = player.profile || {};
     const codeman = characterById(profile.codemanId);
     const playmat = playmatById(profile.playmatId);
     profile.codeman = codeman || null;
-    profile.playmatUrl = playmat ? preferLocalAssetUrl(playmat.assetUrl, playmat.id || profile.playmatId) : null;
+    profile.playmatUrl = playmat ? playmat.assetUrl : null;
     player.profile = profile;
   });
   return view;

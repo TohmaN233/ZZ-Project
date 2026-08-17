@@ -58,6 +58,8 @@
   opponent submits. Force and mana target art uses local card/force ids.
   A finished match shows the same win/lose overlay as offline play until the
   player clicks return.
+- English and Japanese mana faces share the offline assetUrl/assetUrlEn
+  helpers. Online hydration fills those fields the same way as serialize_card.
 - Transport/lobby errors no longer stick on the duel prompt after entering a
   match.
 - Default sample decks are installed as `resources/data/decks/`, outside the

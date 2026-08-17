@@ -92,11 +92,16 @@ def test_opening_snapshot_does_not_rerender_when_only_the_opponent_submits() -> 
     assert "rerender = false" in apply_source
 
 
-def test_effect_target_art_uses_force_and_card_ids_not_option_ids() -> None:
-    source = _function_source("localizedCardAssetUrl")
-    assert "card.forceId" in source
-    assert "card.cardId" in source
-    assert "looksLikeAssetId" in source
+def test_card_and_force_art_use_the_same_localized_url_helpers() -> None:
+    card_source = _function_source("localizedCardAssetUrl")
+    force_source = _function_source("localizedForceAssetUrl")
+    hydrate_source = _function_source("hydrateMultiplayerViewAssets")
+    assert "currentLanguage() === \"en\" && card.assetUrlEn" in card_source
+    assert "card.assetUrl ? card.assetUrl : null" in card_source
+    assert "mana_token" not in card_source
+    assert "currentLanguage() === \"en\" && force.assetUrlEn" in force_source
+    assert "catalog.manaAssets" in hydrate_source
+    assert "card.assetUrlEn = manaUrl" in hydrate_source
 
 
 def test_online_game_over_waits_for_return_before_leaving_the_duel() -> None:
