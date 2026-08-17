@@ -674,10 +674,16 @@ function registerIpc() {
   });
   ipcMain.handle("multiplayer:startLanHost", async (_event, options) => {
     assertTrustedSender(_event);
+    const port = (options && options.port) || 32145;
+    const packaged = packagedServerPath();
     await lanManager.startHost({
       projectRoot: projectRoot(),
       python: process.env.ZZ_PYTHON || "python",
-      port: options && options.port,
+      command: packaged || process.env.ZZ_PYTHON || "python",
+      args: packaged
+        ? ["--multiplayer", "--host", "0.0.0.0", "--port", String(port)]
+        : ["-m", "zz.multiplayer.websocket_server", "--host", "0.0.0.0", "--port", String(port)],
+      port,
       serverName: options && options.serverName,
     });
     return multiplayerSnapshot();

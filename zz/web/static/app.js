@@ -237,6 +237,7 @@ const UI_TEXT = {
     lanDiscoveredRooms: "发现的房间",
     lanNoRooms: "未发现局域网房间",
     lanHosting: "局域网服务",
+    lanJoinHint: "另一台电脑请切到 LAN Game，搜索房间，或填写这个 IP，不要填 127.0.0.1",
     battleReview: "回顾对战",
     first: "先攻",
     second: "后攻",
@@ -495,6 +496,7 @@ const UI_TEXT = {
     lanDiscoveredRooms: "検出したルーム",
     lanNoRooms: "LAN ルームが見つかりません",
     lanHosting: "LAN サーバー",
+    lanJoinHint: "もう1台は LAN Game でルーム検索するか、この IP を入力。127.0.0.1 は不可",
     battleReview: "対戦リプレイ",
     first: "先攻",
     second: "後攻",
@@ -753,6 +755,7 @@ const UI_TEXT = {
     lanDiscoveredRooms: "Discovered Rooms",
     lanNoRooms: "No LAN rooms found",
     lanHosting: "LAN Server",
+    lanJoinHint: "On the other PC open LAN Game, search rooms, or type this IP. Do not use 127.0.0.1",
     battleReview: "Battle Review",
     first: "First",
     second: "Second",
@@ -2952,7 +2955,7 @@ async function discoverLanRooms() {
   multiplayerUi.lan = { ...(multiplayerUi.lan || {}), discovering: true };
   render();
   try {
-    const discovered = await bridge.discoverLan({ timeoutMs: 1400 });
+    const discovered = await bridge.discoverLan({ timeoutMs: 4000 });
     multiplayerUi.lan = {
       ...(multiplayerUi.lan || {}),
       discovering: false,
@@ -7005,6 +7008,7 @@ function renderLanControls() {
         <span>${esc(t("lanHosting"))}</span>
         <strong>${esc(lan.state || "STOPPED")}</strong>
       </div>
+      ${hosting && (lan.addresses || []).length ? `\n        <div class="online-status-line">\n          <span>${esc(t("lanManualAddress"))}</span>\n          <strong>${esc((lan.addresses || []).join(" / "))}</strong>\n        </div>\n        <small>${esc(t("lanJoinHint"))}</small>\n      ` : ""}
     </div>
     <div class="lan-discovery-list">
       <span class="lan-discovery-title">${esc(t("lanDiscoveredRooms"))}</span>

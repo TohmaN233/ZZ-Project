@@ -141,7 +141,7 @@ function makeDependencies({ startupMarker = "auto" } = {}) {
 
 async function startReadyHost(manager, options = {}) {
   return manager.startHost({
-    projectRoot: "D:\\Games\\ZZ-Project",
+    projectRoot: "D:\\Zenonzard_game\\clean_runtime_release_v2",
     serverName: "Alice LAN",
     ...options,
   });
@@ -160,7 +160,7 @@ test("construction has no side effects and startHost explicitly binds the author
     "py",
     ["-m", "zz.multiplayer.websocket_server", "--host", "0.0.0.0", "--port", "32222"],
     {
-      cwd: "D:\\Games\\ZZ-Project",
+      cwd: "D:\\Zenonzard_game\\clean_runtime_release_v2",
       windowsHide: true,
       stdio: ["ignore", "pipe", "pipe"],
     },
@@ -184,7 +184,7 @@ test("same start is idempotent, conflicting start is rejected, and logs stay bou
   assert.equal(deps.spawnCalls.length, 1);
   assert.throws(
     () => manager.startHost({
-      projectRoot: "D:\\Games\\ZZ-Project",
+      projectRoot: "D:\\Zenonzard_game\\clean_runtime_release_v2",
       serverName: "Alice LAN",
       port: 33333,
     }),
@@ -212,9 +212,10 @@ test("room broadcasts use an exact privacy-safe schema and update without openin
     view: { hand: ["secret-card"] },
   });
   await Promise.resolve();
-  const socket = deps.udpSockets[0];
-  assert.equal(socket.broadcast, true);
-  assert.equal(socket.bindCalls.length, 1);
+  const sockets = deps.udpSockets.filter((item) => item.sent.length);
+  assert.equal(sockets.length >= 2, true);
+  assert.equal(sockets.every((item) => item.broadcast), true);
+  const socket = sockets[0];
   assert.equal(socket.sent.length >= 1, true);
   const packet = JSON.parse(socket.sent.at(-1).message.toString("utf8"));
   assert.deepEqual(Object.keys(packet), [
@@ -241,8 +242,9 @@ test("room broadcasts use an exact privacy-safe schema and update without openin
   assert.equal(socket.sent.at(-1).port, 32146);
   assert.equal(socket.sent.at(-1).address, "255.255.255.255");
 
+  const socketCount = deps.udpSockets.length;
   manager.updateRoom({ roomCode: "ABC123", players: 2, capacity: 2 });
-  assert.equal(deps.udpSockets.length, 1);
+  assert.equal(deps.udpSockets.length, socketCount);
   assert.equal(JSON.parse(socket.sent.at(-1).message).players, 2);
   assert.equal(timers.intervals.size, 1);
 
@@ -303,9 +305,8 @@ test("stopHost closes broadcasts and discoveries, kills once, and is idempotent"
   await startReadyHost(manager);
   manager.updateRoom({ roomCode: "ABC123", players: 1, capacity: 2 });
   await Promise.resolve();
-  const broadcastSocket = deps.udpSockets[0];
+  const advertised = deps.udpSockets.slice();
   const discoveryPromise = manager.discover({ timeoutMs: 1000 });
-  const discoverySocket = deps.udpSockets[1];
 
   const stopped = await manager.stopHost();
   assert.equal(stopped.state, "stopped");
@@ -313,8 +314,7 @@ test("stopHost closes broadcasts and discoveries, kills once, and is idempotent"
   assert.equal(stopped.broadcasting, false);
   assert.equal(stopped.discovering, 0);
   assert.equal(deps.children[0].killCalls, 1);
-  assert.equal(broadcastSocket.closeCalls, 1);
-  assert.equal(discoverySocket.closeCalls, 1);
+  assert.equal(advertised.every((socket) => socket.closeCalls >= 1), true);
   assert.equal(timers.intervals.size, 0);
   assert.deepEqual(await discoveryPromise, []);
 

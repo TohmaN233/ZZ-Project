@@ -42,7 +42,8 @@ class LanManager {
   #state = "stopped";
   #startPromise = null;
   #stopPromise = null;
-  #broadcastSocket = null;
+  #broadcastSockets = [];
+  #probeSocket = null;
   #broadcastInterval = null;
   #roomPacket = null;
   #discoveries = new Set();
@@ -91,10 +92,19 @@ class LanManager {
     this.#maxLogChars = requirePositiveInteger(maxLogChars, "maxLogChars");
   }
 
-  startHost({ projectRoot, python = "python", port = DEFAULT_HOST_PORT, serverName } = {}) {
+  startHost({
+    projectRoot,
+    python = "python",
+    command,
+    args,
+    port = DEFAULT_HOST_PORT,
+    serverName,
+  } = {}) {
     const config = {
       projectRoot: requireAbsolutePath(projectRoot, "projectRoot"),
       python: requireNonBlankString(python, "python"),
+      command: command ? requireNonBlankString(command, "command") : null,
+      args: Array.isArray(args) ? args.map((value) => String(value)) : null,
       port: requirePort(port, "port"),
       serverName: normalizeServerName(serverName, this.#os),
     };
@@ -109,7 +119,8 @@ class LanManager {
     this.#hostConfig = config;
     this.#state = "starting";
     this.#lastError = null;
-    const args = [
+    const executable = config.command || config.python;
+    const spawnArgs = config.args || [
       "-m",
       "zz.multiplayer.websocket_server",
       "--host",
@@ -119,7 +130,7 @@ class LanManager {
     ];
     let child;
     try {
-      child = this.#spawn(config.python, args, {
+      child = this.#spawn(executable, spawnArgs, {
         cwd: config.projectRoot,
         windowsHide: true,
         stdio: ["ignore", "pipe", "pipe"],
@@ -144,6 +155,7 @@ class LanManager {
           throw new Error("LAN host stopped before becoming ready");
         }
         this.#state = "running";
+        this.#startProbeListener();
         return this.getSnapshot();
       })
       .catch((error) => {
@@ -171,6 +183,7 @@ class LanManager {
   stopHost() {
     if (this.#stopPromise) return this.#stopPromise;
     this.#clearBroadcast();
+    this.#stopProbeListener();
     this.#closeDiscoveries();
     this.#roomPacket = null;
     const child = this.#process;
@@ -219,7 +232,7 @@ class LanManager {
     const encoded = Buffer.from(JSON.stringify(packet), "utf8");
     if (encoded.length > this.#maxPacketBytes) throw new RangeError("discovery packet is too large");
     this.#roomPacket = packet;
-    if (!this.#broadcastSocket) {
+    if (!this.#broadcastSockets.length) {
       this.#startBroadcastSocket();
     } else {
       this.#sendBroadcast();
@@ -233,15 +246,14 @@ class LanManager {
     return this.getSnapshot();
   }
 
-  discover({ timeoutMs = 1500 } = {}) {
+  discover({ timeoutMs = 4000 } = {}) {
     const duration = requirePositiveInteger(timeoutMs, "timeoutMs");
-    const socket = this.#dgram.createSocket("udp4");
-    assertDatagramSocket(socket);
     const rooms = new Map();
+    const sockets = [];
 
     return new Promise((resolve, reject) => {
       const discovery = {
-        socket,
+        sockets,
         timeout: null,
         done: false,
         finish: (error) => {
@@ -249,7 +261,7 @@ class LanManager {
           discovery.done = true;
           if (discovery.timeout !== null) this.#timers.clearTimeout(discovery.timeout);
           this.#discoveries.delete(discovery);
-          closeSocket(socket);
+          for (const socket of sockets) closeSocket(socket);
           if (error) {
             reject(error);
             return;
@@ -258,18 +270,35 @@ class LanManager {
         },
       };
       this.#discoveries.add(discovery);
-      socket.on("message", (message, rinfo) => {
+      const onMessage = (message, rinfo) => {
         const room = parseDiscoveryPacket(message, rinfo, this.#net, this.#maxPacketBytes);
         if (!room) return;
         rooms.set(`${room.serverName}:${room.port}:${room.roomCode}`, room);
-      });
-      socket.once("error", (error) => discovery.finish(error));
-      discovery.timeout = this.#timers.setTimeout(() => discovery.finish(), duration);
-      try {
-        socket.bind({ port: this.#discoveryPort, address: "0.0.0.0", exclusive: false });
-      } catch (error) {
-        discovery.finish(error);
+      };
+      const bindAddresses = ["0.0.0.0", ...this.#localAddresses()];
+      for (const address of bindAddresses) {
+        const socket = this.#dgram.createSocket("udp4");
+        assertDatagramSocket(socket);
+        sockets.push(socket);
+        socket.on("message", onMessage);
+        socket.once("error", (error) => {
+          if (address === "0.0.0.0") discovery.finish(error);
+        });
+        try {
+          socket.bind({ port: address === "0.0.0.0" ? this.#discoveryPort : 0, address, exclusive: false }, () => {
+            try {
+              socket.setBroadcast(true);
+              const probe = Buffer.from(JSON.stringify({ service: SERVICE, type: "probe" }), "utf8");
+              socket.send(probe, this.#discoveryPort, BROADCAST_ADDRESS);
+            } catch (_error) {
+              // Keep listening for host broadcasts even if a probe cannot be sent.
+            }
+          });
+        } catch (error) {
+          if (address === "0.0.0.0") discovery.finish(error);
+        }
       }
+      discovery.timeout = this.#timers.setTimeout(() => discovery.finish(), duration);
     });
   }
 
@@ -293,25 +322,29 @@ class LanManager {
       manualEndpoints: this.getManualEndpoints(),
       log: this.#logs.map((entry) => ({ ...entry })),
       lastError: this.#lastError ? { ...this.#lastError } : null,
-      broadcasting: this.#broadcastSocket !== null,
+      broadcasting: this.#broadcastSockets.length > 0,
       discovering: this.#discoveries.size,
     };
   }
 
   #startBroadcastSocket() {
-    const socket = this.#dgram.createSocket("udp4");
-    assertDatagramSocket(socket);
-    this.#broadcastSocket = socket;
-    socket.once("error", (error) => {
-      if (this.#broadcastSocket !== socket) return;
-      this.#recordError("BROADCAST_ERROR", error);
-      this.#clearBroadcast();
-    });
-    socket.bind(0, () => {
-      if (this.#broadcastSocket !== socket) return;
-      socket.setBroadcast(true);
-      this.#sendBroadcast();
-    });
+    const bindAddresses = this.#localAddresses();
+    const targets = bindAddresses.length ? bindAddresses : ["0.0.0.0"];
+    for (const address of targets) {
+      const socket = this.#dgram.createSocket("udp4");
+      assertDatagramSocket(socket);
+      this.#broadcastSockets.push(socket);
+      socket.once("error", (error) => {
+        if (!this.#broadcastSockets.includes(socket)) return;
+        this.#recordError("BROADCAST_ERROR", error);
+        this.#clearBroadcast();
+      });
+      socket.bind({ address, port: 0 }, () => {
+        if (!this.#broadcastSockets.includes(socket)) return;
+        socket.setBroadcast(true);
+        this.#sendBroadcastOn(socket);
+      });
+    }
     this.#broadcastInterval = this.#timers.setInterval(
       () => this.#sendBroadcast(),
       this.#broadcastIntervalMs,
@@ -319,9 +352,13 @@ class LanManager {
   }
 
   #sendBroadcast() {
-    if (!this.#broadcastSocket || !this.#roomPacket) return;
+    for (const socket of this.#broadcastSockets) this.#sendBroadcastOn(socket);
+  }
+
+  #sendBroadcastOn(socket) {
+    if (!socket || !this.#roomPacket) return;
     const encoded = Buffer.from(JSON.stringify(this.#roomPacket), "utf8");
-    this.#broadcastSocket.send(
+    socket.send(
       encoded,
       this.#discoveryPort,
       BROADCAST_ADDRESS,
@@ -331,15 +368,49 @@ class LanManager {
     );
   }
 
+  #startProbeListener() {
+    if (this.#probeSocket) return;
+    const socket = this.#dgram.createSocket("udp4");
+    assertDatagramSocket(socket);
+    this.#probeSocket = socket;
+    socket.on("message", (message, rinfo) => {
+      if (!this.#roomPacket || !rinfo || this.#net.isIP(rinfo.address) !== 4) return;
+      let value;
+      try {
+        value = JSON.parse(message.toString("utf8"));
+      } catch (_error) {
+        return;
+      }
+      if (!value || value.service !== SERVICE || value.type !== "probe") return;
+      const encoded = Buffer.from(JSON.stringify(this.#roomPacket), "utf8");
+      socket.send(encoded, rinfo.port, rinfo.address);
+    });
+    socket.once("error", (error) => {
+      if (this.#probeSocket !== socket) return;
+      this.#recordError("PROBE_LISTEN_ERROR", error);
+      this.#stopProbeListener();
+    });
+    try {
+      socket.bind({ port: this.#discoveryPort, address: "0.0.0.0", exclusive: false });
+    } catch (error) {
+      this.#recordError("PROBE_LISTEN_ERROR", error);
+      this.#stopProbeListener();
+    }
+  }
+
+  #stopProbeListener() {
+    if (!this.#probeSocket) return;
+    closeSocket(this.#probeSocket);
+    this.#probeSocket = null;
+  }
+
   #clearBroadcast() {
     if (this.#broadcastInterval !== null) {
       this.#timers.clearInterval(this.#broadcastInterval);
       this.#broadcastInterval = null;
     }
-    if (this.#broadcastSocket) {
-      closeSocket(this.#broadcastSocket);
-      this.#broadcastSocket = null;
-    }
+    for (const socket of this.#broadcastSockets) closeSocket(socket);
+    this.#broadcastSockets = [];
   }
 
   #closeDiscoveries() {
@@ -382,6 +453,7 @@ class LanManager {
     this.#hostConfig = null;
     this.#state = "stopped";
     this.#clearBroadcast();
+    this.#stopProbeListener();
   }
 
   #handleProcessExit(child, code, signal) {
@@ -392,6 +464,7 @@ class LanManager {
     this.#hostConfig = null;
     this.#state = "stopped";
     this.#clearBroadcast();
+    this.#stopProbeListener();
   }
 
   #appendLog(stream, chunk) {
@@ -536,6 +609,8 @@ function sameHostConfig(left, right) {
   return Boolean(right)
     && left.projectRoot === right.projectRoot
     && left.python === right.python
+    && left.command === right.command
+    && JSON.stringify(left.args) === JSON.stringify(right.args)
     && left.port === right.port
     && left.serverName === right.serverName;
 }
