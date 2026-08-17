@@ -1686,6 +1686,29 @@ class Engine:
         self.triggers.emit(TriggerTiming.MOVE_BACK, Context(controller=owner, source=ci))
         self.triggers.resolve_all()
 
+    def select_base_replacement_iid(
+            self,
+            player: Player,
+            source: CardInstance | None = None,
+    ) -> int | None:
+        if len(player.base) < BASE_CAP:
+            return None
+        selected = self.select_target(player, "ally_base", 1, 1, source=source)
+        return selected[0].iid if selected else None
+
+    def move_target_to_base_asking_owner(
+            self,
+            ci: CardInstance,
+            *,
+            rested: bool = True,
+            source: CardInstance | None = None,
+    ) -> bool:
+        replace_iid = self.select_base_replacement_iid(ci.owner, source)
+        if len(ci.owner.base) >= BASE_CAP and replace_iid is None:
+            return False
+        self.move_target_to_base(ci, rested=rested, replace_base_iid=replace_iid)
+        return True
+
     # ---- combat -------------------------------------------------------
 
     def can_attack(self, attacker: CardInstance) -> bool:

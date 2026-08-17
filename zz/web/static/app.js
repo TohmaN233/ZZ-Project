@@ -5654,19 +5654,26 @@ function renderEffectPromptCard(card, option, index, isMulti = false) {
   const title = localizedName(card, card.label || card.cardId || "Card");
   const location = card.targetLabel || "";
   const artUrl = localizedCardAssetUrl(card);
+  const restable = cardCanBeRested(card);
+  const rested = restable && Boolean(card.rested);
   const art = card.type === "mana_color"
     ? `<span class="force-choice-fallback mana-color-choice ${esc(card.manaColor || "")}">${esc(title.slice(0, 1))}</span>`
     : artUrl
     ? `<img src="${esc(artUrl)}" alt="${esc(title)}">`
     : `<span class="force-choice-fallback">${esc(title.slice(0, 1))}</span>`;
+  const restStatus = restable && card.type !== "force"
+    ? `<span class="effect-choice-status">${esc(card.rested ? t("rested") : t("active"))}</span>`
+    : "";
   const stats = card.type === "force"
     ? `<span>${esc(card.rested ? t("rested") : t("active"))} ${esc(card.life ?? "-")}/${esc(lifeMax(card))}</span>`
     : card.type === "mana_color"
     ? `<span>${esc(card.manaColor || card.label || "")}</span>`
     : card.type === "player"
     ? `<span class="player-life">${esc(card.life ?? "-")}/${esc(card.maxLife ?? "-")}</span>`
+    : card.type === "mana_token"
+    ? `<span>${esc(card.manaColor || card.type)}</span>`
     : card.type && card.type !== "magic"
-    ? `<span>${esc(card.effectiveBp ?? card.bp ?? "-")}/${esc(card.effectiveDp ?? card.dp ?? "-")}${cardCanBeRested(card) && card.rested ? " R" : ""}</span>`
+    ? `<span>${esc(card.effectiveBp ?? card.bp ?? "-")}/${esc(card.effectiveDp ?? card.dp ?? "-")}</span>`
     : `<span>${esc(card.type || card.area || "")}</span>`;
   const selectable = Boolean(option);
   const selected = Boolean(option && effectTargetSelectionIds.has(option.id));
@@ -5674,12 +5681,13 @@ function renderEffectPromptCard(card, option, index, isMulti = false) {
     ? (isMulti ? `data-effect-target-option="${esc(option.id)}"` : `data-option="${esc(option.id)}"`)
     : "disabled";
   return `
-    <button class="effect-choice-card ${selectable ? "selectable" : "disabled"} ${selected ? "selected" : ""} ${!isMulti && index === 0 && selectable ? "primary" : ""}"
+    <button class="effect-choice-card ${selectable ? "selectable" : "disabled"} ${selected ? "selected" : ""} ${rested ? "rested" : ""} ${!isMulti && index === 0 && selectable ? "primary" : ""}"
             ${targetAttr}>
       ${art}
       <span class="force-choice-name">${esc(title)}</span>
       ${location ? `<span class="effect-choice-location">${esc(location)}</span>` : ""}
       ${stats}
+      ${restStatus}
     </button>
   `;
 }

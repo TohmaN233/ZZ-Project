@@ -222,13 +222,8 @@ def _move_ally_to_base_preserving_rest(source: CardInstance, state: Any, ctx: Co
     if not targets:
         return
     target = targets[0]
-    replace_iid = None
-    if len(source.owner.base) >= 10:
-        replacements = eng.select_target(source.owner, "ally_base", 1, 1, source=source)
-        if not replacements:
-            return
-        replace_iid = replacements[0].iid
-    eng.move_target_to_base(target, rested=target.rested, replace_base_iid=replace_iid)
+    if not eng.move_target_to_base_asking_owner(target, rested=target.rested, source=source):
+        return
 
 
 def _mark_must_block(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -484,13 +479,8 @@ def _howling_voice(source: CardInstance, state: Any, ctx: Context) -> None:
     if isinstance(target, Player):
         eng._damage_player(target, 1, source=source)
         return
-    replace_iid = None
-    if len(target.owner.base) >= 10:
-        replacements = eng.select_target(target.owner, "ally_base", 1, 1, source=source)
-        if not replacements:
-            return
-        replace_iid = replacements[0].iid
-    eng.move_target_to_base(target, rested=True, replace_base_iid=replace_iid)
+    if not eng.move_target_to_base_asking_owner(target, rested=True, source=source):
+        return
 
 
 def _put_blue_minion_rested(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -505,12 +495,9 @@ def _put_blue_minion_rested(source: CardInstance, state: Any, ctx: Context) -> N
     )
     if not targets:
         return
-    replace_iid = None
-    if len(source.owner.base) >= 10:
-        replacements = eng.select_target(source.owner, "ally_base", 1, 1, source=source)
-        if not replacements:
-            return
-        replace_iid = replacements[0].iid
+    replace_iid = eng.select_base_replacement_iid(source.owner, source)
+    if len(source.owner.base) >= 10 and replace_iid is None:
+        return
     eng.put_base_minion_from_hand(
         source.owner,
         targets[0],

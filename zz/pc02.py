@@ -198,13 +198,6 @@ def _replacement_iid(engine: Any, player: Player, source: CardInstance) -> int |
     return selected[0].iid if selected else None
 
 
-def _base_replacement_iid(engine: Any, player: Player, source: CardInstance) -> int | None:
-    if len(player.base) < 10:
-        return None
-    selected = engine.select_target(player, "ally_base", 1, 1, source=source)
-    return selected[0].iid if selected else None
-
-
 def _create_tokens(source: CardInstance, state: Any, specs: list[Card]) -> None:
     state.engine.create_tokens(source.owner, specs, source=source)
 
@@ -546,7 +539,7 @@ def _anima(source: CardInstance, state: Any, ctx: Context) -> None:
     )
     if selected:
         target = selected[0]
-        replace_iid = _base_replacement_iid(engine, source.owner, source)
+        replace_iid = engine.select_base_replacement_iid(source.owner, source)
         if len(source.owner.base) < 10 or replace_iid is not None:
             engine._make_base_space(source.owner, replace_iid)
             source.owner.deck.remove(target)
@@ -651,9 +644,7 @@ def _blackscale_retreat(source: CardInstance, state: Any, ctx: Context) -> None:
         source=source,
     )
     for target in targets:
-        replace_iid = _base_replacement_iid(engine, target.owner, source)
-        if len(target.owner.base) < 10 or replace_iid is not None:
-            engine.move_target_to_base(target, rested=True, replace_base_iid=replace_iid)
+        engine.move_target_to_base_asking_owner(target, rested=True, source=source)
 
 
 def _giulio_move(source: CardInstance, state: Any, ctx: Context) -> bool:
@@ -1256,7 +1247,7 @@ def on_targets_selected(player: Player, source: CardInstance | None, selected: I
 
 
 def _place_red_mana_rested(engine: Any, player: Player, source: CardInstance) -> None:
-    replace_iid = _base_replacement_iid(engine, player, source)
+    replace_iid = engine.select_base_replacement_iid(player, source)
     if len(player.base) >= 10 and replace_iid is None:
         return
     mana = engine.place_generated_colorless_mana(player, replace_base_iid=replace_iid)

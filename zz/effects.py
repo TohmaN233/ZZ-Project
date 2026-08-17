@@ -691,13 +691,8 @@ def _move_to_base_targets(
             filter_fn = _target_filter(eng, max_cost=max_cost, min_cost=min_cost)
         targets = eng.select_target(ci.owner, target_kind, min_targets, max_targets, filter_fn=filter_fn, source=ci)
         for target in targets[:max_targets]:
-            replace_iid = None
-            if len(target.owner.base) >= 10:
-                replacement = eng.select_target(target.owner, "ally_base", 1, 1, source=ci)
-                if not replacement:
-                    return
-                replace_iid = replacement[0].iid
-            eng.move_target_to_base(target, rested=rested, replace_base_iid=replace_iid)
+            if not eng.move_target_to_base_asking_owner(target, rested=rested, source=ci):
+                return
     return fn
 
 
@@ -974,12 +969,12 @@ def _place_base_from_hand(
         if candidate is None:
             return
         replace_iid = None
-        if eng is not None and len(owner.base) >= 10:
-            replacements = eng.select_target(owner, "ally_base", 1, 1, source=ci)
-            if not replacements:
+        if eng is not None:
+            replace_iid = eng.select_base_replacement_iid(owner, ci)
+            if len(owner.base) >= 10 and replace_iid is None:
                 return
-            replace_iid = replacements[0].iid
-            eng._make_base_space(owner, replace_iid)
+            if replace_iid is not None:
+                eng._make_base_space(owner, replace_iid)
         elif len(owner.base) >= 10:
             return
         owner.hand.remove(candidate)
@@ -993,12 +988,9 @@ def _place_colorless_mana(*, rested: bool = False, **_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
         eng = getattr(state, "engine", None)
         if eng is not None:
-            replace_iid = None
-            if len(ci.owner.base) >= 10:
-                replacements = eng.select_target(ci.owner, "ally_base", 1, 1, source=ci)
-                if not replacements:
-                    return
-                replace_iid = replacements[0].iid
+            replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
+            if len(ci.owner.base) >= 10 and replace_iid is None:
+                return
             token = eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid)
             token.rested = rested
     return fn
@@ -1061,13 +1053,10 @@ def _place_base_from_deck(
         for candidate in chosen[:max_targets]:
             if candidate not in ci.owner.deck:
                 continue
-            replace_iid = None
-            if len(ci.owner.base) >= 10:
-                replacements = eng.select_target(ci.owner, "ally_base", 1, 1, source=ci)
-                if not replacements:
-                    eng.rng.shuffle(ci.owner.deck)
-                    return
-                replace_iid = replacements[0].iid
+            replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
+            if len(ci.owner.base) >= 10 and replace_iid is None:
+                eng.rng.shuffle(ci.owner.deck)
+                return
             eng.place_from_deck_to_base(ci.owner, candidate, rested=rested, replace_base_iid=replace_iid)
         eng.rng.shuffle(ci.owner.deck)
     return fn

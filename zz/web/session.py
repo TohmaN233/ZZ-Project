@@ -3811,20 +3811,15 @@ class GameSession:
                 "ownerSide": target.side.name,
             }
         if isinstance(target, ForceInstance):
-            return {
+            payload = serialize_force(self.engine, target, self.asset_index)
+            payload.update({
                 "kind": "effect_target",
                 "targetKind": "force",
                 "forceId": target.force.id,
-                "nameJp": target.force.name_jp,
                 "type": "force",
                 "targetLabel": self._effect_target_position_label(target),
-                "life": target.life,
-                "initialLife": target.force.initial_life,
-                "maxLife": LIFE_CAP,
-                "assetUrl": self.asset_index.asset_url(target.force.id),
-                "ownerSide": target.owner.side.name,
-                "rested": target.rested,
-            }
+            })
+            return payload
         if isinstance(target, Force):
             return {
                 "kind": "effect_target",
@@ -3834,24 +3829,16 @@ class GameSession:
                 "type": "force_ability",
                 "targetLabel": "FORCE CATALOG",
                 "assetUrl": self.asset_index.asset_url(target.id),
+                "assetUrlEn": self.asset_index.asset_url_en(target.id),
             }
-        return {
+        payload = serialize_card(self.engine, target, self.asset_index)
+        payload.update({
             "kind": "effect_target",
             "targetKind": "card",
             "cardIid": target.iid,
-            "cardId": target.card.id,
-            "nameJp": target.card.name_jp,
-            "type": target.card.type.value,
-            "bp": target.card.bp,
-            "dp": target.card.dp,
-            "effectiveBp": self.engine.effective_bp(target),
-            "effectiveDp": self.engine.effective_dp(target),
             "targetLabel": self._effect_target_position_label(target),
-            "assetUrl": self.asset_index.asset_url(target.card.id),
-            "ownerSide": target.owner.side.name,
-            "area": target.area.value,
-            "rested": target.rested,
-        }
+        })
+        return payload
 
     def _effect_target_log_payload(self, target: Any) -> dict[str, Any]:
         if isinstance(target, Color):

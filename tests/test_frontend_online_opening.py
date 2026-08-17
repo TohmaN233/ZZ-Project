@@ -111,3 +111,13 @@ def test_online_game_over_waits_for_return_before_leaving_the_duel() -> None:
     assert "multiplayerUi.view && multiplayerUi.view.gameOver" in apply_source
     assert "dismissMatchResult" in return_source
     assert "data-online-return-room" in prompt_source
+
+def test_effect_prompt_cards_reuse_shared_art_and_show_rested_state() -> None:
+    source = _function_source("renderEffectPromptCard")
+    assert "localizedCardAssetUrl(card)" in source
+    assert 'card.type === "mana_token"' in source
+    assert 't("rested")' in source
+    assert 't("active")' in source
+    assert "effect-choice-status" in source
+    assert '${rested ? "rested" : ""}' in source
+    assert "card.assetUrl" not in source

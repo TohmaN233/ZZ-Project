@@ -1055,12 +1055,9 @@ def _catherine_purple_force_destroy_reward(ci: CardInstance, state, ctx: Context
     eng = getattr(state, "engine", None)
     if eng is None:
         return
-    replace_iid = None
-    if len(ci.owner.base) >= 10:
-        replacements = eng.select_target(ci.owner, "ally_base", 1, 1, source=ci)
-        if not replacements:
-            return
-        replace_iid = replacements[0].iid
+    replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
+    if len(ci.owner.base) >= 10 and replace_iid is None:
+        return
     setattr(ctx, "_catherine_rewarded", True)
     eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid)
     eng.draw(ci.owner, 1)
