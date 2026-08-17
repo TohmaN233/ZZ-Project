@@ -53,12 +53,18 @@
 3. [`ZZ-Project-v0.3.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
-4. [`ZZ-Assets-PC02-v1.zip.001` and `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
+4. [`ZZ-Multiplayer-v0.3.0-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Multiplayer-v0.3.0-d22c867.tar.gz):
+   latest authoritative server snapshot for people who want to host their own
+   room service. Older server archives are not kept. Size: `21774546` bytes.
+   SHA-256:
+   `4188B019A2BBD816CB9E8685B1175F87BB2B6801905BB42F545FB57F85DA6F06`.
+   Setup: [docs/ONLINE.md](docs/ONLINE.md).
+5. [`ZZ-Assets-PC02-v1.zip.001` and `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
    main card art, characters, playmats, video, sound effects, and BGM. Download
    both volumes, open `.001` with 7-Zip, and place the resulting `asserts/`
    beside `ZZ-Project.exe` for Windows or at the bundle/project root for Linux
    and source launches.
-5. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
+6. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
    English card, Force, and Mana faces. Extract it on top of the main
    `asserts/` directory.
 

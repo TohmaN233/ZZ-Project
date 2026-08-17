@@ -2,31 +2,68 @@
 
 ## 局域网模式
 
-1. 双方使用同一版本的项目与资源包。
-2. 房主进入 `Online Game`，切换到 LAN，并启动本地房间。
-3. Windows 防火墙第一次询问时，允许 Python / Electron 访问专用网络。
-4. 加入方输入房主界面显示的 `ws://局域网地址:端口`。
+1. 双方使用同一版本的客户端与资源包。
+2. 房主进入 Online Game，切换到 LAN，并启动本地房间。
+3. Windows 防火墙第一次询问时，允许游戏访问专用网络。
+4. 加入方输入房主界面显示的地址。
 5. 创建或加入房间，双方准备后开始对战。
 
-LAN 模式不需要外部服务器。无法连接时，先确认双方在同一网络，并检查防火墙是否允许对应端口。
+LAN 不需要单独的服务器包。
 
 ## 公网模式
 
-客户端默认连接项目维护者的个人 WebSocket 服务。服务器位于加拿大：
+客户端默认连接项目维护者的个人服务器（加拿大）。这是个人维护的服务，不承诺持续在线。中国大陆通常需要代理。
 
-- 加拿大及邻近地区以外的延迟与稳定性没有充分测试。
-- 中国大陆通常需要可用代理。
-- 这是个人维护的服务，不承诺持续在线或商业级可用性。
-
-客户端会验证协议版本、房间状态与对局修订号。连接中断后可以尝试重新连接当前房间；若版本不兼容，请先更新双方客户端。
+双方必须使用同一应用版本、同一协议版本和同一规则 checksum。版本不兼容时先更新客户端。
 
 ## 自建服务器
 
-仓库的 `deploy/` 提供 systemd、Nginx 与环境变量示例。服务器入口：
+Release 只保留**最新一份**服务器包：
 
-```powershell
-python -m zz.multiplayer.websocket_server --help
+[`ZZ-Multiplayer-v0.3.0-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Multiplayer-v0.3.0-d22c867.tar.gz)
+
+SHA-256: `4188B019A2BBD816CB9E8685B1175F87BB2B6801905BB42F545FB57F85DA6F06`
+
+需要 Linux、Python 3.10+，以及一个带 TLS 的 HTTPS 域名。游戏客户端按 `PUBLIC_ORIGIN` 校验来源，所以公网入口必须是 `https://你的域名`，不能带路径。
+
+```bash
+mkdir zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.3.0-d22c867.tar.gz -C zz-multiplayer
+cd zz-multiplayer
+python3 -m venv .venv
+.venv/bin/pip install --upgrade pip
+.venv/bin/pip install --no-cache-dir '.[multiplayer]'
+cp deploy/zz-multiplayer.env.example zz-multiplayer.env
 ```
 
-部署前请修改示例域名、TLS 证书位置、监听地址与允许来源。不要把真实密钥或 `.env` 提交到仓库。
+编辑 `zz-multiplayer.env`，至少改这两项：
 
+```text
+PUBLIC_ORIGIN=https://your.example.com
+PROTOCOL_VERSION=2
+```
+
+其余可先保持示例值。`MAX_MESSAGE_BYTES` 需要是 `262144`。不要把填好的 env 提交到 git。
+
+```bash
+set -a
+source zz-multiplayer.env
+set +a
+.venv/bin/python -m zz.multiplayer.deployment_server --check-config
+.venv/bin/python -m zz.multiplayer.deployment_server
+```
+
+进程默认只听本机 `127.0.0.1:32145`（对局 WebSocket）和 `127.0.0.1:32146`（`/healthz`）。前面再放一层 Nginx / Caddy：
+
+- `https://your.example.com/` → `ws://127.0.0.1:32145/`
+- `https://your.example.com/healthz` → `http://127.0.0.1:32146/healthz`
+
+`deploy/nginx/zz-multiplayer.conf` 和 `deploy/systemd/zz-multiplayer.service` 是可选模板。先确认：
+
+```bash
+curl --fail https://your.example.com/healthz
+```
+
+应返回带 `protocolVersion: 2` 的 JSON。然后在客户端 Online Game 里填写 `wss://your.example.com/`。
+
+玩家仍使用普通 Windows / Linux 客户端，不必下载这份服务器包。

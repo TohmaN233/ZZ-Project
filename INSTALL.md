@@ -189,10 +189,14 @@ log.
 ## 8. Online play
 
 - **LAN:** create a room in Online Game and let other players join using the
-  address shown by the host.
+  address shown by the host. No extra server package is required.
 - **Internet:** the default personal server is in Canada. Cross-region
   stability has not been fully verified; users in mainland China may need a
   proxy.
+- **Self-hosted:** download the latest
+  [`ZZ-Multiplayer-v0.3.0-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Multiplayer-v0.3.0-d22c867.tar.gz)
+  from the Release, then follow [docs/ONLINE.md](docs/ONLINE.md). Only the
+  newest server archive is kept.
 
 See [docs/ONLINE.md](docs/ONLINE.md) for the full online-play notes.
 
