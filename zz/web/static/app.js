@@ -84,6 +84,10 @@ let effectTargetSelectionIds = new Set();
 let selectedCatalogCardId = null;
 let battleDebugOpen = false;
 let logModalOpen = false;
+let rulebookModalOpen = false;
+let rulebookMarkdownByLang = {};
+let rulebookLoading = false;
+let rulebookError = null;
 let battleDebugSearch = "";
 let battleDebugFilters = {};
 let battleDebugSide = "P1";
@@ -304,6 +308,8 @@ const UI_TEXT = {
     homeGuideName: "广报 AI 米娜",
     homeGuideText: "先确认规则，再选择角色、卡垫和双方卡组。",
     openRulebook: "打开规则书",
+    rulebook: "规则书",
+    rulebookLoadFailed: "规则书读取失败",
     savedDecks: "保存的卡组",
     newDeck: "新建",
     startBattle: "进入对战",
@@ -575,6 +581,8 @@ const UI_TEXT = {
     homeGuideName: "広報AIミーナ",
     homeGuideText: "ルールを確認してから、キャラクター、プレイマット、デッキを選びましょう。",
     openRulebook: "ルールブックを開く",
+    rulebook: "ルールブック",
+    rulebookLoadFailed: "ルールブックを読み込めません",
     savedDecks: "保存したデッキ",
     newDeck: "新規",
     startBattle: "対戦開始",
@@ -822,6 +830,8 @@ const UI_TEXT = {
     homeGuideName: "Publicity AI Mina",
     homeGuideText: "Review the rules, then choose codemen, playmats, and decks for both sides.",
     openRulebook: "Open Rulebook",
+    rulebook: "Rulebook",
+    rulebookLoadFailed: "Could not load the rulebook",
     savedDecks: "Saved Decks",
     newDeck: "New",
     startBattle: "Start Duel",
@@ -1694,6 +1704,138 @@ function characterCatchphrase(character) {
 function rulebookUrl() {
   return `/rules/${currentLanguage()}`;
 }
+
+function rulebookHeadingId(title) {
+  return `rulebook-${String(title || "").trim().toLowerCase().replace(/[^a-z0-9\u3040-\u30ff\u3400-\u9fff]+/gi, "-").replace(/^-+|-+$/g, "") || "section"}`;
+}
+
+function renderRulebookMarkdown(markdown) {
+  const lines = String(markdown || "").replace(/\r\n/g, "\n").split("\n");
+  const html = [];
+  const toc = [];
+  let index = 0;
+  const isTableRow = (line) => line.trim().startsWith("|");
+  const isSeparator = (line) => /^\s*\|?(?:\s*:?-{3,}:?\s*\|)+\s*$/.test(line);
+  const splitRow = (line) => line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
+  while (index < lines.length) {
+    const line = lines[index];
+    if (line.startsWith("```")) {
+      const block = [];
+      index += 1;
+      while (index < lines.length && !lines[index].startsWith("```")) {
+        block.push(lines[index]);
+        index += 1;
+      }
+      if (index < lines.length) index += 1;
+      html.push(`<pre class="rulebook-code"><code>${esc(block.join("\n"))}</code></pre>`);
+      continue;
+    }
+    if (isTableRow(line)) {
+      const rows = [];
+      while (index < lines.length && isTableRow(lines[index])) {
+        rows.push(lines[index]);
+        index += 1;
+      }
+      const bodyRows = rows.filter((row) => !isSeparator(row));
+      if (!bodyRows.length) continue;
+      const head = splitRow(bodyRows[0]);
+      const body = bodyRows.slice(1).map(splitRow);
+      html.push(`<div class="rulebook-table-wrap"><table class="rulebook-table"><thead><tr>${head.map((cell) => `<th>${esc(cell)}</th>`).join("")}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${esc(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+      continue;
+    }
+    if (line.startsWith("# ")) {
+      html.push(`<h1>${esc(line.slice(2).trim())}</h1>`);
+      index += 1;
+      continue;
+    }
+    if (line.startsWith("## ")) {
+      const title = line.slice(3).trim();
+      const id = rulebookHeadingId(title);
+      toc.push({ id, title });
+      html.push(`<h2 id="${esc(id)}">${esc(title)}</h2>`);
+      index += 1;
+      continue;
+    }
+    if (!line.trim()) {
+      index += 1;
+      continue;
+    }
+    const paragraph = [line.trim()];
+    index += 1;
+    while (index < lines.length && lines[index].trim() && !lines[index].startsWith("#") && !isTableRow(lines[index]) && !lines[index].startsWith("```")) {
+      paragraph.push(lines[index].trim());
+      index += 1;
+    }
+    html.push(`<p>${esc(paragraph.join(" "))}</p>`);
+  }
+  return { html: html.join(""), toc };
+}
+
+function renderTopbarRulebookButton() {
+  return `
+    <button class="topbar-rulebook" type="button" data-open-rulebook
+            aria-label="${esc(t("openRulebook"))}" aria-haspopup="dialog"
+            aria-expanded="${rulebookModalOpen ? "true" : "false"}">
+      ${esc(t("rulebook"))}
+    </button>
+  `;
+}
+
+function renderRulebookModal() {
+  if (!rulebookModalOpen) return "";
+  const lang = currentLanguage();
+  const markdown = rulebookMarkdownByLang[lang] || "";
+  const rendered = markdown ? renderRulebookMarkdown(markdown) : { html: "", toc: [] };
+  const body = rulebookLoading
+    ? `<div class="rulebook-empty">${esc(t("loading"))}</div>`
+    : rulebookError
+    ? `<div class="rulebook-empty">${esc(rulebookError)}</div>`
+    : rendered.html || `<div class="rulebook-empty">${esc(t("rulebookLoadFailed"))}</div>`;
+  const toc = rendered.toc.length
+    ? `<nav class="rulebook-toc" aria-label="${esc(t("rulebook"))}">${rendered.toc.map((item) => `<a href="#${esc(item.id)}">${esc(item.title)}</a>`).join("")}</nav>`
+    : "";
+  return `
+    <div class="rulebook-modal" data-rulebook-close>
+      <article class="rulebook-panel" role="dialog" aria-modal="true" aria-label="${esc(t("rulebook"))}">
+        <header class="rulebook-head">
+          <div>
+            <span>${esc(t("openRulebook"))}</span>
+            <strong>${esc(t("rulebook"))}</strong>
+          </div>
+          <button type="button" data-rulebook-close>${esc(t("close"))}</button>
+        </header>
+        <div class="rulebook-layout">
+          ${toc}
+          <div class="rulebook-markdown">${body}</div>
+        </div>
+      </article>
+    </div>
+  `;
+}
+
+async function openRulebookModal() {
+  rulebookModalOpen = true;
+  logModalOpen = false;
+  const lang = currentLanguage();
+  if (rulebookMarkdownByLang[lang]) {
+    rulebookError = null;
+    render();
+    return;
+  }
+  rulebookLoading = true;
+  rulebookError = null;
+  render();
+  try {
+    const response = await fetch(rulebookUrl(), { cache: "no-store" });
+    if (!response.ok) throw new Error("rulebook_not_found");
+    rulebookMarkdownByLang[lang] = await response.text();
+  } catch (error) {
+    rulebookError = t("rulebookLoadFailed");
+  }
+  rulebookLoading = false;
+  render();
+}
+
 
 function renderLanguageSwitch() {
   return `
@@ -4378,7 +4520,7 @@ function queueBoardAnimationAnchorRefresh() {
 }
 
 function setAppHtml(html) {
-  app.innerHTML = html;
+  app.innerHTML = `${html}${renderRulebookModal()}`;
   hydrateHomeThemeVideo();
   syncHomeThemeIdle();
   queueBoardAnimationAnchorRefresh();
@@ -5965,6 +6107,7 @@ function renderDuelView(error = null) {
       ${renderDuelBrand()}
       ${renderTopLog()}
       <div class="controls">
+        ${renderTopbarRulebookButton()}
         ${renderLanguageSwitch()}
         <button data-view="home">${esc(t("home"))}</button>
         ${online ? "" : `<button data-mode="human-vs-ai">${esc(t("human"))}</button>`}
@@ -7216,9 +7359,9 @@ function renderHomeGuide() {
         <strong>${esc(characterTitle(guide) || t("homeGuideName"))}</strong>
         <p>${esc(t("homeGuideText"))}</p>
         <div class="home-guide-actions">
-          <a class="rulebook-link" href="${esc(rulebookUrl())}" target="_blank" rel="noopener" data-open-rulebook>
+          <button class="rulebook-link" type="button" data-open-rulebook>
             ${esc(t("openRulebook"))}
-          </a>
+          </button>
         </div>
       </div>
     </aside>
@@ -8542,6 +8685,27 @@ app.addEventListener("click", async (event) => {
     event.preventDefault();
     return;
   }
+  if (event.target.closest("[data-open-rulebook]")) {
+    event.preventDefault();
+    openRulebookModal();
+    return;
+  }
+  const rulebookTocLink = event.target.closest(".rulebook-toc a");
+  if (rulebookTocLink) {
+    event.preventDefault();
+    const targetId = (rulebookTocLink.getAttribute("href") || "").replace(/^#/, "");
+    const headingNode = targetId ? app.querySelector("#" + CSS.escape(targetId)) : null;
+    if (headingNode) headingNode.scrollIntoView({ block: "start" });
+    return;
+  }
+  const rulebookCloseTarget = event.target.closest("[data-rulebook-close]");
+  const insideRulebookPanel = event.target.closest(".rulebook-panel");
+  if (rulebookCloseTarget && (!insideRulebookPanel || event.target.closest("button[data-rulebook-close]"))) {
+    event.preventDefault();
+    rulebookModalOpen = false;
+    render();
+    return;
+  }
   if (event.target.closest("[data-home-theme-skip]")) {
     event.preventDefault();
     stopHomeThemeVideo();
@@ -8550,6 +8714,7 @@ app.addEventListener("click", async (event) => {
   if (event.target.closest("[data-log-toggle]")) {
     event.preventDefault();
     logModalOpen = true;
+    rulebookModalOpen = false;
     render();
     return;
   }
@@ -9112,6 +9277,7 @@ app.addEventListener("change", (event) => {
   const uiLanguage = event.target.closest("[data-ui-language]");
   if (uiLanguage) {
     setUiLanguage(uiLanguage.value);
+    if (rulebookModalOpen) openRulebookModal();
     return;
   }
   const bgmTrack = event.target.closest("[data-bgm-track]");
@@ -9244,6 +9410,12 @@ app.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && selectedTrashSide) {
     event.preventDefault();
     closeTrashDetail();
+    return;
+  }
+  if (event.key === "Escape" && rulebookModalOpen) {
+    event.preventDefault();
+    rulebookModalOpen = false;
+    render();
     return;
   }
   if (event.key === "Escape" && logModalOpen) {

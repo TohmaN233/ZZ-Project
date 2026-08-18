@@ -2232,6 +2232,196 @@ button:disabled {
   margin-top: 6px;
 }
 
+
+.topbar-rulebook {
+  border: 1px solid rgba(224, 181, 90, 0.48);
+  border-radius: 6px;
+  padding: 5px 10px;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  background: linear-gradient(180deg, rgba(224, 181, 90, 0.16), rgba(3, 8, 12, 0.42));
+}
+
+.topbar-rulebook[aria-expanded="true"],
+.topbar-rulebook:hover,
+.topbar-rulebook:focus-visible {
+  border-color: rgba(50, 213, 200, 0.7);
+  color: var(--ink);
+  background: linear-gradient(180deg, rgba(50, 213, 200, 0.22), rgba(224, 181, 90, 0.18));
+}
+
+.rulebook-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 22px;
+  background: rgba(2, 6, 9, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.rulebook-panel {
+  width: min(1080px, calc(100vw - 28px));
+  max-height: min(860px, calc(100vh - 36px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid rgba(224, 181, 90, 0.38);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at top left, rgba(224, 181, 90, 0.16), transparent 34%),
+    linear-gradient(180deg, rgba(12, 24, 30, 0.98), rgba(4, 8, 12, 0.98));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(238, 248, 245, 0.08);
+}
+
+.rulebook-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(238, 248, 245, 0.1);
+}
+
+.rulebook-head span {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.rulebook-head strong {
+  display: block;
+  color: var(--gold);
+  font-size: 22px;
+  line-height: 1.1;
+}
+
+.rulebook-layout {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+}
+
+.rulebook-toc {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  padding: 14px 12px;
+  overflow: auto;
+  border-right: 1px solid rgba(238, 248, 245, 0.08);
+  background: rgba(238, 248, 245, 0.03);
+}
+
+.rulebook-toc a {
+  color: rgba(238, 248, 245, 0.78);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.rulebook-toc a:hover,
+.rulebook-toc a:focus-visible {
+  color: var(--gold);
+}
+
+.rulebook-markdown,
+.rulebook-empty {
+  min-height: 0;
+  overflow: auto;
+  padding: 18px 22px 28px;
+}
+
+.rulebook-empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.rulebook-markdown h1 {
+  margin: 0 0 14px;
+  color: var(--gold);
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.rulebook-markdown h2 {
+  margin: 22px 0 10px;
+  color: var(--cyan);
+  font-size: 18px;
+}
+
+.rulebook-markdown p {
+  margin: 0 0 12px;
+  color: rgba(238, 248, 245, 0.9);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.rulebook-table-wrap {
+  margin: 0 0 16px;
+  overflow: auto;
+  border: 1px solid rgba(50, 213, 200, 0.2);
+  border-radius: 8px;
+}
+
+.rulebook-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.rulebook-table th,
+.rulebook-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(238, 248, 245, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.rulebook-table th {
+  color: var(--gold);
+  background: rgba(224, 181, 90, 0.08);
+}
+
+.rulebook-table td {
+  color: rgba(238, 248, 245, 0.88);
+}
+
+.rulebook-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.rulebook-code {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  overflow: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(50, 213, 200, 0.22);
+  background: rgba(0, 0, 0, 0.28);
+  color: #d7fff6;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 820px) {
+  .rulebook-layout {
+    grid-template-columns: 1fr;
+  }
+  .rulebook-toc {
+    border-right: 0;
+    border-bottom: 1px solid rgba(238, 248, 245, 0.08);
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    overflow-x: auto;
+  }
+}
+
 .rulebook-link {
   width: fit-content;
   border: 1px solid rgba(224, 181, 90, 0.42);
