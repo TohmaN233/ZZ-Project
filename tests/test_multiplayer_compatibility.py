@@ -20,8 +20,8 @@ def test_static_manifest_matches_versions_and_authoritative_definitions() -> Non
     package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
-    assert COMPATIBILITY["applicationVersion"] == package["version"] == "0.3.0"
-    assert re.search(r'^version = "0\.3\.0"$', pyproject, re.MULTILINE)
+    assert COMPATIBILITY["applicationVersion"] == package["version"] == "0.3.1"
+    assert re.search(r'^version = "0\.3\.1"$', pyproject, re.MULTILINE)
     assert COMPATIBILITY["protocolVersion"] == PROTOCOL_VERSION
     assert COMPATIBILITY["rulesVersion"] == RULES_VERSION
     assert COMPATIBILITY["cardDatabaseChecksum"] == calculate_card_database_checksum(ROOT)

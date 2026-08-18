@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.3.0",
+  "releaseVersion": "0.3.1",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -27,7 +27,7 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.3.0-Windows-Setup.exe",
+    "filename": "ZZ-Project-v0.3.1-Windows-Setup.exe",
     "bytes": 142828428,
     "sha256": "5C0FFF8C7A844A08B24617FB0458E64E80DAB488BA7E88DCE80502EB5432679D",
     "contains": [
@@ -42,7 +42,7 @@
     "asserts": "external sibling directory next to ZZ-Project.exe"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.3.0-Linux.tar.gz",
+    "filename": "ZZ-Project-v0.3.1-Linux.tar.gz",
     "bytes": 21475983,
     "sha256": "57425155B16BC6586C7270B09AE1B01136FF36ED25C7983D85BF05C6383DDA19",
     "contains": [

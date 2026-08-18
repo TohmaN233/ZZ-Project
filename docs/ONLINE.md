@@ -20,7 +20,7 @@ LAN 不需要单独的服务器包。
 
 Release 只保留**最新一份**服务器包：
 
-[`ZZ-Multiplayer-v0.3.0-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Multiplayer-v0.3.0-d22c867.tar.gz)
+[`ZZ-Multiplayer-v0.3.1-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Multiplayer-v0.3.1-d22c867.tar.gz)
 
 SHA-256: `4188B019A2BBD816CB9E8685B1175F87BB2B6801905BB42F545FB57F85DA6F06`
 
@@ -28,7 +28,7 @@ SHA-256: `4188B019A2BBD816CB9E8685B1175F87BB2B6801905BB42F545FB57F85DA6F06`
 
 ```bash
 mkdir zz-multiplayer
-tar -xzf ZZ-Multiplayer-v0.3.0-d22c867.tar.gz -C zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.3.1-d22c867.tar.gz -C zz-multiplayer
 cd zz-multiplayer
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip

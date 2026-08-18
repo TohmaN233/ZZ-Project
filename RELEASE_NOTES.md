@@ -1,4 +1,4 @@
-# v0.3.0 - Online Duel Parity
+# v0.3.1 - Online Duel Parity
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
@@ -13,6 +13,7 @@
 - Replay review, local training entrypoints, LAN play, and personal-server
   online play.
 - Simplified Chinese, Japanese, and English UI plus a trilingual rulebook.
+- The duel top bar opens the rulebook as a rendered in-game panel.
 - Optional battle BGM, Codeman profiles, and playmat profiles.
 - The large `asserts/` media pack stays a separate download; updating the
   installer does not replace it.
@@ -36,24 +37,24 @@
 
 ## Download contents
 
-1. [`ZZ-Project-v0.3.0-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Windows-Setup.exe):
+1. [`ZZ-Project-v0.3.1-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-Windows-Setup.exe):
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
    Size: `142828428` bytes.
    SHA-256:
    `5C0FFF8C7A844A08B24617FB0458E64E80DAB488BA7E88DCE80502EB5432679D`.
-2. [`ZZ-Project-v0.3.0-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-Linux.tar.gz):
+2. [`ZZ-Project-v0.3.1-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
    Size: `21475983` bytes.
    SHA-256:
    `57425155B16BC6586C7270B09AE1B01136FF36ED25C7983D85BF05C6383DDA19`.
-3. [`ZZ-Project-v0.3.0-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Project-v0.3.0-source.zip):
+3. [`ZZ-Project-v0.3.1-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
-4. [`ZZ-Multiplayer-v0.3.0-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.0/ZZ-Multiplayer-v0.3.0-d22c867.tar.gz):
+4. [`ZZ-Multiplayer-v0.3.1-d22c867.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Multiplayer-v0.3.1-d22c867.tar.gz):
    latest authoritative server snapshot for people who want to host their own
    room service. Older server archives are not kept. Size: `21774546` bytes.
    SHA-256:

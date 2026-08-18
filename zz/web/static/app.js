@@ -3961,12 +3961,12 @@ function openPlayerDetail(side) {
 
 function openCatalogCardDetail(cardId) {
   selectedCatalogCardId = cardId;
-  render();
+  renderPreservingDeckBuilderScroll();
 }
 
 function closeCatalogCardDetail(rerender = true) {
   selectedCatalogCardId = null;
-  if (rerender) render();
+  if (rerender) renderPreservingDeckBuilderScroll();
 }
 
 function closeCardDetail(rerender = true) {
