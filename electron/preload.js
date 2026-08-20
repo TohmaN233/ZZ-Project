@@ -12,6 +12,13 @@ contextBridge.exposeInMainWorld("zzDesktop", {
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
   checkForUpdates: () => ipcRenderer.invoke("app:checkForUpdates"),
   openReleasePage: () => ipcRenderer.invoke("app:openReleasePage"),
+  downloadAndInstallUpdate: () => ipcRenderer.invoke("app:downloadAndInstallUpdate"),
+  onUpdateDownloadProgress: (callback) => {
+    if (typeof callback !== "function") throw new TypeError("callback must be a function");
+    const listener = (_event, payload) => callback(payload);
+    ipcRenderer.on("app:updateDownloadProgress", listener);
+    return () => ipcRenderer.removeListener("app:updateDownloadProgress", listener);
+  },
   quit: () => ipcRenderer.invoke("app:quit"),
 });
 

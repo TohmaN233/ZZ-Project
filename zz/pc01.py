@@ -706,7 +706,7 @@ def _schedule_refresh_all_base_at_turn_end(ci: CardInstance, state, ctx: Context
 
             def refresh_base() -> None:
                 for base in owner.base:
-                    base.rested = False
+                    eng.refresh_target(base)
 
             eng.schedule_turn_end_effect(owner, refresh_base)
 

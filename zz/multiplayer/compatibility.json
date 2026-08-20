@@ -1,6 +1,6 @@
 {
-  "applicationVersion": "0.3.1",
+  "applicationVersion": "0.3.2",
   "protocolVersion": 2,
   "rulesVersion": "0.0.3",
-  "cardDatabaseChecksum": "sha256:a4ee414bf7850df7249079b7f4a14f0b2f529119fe47f3d81c33809e3acecdb4"
+  "cardDatabaseChecksum": "sha256:5d3aaad432c5aa4aec2f4a824aa9fa1778131c36dc7ad319bafde34e3538c46c"
 }

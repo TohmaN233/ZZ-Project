@@ -268,6 +268,29 @@ class Engine:
                     "amount": healed,
                 })
 
+    def refresh_target(self, target) -> bool:
+        if not getattr(target, "rested", False):
+            return False
+        target.rested = False
+        if isinstance(target, ForceInstance):
+            self._record_visual_event({
+                "type": "refresh",
+                "targetKind": "force",
+                "side": target.owner.side.name,
+                "forceId": target.force.id,
+            })
+            return True
+        owner = getattr(target, "owner", None)
+        if owner is None:
+            return True
+        self._record_visual_event({
+            "type": "refresh",
+            "targetKind": "card",
+            "side": owner.side.name,
+            "card": target,
+        })
+        return True
+
     def modify_stat(
             self,
             ci: CardInstance,
@@ -687,6 +710,7 @@ class Engine:
         self.triggers.resolve_all()
         # REFRESH — untap own field/base/forces; clear summoning sickness
         self._set_step(Step.REFRESH)
+        self._record_phase_visual_event("refresh", active)
         for ci in active.field + active.base:
             self._refresh_rest_state(active, ci)
             ci.summoning_sickness = False
@@ -719,7 +743,7 @@ class Engine:
         clear_turn_state(self.state)
         for ci in active.field:
             if ci.owner is active and ci.area is AreaType.FIELD and self.has_keyword(ci, Keyword.REAWAKEN):
-                ci.rested = False
+                self.refresh_target(ci)
         # Update HR2 streak: did active's base contain ANY colored mana this turn?
         has_colored = any(
             self._mana_color_of(ci) != Color.COLORLESS
@@ -867,6 +891,11 @@ class Engine:
     def _eject_field_card(self, player: Player, ci: CardInstance) -> None:
         if ci not in player.field:
             raise IllegalActionError("replacement card not in field")
+        self.destroy_events.append(ci)
+        self._record_visual_event({
+            "type": "destroy",
+            "card": ci,
+        })
         if ci.card.is_token:
             self._remove_token_from_game(ci)
             return
@@ -1333,6 +1362,7 @@ class Engine:
             on_base_mana_removed(self, active, ci, reason="move_to_field")
             ci.area = AreaType.FIELD
             active.field.append(ci)
+            self._record_zone_move(ci, AreaType.BASE, AreaType.FIELD)
             self._fire_siren_mana_hooks("minion_mana_moves_to_field", ci)
             self.triggers.emit(EffectTiming.ON_MOVE_TO_FIELD,
                                Context(controller=active, source=ci))
@@ -1352,6 +1382,7 @@ class Engine:
             self._reset_card_modifiers(ci)
             ci.area = AreaType.BASE
             active.base.append(ci)
+            self._record_zone_move(ci, AreaType.FIELD, AreaType.BASE)
             self.triggers.emit(EffectTiming.MOVE_TO_BASE,
                                Context(controller=active, source=ci))
             self.triggers.emit(TriggerTiming.MOVE_BACK,
@@ -2853,7 +2884,7 @@ class Engine:
         if isinstance(flags, set) and flag in flags:
             flags.remove(flag)
             return
-        target.rested = False
+        self.refresh_target(target)
 
     def _skip_refresh_flag(self, side: Side) -> str:
         return f"skip_refresh:{side.name}"

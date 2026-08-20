@@ -1,4 +1,4 @@
-# v0.3.1 - Online Duel Parity
+# v0.3.2 - Duel Timing And Desktop Update
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
@@ -20,6 +20,10 @@
 - Online play uses the same duel screen and local assets as offline. Players
   choose rock, paper, or scissors for first turn, then can rematch in the same
   room. Protocol `2`, rules `0.0.3`.
+- End-of-turn heals and exhausted cards resolve before the opponent draws.
+  Triggered card text follows the selected UI language.
+- The desktop client can download and launch the latest Windows or Linux package
+  from GitHub Releases after checksum verification.
 
 ## Known limitations
 
@@ -37,24 +41,24 @@
 
 ## Download contents
 
-1. [`ZZ-Project-v0.3.1-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-Windows-Setup.exe):
+1. [`ZZ-Project-v0.3.2-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Windows-Setup.exe):
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
    Size: `142828752` bytes.
    SHA-256:
    `C2173989CDBD3F80AA51DC32052DAD475675BCD03B400AEFA7E313BB8B558193`.
-2. [`ZZ-Project-v0.3.1-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-Linux.tar.gz):
+2. [`ZZ-Project-v0.3.2-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
    Size: `21475906` bytes.
    SHA-256:
    `750F5FEC861EEC71CB7F81FBA6186B3323A8ACB6C65287DF421B314651A88881`.
-3. [`ZZ-Project-v0.3.1-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-source.zip):
+3. [`ZZ-Project-v0.3.2-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
-4. [`ZZ-Multiplayer-v0.3.1-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Multiplayer-v0.3.1-cef454d.tar.gz):
+4. [`ZZ-Multiplayer-v0.3.2-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-cef454d.tar.gz):
    latest authoritative server snapshot for people who want to host their own
    room service. Older server archives are not kept. Size: `21779133` bytes.
    SHA-256:

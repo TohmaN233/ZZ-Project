@@ -68,7 +68,8 @@ let bgmError = null;
 let homeThemeTimer = null;
 let homeThemeActive = false;
 let homeThemeVideoError = null;
-let applicationUpdate = { status: "idle", currentVersion: null, latestVersion: null, error: null };
+let applicationUpdate = { status: "idle", currentVersion: null, latestVersion: null, error: null, downloadStatus: "idle", downloadPercent: 0, downloadError: null };
+let applicationUpdateProgressUnsub = null;
 let sfxContext = null;
 let publicRevealQueue = [];
 let activePublicReveal = null;
@@ -267,7 +268,11 @@ const UI_TEXT = {
     comingSoon: "占位",
     updateAvailable: "发现新版本 {version}",
     updateCurrent: "当前版本 {version}",
-    viewRelease: "查看更新",
+    viewRelease: "下载并安装",
+    updateDownloading: "正在下载 {percent}%",
+    updateVerifying: "正在校验安装包",
+    updateLaunching: "正在打开安装包",
+    updateDownloadFailed: "下载失败：{error}",
     startGame: "开始游戏",
     launchMode: "模式",
     modeHumanAi: "人机对战",
@@ -540,7 +545,11 @@ const UI_TEXT = {
     comingSoon: "準備中",
     updateAvailable: "新しいバージョン {version} があります",
     updateCurrent: "現在のバージョン {version}",
-    viewRelease: "更新を見る",
+    viewRelease: "ダウンロードしてインストール",
+    updateDownloading: "ダウンロード中 {percent}%",
+    updateVerifying: "インストールファイルを検証しています",
+    updateLaunching: "インストーラーを開いています",
+    updateDownloadFailed: "ダウンロードに失敗しました：{error}",
     startGame: "対戦開始",
     launchMode: "モード",
     modeHumanAi: "対AI",
@@ -789,7 +798,11 @@ const UI_TEXT = {
     comingSoon: "Placeholder",
     updateAvailable: "Version {version} is available",
     updateCurrent: "Current version {version}",
-    viewRelease: "View update",
+    viewRelease: "Download and install",
+    updateDownloading: "Downloading {percent}%",
+    updateVerifying: "Verifying installer",
+    updateLaunching: "Opening installer",
+    updateDownloadFailed: "Download failed: {error}",
     startGame: "Start Game",
     launchMode: "Mode",
     modeHumanAi: "Human vs AI",
@@ -1248,11 +1261,11 @@ function pendingVisualEvents() {
 
 function animationEventNeedsHeldState(event) {
   if (!event) return false;
-  return ["attack", "block", "damage", "heal", "destroy", "zone_move", "effect", "draw", "effect_target"].includes(event.type);
+  return ["attack", "block", "damage", "heal", "refresh", "destroy", "zone_move", "effect", "draw", "effect_target"].includes(event.type);
 }
 
 function animationEventSettlesVisualState(event) {
-  return Boolean(event && ["zone_move", "draw"].includes(event.type));
+  return Boolean(event && ["zone_move", "draw", "destroy", "heal", "refresh"].includes(event.type));
 }
 
 function zoneMoveSourceKey(iid, area) {
@@ -1369,6 +1382,66 @@ function addVisualCardToArea(player, area, card) {
   return true;
 }
 
+function rememberDestroySource(event) {
+  if (!event || event.type !== "destroy") return;
+  const card = event.card || {};
+  if (!card.iid) return;
+  hiddenZoneMoveSourceKeys.add(zoneMoveSourceKey(card.iid, "field"));
+}
+
+function settleDestroyVisualState(event) {
+  if (!state || !pendingVisualState || visualStateStaged || !event || event.type !== "destroy") return false;
+  const card = event.card || {};
+  const player = findPlayerBySide(event.side || card.ownerSide);
+  if (!player || !card.iid) return false;
+  removeVisualCardFromArea(player, "field", card.iid);
+  refreshPlayerZoneCounts(player);
+  syncUiStateFromCurrentState();
+  return true;
+}
+
+function isRefreshVisualEvent(event) {
+  return Boolean(event && (event.type === "refresh" || (event.type === "phase" && event.phase === "refresh")));
+}
+
+function settleRefreshVisualState(event) {
+  if (!state || !pendingVisualState || !isRefreshVisualEvent(event)) return false;
+  let changed = false;
+  for (const card of event.cards || []) {
+    const found = card && card.iid != null ? findCardByIid(card.iid) : null;
+    if (!found || !found.rested) continue;
+    found.rested = false;
+    changed = true;
+  }
+  for (const forceEvent of event.forces || []) {
+    const player = findPlayerBySide(forceEvent.side || event.side);
+    const force = ((player && player.forces) || []).find((item) => item.id === forceEvent.forceId);
+    if (!force || !force.rested) continue;
+    force.rested = false;
+    changed = true;
+  }
+  if (changed) syncUiStateFromCurrentState();
+  return changed;
+}
+
+function settleHealVisualState(event) {
+  if (!state || !pendingVisualState || visualStateStaged || !event || event.type !== "heal") return false;
+  const amount = Number(event.amount || 0);
+  if (!(amount > 0)) return false;
+  const player = findPlayerBySide(event.side);
+  if (!player) return false;
+  const cap = Number(event.maxLife || player.maxLife || 10);
+  if (event.targetKind === "force" && event.forceId) {
+    const force = (player.forces || []).find((item) => item.id === event.forceId);
+    if (!force) return false;
+    force.life = Math.min(cap, Number(force.life || 0) + amount);
+  } else {
+    player.life = Math.min(cap, Number(player.life || 0) + amount);
+  }
+  syncUiStateFromCurrentState();
+  return true;
+}
+
 function settleZoneMoveVisualState(event) {
   if (!state || !pendingVisualState || visualStateStaged || !event || event.type !== "zone_move") return false;
   const card = event.card || {};
@@ -1403,6 +1476,9 @@ function settleFinishedAnimationEvent(event) {
   if (!animationEventSettlesVisualState(event)) return false;
   if (event.type === "zone_move") return settleZoneMoveVisualState(event);
   if (event.type === "draw") return settleDrawVisualState(event);
+  if (event.type === "destroy") return settleDestroyVisualState(event);
+  if (event.type === "heal") return settleHealVisualState(event);
+  if (isRefreshVisualEvent(event)) return settleRefreshVisualState(event);
   return false;
 }
 
@@ -1645,6 +1721,14 @@ function hydrateMultiplayerViewAssets(view) {
     const assetId = card.assetId || card.cardId;
     card.assetUrl = (localCard && localCard.assetUrl) || localAssetUrl(assetId);
     card.assetUrlEn = (localCard && localCard.assetUrlEn) || card.assetUrl;
+    if (localCard) {
+      card.nameJp = card.nameJp || localCard.nameJp;
+      card.nameZh = card.nameZh || localCard.nameZh;
+      card.nameEn = card.nameEn || localCard.nameEn;
+      card.abilityJp = card.abilityJp || localCard.abilityJp;
+      card.abilityZh = card.abilityZh || localCard.abilityZh;
+      card.abilityEn = card.abilityEn || localCard.abilityEn;
+    }
   };
   const fillForceUrls = (force) => {
     if (!force || typeof force !== "object") return;
@@ -1652,6 +1736,14 @@ function hydrateMultiplayerViewAssets(view) {
     const assetId = force.assetId || force.forceId || force.id;
     force.assetUrl = (localForce && localForce.assetUrl) || localAssetUrl(assetId);
     force.assetUrlEn = (localForce && localForce.assetUrlEn) || force.assetUrl;
+    if (localForce) {
+      force.nameJp = force.nameJp || localForce.nameJp;
+      force.nameZh = force.nameZh || localForce.nameZh;
+      force.nameEn = force.nameEn || localForce.nameEn;
+      force.abilityJp = force.abilityJp || localForce.abilityJp;
+      force.abilityZh = force.abilityZh || localForce.abilityZh;
+      force.abilityEn = force.abilityEn || localForce.abilityEn;
+    }
   };
   const visit = (value) => {
     if (!value || typeof value !== "object") return;
@@ -4161,6 +4253,13 @@ function cardEffectText(card) {
   return localizedAbility(card);
 }
 
+function localizedTriggeredEffectText(event, card) {
+  const lang = currentLanguage();
+  if (lang === "zh") return (event && event.effectTextZh) || cardEffectText(card) || (event && event.effectText) || "";
+  if (lang === "en") return (event && event.effectTextEn) || cardEffectText(card) || (event && event.effectText) || "";
+  return (event && (event.effectTextJp || event.effectText)) || cardEffectText(card) || "";
+}
+
 function visualPlaybackActive() {
   return Boolean(activeAnimationEvent || animationEventQueue.length || pendingVisualStateStillNeeded());
 }
@@ -4259,6 +4358,7 @@ function animationEventDuration(event) {
   if (event.type === "attack") return 860;
   if (event.type === "block") return 1060;
   if (event.type === "zone_move") return 900;
+  if (event.type === "refresh") return 280;
   if (event.type === "damage" || event.type === "heal") return 840;
   if (event.type === "game_result") return 1800;
   return 1200;
@@ -4276,6 +4376,12 @@ function showNextAnimationEvent(rerender = true) {
   if (activeAnimationEvent) {
     if (activeAnimationEvent.type === "zone_move") {
       rememberZoneMoveSource(activeAnimationEvent);
+    }
+    if (activeAnimationEvent.type === "destroy") {
+      rememberDestroySource(activeAnimationEvent);
+    }
+    if (isRefreshVisualEvent(activeAnimationEvent)) {
+      settleRefreshVisualState(activeAnimationEvent);
     }
     if (activeAnimationEvent.type === "effect") {
       stagePendingVisualStateForEffect();
@@ -4311,7 +4417,10 @@ function animationEventAssetId(event) {
 function animationEventLabel(event) {
   if (!event) return "";
   if (event.type === "turn_begin") return "Turn Begin";
-  if (event.type === "phase") return String(event.phase || "").toUpperCase();
+  if (event.type === "phase") {
+    if (String(event.phase || "").toLowerCase() === "refresh") return "refresh";
+    return String(event.phase || "").toUpperCase();
+  }
   if (event.type === "dice_roll") return `D6 ${event.value} / ${event.firstSeat || ""}`;
   if (event.type === "rock_paper_scissors") return t("onlineOpeningChoice");
   if (event.type === "damage") return `-${event.amount}`;
@@ -4326,7 +4435,8 @@ function animationEventLabel(event) {
 function animationEventLayerMode(event) {
   if (!event) return "none";
   if (event.type === "shuffle") return "none";
-  if (event.type === "phase") return "none";
+  if (event.type === "phase") return event.phase === "refresh" ? "overlay" : "none";
+  if (event.type === "refresh") return "none";
   if (event.type === "draw") return "board";
   if (
     event.type === "zone_move" ||
@@ -4944,7 +5054,7 @@ function renderEffectTriggerOverlay(event) {
   const card = event.card || {};
   const art = localizedCardAssetUrl(card) || "";
   const name = cardTitle(card);
-  const text = event.effectText || cardEffectText(card) || "Effect";
+  const text = localizedTriggeredEffectText(event, card) || "Effect";
   return `
     <div class="visual-overlay effect-trigger-overlay" aria-live="polite">
       <div class="visual-overlay-card effect-trigger-card">
@@ -6875,13 +6985,22 @@ function renderShellHeader(title = "ZENONZARD") {
 
 function renderApplicationUpdateNotice() {
   if (applicationUpdate.status !== "available") return "";
+  const downloadStatus = applicationUpdate.downloadStatus || "idle";
+  const percent = Math.max(0, Math.min(100, Number(applicationUpdate.downloadPercent || 0)));
+  let statusText = "";
+  if (downloadStatus === "downloading") statusText = t("updateDownloading", { percent });
+  else if (downloadStatus === "verifying") statusText = t("updateVerifying");
+  else if (downloadStatus === "launching") statusText = t("updateLaunching");
+  else if (downloadStatus === "error") statusText = t("updateDownloadFailed", { error: applicationUpdate.downloadError || "unknown error" });
+  const busy = ["downloading", "verifying", "launching"].includes(downloadStatus);
   return `
     <aside class="home-update-notice" role="status">
       <div>
         <strong>${esc(t("updateAvailable", { version: applicationUpdate.latestVersion }))}</strong>
         <span>${esc(t("updateCurrent", { version: applicationUpdate.currentVersion }))}</span>
+        ${statusText ? `<span>${esc(statusText)}</span>` : ""}
       </div>
-      <button type="button" data-open-release>${esc(t("viewRelease"))} ↗</button>
+      <button type="button" data-open-release ${busy ? "disabled" : ""}>${esc(t("viewRelease"))}</button>
     </aside>
   `;
 }
@@ -6896,7 +7015,34 @@ async function loadApplicationUpdate() {
   return applicationUpdate;
 }
 
+function subscribeApplicationUpdateProgress() {
+  if (applicationUpdateProgressUnsub || !ZZApi.desktop || typeof ZZApi.desktop.onUpdateDownloadProgress !== "function") return;
+  applicationUpdateProgressUnsub = ZZApi.desktop.onUpdateDownloadProgress((payload) => {
+    if (!payload || typeof payload !== "object") return;
+    applicationUpdate = { ...applicationUpdate, ...payload };
+    if (appView === "home") render();
+  });
+}
+
 async function openApplicationRelease() {
+  subscribeApplicationUpdateProgress();
+  if (ZZApi.desktop && typeof ZZApi.desktop.downloadAndInstallUpdate === "function") {
+    applicationUpdate = { ...applicationUpdate, downloadStatus: "downloading", downloadPercent: 0, downloadError: null };
+    if (appView === "home") render();
+    const result = await ZZApi.desktop.downloadAndInstallUpdate();
+    applicationUpdate = { ...applicationUpdate, ...(result && typeof result === "object" ? result : {}) };
+    if (result && result.ok === true) {
+      applicationUpdate = { ...applicationUpdate, downloadStatus: "launching", downloadError: null };
+    } else if (!result || result.ok !== true) {
+      applicationUpdate = {
+        ...applicationUpdate,
+        downloadStatus: "error",
+        downloadError: (result && result.error) || "unknown error",
+      };
+    }
+    if (appView === "home") render();
+    return;
+  }
   const result = await ZZApi.desktop.openReleasePage();
   if (!result || result.ok !== true) console.warn("GitHub release page is unavailable outside the desktop client.");
 }

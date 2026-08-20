@@ -1,6 +1,6 @@
 [project]
 name = "zz"
-version = "0.3.1"
+version = "0.3.2"
 description = "Zenonzard CLI clone (faithful MVP)"
 requires-python = ">=3.10"
 

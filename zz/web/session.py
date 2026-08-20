@@ -25,7 +25,8 @@ from zz.model import Action, AttackTarget, CardInstance, Context, ForceInstance,
 from zz.web.assets import AssetIndex
 from zz.web.profiles import normalize_profile, profile_dto
 from zz.web.settings_store import normalize_ai_difficulty
-from zz.web.serialize import serialize_card, serialize_force, serialize_state
+from zz.web.localization import card_translation
+from zz.web.serialize import _first, serialize_card, serialize_force, serialize_state
 
 
 USER_CONTROLLED_MODES = {"human-vs-ai", "god", "debug-card-lab"}
@@ -736,7 +737,8 @@ class GameSession:
                 option_id, label, value, meta = raw
             self._options[option_id] = value
             public = {"id": option_id, "label": label}
-            public.update(meta)
+            public.update(meta or {})
+            public["id"] = option_id
             public_options.append(public)
         self.prompt = {
             "id": prompt_id,
@@ -1064,6 +1066,14 @@ class GameSession:
         self._visual_snapshot = self._visual_state_snapshot()
 
     def _queue_animation_event(self, event: dict[str, Any]) -> None:
+        if event.get("type") == "refresh" and self._animation_events:
+            last = self._animation_events[-1]
+            if last.get("type") == "refresh" or (
+                last.get("type") == "phase" and last.get("phase") == "refresh"
+            ):
+                last.setdefault("cards", []).extend(event.get("cards") or [])
+                last.setdefault("forces", []).extend(event.get("forces") or [])
+                return
         self._animation_events.append(event)
 
     def _zone_move_summon_fx(self, from_area: AreaType, to_area: AreaType) -> str | None:
@@ -1135,42 +1145,91 @@ class GameSession:
             candidates.update(part for part in re.split(r"[／/・：:]", label or "") if part)
         return {candidate for candidate in candidates if candidate}
 
-    def _effect_event_text(self, ci: CardInstance, effect: Any, ctx: Context | None = None) -> str | None:
+    def _card_ability_by_language(self, ci: CardInstance) -> dict[str, str]:
+        translation = card_translation(ci.card.id)
+        return {
+            "jp": getattr(ci.card, "ability_jp", "") or "",
+            "zh": _first(translation.get("ability_zh")),
+            "en": _first(translation.get("ability_en"), getattr(ci.card, "ability_en", "")),
+        }
+
+    def _matched_effect_segment(
+            self,
+            ci: CardInstance,
+            effect: Any,
+            ability: str,
+    ) -> tuple[str | None, int | None]:
         timing = getattr(effect, "timing", getattr(effect, "when", None))
         continuous_markers = {"常時", "自分のターン", "相手のターン"}
         timing_label = getattr(effect, "official_timing", None) or TIMING_LABELS.get(timing)
         if timing is EffectTiming.CONTINUOUS or timing_label in continuous_markers:
-            return None
+            return None, None
         official_effect = getattr(effect, "official_effect", None)
         official_condition = getattr(effect, "official_condition", None)
-        ability = getattr(ci.card, "ability_jp", "") or getattr(ci.card, "ability_en", "")
-        if ability:
-            wanted = self._effect_marker_candidates(timing, timing_label)
-            wanted.update(self._effect_marker_candidates(None, official_condition))
-            segments = self._effect_text_segments(ability)
-            if segments:
-                for markers, segment in segments:
-                    if wanted.intersection(markers):
-                        if continuous_markers.intersection(markers):
-                            return None
-                        return segment
-                return None
-            return ability
-        prefix = "".join(f"【{part}】" for part in (timing_label, official_condition, official_effect) if part)
-        template_id = getattr(effect, "template_id", None)
-        return prefix or str(template_id or timing_label or "Effect")
+        if not ability:
+            prefix = "".join(f"【{part}】" for part in (timing_label, official_condition, official_effect) if part)
+            template_id = getattr(effect, "template_id", None)
+            fallback = prefix or str(template_id or timing_label or "Effect")
+            return fallback, None
+        wanted = self._effect_marker_candidates(timing, timing_label)
+        wanted.update(self._effect_marker_candidates(None, official_condition))
+        segments = self._effect_text_segments(ability)
+        if not segments:
+            return ability, None
+        for index, (markers, segment) in enumerate(segments):
+            if wanted.intersection(markers):
+                if continuous_markers.intersection(markers):
+                    return None, None
+                return segment, index
+        return None, None
+
+    def _effect_event_texts(self, ci: CardInstance, effect: Any, ctx: Context | None = None) -> dict[str, str]:
+        abilities = self._card_ability_by_language(ci)
+        jp_text, index = self._matched_effect_segment(ci, effect, abilities["jp"] or abilities["en"])
+        if not jp_text:
+            return {}
+        texts = {"jp": jp_text}
+        for lang in ("zh", "en"):
+            ability = abilities[lang]
+            if not ability:
+                continue
+            if index is not None:
+                segments = self._effect_text_segments(ability)
+                if 0 <= index < len(segments):
+                    texts[lang] = segments[index][1]
+                    continue
+            texts[lang] = ability
+        return texts
+
+    def _effect_text_fields(self, ci: CardInstance, effect: Any, ctx: Context | None = None) -> dict[str, str]:
+        texts = self._effect_event_texts(ci, effect, ctx)
+        if not texts:
+            return {}
+        fields = {
+            "effectText": texts.get("jp") or texts.get("zh") or texts.get("en") or "",
+        }
+        if texts.get("jp"):
+            fields["effectTextJp"] = texts["jp"]
+        if texts.get("zh"):
+            fields["effectTextZh"] = texts["zh"]
+        if texts.get("en"):
+            fields["effectTextEn"] = texts["en"]
+        return fields
+
+    def _effect_event_text(self, ci: CardInstance, effect: Any, ctx: Context | None = None) -> str | None:
+        return self._effect_event_texts(ci, effect, ctx).get("jp")
 
     def _drain_effect_events(self) -> None:
         while self.engine.effect_events:
             ci, effect, ctx = self.engine.effect_events.pop(0)
-            text = self._effect_event_text(ci, effect, ctx)
-            if not text:
+            fields = self._effect_text_fields(ci, effect, ctx)
+            if not fields:
                 continue
             self._queue_animation_event({
                 "type": "effect",
                 "side": ci.owner.side.name,
                 "card": serialize_card(self.engine, ci, self.asset_index),
-                "effectText": text,
+                **fields,
             })
 
     def _drain_destroy_events(self) -> None:
@@ -1186,14 +1245,14 @@ class GameSession:
         event_type = event.get("type")
         if event_type == "effect":
             ci = event["card"]
-            text = self._effect_event_text(ci, event.get("effect"), event.get("ctx"))
-            if not text:
+            fields = self._effect_text_fields(ci, event.get("effect"), event.get("ctx"))
+            if not fields:
                 return None
             return {
                 "type": "effect",
                 "side": ci.owner.side.name,
                 "card": serialize_card(self.engine, ci, self.asset_index),
-                "effectText": text,
+                **fields,
             }
         if event_type == "destroy":
             ci = event["card"]
@@ -1225,6 +1284,23 @@ class GameSession:
             if summon_fx is not None:
                 animation_event["summonFx"] = summon_fx
             return animation_event
+        if event_type == "refresh":
+            animation_event = {
+                "type": "refresh",
+                "side": event.get("side"),
+                "cards": [],
+                "forces": [],
+            }
+            if event.get("targetKind") == "force":
+                animation_event["forces"].append({
+                    "forceId": event.get("forceId"),
+                    "side": event.get("side"),
+                })
+            else:
+                ci = event["card"]
+                animation_event["side"] = ci.owner.side.name
+                animation_event["cards"].append(serialize_card(self.engine, ci, self.asset_index))
+            return animation_event
         if event_type in {"turn_begin", "phase", "damage", "heal"}:
             return dict(event)
         return None
@@ -1237,6 +1313,25 @@ class GameSession:
             str(event.get("side") or ""),
             None if event.get("forceId") is None else str(event.get("forceId")),
         )
+
+    def _insert_uncovered_life_events(self, events: list[dict[str, Any]]) -> None:
+        if not events:
+            return
+        heals = [event for event in events if event.get("type") == "heal"]
+        others = [event for event in events if event.get("type") != "heal"]
+        turn_advance_at = next(
+            (
+                index
+                for index, event in enumerate(self._animation_events)
+                if event.get("type") in {"turn_begin", "draw"}
+            ),
+            None,
+        )
+        if heals and turn_advance_at is not None:
+            self._animation_events[turn_advance_at:turn_advance_at] = heals
+        else:
+            self._animation_events.extend(heals)
+        self._animation_events.extend(others)
 
     def _drain_ordered_engine_visual_events(self) -> set[tuple[str, str, str | None]] | None:
         if not getattr(self.engine, "visual_events", None):
@@ -1317,6 +1412,7 @@ class GameSession:
             self._drain_effect_events()
             self._drain_destroy_events()
 
+        snapshot_life_events: list[dict[str, Any]] = []
         for side, life in current["players"].items():
             old_life = before["players"].get(side)
             if old_life is None or old_life == life:
@@ -1324,7 +1420,7 @@ class GameSession:
             if ("player", side, None) in covered_life_events:
                 continue
             event_type = "damage" if life < old_life else "heal"
-            self._queue_animation_event({
+            snapshot_life_events.append({
                 "type": event_type,
                 "targetKind": "player",
                 "side": side,
@@ -1338,7 +1434,7 @@ class GameSession:
             if ("force", force["side"], force["forceId"]) in covered_life_events:
                 continue
             event_type = "damage" if force["life"] < old_force["life"] else "heal"
-            self._queue_animation_event({
+            snapshot_life_events.append({
                 "type": event_type,
                 "targetKind": "force",
                 "side": force["side"],
@@ -1346,6 +1442,7 @@ class GameSession:
                 "amount": abs(force["life"] - old_force["life"]),
             })
 
+        self._insert_uncovered_life_events(snapshot_life_events)
         self._visual_snapshot = current
 
     def _make_mulligan_prompt_state(self, player: Player) -> dict[str, Any]:
@@ -2372,9 +2469,9 @@ class GameSession:
         if source is not None:
             self.prompt["card"] = serialize_card(self.engine, source, self.asset_index)
             if effect is not None:
-                text = self._effect_event_text(source, effect, Context(controller=player, source=source))
-                if text:
-                    self.prompt["effectText"] = text
+                fields = self._effect_text_fields(source, effect, Context(controller=player, source=source))
+                if fields:
+                    self.prompt.update(fields)
 
     def _defer_trigger_choice(self, pending: Any) -> bool:
         if self.prompt is not None:
@@ -3414,9 +3511,9 @@ class GameSession:
             ])
         self.prompt["playerSide"] = player.side.name
         self.prompt["card"] = serialize_card(self.engine, source, self.asset_index)
-        text = self._effect_event_text(source, effect, Context(controller=player, source=source))
-        if text:
-            self.prompt["effectText"] = text
+        fields = self._effect_text_fields(source, effect, Context(controller=player, source=source))
+        if fields:
+            self.prompt.update(fields)
 
     def _begin_deferred_play_effect(self, player: Player, action: Action, mode: str) -> None:
         effect = self._targeted_effect_for_action(action, player)
@@ -3753,9 +3850,9 @@ class GameSession:
         if source_ci is not None:
             self.prompt["card"] = serialize_card(self.engine, source_ci, self.asset_index)
             if effect is not None:
-                text = self._effect_event_text(source_ci, effect, Context(controller=player, source=source_ci))
-                if text:
-                    self.prompt["effectText"] = text
+                fields = self._effect_text_fields(source_ci, effect, Context(controller=player, source=source_ci))
+                if fields:
+                    self.prompt.update(fields)
         if revealed:
             self.prompt["revealedCards"] = [
                 self._effect_target_meta(target) for target in revealed
@@ -3812,6 +3909,7 @@ class GameSession:
             }
         if isinstance(target, ForceInstance):
             payload = serialize_force(self.engine, target, self.asset_index)
+            payload.pop("id", None)
             payload.update({
                 "kind": "effect_target",
                 "targetKind": "force",

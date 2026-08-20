@@ -74,11 +74,59 @@ async function checkLatestRelease({ currentVersion, fetchImpl }) {
   };
 }
 
+const CHECKSUMS_ASSET_NAME = "SHA256SUMS-PC02.txt";
+
+function installerFileName(version, platform = process.platform) {
+  const normalized = String(version || "").replace(/^v/, "");
+  if (platform === "win32") return `ZZ-Project-v${normalized}-Windows-Setup.exe`;
+  if (platform === "linux") return `ZZ-Project-v${normalized}-Linux.tar.gz`;
+  return null;
+}
+
+function parseChecksumMap(text) {
+  const checksums = {};
+  String(text || "").split(/\r?\n/).forEach((line) => {
+    const match = /^([0-9a-fA-F]{64})\s+\*?(.+?)$/.exec(line.trim());
+    if (!match) return;
+    checksums[match[2].trim()] = match[1].toLowerCase();
+  });
+  return checksums;
+}
+
+function selectInstallerAsset(release, platform = process.platform) {
+  if (!release || typeof release !== "object") {
+    throw new Error("GitHub latest release is missing");
+  }
+  const version = parseVersion(release.tag_name).raw.replace(/^v/, "");
+  const fileName = installerFileName(version, platform);
+  if (!fileName) {
+    throw new Error(`no packaged installer for platform ${platform}`);
+  }
+  const assets = Array.isArray(release.assets) ? release.assets : [];
+  const installer = assets.find((asset) => asset && asset.name === fileName);
+  if (!installer || typeof installer.browser_download_url !== "string") {
+    throw new Error(`missing installer asset ${fileName}`);
+  }
+  const checksums = assets.find((asset) => asset && asset.name === CHECKSUMS_ASSET_NAME) || null;
+  return {
+    version,
+    fileName,
+    downloadUrl: installer.browser_download_url,
+    checksumsUrl: checksums && typeof checksums.browser_download_url === "string"
+      ? checksums.browser_download_url
+      : null,
+  };
+}
+
 module.exports = {
+  CHECKSUMS_ASSET_NAME,
   LATEST_RELEASE_URL,
   PROJECT_WEBSITE_URL,
   RELEASE_API_URL,
   checkLatestRelease,
   compareVersions,
+  installerFileName,
+  parseChecksumMap,
   parseVersion,
+  selectInstallerAsset,
 };

@@ -31,7 +31,7 @@ separate overlay pack.
 ## 3. Windows installer
 
 Download and run
-[`ZZ-Project-v0.3.1-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-Windows-Setup.exe).
+[`ZZ-Project-v0.3.2-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Windows-Setup.exe).
 Python, Node.js, and `npm install` are not required. Start the installed game
 from the Start menu or the desktop shortcut.
 
@@ -73,12 +73,12 @@ Installer SHA-256:
 ## 4. Linux portable bundle
 
 Download
-[`ZZ-Project-v0.3.1-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-Linux.tar.gz),
+[`ZZ-Project-v0.3.2-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Linux.tar.gz),
 then extract and run:
 
 ```bash
-tar -xzf ZZ-Project-v0.3.1-Linux.tar.gz
-cd ZZ-Project-v0.3.1
+tar -xzf ZZ-Project-v0.3.2-Linux.tar.gz
+cd ZZ-Project-v0.3.2
 ./launch-electron.sh --check
 ./launch-electron.sh
 ```
@@ -100,7 +100,7 @@ Bundle SHA-256:
 ## 5. Source launch and macOS
 
 Download the explicitly named
-[`ZZ-Project-v0.3.1-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Project-v0.3.1-source.zip).
+[`ZZ-Project-v0.3.2-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-source.zip).
 Do not use the smaller source archive generated automatically by an old GitHub
 tag. The named archive contains the release snapshot, runtime models, tests,
 documentation, and `image.png`.
@@ -194,7 +194,7 @@ log.
   stability has not been fully verified; users in mainland China may need a
   proxy.
 - **Self-hosted:** download the latest
-  [`ZZ-Multiplayer-v0.3.1-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.1/ZZ-Multiplayer-v0.3.1-cef454d.tar.gz)
+  [`ZZ-Multiplayer-v0.3.2-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-cef454d.tar.gz)
   from the Release, then follow [docs/ONLINE.md](docs/ONLINE.md). Only the
   newest server archive is kept.
 

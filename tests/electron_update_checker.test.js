@@ -8,6 +8,9 @@ const {
   RELEASE_API_URL,
   checkLatestRelease,
   compareVersions,
+  installerFileName,
+  parseChecksumMap,
+  selectInstallerAsset,
 } = require("../electron/update-checker");
 
 function githubResponse(tagName, overrides = {}) {
@@ -75,4 +78,44 @@ test("current release and GitHub failures remain explicit", async () => {
     }),
     /missing tag_name/,
   );
+});
+
+
+test("installer asset names and checksums come from the latest release", () => {
+  assert.equal(installerFileName("0.3.1", "win32"), "ZZ-Project-v0.3.1-Windows-Setup.exe");
+  assert.equal(installerFileName("v0.3.1", "linux"), "ZZ-Project-v0.3.1-Linux.tar.gz");
+  assert.equal(installerFileName("0.3.1", "darwin"), null);
+
+  const checksums = parseChecksumMap(
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa  ZZ-Project-v0.3.1-Windows-Setup.exe\n" +
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb *ZZ-Project-v0.3.1-Linux.tar.gz\n",
+  );
+  assert.equal(
+    checksums["ZZ-Project-v0.3.1-Windows-Setup.exe"],
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  );
+  assert.equal(
+    checksums["ZZ-Project-v0.3.1-Linux.tar.gz"],
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  );
+
+  const selected = selectInstallerAsset({
+    tag_name: "v0.3.1",
+    assets: [
+      {
+        name: "ZZ-Project-v0.3.1-Windows-Setup.exe",
+        browser_download_url: "https://example.test/setup.exe",
+      },
+      {
+        name: "SHA256SUMS-PC02.txt",
+        browser_download_url: "https://example.test/SHA256SUMS-PC02.txt",
+      },
+    ],
+  }, "win32");
+  assert.deepEqual(selected, {
+    version: "0.3.1",
+    fileName: "ZZ-Project-v0.3.1-Windows-Setup.exe",
+    downloadUrl: "https://example.test/setup.exe",
+    checksumsUrl: "https://example.test/SHA256SUMS-PC02.txt",
+  });
 });

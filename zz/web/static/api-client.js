@@ -41,6 +41,12 @@
     openReleasePage: () => window.zzDesktop && window.zzDesktop.openReleasePage
       ? window.zzDesktop.openReleasePage()
       : Promise.resolve({ ok: false, unavailable: true }),
+    downloadAndInstallUpdate: () => window.zzDesktop && window.zzDesktop.downloadAndInstallUpdate
+      ? window.zzDesktop.downloadAndInstallUpdate()
+      : Promise.resolve({ ok: false, unavailable: true, error: "desktop client required" }),
+    onUpdateDownloadProgress: (callback) => window.zzDesktop && window.zzDesktop.onUpdateDownloadProgress
+      ? window.zzDesktop.onUpdateDownloadProgress(callback)
+      : () => {},
     quit: () => window.zzDesktop && window.zzDesktop.quit
       ? window.zzDesktop.quit()
       : Promise.resolve({ ok: false, unavailable: true }),

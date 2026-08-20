@@ -1,5 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain, Menu, net, session, shell } = require("electron");
 const { spawn } = require("node:child_process");
+const crypto = require("node:crypto");
 const fsSync = require("node:fs");
 const fs = require("node:fs/promises");
 const http = require("node:http");
@@ -11,6 +12,9 @@ const {
   checkLatestRelease,
   LATEST_RELEASE_URL,
   PROJECT_WEBSITE_URL,
+  RELEASE_API_URL,
+  parseChecksumMap,
+  selectInstallerAsset,
 } = require("./update-checker");
 
 let mainWindow = null;
@@ -37,6 +41,7 @@ let shutdownPrepared = false;
 let shutdownPromise = null;
 let updateCheckPromise = null;
 let updateStatus = { status: "idle", currentVersion: null };
+let updateDownloadPromise = null;
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -188,6 +193,116 @@ async function checkForApplicationUpdate() {
     updateCheckPromise = null;
   });
   return updateCheckPromise;
+}
+
+function sendUpdateDownloadProgress(payload) {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send("app:updateDownloadProgress", payload);
+}
+
+async function fetchGithubJson(url) {
+  const response = await net.fetch(url, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2026-03-10",
+    },
+  });
+  if (!response.ok) throw new Error(`GitHub request failed: HTTP ${response.status}`);
+  return response.json();
+}
+
+async function fetchGithubText(url) {
+  const response = await net.fetch(url, {
+    headers: { Accept: "text/plain" },
+  });
+  if (!response.ok) throw new Error(`GitHub request failed: HTTP ${response.status}`);
+  return response.text();
+}
+
+async function downloadReleaseFile(url, destination, onProgress) {
+  const response = await net.fetch(url, {
+    headers: { Accept: "application/octet-stream" },
+  });
+  if (!response.ok) throw new Error(`installer download failed: HTTP ${response.status}`);
+  if (!response.body) throw new Error("installer download returned an empty body");
+  const total = Number(response.headers.get("content-length") || 0);
+  const reader = response.body.getReader();
+  const hash = crypto.createHash("sha256");
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  const file = fsSync.createWriteStream(destination);
+  let received = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      hash.update(value);
+      received += value.byteLength;
+      if (!file.write(Buffer.from(value))) {
+        await new Promise((resolve) => file.once("drain", resolve));
+      }
+      if (typeof onProgress === "function") {
+        onProgress({ receivedBytes: received, totalBytes: total });
+      }
+    }
+  } catch (error) {
+    file.destroy();
+    await fs.rm(destination, { force: true });
+    throw error;
+  }
+  await new Promise((resolve, reject) => {
+    file.end((error) => (error ? reject(error) : resolve()));
+  });
+  return { sha256: hash.digest("hex"), receivedBytes: received, totalBytes: total };
+}
+
+async function downloadAndInstallUpdate() {
+  if (updateDownloadPromise) return updateDownloadPromise;
+  updateDownloadPromise = (async () => {
+    sendUpdateDownloadProgress({ downloadStatus: "downloading", downloadPercent: 0, downloadError: null });
+    const release = await fetchGithubJson(RELEASE_API_URL);
+    const installer = selectInstallerAsset(release);
+    if (!installer.checksumsUrl) {
+      throw new Error(`missing SHA256SUMS-PC02.txt for ${installer.fileName}`);
+    }
+    const destination = path.join(app.getPath("temp"), "zz-project-updates", installer.fileName);
+    const download = await downloadReleaseFile(
+      installer.downloadUrl,
+      destination,
+      ({ receivedBytes, totalBytes }) => {
+        const percent = totalBytes > 0 ? Math.floor((receivedBytes / totalBytes) * 100) : 0;
+        sendUpdateDownloadProgress({
+          downloadStatus: "downloading",
+          downloadPercent: percent,
+          downloadError: null,
+        });
+      },
+    );
+    sendUpdateDownloadProgress({ downloadStatus: "verifying", downloadPercent: 100, downloadError: null });
+    const checksums = parseChecksumMap(await fetchGithubText(installer.checksumsUrl));
+    const expected = checksums[installer.fileName];
+    if (!expected) throw new Error(`SHA256SUMS-PC02.txt has no entry for ${installer.fileName}`);
+    if (expected !== download.sha256) {
+      await fs.rm(destination, { force: true });
+      throw new Error(`installer checksum mismatch for ${installer.fileName}`);
+    }
+    sendUpdateDownloadProgress({ downloadStatus: "launching", downloadPercent: 100, downloadError: null });
+    const openError = await shell.openPath(destination);
+    if (openError) throw new Error(openError);
+    return {
+      ok: true,
+      downloadStatus: "launching",
+      downloadPercent: 100,
+      fileName: installer.fileName,
+      filePath: destination,
+    };
+  })().catch((error) => {
+    const message = error && error.message ? error.message : String(error);
+    sendUpdateDownloadProgress({ downloadStatus: "error", downloadError: message });
+    return { ok: false, downloadStatus: "error", error: message };
+  }).finally(() => {
+    updateDownloadPromise = null;
+  });
+  return updateDownloadPromise;
 }
 
 function multiplayerSnapshot() {
@@ -589,6 +704,10 @@ function registerIpc() {
     assertTrustedSender(_event);
     await shell.openExternal(LATEST_RELEASE_URL);
     return { ok: true };
+  });
+  ipcMain.handle("app:downloadAndInstallUpdate", async (_event) => {
+    assertTrustedSender(_event);
+    return downloadAndInstallUpdate();
   });
   ipcMain.handle("app:quit", async (_event) => {
     assertTrustedSender(_event);

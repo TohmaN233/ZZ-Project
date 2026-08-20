@@ -758,8 +758,7 @@ def _refresh_targets(
         required = 0 if optional else min_targets
         targets = eng.select_target(ci.owner, target_kind, required, max_targets, filter_fn=filter_fn, source=ci)
         for target in targets[:max_targets]:
-            if hasattr(target, "rested"):
-                target.rested = False
+            eng.refresh_target(target)
     return fn
 
 
@@ -1145,6 +1144,10 @@ def _force_block(
 
 def _refresh_self(**_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
+        eng = getattr(state, "engine", None)
+        if eng is not None:
+            eng.refresh_target(ci)
+            return
         ci.rested = False
     return fn
 
