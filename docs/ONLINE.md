@@ -20,15 +20,15 @@ LAN 不需要单独的服务器包。
 
 Release 只保留**最新一份**服务器包：
 
-[`ZZ-Multiplayer-v0.3.2-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-cef454d.tar.gz)
+[`ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz)
 
-SHA-256: `A7A0C2A930C19402DDF673067E278E0FB68FEDB7C74B390841CB8FAD04E29D19`
+SHA-256: `04139BDC15FC9CD65A2F2B0D4F07B008161A8C94493B9F9B1DCB908145EED9CD`
 
 需要 Linux、Python 3.10+，以及一个带 TLS 的 HTTPS 域名。游戏客户端按 `PUBLIC_ORIGIN` 校验来源，所以公网入口必须是 `https://你的域名`，不能带路径。
 
 ```bash
 mkdir zz-multiplayer
-tar -xzf ZZ-Multiplayer-v0.3.2-cef454d.tar.gz -C zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz -C zz-multiplayer
 cd zz-multiplayer
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip

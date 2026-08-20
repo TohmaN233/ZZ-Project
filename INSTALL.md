@@ -65,10 +65,10 @@ English players should then extract
 `ZZ-Assets-PC02-English-v1.zip` into the same `asserts/` directory. It writes
 `asserts/Eng-cards/` and does not replace the main asset pack.
 
-Installer size: `142828752` bytes.
+Installer size: `142837370` bytes.
 
 Installer SHA-256:
-`C2173989CDBD3F80AA51DC32052DAD475675BCD03B400AEFA7E313BB8B558193`.
+`E5703C4976E3A52692550066571E17DE42B5312363370745ACD61D922257BB7A`.
 
 ## 4. Linux portable bundle
 
@@ -92,10 +92,10 @@ On first launch the existing launcher downloads or prepares the user-scoped
 Node.js, Electron, and Python runtime. A network connection is therefore
 needed for the first bootstrap unless those runtime files are already cached.
 
-Bundle size: `21475906` bytes.
+Bundle size: `21480331` bytes.
 
 Bundle SHA-256:
-`750F5FEC861EEC71CB7F81FBA6186B3323A8ACB6C65287DF421B314651A88881`.
+`A9FF73C2088B0FC512C755318176289F76EA4ED3309536996E02D6F2D90FF7A2`.
 
 ## 5. Source launch and macOS
 
@@ -194,7 +194,7 @@ log.
   stability has not been fully verified; users in mainland China may need a
   proxy.
 - **Self-hosted:** download the latest
-  [`ZZ-Multiplayer-v0.3.2-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-cef454d.tar.gz)
+  [`ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz)
   from the Release, then follow [docs/ONLINE.md](docs/ONLINE.md). Only the
   newest server archive is kept.
 

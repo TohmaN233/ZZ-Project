@@ -45,24 +45,24 @@
    directly installable and playable Windows desktop package. It contains
    Electron, the frozen Python server, the PC02 runtime, Torch-free current
    runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142828752` bytes.
+   Size: `142837370` bytes.
    SHA-256:
-   `C2173989CDBD3F80AA51DC32052DAD475675BCD03B400AEFA7E313BB8B558193`.
+   `E5703C4976E3A52692550066571E17DE42B5312363370745ACD61D922257BB7A`.
 2. [`ZZ-Project-v0.3.2-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Linux.tar.gz):
    portable Linux source/runtime bundle. Extract it and run
    `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
    Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `21475906` bytes.
+   Size: `21480331` bytes.
    SHA-256:
-   `750F5FEC861EEC71CB7F81FBA6186B3323A8ACB6C65287DF421B314651A88881`.
+   `A9FF73C2088B0FC512C755318176289F76EA4ED3309536996E02D6F2D90FF7A2`.
 3. [`ZZ-Project-v0.3.2-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-source.zip):
    source, tests, documentation, runtime models, and `image.png` for macOS
    players and developers.
-4. [`ZZ-Multiplayer-v0.3.2-cef454d.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-cef454d.tar.gz):
+4. [`ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz):
    latest authoritative server snapshot for people who want to host their own
-   room service. Older server archives are not kept. Size: `21779133` bytes.
+   room service. Older server archives are not kept. Size: `21786306` bytes.
    SHA-256:
-   `A7A0C2A930C19402DDF673067E278E0FB68FEDB7C74B390841CB8FAD04E29D19`.
+   `04139BDC15FC9CD65A2F2B0D4F07B008161A8C94493B9F9B1DCB908145EED9CD`.
    Setup: [docs/ONLINE.md](docs/ONLINE.md).
 5. [`ZZ-Assets-PC02-v1.zip.001` and `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
    main card art, characters, playmats, video, sound effects, and BGM. Download
