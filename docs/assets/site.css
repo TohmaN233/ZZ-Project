@@ -403,6 +403,9 @@ img { display: block; max-width: 100%; }
 .split-band article:last-child { padding-right: max(20px, calc((100vw - var(--max)) / 2)); }
 .split-band h2 { font-size: clamp(32px, 4vw, 50px); }
 .text-link { display: inline-block; margin-top: 28px; color: var(--teal-deep); font-weight: 800; text-decoration: none; }
+.online-demo-label { margin-top: 28px; margin-bottom: 12px; color: var(--teal-deep); font-weight: 800; }
+.online-demo { position: relative; width: 100%; padding-bottom: 56.25%; margin-top: 12px; overflow: hidden; }
+.online-demo-frame { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
 .content-status { display: grid; grid-template-columns: 0.55fr 1.45fr; gap: 70px; }
 .status-copy h2 { margin: 0; font-size: 50px; line-height: 1.05; }
