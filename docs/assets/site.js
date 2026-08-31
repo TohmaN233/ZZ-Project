@@ -62,6 +62,7 @@ const copy = {
     storyCaveat: "这是未来目标，不代表第一版已经提供生成式剧情功能。",
     contributeEyebrow: "CONTRIBUTE", contributeTitle: "欢迎懂强化学习、卡牌资料或本地化的朋友加入",
     contributeBody: "尤其希望有强化学习经验的贡献者一起研究：是否能训练出真正适合离线运行的 ZZ AI。英文卡图、卡牌译文、规则测试与 Bug 报告同样重要。",
+    starGithubShort: "Star", starGithub: "在 GitHub 点个 Star", starNote: "Star 是最省事的支持方式，也是继续更新的动力。",
     reportIssue: "提交 Issue", joinDiscussion: "参与讨论", footerUnofficial: "非官方、非商业的粉丝开发与研究项目。",
     footerRights: "ZENONZARD 名称、角色、卡图、音乐与相关素材的权利归各自权利方所有。本项目与 BANDAI / STRAIGHT EDGE / SUNRISE 无隶属或授权关系。",
     backTop: "返回顶部 ↑",
@@ -120,6 +121,7 @@ const copy = {
     storyCaveat: "これは将来目標であり、初回版に生成ストーリー機能が含まれるという意味ではありません。",
     contributeEyebrow: "CONTRIBUTE", contributeTitle: "強化学習、カード資料、ローカライズの協力者を歓迎します",
     contributeBody: "特に、オフラインで動く本格的な ZZ AI を学習できるか、強化学習経験者と一緒に研究したいと考えています。英語カード画像、翻訳、ルールテスト、バグ報告も重要です。",
+    starGithubShort: "Star", starGithub: "GitHub で Star する", starNote: "Star はいちばん手軽な応援です。今後の更新の励みになります。",
     reportIssue: "Issue を送る", joinDiscussion: "議論に参加", footerUnofficial: "非公式・非商用のファン開発および研究プロジェクトです。",
     footerRights: "ZENONZARD の名称、キャラクター、カード画像、音楽、関連素材の権利は各権利者に帰属します。本プロジェクトは BANDAI / STRAIGHT EDGE / SUNRISE の公式・認可プロジェクトではありません。",
     backTop: "ページ上部へ ↑",
@@ -178,6 +180,7 @@ const copy = {
     storyCaveat: "This is a future goal, not a claim that generative story features ship in version one.",
     contributeEyebrow: "CONTRIBUTE", contributeTitle: "RL, card-data, and localization contributors are welcome",
     contributeBody: "The project especially welcomes reinforcement-learning experts interested in whether a genuinely useful offline ZZ AI can be trained. English card art, translations, rules testing, and bug reports matter just as much.",
+    starGithubShort: "Star", starGithub: "Star on GitHub", starNote: "A star is the easiest way to support the project, and it helps keep updates coming.",
     reportIssue: "Open an issue", joinDiscussion: "Join discussions", footerUnofficial: "An unofficial, non-commercial fan development and research project.",
     footerRights: "ZENONZARD names, characters, card art, music, and related assets belong to their respective rights holders. This project is not affiliated with or endorsed by BANDAI, STRAIGHT EDGE, or SUNRISE.",
     backTop: "Back to top ↑",
@@ -243,6 +246,7 @@ function configureLinks() {
   const projectUrl = RELEASE_CONFIG.projectUrl.replace(/\/$/, "");
   document.querySelectorAll("[data-repo-link]").forEach((link) => { link.href = RELEASE_CONFIG.programUrl; });
   document.querySelectorAll("[data-linux-link]").forEach((link) => { link.href = RELEASE_CONFIG.linuxBundleUrl; });
+  document.querySelectorAll("[data-star-link]").forEach((link) => { link.href = projectUrl; });
   document.querySelectorAll("[data-issues-link]").forEach((link) => { link.href = `${projectUrl}/issues`; });
   document.querySelectorAll("[data-discussions-link]").forEach((link) => { link.href = `${projectUrl}/discussions`; });
   document.querySelectorAll("[data-asset-link]").forEach((link) => {
