@@ -63,7 +63,7 @@ class TriggerRegistry:
         state = self._engine.state
         # Active player's permanents fire first, then opponent's
         for player in (state.active, state.opponent):
-            for region in (player.field, player.base):
+            for region in (player.field, player.base, player.trash):
                 for ci in region:
                     for effect in ci.card.effects:
                         if effect.timing is not timing:

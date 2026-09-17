@@ -741,6 +741,9 @@ class Engine:
 
         clear_owner_turn_end_locks(active)
         clear_turn_state(self.state)
+        from zz.pc02r import on_turn_end_flags
+
+        on_turn_end_flags(self.state, active)
         for ci in active.field:
             if ci.owner is active and ci.area is AreaType.FIELD and self.has_keyword(ci, Keyword.REAWAKEN):
                 self.refresh_target(ci)
@@ -1061,7 +1064,7 @@ class Engine:
 
     def effective_cost(self, player: Player, ci: CardInstance) -> dict[Color, int]:
         cost = dict(ci.card.cost)
-        if not cost:
+        if not cost and ci.card.id != "colorless_00_02_02r_00":
             return {}
         if ci.card.id == "colorless_04_02_01_04" and "cast_cost_4_magic_this_turn" in player.flags:
             return {}
@@ -1692,6 +1695,37 @@ class Engine:
         self._emit_enter_field(player, ci)
         self.triggers.resolve_all()
 
+    def summon_from_deck(
+            self,
+            player: Player,
+            ci: CardInstance,
+            *,
+            rested: bool = False,
+            replace_field_iid: int | None = None,
+    ) -> None:
+        if ci not in player.deck:
+            raise IllegalActionError("card is not in deck")
+        if ci.card.type is not CardType.F_MINION:
+            raise IllegalActionError("only field minions can be summoned from deck")
+        self._make_field_space(player, replace_field_iid)
+        player.deck.remove(ci)
+        ci.area = AreaType.FIELD
+        ci.rested = rested
+        ci.summoning_sickness = True
+        player.field.append(ci)
+        self._record_zone_move(ci, AreaType.DECK, AreaType.FIELD)
+        self._emit_enter_field(player, ci)
+        self.triggers.resolve_all()
+
+    def morph_in_place(self, ci: CardInstance, new_card: Card) -> None:
+        if ci.area is not AreaType.FIELD or ci not in ci.owner.field:
+            raise IllegalActionError("only a field minion can transform")
+        ci.card = new_card
+        if Keyword.RUSH in new_card.keywords:
+            ci.summoning_sickness = False
+        self.triggers.emit(EffectTiming.ON_TRANSFORM, Context(controller=ci.owner, source=ci))
+        self.triggers.resolve_all()
+
     def move_target_to_base(
             self,
             ci: CardInstance,
@@ -1759,6 +1793,8 @@ class Engine:
 
         if not can_attack_or_move(attacker) or not can_attack(attacker):
             return False
+        if "pc02r:cannot_attack" in attacker.flags:
+            return False
         if attacker.rested:
             return False
         if self.state.step is not Step.MAIN:
@@ -1770,6 +1806,7 @@ class Engine:
         if not self.can_attack(attacker):
             return []
         opp = self.state.opponent
+        cannot_attack_player = "pc02r:cannot_attack_player" in attacker.flags
         out: list[AttackTarget] = []
         for f in opp.forces:
             if not f.destroyed and not self._force_attack_restricted(attacker, f):
@@ -1777,9 +1814,12 @@ class Engine:
         no_forces_left = all(f.destroyed for f in opp.forces)
         was_present_at_turn_start = attacker.iid in self.state.present_at_turn_start
         if (
-            no_forces_left
-            or self.has_keyword(attacker, Keyword.RUSH)
-            or (not attacker.summoning_sickness and was_present_at_turn_start)
+            not cannot_attack_player
+            and (
+                no_forces_left
+                or self.has_keyword(attacker, Keyword.RUSH)
+                or (not attacker.summoning_sickness and was_present_at_turn_start)
+            )
         ):
             out.append(AttackTarget(kind=AttackTargetKind.PLAYER, ref=opp))
         return out
@@ -1803,6 +1843,8 @@ class Engine:
                 continue
             if not pc02_can_block(attacker, b, self.state):
                 continue
+            if "pc02r:cannot_block" in b.flags:
+                continue
             out.append(b)
         return out
 
@@ -1815,7 +1857,7 @@ class Engine:
 
         return (
             ci.card.id == "purple_02_02_01_01" and self._opponent_has_force(ci.owner)
-        ) or not can_attack_or_move(ci)
+        ) or not can_attack_or_move(ci) or "pc02r:cannot_move" in ci.flags
 
     def _own_field_minion_count(self, player: Player) -> int:
         return sum(
@@ -1885,6 +1927,9 @@ class Engine:
                 from zz.pc01r import adjust_minion_dp_damage
 
                 amount = adjust_minion_dp_damage(self.state, amount, source)
+            from zz.pc02r import adjust_life_damage
+
+            amount = adjust_life_damage(self.state, player, amount, source, damage_kind)
             amount = max(0, amount - self._yakutzork_player_damage_reduction(player))
             amount = max(0, amount - self._player_damage_reduction.get(id(player), 0))
         if amount <= 0:
@@ -1923,6 +1968,9 @@ class Engine:
             return amount
         if id(fi) not in self._force_damage_reduction_blocked:
             amount = max(0, amount - self._force_damage_reduction.get(id(fi), 0))
+            from zz.pc02r import adjust_force_damage
+
+            amount = adjust_force_damage(self.state, fi, amount, source)
         if amount <= 0:
             return 0
         absorbed = min(fi.life, amount)
@@ -1986,7 +2034,9 @@ class Engine:
         fi.destroyed = True
         fi.rested = True
         # Fire on_destroy in rested state (rulebook page 8 footnote)
-        if fi.force.on_destroy is not None:
+        from zz.pc02r import suppress_force_on_destroy
+
+        if fi.force.on_destroy is not None and not suppress_force_on_destroy(source, fi, self.state):
             fi.force.on_destroy(fi, self.state, Context(controller=fi.owner, source=source))
         # Unregister passive
         self._passive_modifiers = [
@@ -2042,6 +2092,10 @@ class Engine:
                                        source=blocker, target=attacker))
             self.triggers.resolve_all()
             self._apply_player_blocked_attack_effects(attacker, blocker)
+            from zz.pc02r import on_player_attack_blocked
+
+            if target.kind is AttackTargetKind.PLAYER:
+                on_player_attack_blocked(self, attacker, blocker)
             # 4. Minion battle compares BP against BP.
             from zz.pc01r import battle_outcome_override
             from zz.pc02 import battle_outcome_override as pc02_battle_outcome_override
@@ -2190,6 +2244,11 @@ class Engine:
     def _destroy(self, ci: CardInstance, source) -> None:
         if ci.area is not AreaType.FIELD:
             return
+        if self._effect_resolution_depth > 0:
+            from zz.pc02r import blocks_effect_destroy
+
+            if blocks_effect_destroy(ci, source, self.state):
+                return
         owner = ci.owner
         self.destroy_events.append(ci)
         self._record_visual_event({
@@ -2740,6 +2799,8 @@ class Engine:
                 ci for ci in player.deck[:3]
                 if ci.card.type is CardType.F_MINION
             ]
+        elif kind == "top3_card":
+            eligible = list(player.deck[:3])
         else:
             eligible = []
         if filter_fn:
@@ -2854,6 +2915,11 @@ class Engine:
     def return_to_hand(self, ci: CardInstance) -> None:
         if ci.area is not AreaType.FIELD:
             return
+        if self._effect_resolution_depth > 0:
+            from zz.pc02r import blocks_return_to_hand
+
+            if blocks_return_to_hand(ci, self.state):
+                return
         owner = ci.owner
         if ci in owner.field:
             owner.field.remove(ci)
@@ -3056,10 +3122,16 @@ class Engine:
             if self._turn_stat_modifier_matches(ci, modifier):
                 bp += int(modifier.get("bp_delta") or 0)
                 dp += int(modifier.get("dp_delta") or 0)
+        from zz.pc02 import blessing_stat_aura
+
         for player in self.state.players:
             for source in player.field:
                 if source.area is not AreaType.FIELD:
                     continue
+                if source.blessings:
+                    b, d = blessing_stat_aura(source, ci, self.state)
+                    bp += b
+                    dp += d
                 if source.card.aura is None:
                     continue
                 b, d = source.card.aura(source, ci, self.state)

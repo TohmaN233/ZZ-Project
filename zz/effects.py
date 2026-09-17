@@ -29,6 +29,7 @@ class EffectTiming(Enum):
     ON_DECK_DISCARD = "on_deck_discard"
     ON_MOVE_TO_FIELD = "on_move_to_field"
     MOVE_TO_BASE = "move_to_base"
+    ON_TRANSFORM = "on_transform"
     TURN_START = "turn_start"
     TURN_END = "turn_end"
     CONTINUOUS = "continuous"
@@ -93,6 +94,7 @@ TIMING_LABELS = {
     EffectTiming.ON_DECK_DISCARD: "デッキから破棄された時",
     EffectTiming.ON_MOVE_TO_FIELD: "移動時",
     EffectTiming.MOVE_TO_BASE: "後退時",
+    EffectTiming.ON_TRANSFORM: "変形時",
     EffectTiming.TURN_START: "自分のターン開始時",
     EffectTiming.TURN_END: "自分のターン終了時",
     EffectTiming.CONTINUOUS: "常時",
@@ -1187,15 +1189,21 @@ def _target_filter(
     max_dp: int | None = None,
     min_dp: int | None = None,
     color: Color | str | None = None,
+    exclude_color: Color | str | None = None,
     card_id: str | None = None,
     card_ids: tuple[str, ...] | list[str] | None = None,
     exclude_card_id: str | None = None,
     race: str | None = None,
+    races: tuple[str, ...] | list[str] | None = None,
     card_type: CardType | str | None = None,
+    requires_blessing: bool = False,
+    bp_below_printed: bool = False,
 ):
     wanted_color = _color_from_value(color)
+    excluded_color = _color_from_value(exclude_color)
     wanted_type = _card_type_from_value(card_type)
     wanted_card_ids = set(card_ids or ())
+    wanted_races = tuple(races or ())
 
     def matches(target: Any) -> bool:
         card = getattr(target, "card", None)
@@ -1211,6 +1219,10 @@ def _target_filter(
             return False
         if race is not None and race not in card.race_jp:
             return False
+        if wanted_races and not any(item in card.race_jp for item in wanted_races):
+            return False
+        if requires_blessing and not getattr(target, "blessings", None):
+            return False
         total_cost = sum(card.cost.values())
         if max_cost is not None and total_cost > max_cost:
             return False
@@ -1224,7 +1236,11 @@ def _target_filter(
             return False
         if min_dp is not None and eng.effective_dp(target) < min_dp:
             return False
+        if bp_below_printed and eng.effective_bp(target) >= card.bp:
+            return False
         if wanted_color is not None and _card_color(card) is not wanted_color:
+            return False
+        if excluded_color is not None and _card_color(card) is excluded_color:
             return False
         return True
 

@@ -40,7 +40,12 @@ HOME_GUIDE_CHARACTER_FILES = ("operator.png",)
 KOUHOU_AI_MINA_CHARACTER_ID = "kouhou_ai_mina"
 KOUHOU_AI_MINA_CHARACTER_FILES = (f"{CHARACTER_PORTRAIT_DIR}/mina.png",)
 
-CARD_IMAGE_NAMES: dict[str, list[str]] = {}
+CARD_IMAGE_NAMES: dict[str, list[str]] = {
+    "colorless_03_02_02r_03": ["colorless_03_02_01r_02.png"],
+    "colorless_04_02_02r_03": ["colorless_04_02_01_03.png"],
+    "colorless_09_02_02r_00": ["colorless_09_02_ex01_00.png"],
+    "colorless_010_02_02r_00": ["colorless_010_02_01_00.png"],
+}
 
 TOKEN_IMAGE_NAMES = {
     "s_golem_token": ["red_01_04_00_00.png"],
@@ -167,10 +172,14 @@ class AssetIndex:
                 for name in names:
                     if self._add_if_exists(asset_id, token_dir / name):
                         break
-        red_dir = card_root / "RED"
         for asset_id, names in CARD_IMAGE_NAMES.items():
+            found = False
             for name in names:
-                if self._add_if_exists(asset_id, red_dir / name):
+                for color_dir_name in CARD_COLOR_DIRS:
+                    if self._add_if_exists(asset_id, card_root / color_dir_name / name):
+                        found = True
+                        break
+                if found:
                     break
         for audio_id, names in AUDIO_NAMES.items():
             for name in names:
@@ -520,4 +529,3 @@ class AssetIndex:
 
     def _character_asset_id(self, character_id: str, kind: str) -> str:
         return f"character:{character_id}:{kind}"
-

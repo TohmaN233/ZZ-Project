@@ -12,6 +12,7 @@ import zz.basic  # noqa: F401 - registers Basic non-token cards not already hand
 import zz.ex01  # noqa: F401 - registers EX:01 cards
 import zz.pc01r  # noqa: F401 - registers PC:01R cards
 import zz.pc02  # noqa: F401 - registers PC:02 cards
+import zz.pc02r  # noqa: F401 - registers PC:02R DIVINE cards
 from zz.forces import ALL_FORCES
 from zz.model import CardInstance, Player
 

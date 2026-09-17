@@ -99,14 +99,18 @@ EFFECT_TARGET_FILTER_PARAMS = {
     "card_ids",
     "exclude_card_id",
     "race",
+    "races",
     "card_type",
     "color",
+    "exclude_color",
     "max_cost",
     "min_cost",
     "max_bp",
     "min_bp",
     "max_dp",
     "min_dp",
+    "requires_blessing",
+    "bp_below_printed",
 }
 
 
@@ -2066,19 +2070,59 @@ class GameSession:
                 and self._is_user_controlled(actor)
                 and self._action_needs_effect_target(action, actor)):
             effect = self._targeted_effect_for_action(action, actor)
-            if self._play_action_card(actor, action).card.type is CardType.F_MINION:
+            source = self._play_action_card(actor, action)
+            if source.card.type is CardType.F_MINION:
                 self._begin_deferred_play_effect(actor, action, "main")
                 return
-            target_count = self._target_count_for_action(action, actor)
-            self._pending_effect = {"mode": "main", "action": action, "player": actor, "effect": effect}
-            self._prompt_effect_target(
-                actor,
-                self._target_kind_for_action(action, actor),
-                action,
-                target_count,
-                effect=effect,
+            kind = self._target_kind_for_action(action, actor)
+            eligible = (
+                self._eligible_targets(actor, kind, action, effect, source_ci=source)
+                if kind is not None
+                else []
             )
-            return
+            look_window = self._revealed_cards_for_effect(actor, kind) if kind is not None else []
+            if kind is not None and (eligible or look_window):
+                target_count = self._target_count_for_action(action, actor)
+                self._pending_effect = {
+                    "mode": "main",
+                    "action": action,
+                    "player": actor,
+                    "effect": effect,
+                    "source": source,
+                }
+                self._prompt_effect_target(
+                    actor,
+                    kind,
+                    action,
+                    target_count,
+                    effect=effect,
+                    source_ci=source,
+                )
+                return
+            followup_kind = effect.params.get("followup_target_kind") if isinstance(effect, EffectSpec) else None
+            if followup_kind:
+                followup_count = self._followup_target_count(actor, effect)
+                followup_eligible = self._eligible_targets(
+                    actor, str(followup_kind), action, None, source_ci=source
+                )
+                if followup_eligible and followup_count > 0:
+                    self._pending_effect = {
+                        "mode": "main",
+                        "stage": "followup_target",
+                        "first_targets": [],
+                        "action": action,
+                        "player": actor,
+                        "effect": effect,
+                        "source": source,
+                    }
+                    self._prompt_effect_target(
+                        actor,
+                        str(followup_kind),
+                        action,
+                        min(followup_count, len(followup_eligible)),
+                        source_ci=source,
+                    )
+                    return
         if action.kind == "play_card" and self._is_user_controlled(actor):
             effect = self._play_resolution_prompt_effect_for_action(action, actor)
             if effect is not None:
@@ -2103,9 +2147,11 @@ class GameSession:
         before = self._visual_state_snapshot()
         effect = self._targeted_effect_for_card(attacker.card, EffectTiming.ON_ATTACK)
         effect_kind = effect.target_kind if effect is not None else TARGETED_ATTACK_CARD_KINDS.get(attacker.card.id)
+        attack_target_count = self._target_count_for_effect(attacker.owner, effect) if effect is not None else 1
         defer_attack_effect = (
             self._is_user_controlled(attacker.owner)
             and effect_kind is not None
+            and attack_target_count > 0
             and bool(self._eligible_targets(attacker.owner, effect_kind, None, effect, source_ci=attacker))
         )
         self.engine.declare_attack(attacker, target, resolve_triggers=not defer_attack_effect)
@@ -2126,13 +2172,12 @@ class GameSession:
             "target": self._target_log_payload(target),
         })
         if defer_attack_effect:
-            target_count = self._target_count_for_effect(attacker.owner, effect)
             self._pending_effect = {"mode": "attack_deferred", "player": attacker.owner, "effect": effect, "source": attacker}
             self._prompt_effect_target(
                 attacker.owner,
                 effect_kind,
                 None,
-                target_count,
+                attack_target_count,
                 effect=effect,
                 source_ci=attacker,
             )
@@ -2199,19 +2244,59 @@ class GameSession:
                 and self._is_user_controlled(player)
                 and self._action_needs_effect_target(action, player)):
             effect = self._targeted_effect_for_action(action, player)
-            if self._play_action_card(player, action).card.type is CardType.F_MINION:
+            source = self._play_action_card(player, action)
+            if source.card.type is CardType.F_MINION:
                 self._begin_deferred_play_effect(player, action, "flash")
                 return
-            target_count = self._target_count_for_action(action, player)
-            self._pending_effect = {"mode": "flash", "action": action, "player": player, "effect": effect}
-            self._prompt_effect_target(
-                player,
-                self._target_kind_for_action(action, player),
-                action,
-                target_count,
-                effect=effect,
+            kind = self._target_kind_for_action(action, player)
+            eligible = (
+                self._eligible_targets(player, kind, action, effect, source_ci=source)
+                if kind is not None
+                else []
             )
-            return
+            look_window = self._revealed_cards_for_effect(player, kind) if kind is not None else []
+            if kind is not None and (eligible or look_window):
+                target_count = self._target_count_for_action(action, player)
+                self._pending_effect = {
+                    "mode": "flash",
+                    "action": action,
+                    "player": player,
+                    "effect": effect,
+                    "source": source,
+                }
+                self._prompt_effect_target(
+                    player,
+                    kind,
+                    action,
+                    target_count,
+                    effect=effect,
+                    source_ci=source,
+                )
+                return
+            followup_kind = effect.params.get("followup_target_kind") if isinstance(effect, EffectSpec) else None
+            if followup_kind:
+                followup_count = self._followup_target_count(player, effect)
+                followup_eligible = self._eligible_targets(
+                    player, str(followup_kind), action, None, source_ci=source
+                )
+                if followup_eligible and followup_count > 0:
+                    self._pending_effect = {
+                        "mode": "flash",
+                        "stage": "followup_target",
+                        "first_targets": [],
+                        "action": action,
+                        "player": player,
+                        "effect": effect,
+                        "source": source,
+                    }
+                    self._prompt_effect_target(
+                        player,
+                        str(followup_kind),
+                        action,
+                        min(followup_count, len(followup_eligible)),
+                        source_ci=source,
+                    )
+                    return
         if action.kind == "play_card" and self._is_user_controlled(player):
             effect = self._play_resolution_prompt_effect_for_action(action, player)
             if effect is not None:
@@ -2430,6 +2515,13 @@ class GameSession:
         kind = effect.params.get("optional_followup_target_kind")
         return str(kind) if kind else None
 
+    def _mandatory_followup_target_kind(self, pending: dict[str, Any]) -> str | None:
+        effect = pending.get("effect")
+        if not isinstance(effect, EffectSpec):
+            return None
+        kind = effect.params.get("followup_target_kind")
+        return str(kind) if kind else None
+
     def _optional_followup_excluded_targets(self, pending: dict[str, Any]) -> list[Any]:
         effect = pending.get("effect")
         if not isinstance(effect, EffectSpec):
@@ -2437,6 +2529,36 @@ class GameSession:
         if not effect.params.get("optional_followup_exclude_first_targets"):
             return []
         return list(pending.get("first_targets") or [])
+
+    def _followup_excluded_targets(self, pending: dict[str, Any]) -> list[Any]:
+        effect = pending.get("effect")
+        if not isinstance(effect, EffectSpec):
+            return []
+        if not effect.params.get("followup_exclude_first_targets"):
+            return []
+        return list(pending.get("first_targets") or [])
+
+    def _extra_targets_if_own_color_race(self, player: Player, effect: EffectSpec | None) -> int:
+        if effect is None:
+            return 0
+        spec = effect.params.get("extra_targets_if_own_color_race")
+        if not isinstance(spec, dict):
+            return 0
+        color_value = spec.get("color")
+        race = spec.get("race")
+        wanted = Color[str(color_value)] if color_value is not None and not isinstance(color_value, Color) else color_value
+        if wanted is None:
+            return 0
+        for ci in player.field:
+            if race and race not in ci.card.race_jp:
+                continue
+            if self._card_is_color(ci.card, wanted):
+                return 1
+        return 0
+
+    def _followup_target_count(self, player: Player, effect: EffectSpec) -> int:
+        base = int(effect.params.get("followup_max_targets", 1))
+        return max(0, base + self._extra_targets_if_own_color_race(player, effect))
 
     def _effect_needs_mana_color_choice(self, pending: dict[str, Any]) -> bool:
         effect = pending.get("effect")
@@ -2697,11 +2819,37 @@ class GameSession:
                 return True
             return False
         kind = effect.target_kind
-        eligible = self._eligible_targets(player, kind, None, effect, source_ci=source)
-        look_window = self._revealed_cards_for_effect(player, kind)
+        eligible = self._eligible_targets(player, kind, None, effect, source_ci=source) if kind else []
+        look_window = self._revealed_cards_for_effect(player, kind) if kind else []
         if not eligible and not look_window:
+            followup_kind = effect.params.get("followup_target_kind")
+            if followup_kind:
+                followup_count = self._followup_target_count(player, effect)
+                followup_eligible = self._eligible_targets(
+                    player, str(followup_kind), None, None, source_ci=source
+                )
+                if followup_eligible and followup_count > 0:
+                    self._pending_effect = {
+                        "mode": "source_deferred",
+                        "stage": "followup_target",
+                        "first_targets": [],
+                        "player": player,
+                        "source": source,
+                        "effect": effect,
+                        "context": ctx,
+                    }
+                    self._prompt_effect_target(
+                        player,
+                        str(followup_kind),
+                        None,
+                        min(followup_count, len(followup_eligible)),
+                        source_ci=source,
+                    )
+                    return True
             return False
         target_count = min(self._target_count_for_effect(player, effect), len(eligible)) if eligible else 1
+        if target_count <= 0:
+            return False
         self._pending_effect = {
             "mode": "source_deferred",
             "player": player,
@@ -2822,6 +2970,33 @@ class GameSession:
                 "field_replacement_targets": list(pending.get("field_replacement_targets") or []) + queued_targets,
             }
             queued_targets = list(pending.get("first_targets") or [])
+        elif self._mandatory_followup_target_kind(pending) and pending.get("stage") != "followup_target":
+            source = self._pending_effect_source(pending)
+            kind = self._mandatory_followup_target_kind(pending)
+            effect = pending.get("effect")
+            if source is not None and kind and isinstance(effect, EffectSpec):
+                excluded = self._followup_excluded_targets({**pending, "first_targets": queued_targets})
+                eligible = [
+                    target
+                    for target in self._eligible_targets(player, kind, pending.get("action"), None, source_ci=source)
+                    if target not in excluded
+                ]
+                followup_count = self._followup_target_count(player, effect)
+                if eligible and followup_count > 0:
+                    self._pending_effect = {
+                        **pending,
+                        "stage": "followup_target",
+                        "first_targets": queued_targets,
+                    }
+                    self._prompt_effect_target(
+                        player,
+                        kind,
+                        pending.get("action"),
+                        min(followup_count, len(eligible)),
+                        excluded_targets=excluded,
+                        source_ci=source,
+                    )
+                    return
         elif self._optional_followup_target_kind(pending) and pending.get("stage") != "followup_target":
             source = self._pending_effect_source(pending)
             if source is not None:
@@ -2950,7 +3125,11 @@ class GameSession:
         ):
             target_counts.append((player, len(targets_to_base)))
         elif effect.template_id == "move_to_base_targets" or effect.params.get("moves_targets_to_base"):
-            for target in targets_to_base:
+            move_targets = list(targets_to_base)
+            if effect.params.get("followup_target_kind"):
+                first_targets = list(pending.get("first_targets") or [])
+                move_targets = [target for target in targets_to_base if target not in first_targets]
+            for target in move_targets:
                 if not isinstance(target, CardInstance) or target.card.is_token:
                     continue
                 owner = target.owner
@@ -3105,8 +3284,7 @@ class GameSession:
             self._attack.priority = self._other_player(player)
             self._continue_attack_flow()
         elif pending["mode"] == "post_draw_discard":
-            if queued_targets:
-                target = queued_targets[0]
+            for target in queued_targets:
                 if isinstance(target, CardInstance):
                     self.engine.discard_from_hand(player, target)
             self.engine.triggers.resolve_all()
@@ -3430,9 +3608,17 @@ class GameSession:
         self.engine.draw(player, int(effect.params.get("draw_amount", 2)))
         self._record_visual_changes(before)
         self._log_event(f"{player.name}: {label}", event)
-        if player.hand:
+        discard_count = min(self._target_count_for_effect(player, effect), len(player.hand))
+        if discard_count > 0:
             self._pending_effect = {"mode": "post_draw_discard", "player": player, "source": ci, "effect": effect}
-            self._prompt_effect_target(player, "hand_card", None, 1, effect=effect, source_ci=ci)
+            self._prompt_effect_target(
+                player,
+                effect.target_kind or "hand_card",
+                None,
+                discard_count,
+                effect=effect,
+                source_ci=ci,
+            )
             return
         before = self._visual_state_snapshot()
         self.engine.triggers.resolve_all()
@@ -3566,9 +3752,9 @@ class GameSession:
                 source_ci=ci,
             )
             return
-        eligible_targets = self._eligible_targets(player, kind, None, effect, source_ci=ci)
+        eligible_targets = self._eligible_targets(player, kind, None, effect, source_ci=ci) if kind else []
         if not eligible_targets:
-            if self._revealed_cards_for_effect(player, kind):
+            if kind and self._revealed_cards_for_effect(player, kind):
                 self._pending_effect = {
                     "mode": pending_mode,
                     "player": player,
@@ -3585,6 +3771,34 @@ class GameSession:
                     source_ci=ci,
                 )
                 return
+            followup_kind = effect.params.get("followup_target_kind") if isinstance(effect, EffectSpec) else None
+            if followup_kind:
+                followup_count = self._followup_target_count(player, effect)
+                followup_eligible = self._eligible_targets(
+                    player, str(followup_kind), None, None, source_ci=ci
+                )
+                if followup_eligible and followup_count > 0:
+                    self._pending_effect = {
+                        "mode": pending_mode,
+                        "stage": "followup_target",
+                        "first_targets": [],
+                        "player": player,
+                        "action": action,
+                        "source": ci,
+                        "effect": effect,
+                    }
+                    self._prompt_effect_target(
+                        player,
+                        str(followup_kind),
+                        None,
+                        min(followup_count, len(followup_eligible)),
+                        source_ci=ci,
+                    )
+                    return
+            self.engine.triggers.resolve_all()
+            self._log_public_reveals()
+            return
+        if target_count <= 0:
             self.engine.triggers.resolve_all()
             self._log_public_reveals()
             return
@@ -3626,10 +3840,20 @@ class GameSession:
     def _action_needs_effect_target(self, action: Action, player: Player) -> bool:
         kind = self._target_kind_for_action(action, player)
         effect = self._targeted_effect_for_action(action, player)
-        return kind is not None and bool(
-            self._eligible_targets(player, kind, action, effect)
+        source_ci = None
+        try:
+            source_ci = self._play_action_card(player, action)
+        except IllegalActionError:
+            source_ci = None
+        if kind is not None and bool(
+            self._eligible_targets(player, kind, action, effect, source_ci=source_ci)
             or self._revealed_cards_for_effect(player, kind)
-        )
+        ):
+            return True
+        followup_kind = effect.params.get("followup_target_kind") if isinstance(effect, EffectSpec) else None
+        if not followup_kind:
+            return False
+        return bool(self._eligible_targets(player, str(followup_kind), action, None, source_ci=source_ci))
 
     def _play_effect_timing_for_card(self, card) -> EffectTiming | None:
         if card.type is CardType.F_MINION:
@@ -3727,12 +3951,35 @@ class GameSession:
         card = self._play_action_card(player, action).card
         return TARGETED_CARD_COUNTS.get(card.id, 1)
 
+    def _has_exact_dynamic_target_count(self, effect: EffectSpec | None) -> bool:
+        if effect is None:
+            return False
+        return any(
+            str(key).startswith("exact_target_count_from_") and effect.params.get(key)
+            for key in effect.params
+        )
+
+    def _exact_dynamic_target_count(self, player: Player, effect: EffectSpec | None) -> int | None:
+        if not self._has_exact_dynamic_target_count(effect):
+            return None
+        if effect.params.get("exact_target_count_from_own_destroyed_forces"):
+            return max(0, self.engine.destroyed_forces_count(player))
+        if effect.params.get("exact_target_count_from_opponent_destroyed_forces"):
+            return max(0, self.engine.destroyed_forces_count(self._other_player(player)))
+        return max(0, effect.max_targets)
+
     def _target_count_for_effect(self, player: Player, effect: EffectSpec | None) -> int:
         if effect is None:
             return 1
-        if effect.params.get("exact_target_count_from_own_destroyed_forces"):
-            return max(0, self.engine.destroyed_forces_count(player))
-        return max(1, effect.max_targets + self._extra_rest_targets(player, effect))
+        exact_count = self._exact_dynamic_target_count(player, effect)
+        if exact_count is not None:
+            return exact_count
+        return max(
+            1,
+            effect.max_targets
+            + self._extra_rest_targets(player, effect)
+            + self._extra_targets_if_own_color_race(player, effect),
+        )
 
     def _extra_rest_targets(self, player: Player, effect: EffectSpec | None) -> int:
         if effect is None or effect.template_id != "rest_targets":
@@ -3800,7 +4047,7 @@ class GameSession:
             or bool(effect and effect.optional)
             or no_target_look
         )
-        exact_dynamic_targets = bool(effect and effect.params.get("exact_target_count_from_own_destroyed_forces"))
+        exact_dynamic_targets = self._has_exact_dynamic_target_count(effect)
         variable_targets = bool(
             effect and (
                 effect.params.get("allow_variable_targets")
@@ -3819,7 +4066,14 @@ class GameSession:
             else:
                 target_count = max(target_count, effect.max_targets if effect else 1)
         elif eligible_targets:
-            target_count = max(1, min(target_count, len(eligible_targets)))
+            if exact_dynamic_targets:
+                target_count = min(target_count, len(eligible_targets))
+                min_target_count = target_count
+            else:
+                target_count = max(1, min(target_count, len(eligible_targets)))
+        elif exact_dynamic_targets:
+            target_count = 0
+            min_target_count = 0
         if variable_targets:
             min_target_count = min(min_target_count, target_count)
         if not deck_reorder:
@@ -4180,6 +4434,10 @@ class GameSession:
             return self._filter_card_targets_for_effect(
                 player, list(player.deck[:4]), action, effect, source_ci
             )
+        if kind == "top3_card":
+            return self._filter_card_targets_for_effect(
+                player, list(player.deck[:3]), action, effect, source_ci
+            )
         if kind == "top3_magic":
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.deck[:3]
@@ -4220,6 +4478,12 @@ class GameSession:
             if effect.params.get("required_keyword"):
                 keyword = Keyword[str(effect.params["required_keyword"])]
                 targets = [target for target in targets if self.engine.has_keyword(target, keyword)]
+            if effect.params.get("max_dp_from_opponent_destroyed_forces"):
+                cap = self.engine.destroyed_forces_count(self._other_player(player))
+                targets = [
+                    target for target in targets
+                    if isinstance(target, CardInstance) and self.engine.effective_dp(target) <= cap
+                ]
         return self._filter_targets_for_effect(targets, effect)
 
     def _filter_targets_for_effect(self, targets: list[Any], effect: EffectSpec | None) -> list[Any]:
