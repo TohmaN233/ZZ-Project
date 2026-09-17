@@ -29,7 +29,6 @@ from zz.pc02r import (
     can_effect_select,
 )
 from zz.sim import play_one_game
-from zz.web.assets import CARD_IMAGE_NAMES
 from zz.web.debug_tools import add_debug_card_to_zone, setup_debug_lab
 from zz.web.session import GameSession
 from zz.multiplayer.views import build_player_view
@@ -37,12 +36,6 @@ from zz.multiplayer.views import build_player_view
 
 ROOT = Path(__file__).resolve().parents[1]
 SEMANTIC_RUNNER = ROOT.parent / ".agents" / "skills" / "write-zenonzard-cards" / "scripts" / "run_semantic_scenario.py"
-REPRINT_ART = {
-    "colorless_03_02_02r_03": "colorless_03_02_01r_02.png",
-    "colorless_04_02_02r_03": "colorless_04_02_01_03.png",
-    "colorless_09_02_02r_00": "colorless_09_02_ex01_00.png",
-    "colorless_010_02_02r_00": "colorless_010_02_01_00.png",
-}
 CHARGE_RUSH_IDS = (
     "colorless_010_02_02r_00",
     "blue_07_02_02r_01",
@@ -94,7 +87,7 @@ def test_pc02r_inventory_and_japanese_faces_are_complete() -> None:
         assert card_id not in PC02_CARD_IDS
         card = CARD_REGISTRY[card_id]
         assert card.name_jp
-        assert card.ability_jp or card.ability_en or card.effects or card.keywords or card.aura or card.keyword_aura or card_id in REPRINT_ART
+        assert card.ability_jp or card.ability_en or card.effects or card.keywords or card.aura or card.keyword_aura
         if card.type is not CardType.MAGIC:
             assert card.bp >= 0
             assert card.dp >= 0
@@ -118,15 +111,8 @@ def test_pc02r_charge_is_rush_not_a_new_keyword() -> None:
 def test_pc02r_local_faces_cover_all_106() -> None:
     for card_id in PC02R_CARD_IDS:
         color = card_id.split("_", 1)[0].upper()
-        if card_id in REPRINT_ART:
-            mapped = REPRINT_ART[card_id]
-            assert CARD_IMAGE_NAMES[card_id] == [mapped]
-            jp = ROOT / "asserts" / "ZENONZARD_CARDLIST" / color / mapped
-            assert jp.is_file(), jp
-            continue
-        en = ROOT / "asserts" / "Eng-cards" / color / f"{card_id}.png"
         jp = ROOT / "asserts" / "ZENONZARD_CARDLIST" / color / f"{card_id}.png"
-        assert en.is_file() or jp.is_file(), card_id
+        assert jp.is_file(), jp
 
 
 def test_pc02r_complete_real_game_smoke() -> None:

@@ -20,13 +20,6 @@ SCENARIO_ROOT = ROOT / "project_memory" / "card_scenarios" / "pc02r"
 EVIDENCE_ROOT = ROOT / "project_memory" / "card_evidence" / "pc02r"
 MANIFEST_PATH = ROOT / "project_memory" / "card_boxes" / "pc02r.yaml"
 
-REPRINT_ART = {
-    "colorless_03_02_02r_03": "colorless_03_02_01r_02.png",
-    "colorless_04_02_02r_03": "colorless_04_02_01_03.png",
-    "colorless_09_02_02r_00": "colorless_09_02_ex01_00.png",
-    "colorless_010_02_02r_00": "colorless_010_02_01_00.png",
-}
-
 ENEMY = "red_02_02_02_00"
 ENEMY_VANILLA = "yellow_03_02_02_00"
 COST1 = "colorless_01_02_02r_00"
@@ -2263,13 +2256,11 @@ def build_manifest() -> dict[str, Any]:
     cards: list[dict[str, Any]] = []
     for card_id in PC02R_CARD_IDS:
         color = card_id.split("_", 1)[0].upper()
-        art_name = REPRINT_ART.get(card_id, f"{card_id}.png")
-        art_root = "asserts/ZENONZARD_CARDLIST" if card_id in REPRINT_ART else "asserts/Eng-cards"
         cards.append({
             "card_id": card_id,
             "source_refs": [
                 f"data/cards_bilingual_v4.tsv#{card_id}",
-                f"{art_root}/{color}/{art_name}",
+                f"asserts/ZENONZARD_CARDLIST/{color}/{card_id}.png",
             ],
             "classification": classification(card_id),
             "status": "semantic_passed",
@@ -2278,7 +2269,7 @@ def build_manifest() -> dict[str, Any]:
                 "symbols": ["register_pc02r_cards"],
                 "effect_channels": channels(card_id),
                 "call_chain": [
-                    "data/cards_bilingual_v4.tsv plus local Japanese/English card image",
+                    "local Japanese card image plus Japanese/English data/cards_bilingual_v4.tsv source",
                     "zz.pc02r.register_pc02r_cards -> CARD_REGISTRY",
                     "Card/Keyword/EffectSpec and shared PC02 bless/cost/select hooks",
                     "Engine legality, trigger, targeting, morph_in_place, summon_from_deck",
