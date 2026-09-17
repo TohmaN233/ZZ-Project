@@ -452,11 +452,6 @@ class AssetIndex:
     def asset_url(self, asset_id: str | None) -> str | None:
         if not asset_id or not self._safe_asset_id(asset_id):
             return None
-        if self.resolve_asset_id(asset_id) is not None:
-            return self._local_asset_url(asset_id)
-        english_id = self._english_asset_ids.get(asset_id)
-        if english_id is not None:
-            return self._local_asset_url(english_id)
         return self._local_asset_url(asset_id)
 
     def asset_url_en(self, asset_id: str | None) -> str | None:

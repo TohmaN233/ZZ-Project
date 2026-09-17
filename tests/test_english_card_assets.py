@@ -45,6 +45,32 @@ def test_asset_index_prefers_local_english_cards_and_forces() -> None:
     assert index.asset_url_en(force_id) == f"/assets/english%3A{force_id}"
 
 
+def test_default_asset_url_never_substitutes_english_for_missing_japanese(
+    tmp_path: Path,
+) -> None:
+    card_id = "red_00_01_02r_00"
+    for directory in ("ZENONZARD_CARDLIST", "audio", "video"):
+        (tmp_path / directory).mkdir()
+    english_root = tmp_path / "Eng-cards"
+    english_card = english_root / "RED" / f"{card_id}.png"
+    english_card.parent.mkdir(parents=True)
+    english_card.write_bytes(b"english-card")
+    (english_root / "manifest.json").write_text(
+        json.dumps({
+            "schemaVersion": 1,
+            "cards": {card_id: f"RED/{card_id}.png"},
+            "forces": {},
+            "mana": {},
+        }),
+        encoding="utf-8",
+    )
+
+    index = AssetIndex(tmp_path)
+
+    assert index.asset_url(card_id) == f"/assets/{card_id}"
+    assert index.asset_url_en(card_id) == f"/assets/english%3A{card_id}"
+
+
 def test_mana_token_art_tracks_its_current_color() -> None:
     player = Player(name="P1", side=Side.P1, is_first_player=True)
     opponent = Player(name="P2", side=Side.P2)
