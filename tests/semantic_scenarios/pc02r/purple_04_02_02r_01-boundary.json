@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_04_02_02r_01_boundary",
+  "card_id": "purple_04_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\nこのミニオンはブロックできない。\\n《トラッシュ》【自分のターン終了時】\\n自分の種族「ドラゴン」を持つ紫のミニオンがいる\\n場合、このカードをフィールドに出す。この効果は\\n重複しない。 EN: [Passive]\\nThis minion cannot block.\\n<Trash> [At the End of Your Turn]\\nIf you have a Purple Minion belonging to\\nthe Dragon class on your field, this card\\nenters the field. This effect cannot stack",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_04_02_02r_01",
+        "zone": "hand",
+        "seed": 3727587486,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "dorothy": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "purple_04_02_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$dorothy",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_02_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "end the controller's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "a Purple non-Dragon does not return Dorothy",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_04_02_02r_01"
+      }
+    },
+    {
+      "name": "Dorothy does not enter the Field",
+      "path": "state.players.human.field",
+      "op": "none_where",
+      "where": {
+        "cardId": "purple_04_02_02r_01"
+      }
+    }
+  ]
+}

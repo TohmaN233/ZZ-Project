@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_05_02_02r_00_boundary",
+  "card_id": "green_05_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\nこのミニオンと自分の種族「ドラゴン」を持つ緑の\nミ二ン全ては相手の効果で破壊まは除外され EN: [Passive]\nNeither this minion nor your Green\nMinions belonging to the Dragon class can be\ndestroyed or banished by your opponent's\ncard effects.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_05_02_02r_00",
+        "zone": "field",
+        "seed": 3287801830,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_09_02_02_00",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02_00",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_06_03_02_00",
+        "side": "P2",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "declare attack to create a Flash window",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_02_02_02_00"
+      }
+    },
+    {
+      "name": "attack an opposing Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "opponent casts White banish Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_06_03_02_00"
+      }
+    },
+    {
+      "name": "banish effect targets Olivia",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "green_05_02_02r_00"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Olivia survives the opponent banish effect",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_05_02_02r_00"
+      }
+    },
+    {
+      "name": "Olivia’s Green Dragon ally survives the opponent effect",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_09_02_02_00"
+      }
+    },
+    {
+      "name": "Olivia’s protected field remains in place",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 0
+    }
+  ]
+}

@@ -3,19 +3,30 @@ from __future__ import annotations
 from zz.web.server import DEV_MODE_PASSWORD_ENV, ServerState, dispatch_api
 
 
-def test_developer_mode_fails_closed_until_password_is_configured(monkeypatch, tmp_path) -> None:
+PROJECT_DEFAULT_DEV_MODE_PASSWORD = "wsy466789972"
+
+
+def test_developer_mode_uses_the_project_default_password(monkeypatch, tmp_path) -> None:
     monkeypatch.delenv(DEV_MODE_PASSWORD_ENV, raising=False)
     app = ServerState(settings_root=tmp_path)
 
-    status, payload = dispatch_api(
+    wrong_status, wrong_payload = dispatch_api(
         app,
         "POST",
         "/api/settings/developer-mode",
-        {"enabled": True, "password": "guess"},
+        {"enabled": True, "password": "wrong"},
+    )
+    ok_status, ok_payload = dispatch_api(
+        app,
+        "POST",
+        "/api/settings/developer-mode",
+        {"enabled": True, "password": PROJECT_DEFAULT_DEV_MODE_PASSWORD},
     )
 
-    assert status == 503
-    assert payload["error"]["code"] == "developer_mode_unconfigured"
+    assert wrong_status == 403
+    assert wrong_payload["error"]["code"] == "invalid_developer_password"
+    assert ok_status == 200
+    assert ok_payload["devMode"] is True
 
 
 def test_developer_mode_uses_environment_password(monkeypatch, tmp_path) -> None:

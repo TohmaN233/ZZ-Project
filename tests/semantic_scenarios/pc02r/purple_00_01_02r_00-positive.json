@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_00_01_02r_00_positive",
+  "card_id": "purple_00_01_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 《付与能力》\\n【自分の夕-\\nこのミニオンが与えるDPによるダメージでフォ\\nスが破壊されるたび、そのフォースの【破壊時】効\\n果は発揮しない。 EN: eee Boost: Purple\\n<Boost Ability> [On Your Turn]\\nWhen a Force is destroyed by this\\nminion's DP, the [When Destroyed] abilities of\\nthat Force will not activate.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_00_01_02r_00",
+        "zone": "hand",
+        "seed": 3711141400,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "boost_mana": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "purple_00_01_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "echo_host": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_02_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02r_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "place Purple Echo in Base",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "purple_00_01_02r_00"
+      }
+    },
+    {
+      "name": "attach Purple Echo to the Dragon host",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$boost_mana",
+        "target_iid": "$echo_host"
+      }
+    },
+    {
+      "name": "deal the first one DP damage to Pegasus Force",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_02_02_02r_00"
+      }
+    },
+    {
+      "name": "choose P2 Pegasus Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "deal the lethal two DP damage to Pegasus Force",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_06_02_02r_00"
+      }
+    },
+    {
+      "name": "choose the damaged P2 Pegasus Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the second Minion DP hit destroys Pegasus Force",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "destroyed": true
+      }
+    },
+    {
+      "name": "Purple Echo suppresses the destroyed Force callback",
+      "path": "state.players.opponent.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "green_00_01_02r_00"
+      }
+    }
+  ]
+}

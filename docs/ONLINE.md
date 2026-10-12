@@ -18,17 +18,17 @@ LAN 不需要单独的服务器包。
 
 ## 自建服务器
 
-Release 只保留**最新一份**服务器包：
+v0.4.0 自建服务器候选包位于本地 `dist/releases/v0.4.0/`：
 
-[`ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz)
+`ZZ-Multiplayer-v0.4.0.tar.gz`
 
-SHA-256: `04139BDC15FC9CD65A2F2B0D4F07B008161A8C94493B9F9B1DCB908145EED9CD`
+该候选包尚未公开发布，因此这里不提供下载链接或 SHA-256。公开发布时的文件信息以项目根目录的 `PUBLIC_RELEASE_MANIFEST.json` 为准。
 
 需要 Linux、Python 3.10+，以及一个带 TLS 的 HTTPS 域名。游戏客户端按 `PUBLIC_ORIGIN` 校验来源，所以公网入口必须是 `https://你的域名`，不能带路径。
 
 ```bash
 mkdir zz-multiplayer
-tar -xzf ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz -C zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.4.0.tar.gz -C zz-multiplayer
 cd zz-multiplayer
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip

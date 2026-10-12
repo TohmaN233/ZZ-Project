@@ -70,7 +70,7 @@ def _buff_ally(bp: int = 0, dp: int = 0, keyword: Keyword | None = None):
         target = targets[0]
         eng.modify_stat(target, bp_delta=bp, dp_delta=dp)
         if keyword is not None:
-            eng.add_keyword(target, keyword)
+            eng.add_keyword(target, keyword, duration="turn")
     return fn
 
 
@@ -92,7 +92,7 @@ def _surprise_attack(ci: CardInstance, state, ctx: Context) -> None:
         source=ci,
     )
     if returns:
-        eng.return_to_hand(returns[0])
+        eng.return_to_hand(returns[0], source=ci)
 
 
 def _return_enemy_max_bp(max_bp: int | None = None):
@@ -105,7 +105,7 @@ def _return_enemy_max_bp(max_bp: int | None = None):
             filter_fn = lambda target: eng.effective_bp(target) <= max_bp
         targets = eng.select_target(ci.owner, "enemy_minion", 1, 1, filter_fn=filter_fn)
         if targets:
-            eng.return_to_hand(targets[0])
+            eng.return_to_hand(targets[0], source=ci)
     return fn
 
 

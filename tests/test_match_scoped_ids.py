@@ -67,7 +67,7 @@ def test_engine_created_token_iids_do_not_collide() -> None:
             id="test_token",
             name_jp="Test Token",
             name_en="Test Token",
-            type=CardType.B_MINION,
+            type=CardType.F_MINION,
         ),
     )
     generated_mana = engine.place_generated_colorless_mana(player)

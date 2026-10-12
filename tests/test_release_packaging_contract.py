@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import importlib.util
 import unittest
 from pathlib import Path
 
@@ -45,10 +46,21 @@ class ReleasePackagingContractTests(unittest.TestCase):
         linux_builder = (PROJECT_ROOT / "packaging" / "build_linux_bundle.py").read_text(
             encoding="utf-8"
         )
-        self.assertIn("best_greedy.pt", linux_builder)
-        self.assertIn("best_greedy.runtime.npz", linux_builder)
-        self.assertIn('"local_ai_training"', linux_builder)
-        self.assertIn('"ai_training"', linux_builder)
+        selector_spec = importlib.util.spec_from_file_location(
+            "release_files_contract", PROJECT_ROOT / "packaging" / "release_files.py"
+        )
+        self.assertIsNotNone(selector_spec)
+        self.assertIsNotNone(selector_spec.loader)
+        selector = importlib.util.module_from_spec(selector_spec)
+        selector_spec.loader.exec_module(selector)
+        linux_files = selector.release_files(PROJECT_ROOT, "linux")
+        self.assertNotIn(selector.DEEP_SOURCE_RELATIVE, linux_files)
+        self.assertEqual(selector.DEEP_RUNTIME_RELATIVE.name, "best_greedy.runtime.npz")
+        self.assertIn(selector.NORMAL_MODEL_RELATIVE, linux_files)
+        self.assertFalse(any(path.parts[0] in {"local_ai_training", "ai_training"}
+                             for path in linux_files))
+        self.assertFalse(any("codeman_ai" in path.parts for path in linux_files))
+        self.assertIn("export_deep_runtime_model", linux_builder)
 
         installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
         self.assertIn("!macro customCheckAppRunning", installer)

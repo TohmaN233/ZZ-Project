@@ -1,0 +1,126 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_02_02r_03_boundary",
+  "card_id": "colorless_04_02_02r_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n相手の無色のミニオン1体を破壊する。 EN: ",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02r_03",
+        "zone": "hand",
+        "seed": 2040802,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_07_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Lightningfall with no legal Colorless target",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_04_02_02r_03"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Lightningfall resolves onto the Field without an eligible target",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_02_02r_03"
+      }
+    },
+    {
+      "name": "White Anju remains on the opposing Field",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_07_02_02r_00"
+      }
+    },
+    {
+      "name": "no target choice remains when only White Minions are present",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "main_action"
+    }
+  ]
+}

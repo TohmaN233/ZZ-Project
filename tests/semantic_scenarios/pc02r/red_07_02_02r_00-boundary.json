@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_07_02_02r_00_boundary",
+  "card_id": "red_07_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: [豪竜]\\nダイナソー\\n【召喚時】\\nこのターン中、\\n相手のミ二オン1体をBP-500する\\n【常時】\\nこのミニオンがクティ状態でなければ[加護は付与\\nれない。\\n【加護時】\\n赤の加護である場合、加護しているマナを除外して、「「豪\\n炎竜皇」フレイザウ」に変形する。 EN: [When Summoned]\\nSelect one of your opponent's minions to lose -5OOBP for\\nthe duration of this turn.\\n[Passive]\\nThis minion cannot receive a Boost when not in the Active\\nState.\\n[When Boosted]\\nIf Boosted by a Red Mana, banish that mana. This card\\nTransforms into \"Flare Zaura - The Ignited Emperor\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_07_02_02r_00",
+        "zone": "field",
+        "seed": 1200305619,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "blue_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "end the turn without a legal Red Boost",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "a non-Red Bless does not transform the precursor",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_07_02_02r_00"
+      }
+    },
+    {
+      "name": "a non-Red Bless does not create the second form",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "red_07_02_02r_01"
+      }
+    },
+    {
+      "name": "the non-Red Bless mana is not banished by this trigger",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "name": "Blue mana remains in the Base because it cannot Boost this card",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00"
+      }
+    }
+  ]
+}

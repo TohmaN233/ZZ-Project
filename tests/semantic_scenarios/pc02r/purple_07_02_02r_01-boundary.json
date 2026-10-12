@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_07_02_02r_01_boundary",
+  "card_id": "purple_07_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【変形時】\\n他の種族「ドラゴン」を持つミニオン全てを破壊する。\\n【アタック時】\\n自分のトラッシュにある、コスト3以下のフィールド・ミニオ\\nンドX枚を出す。Xは相手の破壊さフスの数と同\\nじとする。 EN: Charge\\n[When Transformed]\\nDestroy all other minions belonging to the Dragon\\nclass.\\n[When Attacking]\\nRetrieve X Field Minion cards with a cost of 3 or\\nlower from your trash and put them on your field, where\\nX is the number of your opponent's Forces that have\\nbeen destroyed.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "zone": "field",
+        "seed": 89424333,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true,
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_0": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "purple_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "sourceId": "purple_07_02_02r_00",
+        "targetId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_0"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_08_02_02r_00",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "replacement": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "declare the Rekindled attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "name": "target the opponent Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "select the eligible cost-three Field Minion from Trash",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "replace a friendly Field Minion to make room",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "blue_04_02_02r_00",
+        "iid": "$replacement"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the eligible low-cost Field Minion enters the full Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "the retrieved minion leaves Trash",
+      "path": "state.players.human.trash",
+      "op": "none_where",
+      "where": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "the cost-eight minion remains excluded in Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02r_00"
+      }
+    },
+    {
+      "name": "the Field stays at capacity after one replacement",
+      "path": "state.players.human.field",
+      "op": "length_eq",
+      "value": 5
+    },
+    {
+      "name": "the opponent Force count enables one retrieval",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "destroyed": true
+      }
+    }
+  ]
+}

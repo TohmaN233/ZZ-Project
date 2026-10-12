@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_02_02r_00_positive",
+  "card_id": "red_02_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【加護時】\\nこのターン中、相手のプレイヤーとフォースに「こ\\nのライフは回復できず、ダメージを軽減できな\\nい。」を与える。 EN: [When Boosted]\\nDamage dealt to your opponent's Life and\\nForces cannot be reduced for the\\nduration of this turn.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_02_02r_00",
+        "zone": "field",
+        "seed": 3246556791,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_02_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "bless_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 10
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02_00",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_01_03_02r_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Boost the field minion with Red mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$bless_mana",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "attack opponent Life after applying the restriction",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_02_02_02r_00"
+      }
+    },
+    {
+      "name": "target opponent Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "the opponent casts Flash to try to recover one Life",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_01_03_02r_00"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "opponent turn restriction is present only after Red Boost",
+      "path": "state.players.opponent.turnTargetRestrictions",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "sourceCardId": "red_02_02_02r_00",
+        "lifeRecoveryAllowed": false,
+        "damageReductionAllowed": false
+      }
+    },
+    {
+      "name": "the field host remains present",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02r_00"
+      }
+    },
+    {
+      "name": "the restriction bypasses Force Kai and the 1 DP attack damages Life",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 9
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_08_02_02r_00_positive",
+  "card_id": "green_08_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【破壊時】\n自分はカードを3枚引く。 EN: Pierce\n[When Destroyed]\nDraw three cards.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_08_02_02r_00",
+        "zone": "field",
+        "seed": 194687429,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_03_03_01r_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Cast the destruction Magic",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "purple_03_03_01r_00"
+      }
+    },
+    {
+      "name": "Destroy Plakanna",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "green_08_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Plakanna is destroyed",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02r_00"
+      }
+    },
+    {
+      "name": "Plakanna draws three cards",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "Plakanna keeps its printed Pierce keyword",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02r_00",
+        "keywords": {
+          "contains": [
+            "PENETRATE"
+          ]
+        }
+      }
+    },
+    {
+      "name": "the sacrifice Magic still draws its own two cards",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "blue_04_02_02r_00"
+      }
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_05_03_02r_00_positive",
+  "card_id": "yellow_05_03_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【メイン」ノ【フラッシュ】\n自分はデッキの中からコスト4の黄のフィールド・\nミニオンカード1体を出す。その後、自分のデッキ\nをシャッフルする。 EN: [Main] / [Flash]\nSearch your deck for one Yellow Field Minion card with a cost of 4 and put it on your field.\nThen, shuffle your deck.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_05_03_02r_00",
+        "zone": "hand",
+        "seed": 1118671702,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "sacrificial_skye": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "starting_deck_count": {
+          "path": "state.players.human.deckCount"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attack with an unspent Skye",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "attacker_iid": "$attacker"
+      }
+    },
+    {
+      "name": "target the opponent Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass opponent Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "cast Assault Dive during Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_05_03_02r_00"
+      }
+    },
+    {
+      "name": "select the matching Yellow cost-four Field Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "yellow_04_02_02r_00"
+      }
+    },
+    {
+      "name": "replace a Minion because the Field is full",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$sacrificial_skye"
+      }
+    },
+    {
+      "name": "pass opponent Flash priority after the spell",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass controller Flash priority after the spell",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the matching card enters the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_04_02_02r_00"
+      }
+    },
+    {
+      "name": "the other seeded card remains in the deck after one search",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "the search does not publish a card before it enters the Field",
+      "path": "state.publicReveals",
+      "op": "length_eq",
+      "value": 0
+    },
+    {
+      "name": "the selected Skye leaves the full Field",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_02_02r_00"
+      }
+    },
+    {
+      "name": "four other Skye copies remain after the replacement",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 4,
+      "where": {
+        "cardId": "yellow_06_02_02r_00"
+      }
+    }
+  ]
+}

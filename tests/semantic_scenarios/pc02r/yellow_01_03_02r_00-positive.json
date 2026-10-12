@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_01_03_02r_00_positive",
+  "card_id": "yellow_01_03_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【フラッシュ】\nこのバトル中、自分のミ二オン1体をBP+200す\nる。そのミ二オンがバトルに勝利した場合、自分のト EN: [Flash]\nSelect one of your minions to gain +200BP for the duration of this battle.\nIf that minion wins the battle, return one \"Build Up\" from your trash to your hand.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_01_03_02r_00",
+        "zone": "hand",
+        "seed": 1697949731,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_08_02_01_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_08_02_01_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "blocker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_01_03_02r_00",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      },
+      "capture": {
+        "recovery_copy": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_03_02r_01",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "declare the boosted Minion’s attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_08_02_01_00"
+      }
+    },
+    {
+      "name": "target the opponent Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass opponent priority before Build Up",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "play Build Up during Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_01_03_02r_00"
+      }
+    },
+    {
+      "name": "choose the attacking Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$attacker"
+      }
+    },
+    {
+      "name": "pass opponent priority after Build Up",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass controller priority after Build Up",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "choose the blocker",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$blocker"
+      }
+    },
+    {
+      "name": "return the chosen Build Up copy from Trash",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$recovery_copy"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the boosted Minion wins and remains on the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_08_02_01_00",
+        "effectiveBp": 1000
+      }
+    },
+    {
+      "name": "the defeated blocker is destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_08_02_01_00"
+      }
+    },
+    {
+      "name": "Build Up returns after its selected Minion wins",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_01_03_02r_00"
+      }
+    },
+    {
+      "name": "the chosen Build Up copy returns to hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_01_03_02r_00"
+      }
+    },
+    {
+      "name": "the cast Build Up remains in Trash because the other copy was chosen",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_01_03_02r_00"
+      }
+    },
+    {
+      "name": "an unrelated Magic stays in Trash and is never offered for Build Up recovery",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_03_02r_01"
+      }
+    }
+  ]
+}

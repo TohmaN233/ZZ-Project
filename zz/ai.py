@@ -54,6 +54,12 @@ class RandomLegalPolicy:
 class PassOnlyPolicy:
     """Deterministic debug opponent: end main decisions, pass flash, never block."""
 
+    def __init__(self):
+        self._queued_targets: list[object] = []
+
+    def queue_targets(self, targets: list[object]) -> None:
+        self._queued_targets = list(targets)
+
     def choose(self, engine: Engine) -> Action:
         legal = engine.legal_actions()
         for kind in ("skip_mana", "end_turn"):
@@ -74,6 +80,16 @@ class PassOnlyPolicy:
         return targets[0]
 
     def choose_target(self, engine: Engine, kind: str, min_n: int, max_n: int, eligible: list) -> list:
+        if self._queued_targets:
+            if len(self._queued_targets) > max_n:
+                raise ValueError(
+                    f"queued target count {len(self._queued_targets)} exceeds maximum {max_n} for {kind}"
+                )
+            if any(target not in eligible for target in self._queued_targets):
+                raise ValueError(f"queued target for {kind} is no longer eligible")
+            selected = self._queued_targets
+            self._queued_targets = []
+            return selected
         return eligible[:max_n]
 
     def choose_mulligan(self, engine: Engine, player) -> list[CardInstance]:

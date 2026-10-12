@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02r_00_positive",
+  "card_id": "colorless_01_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分はデッキの中から種族「ニンフ」を持つ、DP0で有\\n色のベース・ミニオンカード1枚を公開して手札に加える\\nことができる。そうした場合、自分のデッキをシャッフル\\nする。\\n【常時】\\nこのミニオンはベースに移動するとき、レスト状態で移動\\nする。 EN: [When Summoned]\\nYou can search your deck for a Color <Base>\\nMinion card belonging to the Nymph class that has\\na DP of 0, reveal it to your opponent and add it\\nto your hand. Then, shuffle your deck.\\n[Passive]\\nThis minion enters the Rest State when it moves\\nto the base.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "zone": "field",
+        "seed": 3187289538,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "base_mappirat": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_01_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "search_mappirat": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "move the first Mappirat to Base",
+      "select": {
+        "kind": "move_card",
+        "cardIid": "$base_mappirat",
+        "direction": "field_to_base"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "summon the second Mappirat",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_01_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "reveal and add the colored DP-0 Nymph Base Minion",
+      "select": {
+        "cardId": "blue_00_01_02_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the first Mappirat enters Base rested",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$base_mappirat",
+        "rested": true
+      }
+    },
+    {
+      "name": "the summoned Mappirat remains on Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$search_mappirat"
+      }
+    },
+    {
+      "name": "the selected colored DP-0 Nymph enters hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00"
+      }
+    },
+    {
+      "name": "only the eligible Base Minion is revealed",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "blue_00_01_02_00"
+        }
+      }
+    },
+    {
+      "name": "the ineligible colorless Nymph is not revealed",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "colorless_00_01_02_01"
+        }
+      }
+    },
+    {
+      "name": "one ineligible Nymph remains in the deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

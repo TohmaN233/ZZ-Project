@@ -1,0 +1,15 @@
+:root { color-scheme: dark; font: 15px/1.6 "Segoe UI", "Microsoft YaHei", sans-serif; color: #e3edf0; background: #071117; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { padding: 30px 34px; }
+.brand { color: #68c7d8; font-size: 12px; letter-spacing: 3px; }
+h1 { font-size: 24px; line-height: 1.4; margin: 18px 0 14px; }
+p { margin: 10px 0; }
+#status { min-height: 24px; }
+progress { display: block; width: 100%; height: 12px; accent-color: #62cccf; margin: 20px 0 12px; }
+#bytes { color: #b0c3cc; font-size: 13px; }
+#destination { color: #8ca4b1; font-size: 12px; overflow-wrap: anywhere; }
+.actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+button { padding: 7px 22px; border: 1px solid #526b79; border-radius: 4px; background: #132631; color: inherit; font: inherit; cursor: pointer; }
+button:hover { background: #213b48; }
+button:disabled { opacity: .5; cursor: default; }

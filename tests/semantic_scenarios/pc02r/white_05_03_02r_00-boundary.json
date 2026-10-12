@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_05_03_02r_00_boundary",
+  "card_id": "white_05_03_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】\\n自分はカードを3枚引く。その後、自分の手札X枚\\nを破棄する。Xは自分の破壊されたフォースの数と\\n同じとする。 EN: [Main]\\nDraw three cards. Then, discard X cards\\nfrom your hand, where X is the number of your Forces that have been destroyed.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_05_03_02r_00",
+        "zone": "hand",
+        "seed": 1236419278,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_04_02_02r_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_01_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_06_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "cast Arctic Armaments with no destroyed Forces",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_05_03_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "zero destroyed Forces leaves the first draw in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_04_02_02r_01"
+      }
+    },
+    {
+      "name": "zero destroyed Forces leaves the second draw in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_01_00"
+      }
+    },
+    {
+      "name": "zero destroyed Forces leaves the third draw in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_06_02_02r_00"
+      }
+    },
+    {
+      "name": "zero destroyed Forces discards no drawn cards",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "white_04_02_02r_01"
+      }
+    }
+  ]
+}

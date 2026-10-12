@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_06_02_02r_01_boundary",
+  "card_id": "blue_06_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\n自分が本来のコストが4以上のマジックを使用する\\nたぴ、相手のフォース全てに1ダメージを与える。 EN: [Passive]\\nWhenever you use a Magic card with an\\noriginal cost of 4 or higher, deal 1 damage\\nto each of your opponent's Forces.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_06_02_02r_01",
+        "zone": "field",
+        "seed": 1012783032,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_01_03_02r_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "cast Cogito below original-cost threshold",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_01_03_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "low-cost Magic leaves Force Sho unchanged",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 5
+      }
+    },
+    {
+      "name": "low-cost Magic leaves Force Chi unchanged",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_chi",
+        "life": 5
+      }
+    }
+  ]
+}

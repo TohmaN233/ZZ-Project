@@ -466,6 +466,121 @@ var require_browser = __commonJS({
   }
 });
 
+// node_modules/has-flag/index.js
+var require_has_flag = __commonJS({
+  "node_modules/has-flag/index.js"(exports2, module2) {
+    "use strict";
+    module2.exports = (flag, argv = process.argv) => {
+      const prefix = flag.startsWith("-") ? "" : flag.length === 1 ? "-" : "--";
+      const position = argv.indexOf(prefix + flag);
+      const terminatorPosition = argv.indexOf("--");
+      return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
+    };
+  }
+});
+
+// node_modules/supports-color/index.js
+var require_supports_color = __commonJS({
+  "node_modules/supports-color/index.js"(exports2, module2) {
+    "use strict";
+    var os = require("os");
+    var tty = require("tty");
+    var hasFlag = require_has_flag();
+    var { env } = process;
+    var forceColor;
+    if (hasFlag("no-color") || hasFlag("no-colors") || hasFlag("color=false") || hasFlag("color=never")) {
+      forceColor = 0;
+    } else if (hasFlag("color") || hasFlag("colors") || hasFlag("color=true") || hasFlag("color=always")) {
+      forceColor = 1;
+    }
+    if ("FORCE_COLOR" in env) {
+      if (env.FORCE_COLOR === "true") {
+        forceColor = 1;
+      } else if (env.FORCE_COLOR === "false") {
+        forceColor = 0;
+      } else {
+        forceColor = env.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(env.FORCE_COLOR, 10), 3);
+      }
+    }
+    function translateLevel(level) {
+      if (level === 0) {
+        return false;
+      }
+      return {
+        level,
+        hasBasic: true,
+        has256: level >= 2,
+        has16m: level >= 3
+      };
+    }
+    function supportsColor(haveStream, streamIsTTY) {
+      if (forceColor === 0) {
+        return 0;
+      }
+      if (hasFlag("color=16m") || hasFlag("color=full") || hasFlag("color=truecolor")) {
+        return 3;
+      }
+      if (hasFlag("color=256")) {
+        return 2;
+      }
+      if (haveStream && !streamIsTTY && forceColor === void 0) {
+        return 0;
+      }
+      const min = forceColor || 0;
+      if (env.TERM === "dumb") {
+        return min;
+      }
+      if (process.platform === "win32") {
+        const osRelease = os.release().split(".");
+        if (Number(osRelease[0]) >= 10 && Number(osRelease[2]) >= 10586) {
+          return Number(osRelease[2]) >= 14931 ? 3 : 2;
+        }
+        return 1;
+      }
+      if ("CI" in env) {
+        if (["TRAVIS", "CIRCLECI", "APPVEYOR", "GITLAB_CI", "GITHUB_ACTIONS", "BUILDKITE"].some((sign) => sign in env) || env.CI_NAME === "codeship") {
+          return 1;
+        }
+        return min;
+      }
+      if ("TEAMCITY_VERSION" in env) {
+        return /^(9\.(0*[1-9]\d*)\.|\d{2,}\.)/.test(env.TEAMCITY_VERSION) ? 1 : 0;
+      }
+      if (env.COLORTERM === "truecolor") {
+        return 3;
+      }
+      if ("TERM_PROGRAM" in env) {
+        const version = parseInt((env.TERM_PROGRAM_VERSION || "").split(".")[0], 10);
+        switch (env.TERM_PROGRAM) {
+          case "iTerm.app":
+            return version >= 3 ? 3 : 2;
+          case "Apple_Terminal":
+            return 2;
+        }
+      }
+      if (/-256(color)?$/i.test(env.TERM)) {
+        return 2;
+      }
+      if (/^screen|^xterm|^vt100|^vt220|^rxvt|color|ansi|cygwin|linux/i.test(env.TERM)) {
+        return 1;
+      }
+      if ("COLORTERM" in env) {
+        return 1;
+      }
+      return min;
+    }
+    function getSupportLevel(stream) {
+      const level = supportsColor(stream, stream && stream.isTTY);
+      return translateLevel(level);
+    }
+    module2.exports = {
+      supportsColor: getSupportLevel,
+      stdout: translateLevel(supportsColor(true, tty.isatty(1))),
+      stderr: translateLevel(supportsColor(true, tty.isatty(2)))
+    };
+  }
+});
+
 // node_modules/debug/src/node.js
 var require_node = __commonJS({
   "node_modules/debug/src/node.js"(exports2, module2) {
@@ -484,7 +599,7 @@ var require_node = __commonJS({
     );
     exports2.colors = [6, 2, 3, 4, 5, 1];
     try {
-      const supportsColor = require("supports-color");
+      const supportsColor = require_supports_color();
       if (supportsColor && (supportsColor.stderr || supportsColor).level >= 2) {
         exports2.colors = [
           20,
@@ -5046,7 +5161,8 @@ var require_lan_manager = __commonJS({
       #state = "stopped";
       #startPromise = null;
       #stopPromise = null;
-      #broadcastSocket = null;
+      #broadcastSockets = [];
+      #probeSocket = null;
       #broadcastInterval = null;
       #roomPacket = null;
       #discoveries = /* @__PURE__ */ new Set();
@@ -5093,10 +5209,19 @@ var require_lan_manager = __commonJS({
         this.#maxLogEntries = requirePositiveInteger(maxLogEntries, "maxLogEntries");
         this.#maxLogChars = requirePositiveInteger(maxLogChars, "maxLogChars");
       }
-      startHost({ projectRoot: projectRoot2, python = "python", port = DEFAULT_HOST_PORT, serverName } = {}) {
+      startHost({
+        projectRoot: projectRoot2,
+        python = "python",
+        command,
+        args,
+        port = DEFAULT_HOST_PORT,
+        serverName
+      } = {}) {
         const config = {
           projectRoot: requireAbsolutePath(projectRoot2, "projectRoot"),
           python: requireNonBlankString(python, "python"),
+          command: command ? requireNonBlankString(command, "command") : null,
+          args: Array.isArray(args) ? args.map((value) => String(value)) : null,
           port: requirePort(port, "port"),
           serverName: normalizeServerName(serverName, this.#os)
         };
@@ -5110,7 +5235,8 @@ var require_lan_manager = __commonJS({
         this.#hostConfig = config;
         this.#state = "starting";
         this.#lastError = null;
-        const args = [
+        const executable = config.command || config.python;
+        const spawnArgs = config.args || [
           "-m",
           "zz.multiplayer.websocket_server",
           "--host",
@@ -5120,7 +5246,7 @@ var require_lan_manager = __commonJS({
         ];
         let child;
         try {
-          child = this.#spawn(config.python, args, {
+          child = this.#spawn(executable, spawnArgs, {
             cwd: config.projectRoot,
             windowsHide: true,
             stdio: ["ignore", "pipe", "pipe"]
@@ -5142,6 +5268,7 @@ var require_lan_manager = __commonJS({
             throw new Error("LAN host stopped before becoming ready");
           }
           this.#state = "running";
+          this.#startProbeListener();
           return this.getSnapshot();
         }).catch((error) => {
           if (this.#process === child) {
@@ -5166,6 +5293,7 @@ var require_lan_manager = __commonJS({
       stopHost() {
         if (this.#stopPromise) return this.#stopPromise;
         this.#clearBroadcast();
+        this.#stopProbeListener();
         this.#closeDiscoveries();
         this.#roomPacket = null;
         const child = this.#process;
@@ -5211,7 +5339,7 @@ var require_lan_manager = __commonJS({
         const encoded = Buffer.from(JSON.stringify(packet), "utf8");
         if (encoded.length > this.#maxPacketBytes) throw new RangeError("discovery packet is too large");
         this.#roomPacket = packet;
-        if (!this.#broadcastSocket) {
+        if (!this.#broadcastSockets.length) {
           this.#startBroadcastSocket();
         } else {
           this.#sendBroadcast();
@@ -5223,14 +5351,13 @@ var require_lan_manager = __commonJS({
         this.#clearBroadcast();
         return this.getSnapshot();
       }
-      discover({ timeoutMs = 1500 } = {}) {
+      discover({ timeoutMs = 4e3 } = {}) {
         const duration = requirePositiveInteger(timeoutMs, "timeoutMs");
-        const socket = this.#dgram.createSocket("udp4");
-        assertDatagramSocket(socket);
         const rooms = /* @__PURE__ */ new Map();
+        const sockets = [];
         return new Promise((resolve, reject) => {
           const discovery = {
-            socket,
+            sockets,
             timeout: null,
             done: false,
             finish: (error) => {
@@ -5238,7 +5365,7 @@ var require_lan_manager = __commonJS({
               discovery.done = true;
               if (discovery.timeout !== null) this.#timers.clearTimeout(discovery.timeout);
               this.#discoveries.delete(discovery);
-              closeSocket(socket);
+              for (const socket of sockets) closeSocket(socket);
               if (error) {
                 reject(error);
                 return;
@@ -5247,18 +5374,34 @@ var require_lan_manager = __commonJS({
             }
           };
           this.#discoveries.add(discovery);
-          socket.on("message", (message, rinfo) => {
+          const onMessage = (message, rinfo) => {
             const room = parseDiscoveryPacket(message, rinfo, this.#net, this.#maxPacketBytes);
             if (!room) return;
             rooms.set(`${room.serverName}:${room.port}:${room.roomCode}`, room);
-          });
-          socket.once("error", (error) => discovery.finish(error));
-          discovery.timeout = this.#timers.setTimeout(() => discovery.finish(), duration);
-          try {
-            socket.bind({ port: this.#discoveryPort, address: "0.0.0.0", exclusive: false });
-          } catch (error) {
-            discovery.finish(error);
+          };
+          const bindAddresses = ["0.0.0.0", ...this.#localAddresses()];
+          for (const address of bindAddresses) {
+            const socket = this.#dgram.createSocket("udp4");
+            assertDatagramSocket(socket);
+            sockets.push(socket);
+            socket.on("message", onMessage);
+            socket.once("error", (error) => {
+              if (address === "0.0.0.0") discovery.finish(error);
+            });
+            try {
+              socket.bind({ port: address === "0.0.0.0" ? this.#discoveryPort : 0, address, exclusive: false }, () => {
+                try {
+                  socket.setBroadcast(true);
+                  const probe = Buffer.from(JSON.stringify({ service: SERVICE, type: "probe" }), "utf8");
+                  socket.send(probe, this.#discoveryPort, BROADCAST_ADDRESS);
+                } catch (_error) {
+                }
+              });
+            } catch (error) {
+              if (address === "0.0.0.0") discovery.finish(error);
+            }
           }
+          discovery.timeout = this.#timers.setTimeout(() => discovery.finish(), duration);
         });
       }
       getManualEndpoints() {
@@ -5280,33 +5423,40 @@ var require_lan_manager = __commonJS({
           manualEndpoints: this.getManualEndpoints(),
           log: this.#logs.map((entry) => ({ ...entry })),
           lastError: this.#lastError ? { ...this.#lastError } : null,
-          broadcasting: this.#broadcastSocket !== null,
+          broadcasting: this.#broadcastSockets.length > 0,
           discovering: this.#discoveries.size
         };
       }
       #startBroadcastSocket() {
-        const socket = this.#dgram.createSocket("udp4");
-        assertDatagramSocket(socket);
-        this.#broadcastSocket = socket;
-        socket.once("error", (error) => {
-          if (this.#broadcastSocket !== socket) return;
-          this.#recordError("BROADCAST_ERROR", error);
-          this.#clearBroadcast();
-        });
-        socket.bind(0, () => {
-          if (this.#broadcastSocket !== socket) return;
-          socket.setBroadcast(true);
-          this.#sendBroadcast();
-        });
+        const bindAddresses = this.#localAddresses();
+        const targets = bindAddresses.length ? bindAddresses : ["0.0.0.0"];
+        for (const address of targets) {
+          const socket = this.#dgram.createSocket("udp4");
+          assertDatagramSocket(socket);
+          this.#broadcastSockets.push(socket);
+          socket.once("error", (error) => {
+            if (!this.#broadcastSockets.includes(socket)) return;
+            this.#recordError("BROADCAST_ERROR", error);
+            this.#clearBroadcast();
+          });
+          socket.bind({ address, port: 0 }, () => {
+            if (!this.#broadcastSockets.includes(socket)) return;
+            socket.setBroadcast(true);
+            this.#sendBroadcastOn(socket);
+          });
+        }
         this.#broadcastInterval = this.#timers.setInterval(
           () => this.#sendBroadcast(),
           this.#broadcastIntervalMs
         );
       }
       #sendBroadcast() {
-        if (!this.#broadcastSocket || !this.#roomPacket) return;
+        for (const socket of this.#broadcastSockets) this.#sendBroadcastOn(socket);
+      }
+      #sendBroadcastOn(socket) {
+        if (!socket || !this.#roomPacket) return;
         const encoded = Buffer.from(JSON.stringify(this.#roomPacket), "utf8");
-        this.#broadcastSocket.send(
+        socket.send(
           encoded,
           this.#discoveryPort,
           BROADCAST_ADDRESS,
@@ -5315,15 +5465,47 @@ var require_lan_manager = __commonJS({
           }
         );
       }
+      #startProbeListener() {
+        if (this.#probeSocket) return;
+        const socket = this.#dgram.createSocket("udp4");
+        assertDatagramSocket(socket);
+        this.#probeSocket = socket;
+        socket.on("message", (message, rinfo) => {
+          if (!this.#roomPacket || !rinfo || this.#net.isIP(rinfo.address) !== 4) return;
+          let value;
+          try {
+            value = JSON.parse(message.toString("utf8"));
+          } catch (_error) {
+            return;
+          }
+          if (!value || value.service !== SERVICE || value.type !== "probe") return;
+          const encoded = Buffer.from(JSON.stringify(this.#roomPacket), "utf8");
+          socket.send(encoded, rinfo.port, rinfo.address);
+        });
+        socket.once("error", (error) => {
+          if (this.#probeSocket !== socket) return;
+          this.#recordError("PROBE_LISTEN_ERROR", error);
+          this.#stopProbeListener();
+        });
+        try {
+          socket.bind({ port: this.#discoveryPort, address: "0.0.0.0", exclusive: false });
+        } catch (error) {
+          this.#recordError("PROBE_LISTEN_ERROR", error);
+          this.#stopProbeListener();
+        }
+      }
+      #stopProbeListener() {
+        if (!this.#probeSocket) return;
+        closeSocket(this.#probeSocket);
+        this.#probeSocket = null;
+      }
       #clearBroadcast() {
         if (this.#broadcastInterval !== null) {
           this.#timers.clearInterval(this.#broadcastInterval);
           this.#broadcastInterval = null;
         }
-        if (this.#broadcastSocket) {
-          closeSocket(this.#broadcastSocket);
-          this.#broadcastSocket = null;
-        }
+        for (const socket of this.#broadcastSockets) closeSocket(socket);
+        this.#broadcastSockets = [];
       }
       #closeDiscoveries() {
         for (const discovery of [...this.#discoveries]) discovery.finish();
@@ -5363,6 +5545,7 @@ var require_lan_manager = __commonJS({
         this.#hostConfig = null;
         this.#state = "stopped";
         this.#clearBroadcast();
+        this.#stopProbeListener();
       }
       #handleProcessExit(child, code, signal) {
         if (this.#process !== child) return;
@@ -5372,6 +5555,7 @@ var require_lan_manager = __commonJS({
         this.#hostConfig = null;
         this.#state = "stopped";
         this.#clearBroadcast();
+        this.#stopProbeListener();
       }
       #appendLog(stream, chunk) {
         const text = String(chunk ?? "").trim();
@@ -5498,7 +5682,7 @@ var require_lan_manager = __commonJS({
       return value;
     }
     function sameHostConfig(left, right) {
-      return Boolean(right) && left.projectRoot === right.projectRoot && left.python === right.python && left.port === right.port && left.serverName === right.serverName;
+      return Boolean(right) && left.projectRoot === right.projectRoot && left.python === right.python && left.command === right.command && JSON.stringify(left.args) === JSON.stringify(right.args) && left.port === right.port && left.serverName === right.serverName;
     }
     function assertChildProcess(child) {
       if (!child || typeof child.once !== "function" || typeof child.removeListener !== "function" || typeof child.kill !== "function" || !child.stdout || typeof child.stdout.on !== "function" || !child.stderr || typeof child.stderr.on !== "function") {
@@ -5545,10 +5729,10 @@ var require_lan_manager = __commonJS({
 var require_compatibility = __commonJS({
   "zz/multiplayer/compatibility.json"(exports2, module2) {
     module2.exports = {
-      applicationVersion: "0.2.0",
-      protocolVersion: 1,
-      rulesVersion: "0.0.2",
-      cardDatabaseChecksum: "sha256:b54eb5257a2ae0d157fde2bacb502d40aa26323be34449fc00b8670cfe1837c8"
+      applicationVersion: "0.4.0",
+      protocolVersion: 2,
+      rulesVersion: "0.0.3",
+      cardDatabaseChecksum: "sha256:22fec2cf83a6c2ed148b7fd8d7dc40050f7e5546ebe9db9e00f4f6e2b379f5ad"
     };
   }
 });
@@ -5580,7 +5764,7 @@ var require_multiplayer_client = __commonJS({
       MATCH_STARTING: /* @__PURE__ */ new Set(["CONNECTED", "IN_MATCH", "MATCH_FINISHED", "RECONNECTING", "OFFLINE", "ERROR"]),
       IN_MATCH: /* @__PURE__ */ new Set(["CONNECTED", "MATCH_FINISHED", "RECONNECTING", "OFFLINE", "ERROR"]),
       RECONNECTING: /* @__PURE__ */ new Set(["CONNECTED", "IN_ROOM", "MATCH_STARTING", "IN_MATCH", "MATCH_FINISHED", "OFFLINE", "ERROR"]),
-      MATCH_FINISHED: /* @__PURE__ */ new Set(["CONNECTED", "RECONNECTING", "OFFLINE", "ERROR"]),
+      MATCH_FINISHED: /* @__PURE__ */ new Set(["CONNECTED", "IN_ROOM", "MATCH_STARTING", "RECONNECTING", "OFFLINE", "ERROR"]),
       ERROR: /* @__PURE__ */ new Set(["OFFLINE", "RECONNECTING"])
     });
     var ROOM_COMMAND_STATES = /* @__PURE__ */ new Set([
@@ -5589,6 +5773,7 @@ var require_multiplayer_client = __commonJS({
       MultiplayerClientState.IN_MATCH,
       MultiplayerClientState.MATCH_FINISHED
     ]);
+    var MAX_RECONNECT_FAILURES = 5;
     var SERVER_MESSAGE_TYPES = /* @__PURE__ */ new Set([
       "WELCOME",
       "ROOM_STATE",
@@ -5611,6 +5796,7 @@ var require_multiplayer_client = __commonJS({
       #pendingAction = null;
       #recovery = null;
       #pendingActionNeedsReplay = false;
+      #reconnectFailures = 0;
       constructor({ WebSocketImpl = globalThis.WebSocket, uuidFactory = randomUUID } = {}) {
         if (typeof WebSocketImpl !== "function") {
           throw new TypeError("WebSocketImpl must be a constructor");
@@ -5654,7 +5840,8 @@ var require_multiplayer_client = __commonJS({
           pendingAction: cloneJson(this.#pendingAction),
           canSubmitAction: this.canSubmitAction,
           canReconnect: this.#recovery !== null,
-          reconnectAttemptActive: this.state === MultiplayerClientState.RECONNECTING && this.#socket !== null
+          reconnectAttemptActive: this.state === MultiplayerClientState.RECONNECTING && this.#socket !== null,
+          reconnectFailures: this.#reconnectFailures
         };
       }
       getRecoverySession() {
@@ -5752,6 +5939,7 @@ var require_multiplayer_client = __commonJS({
         this.#error = null;
         this.#pendingAction = preserveRecovery && this.#recovery ? cloneJson(this.#recovery.pendingAction) : null;
         this.#pendingActionNeedsReplay = false;
+        this.#reconnectFailures = 0;
         if (!preserveRecovery) this.#clearRecovery();
         this.#setState(MultiplayerClientState.OFFLINE);
         return this.getSnapshot();
@@ -5798,6 +5986,13 @@ var require_multiplayer_client = __commonJS({
         if (typeof ready !== "boolean") throw new TypeError("ready must be a boolean");
         this.#sendCommand("SET_READY", { ready });
       }
+      selectOpeningChoice({ choice } = {}) {
+        this.#requireState("SELECT_OPENING_CHOICE", /* @__PURE__ */ new Set([MultiplayerClientState.MATCH_STARTING]));
+        if (!["rock", "paper", "scissors"].includes(choice)) {
+          throw new TypeError("choice must be rock, paper, or scissors");
+        }
+        this.#sendCommand("SELECT_OPENING_CHOICE", { choice });
+      }
       submitAction({ action, clientActionId } = {}) {
         if (!isPlainObject(action)) throw new TypeError("action must be an object");
         if (!this.canSubmitAction) {
@@ -5833,6 +6028,17 @@ var require_multiplayer_client = __commonJS({
         this.#requireState("REQUEST_SYNC", ROOM_COMMAND_STATES);
         const payload = this.matchId ? { matchId: this.matchId } : {};
         this.#sendCommand("REQUEST_SYNC", payload);
+      }
+      dismissMatchResult() {
+        if (this.#view && this.#view.gameOver) {
+          this.#view = null;
+          this.#pendingAction = null;
+          this.#pendingActionNeedsReplay = false;
+        }
+        if (this.#room && !["STARTING", "RUNNING", "FINISHED"].includes(this.#room.status)) {
+          this.#applyRoomStatus(this.#room.status);
+        }
+        return this.getSnapshot();
       }
       leaveRoom() {
         this.#requireState("LEAVE_ROOM", ROOM_COMMAND_STATES);
@@ -5911,7 +6117,7 @@ var require_multiplayer_client = __commonJS({
           if (this.state !== MultiplayerClientState.RECONNECTING) {
             this.#setState(MultiplayerClientState.RECONNECTING);
           } else {
-            this.#emitEvent("RECONNECT_FAILED");
+            this.#registerReconnectFailure();
           }
           return;
         }
@@ -5925,9 +6131,13 @@ var require_multiplayer_client = __commonJS({
         try {
           socket.close();
         } finally {
-          if (this.#recovery !== null && this.state === MultiplayerClientState.RECONNECTING) {
-            this.#recordError("RECONNECT_FAILED", error, { causeCode: code });
-            this.#emitEvent("RECONNECT_FAILED");
+          if (this.#recovery !== null) {
+            this.#recordError("RECONNECT_REQUIRED", error, { causeCode: code });
+            if (this.state !== MultiplayerClientState.RECONNECTING) {
+              this.#setState(MultiplayerClientState.RECONNECTING);
+            } else {
+              this.#registerReconnectFailure();
+            }
           } else {
             this.#recordError(code, error);
             this.#setState(MultiplayerClientState.ERROR);
@@ -5956,16 +6166,27 @@ var require_multiplayer_client = __commonJS({
             break;
           case "ROOM_STATE":
             {
+              this.#reconnectFailures = 0;
               const reconnectToken = optionalString(payload.reconnectToken);
               delete payload.reconnectToken;
               this.#room = payload;
               this.playerId = optionalString(payload.playerId) || this.playerId;
-              this.matchId = optionalString(payload.matchId) || this.matchId;
+              if (["STARTING", "RUNNING", "FINISHED"].includes(payload.status)) {
+                this.matchId = optionalString(payload.matchId) || this.matchId;
+              } else if (payload.status === "READY_CHECK" && this.#view && this.#view.gameOver) {
+              } else {
+                this.matchId = null;
+                this.#view = null;
+                this.#pendingAction = null;
+                this.#pendingActionNeedsReplay = false;
+              }
               if (reconnectToken) this.#setRecoveryToken(reconnectToken);
               this.#applyRoomStatus(payload.status);
+              this.#syncRecoverySession();
             }
             break;
           case "MATCH_STARTED":
+            this.#reconnectFailures = 0;
             this.matchId = optionalString(payload.matchId) || optionalString(message.matchId);
             this.playerId = optionalString(payload.playerId) || this.playerId;
             this.#view = requirePlainObjectClone(payload.view, "MATCH_STARTED view");
@@ -5975,6 +6196,7 @@ var require_multiplayer_client = __commonJS({
             this.#setState(MultiplayerClientState.IN_MATCH);
             break;
           case "STATE_SNAPSHOT":
+            this.#reconnectFailures = 0;
             this.matchId = optionalString(payload.matchId) || optionalString(message.matchId) || this.matchId;
             this.playerId = optionalString(payload.playerId) || this.playerId;
             this.#view = requirePlainObjectClone(payload.view, "STATE_SNAPSHOT view");
@@ -6003,10 +6225,19 @@ var require_multiplayer_client = __commonJS({
               if (socket !== null) socket.close();
               if (retryable) {
                 this.#recordError(payload.code, new Error(payload.message || payload.code));
-                this.#emitEvent("RECONNECT_FAILED");
+                this.#registerReconnectFailure();
               } else {
                 this.#clearRecovery();
-                this.#setState(MultiplayerClientState.ERROR);
+                this.#error = null;
+                this.#room = null;
+                this.#view = null;
+                this.connectionId = null;
+                this.playerId = null;
+                this.matchId = null;
+                this.#pendingAction = null;
+                this.#pendingActionNeedsReplay = false;
+                this.#reconnectFailures = 0;
+                this.#setState(MultiplayerClientState.OFFLINE);
               }
               break;
             }
@@ -6033,6 +6264,10 @@ var require_multiplayer_client = __commonJS({
           return;
         }
         if (status === "FINISHED") {
+          this.#setState(MultiplayerClientState.MATCH_FINISHED);
+          return;
+        }
+        if (status === "READY_CHECK" && this.#view && this.#view.gameOver) {
           this.#setState(MultiplayerClientState.MATCH_FINISHED);
           return;
         }
@@ -6109,6 +6344,14 @@ var require_multiplayer_client = __commonJS({
       }
       #newId(label) {
         return requireNonBlankString(this.#uuidFactory(), label);
+      }
+      #registerReconnectFailure() {
+        this.#reconnectFailures += 1;
+        this.#emitEvent("RECONNECT_FAILED");
+        if (this.#reconnectFailures >= MAX_RECONNECT_FAILURES) {
+          this.#recordError("RECONNECT_EXHAUSTED", new Error("reconnect failed repeatedly"));
+          this.#setState(MultiplayerClientState.ERROR);
+        }
       }
       #setState(nextState) {
         if (nextState === this.state) return;
@@ -6219,11 +6462,477 @@ var require_multiplayer_client = __commonJS({
   }
 });
 
+// electron/asset-bootstrap.js
+var require_asset_bootstrap = __commonJS({
+  "electron/asset-bootstrap.js"(exports2, module2) {
+    "use strict";
+    var fs2 = require("node:fs");
+    var fsp = fs2.promises;
+    var path2 = require("node:path");
+    var crypto2 = require("node:crypto");
+    var { spawn: spawn2 } = require("node:child_process");
+    var { path7za } = require("7zip-bin");
+    var REQUIRED_DIRECTORIES = ["ZENONZARD_CARDLIST", "audio", "video"];
+    var SEVEN_ZIP_MAGIC = Buffer.from([55, 122, 188, 175, 39, 28]);
+    var MAX_HTML_BYTES = 256 * 1024;
+    var MAX_TOOL_OUTPUT = 64 * 1024 * 1024;
+    function assetRootLooksValid2(root) {
+      try {
+        return [root, ...REQUIRED_DIRECTORIES.map((name) => path2.join(root, name))].every((item) => {
+          const stat = fs2.lstatSync(item);
+          return stat.isDirectory() && !stat.isSymbolicLink();
+        });
+      } catch (error) {
+        if (error.code === "ENOENT" || error.code === "ENOTDIR") return false;
+        throw error;
+      }
+    }
+    function formatAssetSize(bytes) {
+      if (!Number.isFinite(bytes) || bytes < 0) throw new TypeError("Invalid asset size");
+      if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(2)} GiB`;
+      if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)} MiB`;
+      if (bytes >= 1024) return `${(bytes / 1024).toFixed(1)} KiB`;
+      return `${bytes} B`;
+    }
+    function checkAbort(signal) {
+      if (signal?.aborted) throw new DOMException("Asset installation cancelled", "AbortError");
+    }
+    function checkedDownloadUrl(value, fileId) {
+      const url = new URL(value);
+      const allowed = url.hostname === "drive.google.com" && url.pathname === "/uc" || url.hostname === "drive.usercontent.google.com" && url.pathname === "/download";
+      if (url.protocol !== "https:" || url.port || url.username || url.password || !allowed || url.searchParams.get("id") !== fileId || url.searchParams.get("export") !== "download") {
+        throw new Error("Untrusted Google Drive download URL");
+      }
+      return url;
+    }
+    async function fetchPublic(fetchImpl, url, fileId, signal) {
+      for (let count = 0; count < 8; count += 1) {
+        checkAbort(signal);
+        url = checkedDownloadUrl(url, fileId);
+        const response = await fetchImpl(url.href, { signal, redirect: "manual", credentials: "omit" });
+        if ([301, 302, 303, 307, 308].includes(response.status)) {
+          const location = response.headers.get("location");
+          if (!location) throw new Error("Google Drive redirect has no location");
+          if (response.body) await response.body.cancel();
+          url = new URL(location, url).href;
+          continue;
+        }
+        if (!response.ok) {
+          if (response.body) await response.body.cancel();
+          throw new Error(`Google Drive download failed: HTTP ${response.status}`);
+        }
+        if (response.url) {
+          try {
+            checkedDownloadUrl(response.url, fileId);
+          } catch (error) {
+            if (response.body) await response.body.cancel();
+            throw error;
+          }
+        }
+        return response;
+      }
+      throw new Error("Too many Google Drive redirects");
+    }
+    function decodeHtml(value) {
+      return value.replace(/&(?:amp|quot|apos|lt|gt|#\d+|#x[0-9a-f]+);/gi, (entity) => {
+        const named = { "&amp;": "&", "&quot;": '"', "&apos;": "'", "&lt;": "<", "&gt;": ">" };
+        if (named[entity.toLowerCase()]) return named[entity.toLowerCase()];
+        const number = entity.toLowerCase().startsWith("&#x") ? parseInt(entity.slice(3, -1), 16) : Number(entity.slice(2, -1));
+        if (!Number.isInteger(number) || number > 1114111) throw new Error("Invalid Drive confirmation HTML entity");
+        return String.fromCodePoint(number);
+      });
+    }
+    function htmlAttributes(tag) {
+      const result = /* @__PURE__ */ Object.create(null);
+      for (const match of tag.matchAll(/([\w-]+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/g)) {
+        const key = match[1].toLowerCase();
+        if (Object.hasOwn(result, key)) throw new Error("Duplicate Drive confirmation attribute");
+        result[key] = decodeHtml(match[2] ?? match[3] ?? match[4]);
+      }
+      return result;
+    }
+    function confirmationUrl(html, fileId) {
+      const forms = [...html.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form\s*>/gi)].filter((match) => htmlAttributes(match[1]).id === "download-form");
+      if (forms.length !== 1) throw new Error("Google Drive returned HTML instead of the asset archive (quota, login, or unavailable file)");
+      const attrs = htmlAttributes(forms[0][1]);
+      if ((attrs.method || "get").toLowerCase() !== "get") throw new Error("Unsupported Drive confirmation method");
+      const url = new URL(attrs.action);
+      if (url.protocol !== "https:" || url.hostname !== "drive.usercontent.google.com" || url.pathname !== "/download" || url.port || url.username || url.password || url.search || url.hash) throw new Error("Untrusted Drive confirmation action");
+      const fields = /* @__PURE__ */ new Map();
+      for (const match of forms[0][2].matchAll(/<input\b[^>]*>/gi)) {
+        const input = htmlAttributes(match[0]);
+        if (input.type?.toLowerCase() !== "hidden") continue;
+        if (!["id", "export", "confirm", "uuid"].includes(input.name) || fields.has(input.name) || input.value === void 0) {
+          throw new Error("Unexpected Drive confirmation field");
+        }
+        fields.set(input.name, input.value);
+      }
+      if (fields.get("id") !== fileId || fields.get("export") !== "download" || fields.get("confirm") !== "t" || !/^[a-zA-Z0-9-]{1,128}$/.test(fields.get("uuid") || "")) throw new Error("Invalid Drive confirmation fields");
+      for (const [key, value] of fields) url.searchParams.set(key, value);
+      return checkedDownloadUrl(url.href, fileId).href;
+    }
+    async function readHtml(response, signal) {
+      if (!response.body) throw new Error("Google Drive response has no body");
+      const reader = response.body.getReader();
+      const chunks = [];
+      let size = 0;
+      try {
+        while (true) {
+          checkAbort(signal);
+          const item = await reader.read();
+          if (item.done) break;
+          size += item.value.byteLength;
+          if (size > MAX_HTML_BYTES) throw new Error("Google Drive HTML response exceeds confirmation limit");
+          chunks.push(Buffer.from(item.value));
+        }
+        return Buffer.concat(chunks).toString("utf8");
+      } finally {
+        await reader.cancel();
+        reader.releaseLock();
+      }
+    }
+    async function requireDiskSpace(directory, requiredBytes) {
+      if (typeof fsp.statfs !== "function") throw new Error("Disk space verification requires Node statfs support");
+      const stat = await fsp.statfs(directory, { bigint: true });
+      const available = stat.bavail * stat.bsize;
+      if (available < BigInt(requiredBytes) + 64n * 1024n * 1024n) {
+        throw new Error(`Insufficient disk space: need ${formatAssetSize(requiredBytes)} plus 64 MiB reserve`);
+      }
+    }
+    async function run7zip(args, signal, onOutput) {
+      checkAbort(signal);
+      return new Promise((resolve, reject) => {
+        const child = spawn2(path7za, args, { windowsHide: true, stdio: ["ignore", "pipe", "pipe"] });
+        let output = "";
+        let failure;
+        const abort = () => child.kill();
+        signal?.addEventListener("abort", abort, { once: true });
+        const collect = (chunk) => {
+          output += chunk.toString("utf8");
+          if (output.length > MAX_TOOL_OUTPUT) {
+            failure = new Error("7-Zip output exceeds safe limit");
+            child.kill();
+          }
+          if (onOutput && !failure) {
+            try {
+              onOutput(chunk.toString("utf8"));
+            } catch (error) {
+              failure = error;
+              child.kill();
+            }
+          }
+        };
+        child.stdout.on("data", collect);
+        child.stderr.on("data", collect);
+        child.on("error", (error) => {
+          failure = error;
+        });
+        child.on("close", (code) => {
+          signal?.removeEventListener("abort", abort);
+          if (signal?.aborted) return reject(new DOMException("Asset installation cancelled", "AbortError"));
+          if (failure) return reject(failure);
+          if (code !== 0) return reject(new Error(`7-Zip ${args[0]} failed (exit ${code}): ${output.slice(-4096).trim()}`));
+          resolve(output);
+        });
+        if (signal?.aborted) abort();
+      });
+    }
+    function inspectEntries(listing) {
+      const names = /* @__PURE__ */ new Set();
+      let expandedBytes = 0;
+      const records = listing.split(/\r?\n\s*\r?\n/).filter((record) => record.trim());
+      for (const record of records) {
+        const fields = /* @__PURE__ */ Object.create(null);
+        for (const line of record.split(/\r?\n/)) {
+          const match = /^([^=]+) = (.*)$/.exec(line);
+          if (!match || Object.hasOwn(fields, match[1].trim())) throw new Error("Unrecognized 7-Zip entry listing");
+          fields[match[1].trim()] = match[2];
+        }
+        const name = fields.Path;
+        if (!name || name.includes("\0") || /[\r\n:]/.test(name) || /^[\\/]/.test(name)) throw new Error(`Unsafe archive entry: ${name}`);
+        const parts = name.replace(/\\/g, "/").replace(/\/$/, "").split("/");
+        if (parts.some((part) => !part || part === "." || part === ".." || /[. ]$/.test(part) || /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(?:\.|$)/i.test(part))) {
+          throw new Error(`Unsafe archive entry: ${name}`);
+        }
+        if (Object.keys(fields).some((key) => /link|reparse/i.test(key)) || /(^|\s)l[rwx-]{9}(\s|$)/.test(fields.Attributes || "") || /^[A-Z_]*L/.test(fields.Attributes || "")) {
+          throw new Error(`Archive links are forbidden: ${name}`);
+        }
+        const normalized = parts.join("/").toLowerCase();
+        if (names.has(normalized)) throw new Error(`Duplicate archive entry: ${name}`);
+        names.add(normalized);
+        if (!/^\d+$/.test(fields.Size || "")) throw new Error(`Missing archive entry size: ${name}`);
+        expandedBytes += Number(fields.Size);
+        if (!Number.isSafeInteger(expandedBytes)) throw new Error("Archive expanded size is invalid");
+        if (fields.Encrypted === "+") throw new Error("Encrypted asset archives are unsupported");
+      }
+      return expandedBytes;
+    }
+    async function assertNoExtractedLinks(directory, signal) {
+      checkAbort(signal);
+      for (const name of await fsp.readdir(directory)) {
+        const entry = path2.join(directory, name);
+        const stat = await fsp.lstat(entry);
+        if (stat.isSymbolicLink() || !stat.isDirectory() && !stat.isFile() || stat.isFile() && stat.nlink > 1) {
+          throw new Error(`Extracted asset contains a link or special file: ${entry}`);
+        }
+        if (stat.isDirectory()) await assertNoExtractedLinks(entry, signal);
+      }
+    }
+    async function pathExists(item) {
+      try {
+        await fsp.lstat(item);
+        return true;
+      } catch (error) {
+        if (error.code === "ENOENT") return false;
+        throw error;
+      }
+    }
+    async function installAssetBundle({ destination, source, fetchImpl = globalThis.fetch, onProgress = () => {
+    }, signal }) {
+      if (!destination || !source || !/^[a-zA-Z0-9_-]+$/.test(source.fileId || "") || !Number.isSafeInteger(source.sizeBytes) || source.sizeBytes < 6 || typeof fetchImpl !== "function" || source.expandedBytes !== void 0 && (!Number.isSafeInteger(source.expandedBytes) || source.expandedBytes < 0) || source.sha256 !== void 0 && !/^[a-fA-F0-9]{64}$/.test(source.sha256)) throw new TypeError("Invalid asset installation configuration");
+      destination = path2.resolve(destination);
+      const progress = (stage, receivedBytes, percent, message) => onProgress({ stage, receivedBytes, totalBytes: source.sizeBytes, percent, ...message ? { message } : {} });
+      checkAbort(signal);
+      if (assetRootLooksValid2(destination)) {
+        progress("complete", source.sizeBytes, 100, "Assets already installed");
+        return { status: "existing", destination };
+      }
+      if (await pathExists(destination)) throw new Error(`Asset destination already exists but is incomplete: ${destination}`);
+      const parent = path2.dirname(destination);
+      await fsp.mkdir(parent, { recursive: true });
+      await requireDiskSpace(parent, source.sizeBytes + (source.expandedBytes ?? 0));
+      const staging = await fsp.mkdtemp(path2.join(parent, ".zz-assets-"));
+      let failure;
+      let response;
+      try {
+        const archive = path2.join(staging, "bundle.7z");
+        const extracted = path2.join(staging, "extracted");
+        progress("download", 0, 0);
+        response = await fetchPublic(fetchImpl, `https://drive.google.com/uc?export=download&id=${source.fileId}`, source.fileId, signal);
+        if ((response.headers.get("content-type") || "").toLowerCase().includes("text/html")) {
+          const url = confirmationUrl(await readHtml(response, signal), source.fileId);
+          response = await fetchPublic(fetchImpl, url, source.fileId, signal);
+          if ((response.headers.get("content-type") || "").toLowerCase().includes("text/html")) {
+            throw new Error("Google Drive returned HTML after confirmation (quota, login, or unavailable file)");
+          }
+        }
+        const advertised = response.headers.get("content-length");
+        if (advertised !== null && (!/^\d+$/.test(advertised) || Number(advertised) !== source.sizeBytes)) {
+          throw new Error(`Asset download size mismatch: expected ${source.sizeBytes}, server advertised ${advertised}`);
+        }
+        if (!response.body) throw new Error("Asset download has no response body");
+        if (response.body.locked) throw new Error("Asset response body is already in use");
+        const output = await fsp.open(archive, "wx");
+        const reader = response.body.getReader();
+        const hash = crypto2.createHash("sha256");
+        let receivedBytes = 0;
+        let magic = Buffer.alloc(0);
+        try {
+          while (true) {
+            checkAbort(signal);
+            const item = await reader.read();
+            checkAbort(signal);
+            if (item.done) break;
+            const chunk = Buffer.from(item.value);
+            receivedBytes += chunk.length;
+            if (receivedBytes > source.sizeBytes) throw new Error("Asset download exceeds expected size");
+            if (magic.length < 6) magic = Buffer.concat([magic, chunk]).subarray(0, 6);
+            hash.update(chunk);
+            await output.writeFile(chunk);
+            progress("download", receivedBytes, receivedBytes / source.sizeBytes * 100);
+          }
+        } finally {
+          try {
+            await output.close();
+          } finally {
+            try {
+              await reader.cancel();
+            } finally {
+              reader.releaseLock();
+            }
+          }
+        }
+        if (receivedBytes !== source.sizeBytes) throw new Error(`Asset download size mismatch: expected ${source.sizeBytes}, received ${receivedBytes}`);
+        if (!magic.equals(SEVEN_ZIP_MAGIC)) throw new Error("Downloaded file is not a 7z archive (HTML, quota, or invalid content)");
+        if (source.sha256 && hash.digest("hex") !== source.sha256.toLowerCase()) throw new Error("Asset SHA-256 mismatch");
+        progress("verify", receivedBytes, 0);
+        const listing = await run7zip(["l", "-slt", "-ba", "-sccUTF-8", "-p__asset_bundle_no_password__", archive], signal);
+        const expandedBytes = inspectEntries(listing);
+        if (source.expandedBytes !== void 0 && expandedBytes !== source.expandedBytes) {
+          throw new Error(`Asset expanded size mismatch: expected ${source.expandedBytes}, archive contains ${expandedBytes}`);
+        }
+        await requireDiskSpace(parent, expandedBytes);
+        await run7zip(["t", "-bd", "-y", "-p__asset_bundle_no_password__", archive], signal);
+        progress("verify", receivedBytes, 100);
+        await fsp.mkdir(extracted);
+        progress("extract", receivedBytes, 0);
+        await run7zip(["x", "-y", "-bsp1", "-sccUTF-8", "-p__asset_bundle_no_password__", `-o${extracted}`, archive], signal, (chunk) => {
+          for (const match of chunk.matchAll(/(\d{1,3})%/g)) progress("extract", receivedBytes, Math.min(100, Number(match[1])));
+        });
+        await assertNoExtractedLinks(extracted, signal);
+        const nestedRoot = path2.join(extracted, "asserts");
+        const root = assetRootLooksValid2(nestedRoot) ? nestedRoot : extracted;
+        if (!assetRootLooksValid2(root)) throw new Error("Asset archive layout is invalid: requires ZENONZARD_CARDLIST, audio, and video directories");
+        progress("extract", receivedBytes, 100);
+        checkAbort(signal);
+        if (await pathExists(destination)) throw new Error(`Asset destination appeared during installation: ${destination}`);
+        await fsp.rename(root, destination);
+        progress("complete", receivedBytes, 100);
+        return { status: "installed", destination };
+      } catch (error) {
+        failure = error;
+        throw error;
+      } finally {
+        const cleanupErrors = [];
+        try {
+          if (response?.body && !response.body.locked) await response.body.cancel();
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+        try {
+          await fsp.rm(staging, { recursive: true });
+        } catch (error) {
+          cleanupErrors.push(error);
+        }
+        if (cleanupErrors.length) throw new AggregateError(failure ? [failure, ...cleanupErrors] : cleanupErrors, `Failed to clean asset download or owned staging directory: ${staging}`);
+      }
+    }
+    module2.exports = { installAssetBundle, assetRootLooksValid: assetRootLooksValid2, formatAssetSize };
+  }
+});
+
+// electron/asset-setup.js
+var require_asset_setup = __commonJS({
+  "electron/asset-setup.js"(exports2, module2) {
+    var path2 = require("node:path");
+    var { assetRootLooksValid: assetRootLooksValid2, formatAssetSize, installAssetBundle } = require_asset_bootstrap();
+    async function ensureStartupAssets2({
+      destination,
+      source,
+      dialog: dialog2,
+      BrowserWindow: BrowserWindow2,
+      ipcMain: ipcMain2,
+      fetchImpl,
+      signal,
+      onLog = () => {
+      },
+      installImpl = installAssetBundle
+    }) {
+      if (assetRootLooksValid2(destination)) return destination;
+      if (signal?.aborted) return null;
+      const spaceDetail = source.expandedBytes === void 0 ? "\u89E3\u538B\u8FD8\u9700\u8981\u989D\u5916\u78C1\u76D8\u7A7A\u95F4\u3002" : `\u89E3\u538B\u5927\u5C0F\uFF1A${(source.expandedBytes / 1e9).toFixed(2)} GB
+\u5B89\u88C5\u671F\u95F4\u8BF7\u9884\u7559\u81F3\u5C11 ${((source.sizeBytes + source.expandedBytes + 64 * 1024 ** 2) / 1e9).toFixed(1)} GB \u7A7A\u95F2\u7A7A\u95F4\u3002`;
+      const consent = await dialog2.showMessageBox({
+        type: "question",
+        title: "\u4E0B\u8F7D\u6E38\u620F\u8D44\u6E90",
+        message: "\u672A\u627E\u5230\u5B8C\u6574\u7684 asserts \u6E38\u620F\u8D44\u6E90\u3002\u662F\u5426\u4E0B\u8F7D\u5E76\u81EA\u52A8\u5B89\u88C5\uFF1F",
+        detail: `\u6587\u4EF6\uFF1A${source.fileName}
+\u4E0B\u8F7D\u5927\u5C0F\uFF1A${(source.sizeBytes / 1e9).toFixed(2)} GB\uFF08${formatAssetSize(source.sizeBytes)}\uFF09
+\u4FDD\u5B58\u4F4D\u7F6E\uFF1A${destination}
+\u6765\u6E90\uFF1A${source.folderUrl}
+
+\u4E0B\u8F7D\u540E\u4F1A\u6821\u9A8C\u5E76\u81EA\u52A8\u89E3\u538B\u3002
+${spaceDetail}`,
+        buttons: ["\u4E0B\u8F7D\u5E76\u5B89\u88C5", "\u9000\u51FA"],
+        defaultId: 0,
+        cancelId: 1,
+        noLink: true,
+        signal
+      });
+      if (consent.response !== 0 || signal?.aborted) return null;
+      while (!signal?.aborted) {
+        const controller = new AbortController();
+        const abort = () => controller.abort();
+        signal?.addEventListener("abort", abort, { once: true });
+        const window2 = new BrowserWindow2({
+          width: 580,
+          height: 400,
+          resizable: false,
+          backgroundColor: "#071117",
+          autoHideMenuBar: true,
+          webPreferences: { preload: path2.join(__dirname, "asset-setup-preload.js"), contextIsolation: true, nodeIntegration: false, sandbox: true }
+        });
+        let closing = false;
+        window2.on("close", () => {
+          if (!closing) controller.abort();
+        });
+        window2.webContents.on("will-navigate", (event) => event.preventDefault());
+        window2.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+        ipcMain2.handle("assets:cancel", (event) => {
+          if (event.sender !== window2.webContents) throw new Error("Untrusted asset-setup sender");
+          controller.abort();
+          return { cancelled: true };
+        });
+        let error = null;
+        try {
+          await window2.loadFile(path2.join(__dirname, "asset-setup.html"));
+          onLog(`Asset install started: ${source.fileName}, ${source.sizeBytes} bytes -> ${destination}`);
+          await installImpl({
+            destination,
+            source,
+            fetchImpl,
+            signal: controller.signal,
+            onProgress: (progress) => {
+              if (!window2.isDestroyed()) window2.webContents.send("assets:progress", { ...progress, destination });
+              if (progress.stage !== "download") onLog(`Asset install stage: ${progress.stage}`);
+              if (typeof progress.percent === "number") window2.setProgressBar(progress.percent / 100);
+              else window2.setProgressBar(2);
+            }
+          });
+          if (controller.signal.aborted) return null;
+          onLog(`Asset install completed: ${destination}`);
+          return destination;
+        } catch (failure) {
+          error = failure;
+          onLog(`Asset install ${controller.signal.aborted ? "cancelled" : "failed"}: ${failure.message || failure}`);
+        } finally {
+          closing = true;
+          ipcMain2.removeHandler("assets:cancel");
+          signal?.removeEventListener("abort", abort);
+          if (!window2.isDestroyed()) window2.destroy();
+        }
+        if (controller.signal.aborted || signal?.aborted) return null;
+        const permissionHint = ["EACCES", "EPERM"].includes(error.code) ? "\n\u7A0B\u5E8F\u76EE\u5F55\u6CA1\u6709\u5199\u5165\u6743\u9650\u3002\u8BF7\u4EE5\u7BA1\u7406\u5458\u8EAB\u4EFD\u8FD0\u884C\u4E00\u6B21\uFF0C\u6216\u5C06\u7A0B\u5E8F\u653E\u5728\u53EF\u5199\u76EE\u5F55\u3002" : "";
+        const choice = await dialog2.showMessageBox({
+          type: "error",
+          title: "\u6E38\u620F\u8D44\u6E90\u5B89\u88C5\u5931\u8D25",
+          message: "\u8D44\u6E90\u5C1A\u672A\u5B89\u88C5\uFF0C\u6E38\u620F\u6CA1\u6709\u542F\u52A8\u3002",
+          detail: `${error.message || error}${permissionHint}
+
+\u4FDD\u5B58\u4F4D\u7F6E\uFF1A${destination}
+\u624B\u52A8\u4E0B\u8F7D\uFF1A${source.folderUrl}`,
+          buttons: ["\u91CD\u8BD5", "\u9000\u51FA"],
+          defaultId: 1,
+          cancelId: 1,
+          noLink: true,
+          signal
+        });
+        if (choice.response !== 0) return null;
+      }
+      return null;
+    }
+    module2.exports = { ensureStartupAssets: ensureStartupAssets2 };
+  }
+});
+
+// electron/asset-source.json
+var require_asset_source = __commonJS({
+  "electron/asset-source.json"(exports2, module2) {
+    module2.exports = {
+      fileId: "1f7AAwFqaFRLyX1z7pPF68YJ7fE9r3DXs",
+      fileName: "asserts.7z",
+      sizeBytes: 1534680950,
+      expandedBytes: 1577092255,
+      folderUrl: "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ"
+    };
+  }
+});
+
 // electron/update-checker.js
 var require_update_checker = __commonJS({
   "electron/update-checker.js"(exports2, module2) {
     "use strict";
-    var RELEASE_API_URL = "https://api.github.com/repos/TohmaN233/ZZ-Project/releases/latest";
+    var RELEASE_API_URL2 = "https://api.github.com/repos/TohmaN233/ZZ-Project/releases/latest";
     var LATEST_RELEASE_URL2 = "https://github.com/TohmaN233/ZZ-Project/releases/latest";
     var PROJECT_WEBSITE_URL2 = "https://tohman233.github.io/ZZ-Project/";
     function parseVersion(value) {
@@ -6268,7 +6977,7 @@ var require_update_checker = __commonJS({
     async function checkLatestRelease2({ currentVersion, fetchImpl }) {
       if (typeof fetchImpl !== "function") throw new TypeError("fetchImpl must be a function");
       const current = parseVersion(currentVersion).raw.replace(/^v/, "");
-      const response = await fetchImpl(RELEASE_API_URL, {
+      const response = await fetchImpl(RELEASE_API_URL2, {
         headers: {
           Accept: "application/vnd.github+json",
           "X-GitHub-Api-Version": "2026-03-10"
@@ -6292,13 +7001,55 @@ var require_update_checker = __commonJS({
         publishedAt: typeof release.published_at === "string" ? release.published_at : null
       };
     }
+    var CHECKSUMS_ASSET_NAME = "SHA256SUMS-PC02.txt";
+    function installerFileName(version, platform = process.platform) {
+      const normalized = String(version || "").replace(/^v/, "");
+      if (platform === "win32") return `ZZ-Project-v${normalized}-Windows-Setup.exe`;
+      if (platform === "linux") return `ZZ-Project-v${normalized}-Linux.tar.gz`;
+      return null;
+    }
+    function parseChecksumMap2(text) {
+      const checksums = {};
+      String(text || "").split(/\r?\n/).forEach((line) => {
+        const match = /^([0-9a-fA-F]{64})\s+\*?(.+?)$/.exec(line.trim());
+        if (!match) return;
+        checksums[match[2].trim()] = match[1].toLowerCase();
+      });
+      return checksums;
+    }
+    function selectInstallerAsset2(release, platform = process.platform) {
+      if (!release || typeof release !== "object") {
+        throw new Error("GitHub latest release is missing");
+      }
+      const version = parseVersion(release.tag_name).raw.replace(/^v/, "");
+      const fileName = installerFileName(version, platform);
+      if (!fileName) {
+        throw new Error(`no packaged installer for platform ${platform}`);
+      }
+      const assets = Array.isArray(release.assets) ? release.assets : [];
+      const installer = assets.find((asset) => asset && asset.name === fileName);
+      if (!installer || typeof installer.browser_download_url !== "string") {
+        throw new Error(`missing installer asset ${fileName}`);
+      }
+      const checksums = assets.find((asset) => asset && asset.name === CHECKSUMS_ASSET_NAME) || null;
+      return {
+        version,
+        fileName,
+        downloadUrl: installer.browser_download_url,
+        checksumsUrl: checksums && typeof checksums.browser_download_url === "string" ? checksums.browser_download_url : null
+      };
+    }
     module2.exports = {
+      CHECKSUMS_ASSET_NAME,
       LATEST_RELEASE_URL: LATEST_RELEASE_URL2,
       PROJECT_WEBSITE_URL: PROJECT_WEBSITE_URL2,
-      RELEASE_API_URL,
+      RELEASE_API_URL: RELEASE_API_URL2,
       checkLatestRelease: checkLatestRelease2,
       compareVersions,
-      parseVersion
+      installerFileName,
+      parseChecksumMap: parseChecksumMap2,
+      parseVersion,
+      selectInstallerAsset: selectInstallerAsset2
     };
   }
 });
@@ -6306,16 +7057,24 @@ var require_update_checker = __commonJS({
 // electron/main.js
 var { app, BrowserWindow, dialog, ipcMain, Menu, net, session, shell } = require("electron");
 var { spawn } = require("node:child_process");
+var crypto = require("node:crypto");
+var fsSync = require("node:fs");
 var fs = require("node:fs/promises");
 var http = require("node:http");
 var path = require("node:path");
 var { createAdaptiveWebSocketClass } = require_adaptive_websocket();
 var { LanManager } = require_lan_manager();
 var { MultiplayerDesktopClient } = require_multiplayer_client();
+var { assetRootLooksValid } = require_asset_bootstrap();
+var { ensureStartupAssets } = require_asset_setup();
+var assetSource = require_asset_source();
 var {
   checkLatestRelease,
   LATEST_RELEASE_URL,
-  PROJECT_WEBSITE_URL
+  PROJECT_WEBSITE_URL,
+  RELEASE_API_URL,
+  parseChecksumMap,
+  selectInstallerAsset
 } = require_update_checker();
 var mainWindow = null;
 var serverProcess = null;
@@ -6341,12 +7100,55 @@ var shutdownPrepared = false;
 var shutdownPromise = null;
 var updateCheckPromise = null;
 var updateStatus = { status: "idle", currentVersion: null };
+var updateDownloadPromise = null;
+var startupAssetRoot = null;
+var startupInProgress = false;
+var startupAssetsPromise = null;
+var startupAbortController = new AbortController();
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 function projectRoot() {
+  if (app.isPackaged) return path.join(process.resourcesPath, "app");
   return path.resolve(__dirname, "..");
 }
+function packagedServerPath() {
+  if (!app.isPackaged) return null;
+  const executable = process.platform === "win32" ? "zz-server.exe" : "zz-server";
+  return path.join(process.resourcesPath, "server", executable);
+}
+function packagedAssetRoot() {
+  if (startupAssetRoot) return startupAssetRoot;
+  const configured = process.env.ZZ_ASSET_ROOT || process.env.ZENONZARD_ASSET_ROOT;
+  if (configured) {
+    const configuredCandidates = [
+      path.resolve(configured),
+      path.resolve(projectRoot(), configured),
+      path.resolve(path.dirname(process.execPath), configured)
+    ];
+    const configuredRoot = configuredCandidates.flatMap((root) => [root, path.join(root, "asserts")]).find(assetRootLooksValid);
+    if (configuredRoot) return configuredRoot;
+    return path.isAbsolute(configured) ? path.resolve(configured) : path.resolve(app.isPackaged ? path.dirname(process.execPath) : projectRoot(), configured);
+  }
+  if (!app.isPackaged) {
+    const primary2 = path.join(projectRoot(), "asserts");
+    return [primary2, path.join(primary2, "asserts")].find(assetRootLooksValid) || primary2;
+  }
+  const primary = path.join(path.dirname(process.execPath), "asserts");
+  const candidates = [
+    primary,
+    path.join(primary, "asserts"),
+    path.join(process.resourcesPath, "asserts"),
+    path.join(projectRoot(), "asserts")
+  ];
+  return candidates.find(assetRootLooksValid) || primary;
+}
+function packagedDeckRoot() {
+  return path.join(path.dirname(process.execPath), "data", "decks");
+}
+function packagedUserDataRoot() {
+  return path.join(app.getPath("userData"), "game-data");
+}
 function applicationIconPath() {
-  return path.join(app.getAppPath(), "electron", "icon.png");
+  return path.join(app.getAppPath(), "electron", "icon-256.png");
 }
 function openHelpUrl(url, label) {
   shell.openExternal(url).catch((error) => {
@@ -6394,6 +7196,16 @@ function appendLog(chunk) {
   if (!text) return;
   serverLog.push(text);
   if (serverLog.length > 40) serverLog.splice(0, serverLog.length - 40);
+  try {
+    if (app.isReady()) {
+      const logPath = path.join(app.getPath("userData"), "server.log");
+      fsSync.mkdirSync(path.dirname(logPath), { recursive: true });
+      fsSync.appendFileSync(logPath, `${(/* @__PURE__ */ new Date()).toISOString()} ${text}
+`, "utf8");
+    }
+  } catch (error) {
+    console.error(`Failed to persist server log: ${error.message || error}`);
+  }
 }
 function statusSnapshot() {
   return {
@@ -6424,6 +7236,111 @@ async function checkForApplicationUpdate() {
     updateCheckPromise = null;
   });
   return updateCheckPromise;
+}
+function sendUpdateDownloadProgress(payload) {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send("app:updateDownloadProgress", payload);
+}
+async function fetchGithubJson(url) {
+  const response = await net.fetch(url, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2026-03-10"
+    }
+  });
+  if (!response.ok) throw new Error(`GitHub request failed: HTTP ${response.status}`);
+  return response.json();
+}
+async function fetchGithubText(url) {
+  const response = await net.fetch(url, {
+    headers: { Accept: "text/plain" }
+  });
+  if (!response.ok) throw new Error(`GitHub request failed: HTTP ${response.status}`);
+  return response.text();
+}
+async function downloadReleaseFile(url, destination, onProgress) {
+  const response = await net.fetch(url, {
+    headers: { Accept: "application/octet-stream" }
+  });
+  if (!response.ok) throw new Error(`installer download failed: HTTP ${response.status}`);
+  if (!response.body) throw new Error("installer download returned an empty body");
+  const total = Number(response.headers.get("content-length") || 0);
+  const reader = response.body.getReader();
+  const hash = crypto.createHash("sha256");
+  await fs.mkdir(path.dirname(destination), { recursive: true });
+  const file = fsSync.createWriteStream(destination);
+  let received = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      hash.update(value);
+      received += value.byteLength;
+      if (!file.write(Buffer.from(value))) {
+        await new Promise((resolve) => file.once("drain", resolve));
+      }
+      if (typeof onProgress === "function") {
+        onProgress({ receivedBytes: received, totalBytes: total });
+      }
+    }
+  } catch (error) {
+    file.destroy();
+    await fs.rm(destination, { force: true });
+    throw error;
+  }
+  await new Promise((resolve, reject) => {
+    file.end((error) => error ? reject(error) : resolve());
+  });
+  return { sha256: hash.digest("hex"), receivedBytes: received, totalBytes: total };
+}
+async function downloadAndInstallUpdate() {
+  if (updateDownloadPromise) return updateDownloadPromise;
+  updateDownloadPromise = (async () => {
+    sendUpdateDownloadProgress({ downloadStatus: "downloading", downloadPercent: 0, downloadError: null });
+    const release = await fetchGithubJson(RELEASE_API_URL);
+    const installer = selectInstallerAsset(release);
+    if (!installer.checksumsUrl) {
+      throw new Error(`missing SHA256SUMS-PC02.txt for ${installer.fileName}`);
+    }
+    const destination = path.join(app.getPath("temp"), "zz-project-updates", installer.fileName);
+    const download = await downloadReleaseFile(
+      installer.downloadUrl,
+      destination,
+      ({ receivedBytes, totalBytes }) => {
+        const percent = totalBytes > 0 ? Math.floor(receivedBytes / totalBytes * 100) : 0;
+        sendUpdateDownloadProgress({
+          downloadStatus: "downloading",
+          downloadPercent: percent,
+          downloadError: null
+        });
+      }
+    );
+    sendUpdateDownloadProgress({ downloadStatus: "verifying", downloadPercent: 100, downloadError: null });
+    const checksums = parseChecksumMap(await fetchGithubText(installer.checksumsUrl));
+    const expected = checksums[installer.fileName];
+    if (!expected) throw new Error(`SHA256SUMS-PC02.txt has no entry for ${installer.fileName}`);
+    if (expected !== download.sha256) {
+      await fs.rm(destination, { force: true });
+      throw new Error(`installer checksum mismatch for ${installer.fileName}`);
+    }
+    sendUpdateDownloadProgress({ downloadStatus: "launching", downloadPercent: 100, downloadError: null });
+    const openError = await shell.openPath(destination);
+    if (openError) throw new Error(openError);
+    return {
+      ok: true,
+      downloadStatus: "launching",
+      downloadPercent: 100,
+      fileName: installer.fileName,
+      filePath: destination
+    };
+  })().catch((error) => {
+    const message = error && error.message ? error.message : String(error);
+    sendUpdateDownloadProgress({ downloadStatus: "error", downloadError: message });
+    return { ok: false, downloadStatus: "error", error: message };
+  }).finally(() => {
+    updateDownloadPromise = null;
+  });
+  return updateDownloadPromise;
 }
 function multiplayerSnapshot() {
   const snapshot = multiplayerClient.getSnapshot();
@@ -6575,17 +7492,24 @@ function waitForHttp(url, timeoutMs = 15e3) {
   });
 }
 function pythonArgs(port) {
-  const args = [
-    "-m",
-    "zz.web.server",
+  const assetRoot = startupAssetRoot || (app.isPackaged ? packagedAssetRoot() : null);
+  if (assetRoot && app.isPackaged) {
+    appendLog(`Packaged asset root: ${assetRoot}${assetRootLooksValid(assetRoot) ? "" : " (expected folders not found)"}`);
+  }
+  const args = app.isPackaged ? [
     "--host",
     "127.0.0.1",
     "--port",
-    String(port)
-  ];
-  if (process.env.ZZ_ASSET_ROOT) {
-    args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
-  }
+    String(port),
+    "--asset-root",
+    assetRoot,
+    "--user-data-root",
+    packagedUserDataRoot(),
+    "--bundled-deck-root",
+    packagedDeckRoot()
+  ] : ["-m", "zz.web.server", "--host", "127.0.0.1", "--port", String(port)];
+  if (!app.isPackaged && assetRoot) args.push("--asset-root", assetRoot);
+  else if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
   return args;
 }
 async function startServer(options = {}) {
@@ -6594,8 +7518,8 @@ async function startServer(options = {}) {
   }
   const port = normalizePort(options.port);
   serverState = "starting";
-  const python = process.env.ZZ_PYTHON || "python";
-  serverProcess = spawn(python, pythonArgs(port), {
+  const serverCommand = packagedServerPath() || process.env.ZZ_PYTHON || "python";
+  serverProcess = spawn(serverCommand, pythonArgs(port), {
     cwd: projectRoot(),
     windowsHide: true,
     stdio: ["ignore", "pipe", "pipe"]
@@ -6652,6 +7576,30 @@ function waitForProcessExit(child, timeoutMs = 5e3) {
     }, timeoutMs);
   });
 }
+function terminateProcessTree(child) {
+  if (!child || !child.pid) return;
+  if (process.platform !== "win32") {
+    child.kill();
+    return;
+  }
+  const killer = spawn("taskkill", ["/PID", String(child.pid), "/T", "/F"], {
+    windowsHide: true,
+    stdio: "ignore"
+  });
+  killer.once("error", (error) => {
+    appendLog(`Failed to terminate server process tree: ${error.message || error}`);
+    try {
+      child.kill();
+    } catch (killError) {
+      appendLog(`Fallback server termination failed: ${killError.message || killError}`);
+    }
+  });
+  killer.once("exit", (code, signal) => {
+    if (code !== 0 && code !== 128) {
+      appendLog(`taskkill exited with ${code ?? signal}`);
+    }
+  });
+}
 async function stopServer() {
   if (!serverProcess) {
     serverState = "stopped";
@@ -6659,7 +7607,7 @@ async function stopServer() {
   }
   serverState = "stopping";
   const processToStop = serverProcess;
-  processToStop.kill();
+  terminateProcessTree(processToStop);
   await waitForProcessExit(processToStop);
   if (serverProcess === processToStop) {
     serverProcess = null;
@@ -6718,6 +7666,7 @@ async function createWindow() {
   await mainWindow.loadURL(serverUrl);
   mainWindow.on("closed", () => {
     mainWindow = null;
+    if (!shutdownPrepared) app.quit();
   });
   return status;
 }
@@ -6776,6 +7725,10 @@ function registerIpc() {
     await shell.openExternal(LATEST_RELEASE_URL);
     return { ok: true };
   });
+  ipcMain.handle("app:downloadAndInstallUpdate", async (_event) => {
+    assertTrustedSender(_event);
+    return downloadAndInstallUpdate();
+  });
   ipcMain.handle("app:quit", async (_event) => {
     assertTrustedSender(_event);
     app.quit();
@@ -6822,6 +7775,11 @@ function registerIpc() {
     multiplayerClient.setReady({ ready });
     return multiplayerSnapshot();
   });
+  ipcMain.handle("multiplayer:selectOpeningChoice", async (_event, choice) => {
+    assertTrustedSender(_event);
+    multiplayerClient.selectOpeningChoice({ choice });
+    return multiplayerSnapshot();
+  });
   ipcMain.handle("multiplayer:submitAction", async (_event, action) => {
     assertTrustedSender(_event);
     const clientActionId = multiplayerClient.submitAction({ action });
@@ -6844,16 +7802,25 @@ function registerIpc() {
     multiplayerClient.leaveRoom();
     return multiplayerSnapshot();
   });
+  ipcMain.handle("multiplayer:dismissMatchResult", async (_event) => {
+    assertTrustedSender(_event);
+    multiplayerClient.dismissMatchResult();
+    return multiplayerSnapshot();
+  });
   ipcMain.handle("multiplayer:lanStatus", async (_event) => {
     assertTrustedSender(_event);
     return multiplayerSnapshot().lan;
   });
   ipcMain.handle("multiplayer:startLanHost", async (_event, options) => {
     assertTrustedSender(_event);
+    const port = options && options.port || 32145;
+    const packaged = packagedServerPath();
     await lanManager.startHost({
       projectRoot: projectRoot(),
       python: process.env.ZZ_PYTHON || "python",
-      port: options && options.port,
+      command: packaged || process.env.ZZ_PYTHON || "python",
+      args: packaged ? ["--multiplayer", "--host", "0.0.0.0", "--port", String(port)] : ["-m", "zz.multiplayer.websocket_server", "--host", "0.0.0.0", "--port", String(port)],
+      port,
       serverName: options && options.serverName
     });
     return multiplayerSnapshot();
@@ -6869,12 +7836,29 @@ function registerIpc() {
   });
 }
 app.whenReady().then(async () => {
+  startupInProgress = true;
   installApplicationMenu();
   if (process.platform === "darwin" && app.dock) app.dock.setIcon(applicationIconPath());
+  startupAssetsPromise = ensureStartupAssets({
+    destination: packagedAssetRoot(),
+    source: assetSource,
+    dialog,
+    BrowserWindow,
+    ipcMain,
+    fetchImpl: (url, options) => net.fetch(url, options),
+    signal: startupAbortController.signal,
+    onLog: appendLog
+  });
+  startupAssetRoot = await startupAssetsPromise;
+  if (!startupAssetRoot || startupAbortController.signal.aborted) {
+    app.quit();
+    return;
+  }
   multiplayerRecoveryPath = path.join(app.getPath("userData"), "multiplayer-recovery.json");
   const shouldReconnect = await restoreMultiplayerRecovery();
   registerIpc();
   await createWindow();
+  startupInProgress = false;
   if (shouldReconnect) {
     try {
       multiplayerClient.reconnect();
@@ -6888,16 +7872,23 @@ app.whenReady().then(async () => {
       await createWindow();
     }
   });
+}).catch((error) => {
+  startupInProgress = false;
+  appendLog(`Application startup failed: ${error.message || error}`);
+  dialog.showErrorBox("ZZ-Project \u542F\u52A8\u5931\u8D25", String(error.message || error));
+  app.quit();
 });
 app.on("before-quit", (event) => {
   if (shutdownPrepared) return;
   event.preventDefault();
   if (shutdownPromise !== null) return;
+  startupAbortController.abort();
   if (multiplayerReconnectTimer !== null) clearTimeout(multiplayerReconnectTimer);
   multiplayerReconnectTimer = null;
   if (multiplayerClient.getSnapshot().canReconnect) multiplayerClient.suspend();
   else multiplayerClient.disconnect();
   shutdownPromise = Promise.allSettled([
+    startupAssetsPromise,
     queueMultiplayerRecoveryWrite(),
     lanManager.stopHost(),
     stopServer()
@@ -6907,7 +7898,7 @@ app.on("before-quit", (event) => {
   });
 });
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (!startupInProgress && process.platform !== "darwin") {
     app.quit();
   }
 });

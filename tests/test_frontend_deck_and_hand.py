@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import subprocess
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -58,11 +59,44 @@ def test_floating_pass_gets_a_dedicated_command_row() -> None:
     assert "bottom: 0;" in STYLE_SOURCE
 
 def test_catalog_card_detail_keeps_deck_builder_scroll() -> None:
-    opener = _function_source("openCatalogCardDetail")
-    closer = _function_source("closeCatalogCardDetail")
-
-    assert "renderPreservingDeckBuilderScroll()" in opener
-    assert "render();" not in opener
-    assert "renderPreservingDeckBuilderScroll()" in closer
-    assert "if (rerender) render();" not in closer
+    functions = "\n".join(_function_source(name) for name in (
+        "captureDeckBuilderScroll", "restoreDeckBuilderScroll",
+        "renderPreservingDeckBuilderScroll", "renderPreservingActiveViewScroll",
+        "openCatalogCardDetail", "closeCatalogCardDetail",
+    ))
+    harness = r"""
+const assert = require('node:assert/strict');
+let appView = 'deckbuilder', selectedCatalogCardId = null, catalogDetailSwipeStart = null;
+const CODEMAN_MEMORY_VIEW = 'memory', CODEMAN_REPLAY_VIEW = 'replay';
+let catalogList = {scrollTop: 840}, deckList = {scrollTop: 290};
+const document = {querySelector: selector => selector === '.card-catalog-list' ? catalogList : deckList};
+const window = {scrollX: 16, scrollY: 430, scrollTo(x,y) {this.scrollX=x; this.scrollY=y;}};
+const requestAnimationFrame = callback => callback();
+let renders = 0;
+function render() {
+  renders++;
+  catalogList = {scrollTop: 0}; deckList = {scrollTop: 0};
+  window.scrollX = 0; window.scrollY = 0;
+}
+function focusCatalogCardDetail() {}
+function renderPreservingCodemanReplayScroll() {throw new Error('wrong view');}
+eval(process.argv[1]);
+for (const action of [() => openCatalogCardDetail('source'), () => closeCatalogCardDetail()]) {
+  action();
+  assert.equal(catalogList.scrollTop, 840);
+  assert.equal(deckList.scrollTop, 290);
+  assert.equal(window.scrollX, 16);
+  assert.equal(window.scrollY, 430);
+}
+assert.equal(selectedCatalogCardId, null);
+assert.equal(renders, 2);
+appView = 'duel';
+openCatalogCardDetail('form');
+assert.equal(selectedCatalogCardId, 'form');
+closeCatalogCardDetail();
+assert.equal(selectedCatalogCardId, null);
+assert.equal(renders, 4);
+"""
+    result = subprocess.run(["node", "-e", harness, functions], cwd=ROOT, capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
 

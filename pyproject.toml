@@ -1,6 +1,6 @@
 [project]
 name = "zz"
-version = "0.3.2"
+version = "0.4.0"
 description = "Zenonzard CLI clone (faithful MVP)"
 requires-python = ">=3.10"
 
@@ -9,8 +9,9 @@ test = ["pytest>=7"]
 multiplayer = ["websockets>=16,<17"]
 
 [tool.setuptools.package-data]
+"zz" = ["pc02r_data.tsv"]
 "zz.multiplayer" = ["compatibility.json"]
-"zz.web" = ["translations/*.tsv"]
+"zz.web" = ["translations/*.tsv", "translations/*.json", "static/*"]
 
 [tool.setuptools.packages.find]
 include = ["zz*"]

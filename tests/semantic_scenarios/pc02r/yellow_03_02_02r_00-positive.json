@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_03_02_02r_00_positive",
+  "card_id": "yellow_03_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【アタック時】\\nこのタ一ン中、他の自分のミニオン1体をBP+200\\nする。\nEN: [When Attacking]\\nSelect one of your other minions to gain\\n+200BP for the duration of this turn.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_03_02_02r_00",
+        "zone": "field",
+        "seed": 2222658245,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "attack with Destructive Swallow",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_03_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "attack the opposing Force",
+      "select": {
+        "forceId": "force_kon"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "select one other allied minion",
+      "select": {
+        "cardId": "yellow_02_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_00",
+        "effectiveBp": 400
+      },
+      "name": "selected other minion gains 200 BP"
+    },
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02r_01",
+        "effectiveBp": 200
+      },
+      "name": "unselected minion is unchanged"
+    },
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_03_02_02r_00",
+        "effectiveBp": 300
+      },
+      "name": "the attacker is excluded from its own effect"
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 const app = document.getElementById("app");
 const MultiplayerCardPolicy = window.ZZMultiplayerCardPolicy;
 if (!MultiplayerCardPolicy) throw new Error("multiplayer card policy failed to load");
+const DuelLayout = window.ZZDuelLayout;
+if (!DuelLayout) throw new Error("duel layout failed to load");
+let duelLayoutObserver = null;
 
 let appView = "home";
 let state = null;
@@ -17,6 +20,7 @@ let catalog = {
   devMode: false,
 };
 let savedDecks = [];
+let savedDeckWarnings = [];
 let settings = {
   playerProfile: { codemanId: null, playmatId: null },
   opponentProfile: { codemanId: null, playmatId: null },
@@ -25,6 +29,7 @@ let settings = {
   bgmTrack: "bgm_01",
   developerMode: false,
   reducedMotion: false,
+  duelScale: 100,
 };
 const AI_AUTO_STEP_DELAY_MS = 850;
 const AI_AUTO_VISUAL_POLL_MS = 120;
@@ -76,13 +81,16 @@ let activePublicReveal = null;
 let publicRevealBatchTimer = null;
 let animationEventQueue = [];
 let activeAnimationEvent = null;
+let activeAnimationSourceAnchor = null;
 let animationOverlayTimer = null;
 let pendingVisualState = null;
+let stagedDuelStateQueue = [];
 let visualStateStaged = false;
 let hiddenZoneMoveSourceKeys = new Set();
 let lastAppliedMultiplayerViewKey = null;
 let effectTargetSelectionIds = new Set();
 let selectedCatalogCardId = null;
+let catalogDetailSwipeStart = null;
 let battleDebugOpen = false;
 let logModalOpen = false;
 let rulebookModalOpen = false;
@@ -286,8 +294,12 @@ const UI_TEXT = {
     developerModeEnabled: "开发者模式已打开",
     developerModeDisabled: "开发者模式已关闭",
     reducedMotion: "减少动效",
+    duelScale: "对局卡片缩放",
+    duelScaleNote: "卡片自动适应窗口；缩放以自适应大小为基准，受区域高度限制。",
     bgmSetting: "BGM",
     deckBuilder: "卡组制作",
+    deckLoadWarning: "以下卡组文件加载失败，请修正对应文件：",
+    deckCopyTotal: "合计 {count} / {max}",
     deckBuilderShort: "卡组",
     playmats: "卡垫库",
     continueDuel: "继续对战",
@@ -357,6 +369,12 @@ const UI_TEXT = {
     search: "搜索",
     details: "详情",
     close: "关闭",
+    viewTransformedCard: "变形后",
+    previousTransformation: "上一形态",
+    nextTransformation: "下一形态",
+    transformationPosition: "形态 {current} / {total}",
+    transformedCardDeckNote: "变形后的卡牌不能加入卡组。",
+    unbuildableCardInDeck: "卡组中包含不可组卡的卡牌，请先移除。",
     active: "激活",
     rested: "疲劳",
     destroyed: "已破坏",
@@ -563,8 +581,12 @@ const UI_TEXT = {
     developerModeEnabled: "開発者モード有効",
     developerModeDisabled: "開発者モード無効",
     reducedMotion: "モーションを減らす",
+    duelScale: "対戦カードの拡大率",
+    duelScaleNote: "カードはウィンドウに自動適応します。拡大率は領域の高さで制限されます。",
     bgmSetting: "BGM",
     deckBuilder: "デッキ作成",
+    deckLoadWarning: "次のデッキファイルを読み込めません。該当ファイルを修正してください：",
+    deckCopyTotal: "合計 {count} / {max}",
     deckBuilderShort: "デッキ",
     playmats: "プレイマット",
     continueDuel: "対戦へ戻る",
@@ -634,6 +656,12 @@ const UI_TEXT = {
     search: "検索",
     details: "詳細",
     close: "閉じる",
+    viewTransformedCard: "変形後",
+    previousTransformation: "前の形態",
+    nextTransformation: "次の形態",
+    transformationPosition: "形態 {current} / {total}",
+    transformedCardDeckNote: "変形後のカードはデッキに入れられません。",
+    unbuildableCardInDeck: "デッキに組み込めないカードがあります。先に取り除いてください。",
     active: "アクティブ",
     rested: "レスト",
     destroyed: "破壊済み",
@@ -816,8 +844,12 @@ const UI_TEXT = {
     developerModeEnabled: "Developer Mode Enabled",
     developerModeDisabled: "Developer Mode Disabled",
     reducedMotion: "Reduced Motion",
+    duelScale: "Duel card scale",
+    duelScaleNote: "Cards fit the window automatically. Scale is relative to that size and limited by the area's height.",
     bgmSetting: "BGM",
     deckBuilder: "Deck Builder",
+    deckLoadWarning: "These deck files could not be loaded. Correct the listed files:",
+    deckCopyTotal: "Total {count} / {max}",
     deckBuilderShort: "Decks",
     playmats: "Playmats",
     continueDuel: "Resume Duel",
@@ -887,6 +919,12 @@ const UI_TEXT = {
     search: "Search",
     details: "Details",
     close: "Close",
+    viewTransformedCard: "Transformed form",
+    previousTransformation: "Previous form",
+    nextTransformation: "Next form",
+    transformationPosition: "Form {current} / {total}",
+    transformedCardDeckNote: "Transformed cards cannot be added to decks.",
+    unbuildableCardInDeck: "This deck contains a card that cannot be built. Remove it first.",
     active: "active",
     rested: "rested",
     destroyed: "destroyed",
@@ -1003,12 +1041,19 @@ const UI_TEXT = {
 const ACTIVE_EFFECT_COPY = {
   zh: {
     turn_stat_modifier: "本回合能力修正",
+    battle_stat_modifier: "本次战斗能力修正",
+    blessing_stats: "加护能力修正",
+    blessing_aura: "加护持续效果",
+    blessing_keywords: "加护赋予关键字",
     permanent_stat_modifier: "永久能力修正",
     keyword_modifier: "获得关键字",
     action_lock: "不能攻击、阻挡或移动",
     magic_selection_immunity: "不能被对手的 Magic 选为对象",
+    turn_effect_selection_immunity: "本回合不能被对手卡牌效果选为对象",
     battle_auto_win: "战斗时不比较 BP，直接获胜",
     cannot_attack: "本回合不能攻击",
+    cannot_attack_player: "不能攻击 Player",
+    cannot_move: "不能移动",
     must_block: "本回合必须阻挡",
     must_be_blocked: "攻击时必须被阻挡",
     unblockable_by_cost_at_most_3: "不能被费用 3 以下的 Minion 阻挡",
@@ -1035,12 +1080,19 @@ const ACTIVE_EFFECT_COPY = {
   },
   ja: {
     turn_stat_modifier: "このターンの能力修正",
+    battle_stat_modifier: "このバトルの能力修正",
+    blessing_stats: "加護の能力修正",
+    blessing_aura: "加護の常時効果",
+    blessing_keywords: "加護の付与キーワード",
     permanent_stat_modifier: "永続能力修正",
     keyword_modifier: "付与キーワード",
     action_lock: "アタック・ブロック・移動不可",
     magic_selection_immunity: "相手のマジックの効果で選択されない",
+    turn_effect_selection_immunity: "このターン、相手のカード効果で選択されない",
     battle_auto_win: "BPに関係なくバトルに勝利する",
     cannot_attack: "このターン、アタックできない",
+    cannot_attack_player: "プレイヤーにアタックできない",
+    cannot_move: "移動できない",
     must_block: "このターン、必ずブロックする",
     must_be_blocked: "アタック時、必ずブロックされる",
     unblockable_by_cost_at_most_3: "コスト3以下のミニオンにブロックされない",
@@ -1067,12 +1119,19 @@ const ACTIVE_EFFECT_COPY = {
   },
   en: {
     turn_stat_modifier: "Turn stat modifier",
+    battle_stat_modifier: "Battle stat modifier",
+    blessing_stats: "Boost stat modifier",
+    blessing_aura: "Boost passive effect",
+    blessing_keywords: "Boost granted keywords",
     permanent_stat_modifier: "Permanent stat modifier",
     keyword_modifier: "Granted keyword",
     action_lock: "Cannot attack, block, or move",
     magic_selection_immunity: "Cannot be selected by opposing Magic effects",
+    turn_effect_selection_immunity: "Cannot be selected by opposing card effects this turn",
     battle_auto_win: "Wins battles regardless of BP",
     cannot_attack: "Cannot attack this turn",
+    cannot_attack_player: "Cannot attack the Player",
+    cannot_move: "Cannot move",
     must_block: "Must block this turn",
     must_be_blocked: "Must be blocked when attacking",
     unblockable_by_cost_at_most_3: "Cannot be blocked by Minions costing 3 or less",
@@ -1292,6 +1351,7 @@ function animationEventBlocksPrompt(event, prompt = rawActivePrompt()) {
 
 function promptBlockedByAnimation(prompt = rawActivePrompt()) {
   if (replayReadonlyMode) return false;
+  if (pendingVisualState || stagedDuelStateQueue.length) return true;
   return pendingVisualEvents().some((event) => animationEventBlocksPrompt(event, prompt));
 }
 
@@ -1377,7 +1437,9 @@ function addVisualCardToArea(player, area, card) {
   const cards = playerAreaCards(player, area);
   if (!cards) return false;
   const iid = card.iid;
-  if (cards.some((item) => String(item.iid || "") === String(iid || ""))) return false;
+  if (players().some((sourcePlayer) => cardsFor(sourcePlayer).some((item) => String(item.iid || "") === String(iid || "")))) {
+    throw new Error(`Visual zone transition duplicated card ${iid} entering ${player.side}:${area}.`);
+  }
   cards.push({ ...card, ownerSide: card.ownerSide || player.side, area });
   return true;
 }
@@ -1389,12 +1451,42 @@ function rememberDestroySource(event) {
   hiddenZoneMoveSourceKeys.add(zoneMoveSourceKey(card.iid, "field"));
 }
 
+function startAnimationEventVisualState(event) {
+  if (!state || !pendingVisualState || visualStateStaged || !event) return false;
+  if (event.type === "draw") {
+    const player = findPlayerBySide(event.side);
+    if (!player) return false;
+    const count = Math.max((event.cards || []).length, Number(event.count || 0));
+    for (let index = 0; index < count; index += 1) removeVisualCardFromArea(player, "deck", null);
+    refreshPlayerZoneCounts(player);
+  } else if (["zone_move", "destroy"].includes(event.type)) {
+    const card = event.card || {};
+    const area = event.type === "destroy" ? "field" : event.fromArea;
+    // Controller changes use the recipient side in the event. Locate the source
+    // instance in its current zone instead of removing from the recipient.
+    const player = area === "deck"
+      ? findPlayerBySide(event.side || card.ownerSide)
+      : players().find((player) => (playerAreaCards(player, area) || []).some((item) => String(item.iid) === String(card.iid)));
+    if (!player) return false;
+    if (area !== "deck") {
+      activeAnimationSourceAnchor = captureBoardAnimationSourceAnchor(card.iid, player.side, area);
+    }
+    removeVisualCardFromArea(player, area, card.iid);
+    refreshPlayerZoneCounts(player);
+  } else {
+    return false;
+  }
+  syncUiStateFromCurrentState();
+  return true;
+}
+
 function settleDestroyVisualState(event) {
   if (!state || !pendingVisualState || visualStateStaged || !event || event.type !== "destroy") return false;
   const card = event.card || {};
   const player = findPlayerBySide(event.side || card.ownerSide);
   if (!player || !card.iid) return false;
   removeVisualCardFromArea(player, "field", card.iid);
+  hiddenZoneMoveSourceKeys.delete(zoneMoveSourceKey(card.iid, "field"));
   refreshPlayerZoneCounts(player);
   syncUiStateFromCurrentState();
   return true;
@@ -1447,8 +1539,8 @@ function settleZoneMoveVisualState(event) {
   const card = event.card || {};
   const player = findPlayerBySide(event.side || card.ownerSide);
   if (!player || !card.iid) return false;
-  removeVisualCardFromArea(player, event.fromArea, card.iid);
   addVisualCardToArea(player, event.toArea, pendingVisualCard(event, event.toArea));
+  hiddenZoneMoveSourceKeys.delete(zoneMoveSourceKey(card.iid, event.fromArea));
   refreshPlayerZoneCounts(player);
   syncUiStateFromCurrentState();
   return true;
@@ -1462,7 +1554,6 @@ function settleDrawVisualState(event) {
   const count = Math.max(cards.length, Number(event.count || 0));
   for (let index = 0; index < count; index += 1) {
     const card = cards[index];
-    removeVisualCardFromArea(player, "deck", card && card.iid);
     if (card) {
       addVisualCardToArea(player, "hand", pendingVisualCard({ ...event, card }, "hand"));
     }
@@ -1513,13 +1604,17 @@ function commitPendingVisualState({ rerender = true } = {}) {
 }
 
 function stageDuelState(nextState, nextError = null) {
+  if (activeAnimationEvent || animationEventQueue.length) {
+    stagedDuelStateQueue.push({ state: nextState, error: nextError });
+    return;
+  }
   const previousState = state;
   const animationEvents = (nextState && nextState.animationEvents) || [];
   const holdPreviousState = shouldHoldStateForAnimationEvents(previousState, nextState, animationEvents);
   if (holdPreviousState) {
     pendingVisualState = { state: nextState, error: nextError };
     visualStateStaged = false;
-    state = previousState;
+    state = cloneVisualState(previousState);
   } else {
     pendingVisualState = null;
     visualStateStaged = false;
@@ -1530,8 +1625,14 @@ function stageDuelState(nextState, nextError = null) {
   syncUiStateFromCurrentState();
 }
 
+function stageNextDuelState() {
+  while (!activeAnimationEvent && !animationEventQueue.length && stagedDuelStateQueue.length) {
+    const next = stagedDuelStateQueue.shift();
+    stageDuelState(next.state, next.error);
+  }
+}
+
 function api(path, body = null) {
-  commitPendingVisualState({ rerender: false });
   return ZZApi.request(path, body).then((payload) => {
     const nextState = payload.state || state;
     const nextError = payload.error || (nextState && nextState.error);
@@ -1563,6 +1664,7 @@ async function loadSavedDecks() {
   const payload = await ZZApi.request("/api/decks");
   if (payload.ok) {
     savedDecks = payload.decks || [];
+    savedDeckWarnings = payload.warnings || [];
   }
   render(payload.error || null);
 }
@@ -1588,17 +1690,28 @@ function deckTotal(recipe = deckEditor.recipe) {
 }
 
 function deckIsValid(deck = deckEditor) {
-  return deckTotal(deck.recipe) === 40 &&
+  return !deckRecipeContainsUnbuildableCard(deck.recipe) &&
+    deckRecipeWithinCopyLimits(deck.recipe) &&
+    deckTotal(deck.recipe) === 40 &&
     deck.selectedForceIds.length === 2 &&
     new Set(deck.selectedForceIds).size === 2;
 }
 
 function deckCanAiComplete(deck = deckEditor) {
   const total = deckTotal(deck.recipe);
-  return total >= 15 &&
+  return !deckRecipeContainsUnbuildableCard(deck.recipe) &&
+    deckRecipeWithinCopyLimits(deck.recipe) &&
+    total >= 15 &&
     total < 40 &&
     deck.selectedForceIds.length === 2 &&
     new Set(deck.selectedForceIds).size === 2;
+}
+
+function deckRecipeContainsUnbuildableCard(recipe = {}) {
+  return Object.keys(recipe || {}).some((cardId) => {
+    const card = cardById(cardId);
+    return card && card.deckBuildable === false;
+  });
 }
 
 function deckCardMaxCopies(cardId) {
@@ -1606,8 +1719,27 @@ function deckCardMaxCopies(cardId) {
   return Number((card && card.maxCopies) || 3);
 }
 
+function deckCardCopyIdentity(cardId) {
+  const card = cardById(cardId);
+  if (!card || !card.copyIdentity) throw new Error(`Missing deck copy identity for ${cardId}.`);
+  return card.copyIdentity;
+}
+
+function deckCardCopyCount(cardId, recipe = deckEditor.recipe) {
+  const identity = deckCardCopyIdentity(cardId);
+  return Object.entries(recipe || {}).reduce((sum, [id, count]) =>
+    sum + (deckCardCopyIdentity(id) === identity ? Number(count) : 0), 0);
+}
+
+function deckRecipeWithinCopyLimits(recipe = {}) {
+  return Object.keys(recipe || {}).every((cardId) =>
+    deckCardCopyCount(cardId, recipe) <= deckCardMaxCopies(cardId));
+}
+
 function canAddDeckCard(cardId) {
-  const count = deckEditor.recipe[cardId] || 0;
+  const card = cardById(cardId);
+  if (card && card.deckBuildable === false) return false;
+  const count = deckCardCopyCount(cardId);
   if (deckTotal() >= 40) return false;
   if (count >= deckCardMaxCopies(cardId)) return false;
   return true;
@@ -1987,6 +2119,7 @@ function normalizeSettings(raw = {}) {
     bgmTrack: normalizeBgmTrack(raw.bgmTrack),
     developerMode: normalizeBool(raw.developerMode),
     reducedMotion: normalizeBool(raw.reducedMotion),
+    duelScale: DuelLayout.normalizeScale(raw.duelScale ?? 100),
   };
 }
 
@@ -2955,9 +3088,6 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
       multiplayerUi.view.stateHash,
     ].join(":");
     if (viewKey !== lastAppliedMultiplayerViewKey) {
-      if (previousOnlineDuel && pendingVisualState) {
-        commitPendingVisualState({ rerender: false });
-      }
       stageDuelState(multiplayerUi.view, null);
       lastAppliedMultiplayerViewKey = viewKey;
     }
@@ -3264,9 +3394,14 @@ function cardMatchesBattleDebugFilters(card) {
 function battleDebugCards() {
   const search = battleDebugSearch.trim().toLowerCase();
   return (catalog.cards || [])
+    .filter((card) => canAddBattleDebugCard(card))
     .filter(cardMatchesBattleDebugFilters)
     .filter((card) => cardMatchesSearch(card, search))
     .slice(0, 120);
+}
+
+function canAddBattleDebugCard(card) {
+  return !card || card.deckBuildable !== false;
 }
 
 function refreshBattleDebugSearchResults() {
@@ -3309,6 +3444,8 @@ async function battleDebugApi(path, body = null) {
 
 async function addBattleDebugCard(cardId) {
   if (!devModeEnabled() || !cardId) return;
+  const card = cardById(cardId);
+  if (card && !canAddBattleDebugCard(card)) return;
   await battleDebugApi("/api/debug/add-card", {
     cardId,
     side: battleDebugSide,
@@ -3352,6 +3489,7 @@ async function replaceBattleDebugForces(side) {
 }
 
 function playerDeckPayload(deck) {
+  if (deckRecipeContainsUnbuildableCard(deck && deck.recipe)) return {};
   return {
     playerDeck: { ...(deck.recipe || {}) },
     playerForces: [...(deck.forces || deck.selectedForceIds || [])],
@@ -3376,7 +3514,7 @@ function cloneLaunchPayload(payload = {}) {
 }
 
 function opponentDeckPayload(deck) {
-  if (!deck || deckTotal(deck.recipe) !== 40 || new Set(deck.forces || []).size !== 2) return {};
+  if (!deck || deckRecipeContainsUnbuildableCard(deck.recipe) || deckTotal(deck.recipe) !== 40 || new Set(deck.forces || []).size !== 2) return {};
   return {
     opponentDeck: { ...(deck.recipe || {}) },
     opponentForces: [...(deck.forces || [])],
@@ -3386,7 +3524,7 @@ function opponentDeckPayload(deck) {
 function selectedPlayerPayload() {
   const entry = selectedPlayerDeckEntry();
   const deck = entry && entry.deck;
-  if (!deck || deckTotal(deck.recipe) !== 40 || new Set(deck.forces || []).size !== 2) return {};
+  if (!deck || deckRecipeContainsUnbuildableCard(deck.recipe) || deckTotal(deck.recipe) !== 40 || new Set(deck.forces || []).size !== 2) return {};
   return playerDeckPayload(deck);
 }
 
@@ -3429,7 +3567,7 @@ function setLaunchMode(mode) {
 }
 
 function startGameWithDeck(mode, deck) {
-  if (!deck || deckTotal(deck.recipe) !== 40 || new Set(deck.forces || []).size !== 2) return;
+  if (!deck || deckRecipeContainsUnbuildableCard(deck.recipe) || deckTotal(deck.recipe) !== 40 || new Set(deck.forces || []).size !== 2) return;
   startNew(mode, {
     ...playerDeckPayload(deck),
     ...selectedOpponentPayload(),
@@ -3582,6 +3720,10 @@ async function requestDeckAiCompletion() {
   deckCompletionLoading = false;
   if (!payload.ok) {
     renderPreservingDeckBuilderScroll(payload.error);
+    return;
+  }
+  if (deckRecipeContainsUnbuildableCard(payload.completion.recipe || {})) {
+    renderPreservingDeckBuilderScroll(new Error(t("unbuildableCardInDeck")));
     return;
   }
   deckEditor.recipe = { ...(payload.completion.recipe || {}) };
@@ -4053,12 +4195,69 @@ function openPlayerDetail(side) {
 
 function openCatalogCardDetail(cardId) {
   selectedCatalogCardId = cardId;
-  renderPreservingDeckBuilderScroll();
+  renderPreservingActiveViewScroll();
+  focusCatalogCardDetail();
 }
 
 function closeCatalogCardDetail(rerender = true) {
   selectedCatalogCardId = null;
-  if (rerender) renderPreservingDeckBuilderScroll();
+  catalogDetailSwipeStart = null;
+  if (rerender) renderPreservingActiveViewScroll();
+}
+
+function cardTransformationIds(card) {
+  if (card.transformationIds === undefined) return [];
+  if (!Array.isArray(card.transformationIds)) {
+    throw new TypeError(`Card ${card.id} has invalid transformationIds metadata.`);
+  }
+  if (card.transformationIds.some((cardId) => typeof cardId !== "string" || !cardId)) {
+    throw new TypeError(`Card ${card.id} has an invalid transformation card ID.`);
+  }
+  return card.transformationIds;
+}
+
+function catalogCardTransformationSeries(card) {
+  const ownTransformationIds = cardTransformationIds(card);
+  const baseCard = catalog.cards.find((candidate) => (
+    candidate.id !== card.id &&
+    candidate.deckBuildable !== false &&
+    cardTransformationIds(candidate).includes(card.id)
+  )) || (ownTransformationIds.length ? card : null);
+  if (!baseCard) return [];
+
+  const transformationIds = cardTransformationIds(baseCard);
+  const seriesIds = [baseCard.id, ...transformationIds];
+  if (new Set(seriesIds).size !== seriesIds.length) {
+    throw new Error(`Card ${baseCard.id} has duplicate IDs in its transformation series.`);
+  }
+  for (const cardId of seriesIds) {
+    if (!cardById(cardId)) {
+      throw new Error(`Transformation card ${cardId} referenced by ${baseCard.id} is missing from the catalog.`);
+    }
+  }
+  if (!seriesIds.includes(card.id)) {
+    throw new Error(`Card ${card.id} is not present in its declared transformation series.`);
+  }
+  return seriesIds;
+}
+
+function focusCatalogCardDetail() {
+  const panel = app.querySelector(".catalog-detail-panel");
+  if (panel) panel.focus({ preventScroll: true });
+}
+
+function stepCatalogCardTransformation(step) {
+  if (!selectedCatalogCardId || !Number.isInteger(step) || Math.abs(step) !== 1) return;
+  const currentCard = cardById(selectedCatalogCardId);
+  if (!currentCard) return;
+  const seriesIds = catalogCardTransformationSeries(currentCard);
+  const currentIndex = seriesIds.indexOf(currentCard.id);
+  const nextCardId = seriesIds[currentIndex + step];
+  if (!nextCardId) return;
+  selectedCatalogCardId = nextCardId;
+  catalogDetailSwipeStart = null;
+  renderPreservingActiveViewScroll();
+  focusCatalogCardDetail();
 }
 
 function closeCardDetail(rerender = true) {
@@ -4261,7 +4460,7 @@ function localizedTriggeredEffectText(event, card) {
 }
 
 function visualPlaybackActive() {
-  return Boolean(activeAnimationEvent || animationEventQueue.length || pendingVisualStateStillNeeded());
+  return Boolean(activeAnimationEvent || animationEventQueue.length || stagedDuelStateQueue.length || pendingVisualStateStillNeeded());
 }
 
 const OPEN_REVEAL_REASONS = new Set(["top_four", "top_cards", "top_deck_search", "deck_search"]);
@@ -4372,6 +4571,7 @@ function showNextAnimationEvent(rerender = true) {
   const finishedEvent = activeAnimationEvent;
   settleFinishedAnimationEvent(finishedEvent);
   activeAnimationEvent = animationEventQueue.shift() || null;
+  activeAnimationSourceAnchor = null;
   commitPendingVisualStateIfSettled();
   if (activeAnimationEvent) {
     if (activeAnimationEvent.type === "zone_move") {
@@ -4380,6 +4580,7 @@ function showNextAnimationEvent(rerender = true) {
     if (activeAnimationEvent.type === "destroy") {
       rememberDestroySource(activeAnimationEvent);
     }
+    startAnimationEventVisualState(activeAnimationEvent);
     if (isRefreshVisualEvent(activeAnimationEvent)) {
       settleRefreshVisualState(activeAnimationEvent);
     }
@@ -4392,8 +4593,9 @@ function showNextAnimationEvent(rerender = true) {
       animationOverlayTimer = setTimeout(() => showNextAnimationEvent(true), duration);
     }
   } else {
-    if (commitPendingVisualState({ rerender })) return;
+    commitPendingVisualState({ rerender: false });
     hiddenZoneMoveSourceKeys.clear();
+    stageNextDuelState();
     activatePublicRevealIfIdle();
     scheduleAutoStep(AI_AUTO_VISUAL_POLL_MS);
   }
@@ -4551,6 +4753,21 @@ function boardAnchorForCard(iid, side, fallbackZone = "field") {
   };
 }
 
+function captureBoardAnimationSourceAnchor(iid, side, area) {
+  const fallback = { ...boardAnchorForCardInState(iid, side, area), varName: null };
+  const element = app.querySelector(`[data-board-card-anchor="${boardAnchorKey(side, "card", iid)}"]`);
+  const layer = app.querySelector(".board-animation-layer.live");
+  if (!element || !layer) return fallback;
+  const rect = element.getBoundingClientRect();
+  const layerRect = layer.getBoundingClientRect();
+  if (!layerRect.width || !layerRect.height) return fallback;
+  return {
+    ...fallback,
+    cssX: `${(rect.left - layerRect.left + rect.width / 2) / layerRect.width * 100}%`,
+    cssY: `${(rect.top - layerRect.top + rect.height / 2) / layerRect.height * 100}%`,
+  };
+}
+
 function boardAnchorForForce(side, forceId) {
   const fallback = boardAnchorForZone(side, "force");
   if (!forceId) return fallback;
@@ -4630,7 +4847,9 @@ function queueBoardAnimationAnchorRefresh() {
 }
 
 function setAppHtml(html) {
+  if (duelLayoutObserver) duelLayoutObserver.disconnect();
   app.innerHTML = `${html}${renderRulebookModal()}`;
+  duelLayoutObserver = DuelLayout.observe(app, settings.duelScale, queueBoardAnimationAnchorRefresh);
   hydrateHomeThemeVideo();
   syncHomeThemeIdle();
   queueBoardAnimationAnchorRefresh();
@@ -4742,11 +4961,11 @@ function renderBoardAnchoredDraw(event) {
 function renderBoardAnchoredZoneMove(event) {
   if (event.summonFx === "graveyard") return renderBoardAnchoredGraveyardSummon(event);
   const summonFx = ["hand", "graveyard"].includes(event.summonFx) ? event.summonFx : "";
-  const from = event.summonFx === "hand"
+  const from = activeAnimationSourceAnchor || (event.summonFx === "hand"
     ? boardAnchorForZone(event.side, "hand")
     : event.fromArea === "deck"
     ? boardAnchorForZone(event.side, event.fromArea || "field")
-    : boardAnchorForCard(event.card && event.card.iid, event.side, event.fromArea || "field");
+    : boardAnchorForCard(event.card && event.card.iid, event.side, event.fromArea || "field"));
   const to = boardAnchorForZone(event.side, event.toArea || "field");
   const card = event.card || {};
   const art = localizedCardAssetUrl(card) || "";
@@ -4761,7 +4980,7 @@ function renderBoardAnchoredZoneMove(event) {
 }
 
 function renderBoardAnchoredGraveyardSummon(event) {
-  const from = boardAnchorForZone(event.side, "trash");
+  const from = activeAnimationSourceAnchor || boardAnchorForZone(event.side, "trash");
   const to = boardAnchorForZone(event.side, "field");
   return `
     <div class="board-zone-move graveyard" style="${boardAnchorStyle(from, "from")} ${boardAnchorStyle(to, "to")}">
@@ -4898,7 +5117,7 @@ function renderBoardAnchoredEffectTarget(event) {
 
 function renderBoardAnchoredDestroy(event) {
   const card = event.card || {};
-  const anchor = boardAnchorForCard(card.iid, event.side || card.ownerSide, event.fromArea || "field");
+  const anchor = activeAnimationSourceAnchor || boardAnchorForCard(card.iid, event.side || card.ownerSide, event.fromArea || "field");
   return `
     <div class="board-destroy ${esc(anchor.side)}" style="${boardAnchorStyle(anchor)}">
       ${renderBoardEventCard(card, "board-destroy-card")}
@@ -5241,7 +5460,7 @@ function isActiveZoneMoveSourceCard(card) {
   if (!card || !activeAnimationEvent || activeAnimationEvent.type !== "zone_move") return false;
   if (activeAnimationEvent.fromArea === "deck") return false;
   const eventCard = activeAnimationEvent.card || {};
-  return String(eventCard.iid || "") === String(card.iid || "");
+  return card.area === activeAnimationEvent.fromArea && String(eventCard.iid || "") === String(card.iid || "");
 }
 
 function renderCard(card, size = "") {
@@ -5728,7 +5947,7 @@ function promptTitle(prompt) {
   if (prompt.kind === "effect_target" && prompt.choiceKind === "deck_top_or_bottom") {
     return t("inspectTopCards");
   }
-  if (prompt.kind === "effect_target" && prompt.choiceKind === "top3_magic") {
+  if (prompt.kind === "effect_target" && ["top3_magic", "top3_card"].includes(prompt.choiceKind)) {
     return t("inspectTopCards");
   }
   if (prompt.kind === "effect_target" && ["top_field_minion", "top2_field_minion", "top3_field_minion", "top4_card", "top2_card"].includes(prompt.choiceKind)) {
@@ -5896,6 +6115,7 @@ function effectPromptNote(prompt) {
     top3_field_minion: 3,
     top4_card: 4,
     top2_card: 2,
+    top3_card: 3,
   }[prompt.choiceKind];
   if (topWindowSize) return t("inspectTopCardsNote", { count: topWindowSize });
   if (prompt.choiceKind === "deck_base_minion") return t("deckBaseNote");
@@ -6195,6 +6415,7 @@ function renderDuelBoardShell(error = null, { readonly = false, replay = false, 
     </div>
     ${timelineHtml || ""}
     ${renderCardDetail()}
+    ${renderCatalogCardDetail()}
     ${renderForceDetail()}
     ${renderPlayerDetail()}
     ${renderTrashDetail()}
@@ -6502,6 +6723,7 @@ function renderCardDetailPanel(card, {
         ${renderBlessingDetails(card.blessings)}
         ${renderActiveEffects(card.activeEffects)}
         ${actions}
+        ${renderTransformationPreviewButton(card)}
         ${showDebugTools ? renderBattleDebugCardTools(card) : ""}
       </div>
     </article>
@@ -6519,6 +6741,27 @@ function renderCardDetail(cardOverride = null, options = {}) {
   return `
     <div class="${modalClass}"${modalAttributes ? ` ${modalAttributes}` : ""}>
       ${renderCardDetailPanel(card, panelOptions)}
+    </div>
+  `;
+}
+
+function renderTransformationPreviewButton(card) {
+  if (!card || card.faceDown) return "";
+  const cardId = card.cardId || card.id;
+  if (!cardId) return "";
+  const catalogCard = cardById(cardId);
+  if (!catalogCard) return "";
+  const targetCardId = cardTransformationIds(catalogCard).find((cardId) => cardId !== catalogCard.id);
+  if (!targetCardId) return "";
+  if (!cardById(targetCardId)) {
+    throw new Error(`Transformation card ${targetCardId} referenced by ${catalogCard.id} is missing from the catalog.`);
+  }
+  const label = t("viewTransformedCard");
+  return `
+    <div class="card-detail-actions">
+      <button class="card-detail-action primary" data-card-transformation-preview="${esc(targetCardId)}" title="${esc(label)}">
+        ${esc(label)}
+      </button>
     </div>
   `;
 }
@@ -7461,6 +7704,13 @@ function renderSettingsPage(error = null) {
             <h2>${esc(t("basicSettings"))}</h2>
             ${renderLanguageSwitch()}
             ${renderBgmTrackPicker()}
+            <label class="settings-row">
+              <span>${esc(t("duelScale"))}</span>
+              <select data-duel-scale>
+                ${Array.from({ length: 8 }, (_, i) => 80 + i * 10).map(scale => `<option value="${scale}" ${settings.duelScale === scale ? "selected" : ""}>${scale}%</option>`).join("")}
+              </select>
+            </label>
+            <p>${esc(t("duelScaleNote"))}</p>
             <div class="settings-row">
               <span>${esc(t("bgmSetting"))}</span>
               <button class="bgm-toggle ${bgmPlaying ? "active" : ""}" data-bgm-toggle>
@@ -7993,7 +8243,9 @@ function renderOfficialFilterControls() {
 function filteredDeckCatalogCards() {
   const search = deckEditor.search.trim().toLowerCase();
   return catalog.cards.filter((card) => {
-    return cardMatchesOfficialFilters(card) && cardMatchesSearch(card, search);
+    return card.deckBuildable !== false &&
+      cardMatchesOfficialFilters(card) &&
+      cardMatchesSearch(card, search);
   });
 }
 
@@ -8001,6 +8253,14 @@ function refreshDeckSearchResults() {
   const list = app.querySelector(".card-catalog-list");
   if (!list) throw new Error("Deck search result list is missing.");
   list.innerHTML = filteredDeckCatalogCards().map((card) => renderCatalogCard(card)).join("");
+}
+
+function renderDeckLoadWarnings() {
+  if (!savedDeckWarnings.length) return "";
+  return `<div class="error" role="alert">
+    <p>${esc(t("deckLoadWarning"))}</p>
+    ${savedDeckWarnings.map((warning) => `<p>${esc(warning.file)}: ${esc(warning.message)}</p>`).join("")}
+  </div>`;
 }
 
 function renderDeckBuilder(error = null) {
@@ -8020,6 +8280,7 @@ function renderDeckBuilder(error = null) {
     ${renderShellHeader("ZENONZARD / DECK")}
     <main class="deck-builder">
       ${error ? `<div class="error">${esc(error.message || error)}</div>` : ""}
+      ${renderDeckLoadWarnings()}
       <section class="deck-editor-toolbar">
         <button data-view="lobby">${esc(t("back"))}</button>
         <input data-deck-name value="${esc(deckEditor.name)}" aria-label="deck name">
@@ -8110,6 +8371,7 @@ function renderDeckRowArt(card, fallbackId = "") {
 
 function renderCatalogCard(card) {
   const count = deckEditor.recipe[card.id] || 0;
+  const combinedCount = deckCardCopyCount(card.id);
   const title = localizedName(card, card.id);
   const artUrl = localizedCardAssetUrl(card);
   const art = artUrl
@@ -8128,6 +8390,7 @@ function renderCatalogCard(card) {
         <button data-catalog-detail="${esc(card.id)}">${esc(t("details"))}</button>
         <button data-deck-remove="${esc(card.id)}" ${count ? "" : "disabled"}>-</button>
         <span>${esc(count)}</span>
+        <span>${esc(t("deckCopyTotal", { count: combinedCount, max: deckCardMaxCopies(card.id) }))}</span>
         <button data-deck-add="${esc(card.id)}" ${canAddDeckCard(card.id) ? "" : "disabled"}>+</button>
       </div>
     </article>
@@ -8138,6 +8401,9 @@ function renderCatalogCardDetail() {
   if (!selectedCatalogCardId) return "";
   const card = cardById(selectedCatalogCardId);
   if (!card) return "";
+  const seriesIds = catalogCardTransformationSeries(card);
+  const seriesIndex = seriesIds.indexOf(card.id);
+  const hasTransformationNavigation = seriesIds.length > 1;
   const title = esc(localizedName(card, card.id));
   const artUrl = localizedCardAssetUrl(card);
   const art = artUrl
@@ -8147,9 +8413,16 @@ function renderCatalogCardDetail() {
   const effect = localizedAbility(card);
   return `
     <div class="catalog-detail-modal" data-catalog-detail-close>
-      <article class="catalog-detail-panel" role="dialog" aria-modal="true" aria-label="${title}">
+      <article class="catalog-detail-panel" role="dialog" aria-modal="true" aria-label="${title}" tabindex="-1">
         <button class="detail-close" data-catalog-detail-close>${esc(t("close"))}</button>
-        <div class="card-detail-art">${art}</div>
+        <div class="card-detail-art catalog-detail-art ${hasTransformationNavigation ? "has-transformations" : ""}" data-catalog-detail-swipe>
+          ${hasTransformationNavigation ? `
+            <button class="catalog-detail-nav previous" data-catalog-detail-step="-1" aria-label="${esc(t("previousTransformation"))}" ${seriesIndex === 0 ? "disabled" : ""}>‹</button>
+            <span class="catalog-detail-position" aria-live="polite">${esc(t("transformationPosition", { current: seriesIndex + 1, total: seriesIds.length }))}</span>
+            <button class="catalog-detail-nav next" data-catalog-detail-step="1" aria-label="${esc(t("nextTransformation"))}" ${seriesIndex === seriesIds.length - 1 ? "disabled" : ""}>›</button>
+          ` : ""}
+          ${art}
+        </div>
         <div class="card-detail-copy">
           <div class="card-detail-title">${title}</div>
           <div class="catalog-detail-meta">
@@ -8163,6 +8436,8 @@ function renderCatalogCardDetail() {
             ${localizedCardRarity(card) ? `<span>${esc(localizedCardRarity(card))}</span>` : ""}
           </div>
           ${effect ? `<div class="card-detail-effect">${multiline(effect)}</div>` : ""}
+          ${renderTransformationPreviewButton(card)}
+          ${card.deckBuildable === false ? `<p class="catalog-detail-build-note">${esc(t("transformedCardDeckNote"))}</p>` : ""}
         </div>
       </article>
     </div>
@@ -8372,7 +8647,9 @@ function clearDuelUiState() {
   activePublicReveal = null;
   animationEventQueue = [];
   activeAnimationEvent = null;
+  activeAnimationSourceAnchor = null;
   pendingVisualState = null;
+  stagedDuelStateQueue = [];
   visualStateStaged = false;
   hiddenZoneMoveSourceKeys.clear();
   lastAppliedMultiplayerViewKey = null;
@@ -8543,6 +8820,7 @@ function hasBlockingAutoVisuals() {
     (activePublicReveal && !activePublicReveal.batch) ||
     publicRevealQueue.some((reveal) => !reveal.batch) ||
     pendingVisualState
+    || stagedDuelStateQueue.length
   );
 }
 
@@ -8749,6 +9027,16 @@ function updateBlessDropHover(clientX, clientY) {
 }
 
 app.addEventListener("pointerdown", (event) => {
+  const catalogSwipeArea = event.target.closest("[data-catalog-detail-swipe]");
+  if (catalogSwipeArea && selectedCatalogCardId && event.pointerType === "touch") {
+    catalogDetailSwipeStart = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+  } else if (event.pointerType === "touch") {
+    catalogDetailSwipeStart = null;
+  }
   const source = event.target.closest("[data-bless-source-iid]");
   if (!source) return;
   if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -8802,12 +9090,26 @@ function finishBlessPointerDrag(event) {
 }
 
 app.addEventListener("pointercancel", (event) => {
+  if (catalogDetailSwipeStart && catalogDetailSwipeStart.pointerId === event.pointerId) {
+    catalogDetailSwipeStart = null;
+  }
   if (!pendingBlessDrag || pendingBlessDrag.pointerId !== event.pointerId) return;
   if (pendingBlessDrag.active) suppressCardDetailUntil = Date.now() + 300;
   clearBlessDragState();
 });
 
 app.addEventListener("pointerup", (event) => {
+  const swipe = catalogDetailSwipeStart;
+  if (swipe && swipe.pointerId === event.pointerId) {
+    catalogDetailSwipeStart = null;
+    const deltaX = event.clientX - swipe.startX;
+    const deltaY = event.clientY - swipe.startY;
+    if (Math.abs(deltaX) >= 48 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+      event.preventDefault();
+      stepCatalogCardTransformation(deltaX < 0 ? 1 : -1);
+      return;
+    }
+  }
   if (finishBlessPointerDrag(event)) return;
   if (Date.now() < suppressCardDetailUntil) return;
   const card = cardFromPointerEvent(event);
@@ -8982,6 +9284,18 @@ app.addEventListener("click", async (event) => {
   }
   const catalogCloseTarget = event.target.closest("[data-catalog-detail-close]");
   const insideCatalogDetail = event.target.closest(".catalog-detail-panel");
+  const transformationPreview = event.target.closest("[data-card-transformation-preview]");
+  if (transformationPreview) {
+    event.preventDefault();
+    openCatalogCardDetail(transformationPreview.dataset.cardTransformationPreview);
+    return;
+  }
+  const catalogDetailStep = event.target.closest("[data-catalog-detail-step]");
+  if (catalogDetailStep) {
+    event.preventDefault();
+    stepCatalogCardTransformation(Number(catalogDetailStep.dataset.catalogDetailStep));
+    return;
+  }
   if (catalogCloseTarget && (!insideCatalogDetail || event.target.closest("button[data-catalog-detail-close]"))) {
     closeCatalogCardDetail();
     return;
@@ -9480,6 +9794,13 @@ app.addEventListener("change", (event) => {
     return;
   }
   const reducedMotion = event.target.closest("[data-reduced-motion]");
+  const duelScale = event.target.closest("[data-duel-scale]");
+  if (duelScale) {
+    settings = { ...normalizeSettings(settings), duelScale: DuelLayout.normalizeScale(duelScale.value) };
+    render();
+    saveSettings();
+    return;
+  }
   if (reducedMotion) {
     updateReducedMotion(reducedMotion.checked);
     return;
@@ -9531,6 +9852,16 @@ app.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && selectedCatalogCardId) {
     event.preventDefault();
     closeCatalogCardDetail();
+    return;
+  }
+  if (
+    selectedCatalogCardId &&
+    app.querySelector(".catalog-detail-panel") &&
+    ["ArrowLeft", "ArrowRight"].includes(event.key) &&
+    !event.target.closest("input, textarea, select, [contenteditable='true']")
+  ) {
+    event.preventDefault();
+    stepCatalogCardTransformation(event.key === "ArrowLeft" ? -1 : 1);
     return;
   }
   if (event.key === "Escape" && pendingPaymentOptionId) {

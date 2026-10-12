@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_02_03_02r_00_boundary",
+  "card_id": "white_02_03_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【フラッシュ】\\nこのターン中、自分のミニオン1体をBP+300す\\nる。そのミニオンは相手の効果で選択できない。 EN: [Flash]\\nSelect one of your minions to gain +300BP for the duration of this turn.\\nThat minion cannot be selected as a target for your opponent's minion or Magic card effects.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_02_03_02r_00",
+        "zone": "hand",
+        "seed": 2040102,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "protected_goblin": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "unprotected_goblin": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_08_02_01_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_8": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_8",
+        "sourceId": "colorless_04_02_02r_01",
+        "targetId": "blue_04_02_02r_02"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_8"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_8",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_02_03_02r_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "declare Griphone's attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_08_02_01_00"
+      }
+    },
+    {
+      "name": "attack the opponent's Chi Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_chi"
+      }
+    },
+    {
+      "name": "cast the defending Metal Wall",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_02_03_02r_00"
+      }
+    },
+    {
+      "name": "protect Disaster Goblin",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$protected_goblin"
+      }
+    },
+    {
+      "name": "cast the attacking Metal Wall",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_02_03_02r_00"
+      }
+    },
+    {
+      "name": "target the attacking Griphone",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "white_08_02_01_00"
+      }
+    },
+    {
+      "name": "Blue Anju selects the unprotected Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$unprotected_goblin"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the protected Minion remains on the Field after the opposing Magic use",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_02_02_02r_01",
+        "iid": "$protected_goblin",
+        "effectiveBp": 500
+      }
+    },
+    {
+      "name": "the protected Minion was not moved to the Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "iid": "$protected_goblin",
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "Blue Anju moves the unprotected Minion to the Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$unprotected_goblin",
+        "cardId": "colorless_02_02_02r_01",
+        "rested": true
+      }
+    }
+  ]
+}

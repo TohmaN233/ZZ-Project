@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_05_02_02r_01_positive",
+  "card_id": "colorless_05_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n相手の[加護]が付与されているミ二オン1体を破壊\\nする。 EN: [When Summoned]\\nDestroy one of your opponent's minions\\nthat has received a Boost.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_05_02_02r_01",
+        "zone": "hand",
+        "seed": 4236635162,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "boosted_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "plain_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "ruby_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Bless Stray Bot with unconditional Base Minion mana",
+      "select": {
+        "kind": "bless",
+        "iid": "$ruby_bless",
+        "target_iid": "$boosted_target"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "end P2's turn",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "P1 places turn-start mana",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Ruby Dragon",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_05_02_02r_01"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "destroy the Minion with Bless",
+      "select": {
+        "cardIid": "$boosted_target"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Ruby Dragon destroys the opposing Minion with Bless",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$boosted_target"
+      }
+    },
+    {
+      "name": "Ruby Dragon leaves an unblessed Minion alone",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$plain_target"
+      }
+    },
+    {
+      "name": "Ruby Dragon enters Field after resolving",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_05_02_02r_01"
+      }
+    }
+  ]
+}

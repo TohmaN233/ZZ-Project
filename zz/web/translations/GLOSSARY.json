@@ -57,5 +57,12 @@
   {"src": "ファイブスター", "dst": "Five Star", "info": "种族；英文用于交叉校验", "status": "confirmed"},
   {"src": "スライム・ブロック・トークン", "dst": "黏液壁垒 Token", "info": "卡名；与现有卡名「黏液壁垒」一致", "status": "confirmed"},
   {"src": "S・ゴレイム・トークン", "dst": "S・Golem Token", "info": "Token 卡名；沿用既有中文卡池", "status": "confirmed"},
-  {"src": "ドラゴン・トークン", "dst": "Dragon Token", "info": "Token 卡名", "status": "confirmed"}
+  {"src": "ドラゴン・トークン", "dst": "Dragon Token", "info": "Token 卡名", "status": "confirmed"},
+  {"src": "アンジュ", "dst": "安玖", "info": "PC:02R 多色变身角色名；候选译名", "status": "pending"},
+  {"src": "フレイザウラー", "dst": "弗雷扎乌拉", "info": "PC:02R 红色变身角色名；候选译名", "status": "pending"},
+  {"src": "センシュウ", "dst": "森修", "info": "PC:02R 黄色变身角色名；候选译名", "status": "pending"},
+  {"src": "アンフェール", "dst": "安费尔", "info": "PC:02R 紫色变身角色名；候选译名", "status": "pending"},
+  {"src": "ガウディン", "dst": "高丁", "info": "PC:02R 绿色变身角色名；候选译名", "status": "pending"},
+  {"src": "オルカ", "dst": "奥尔卡", "info": "PC:02R 蓝色变身角色名；候选译名", "status": "pending"},
+  {"src": "グリフォン", "dst": "格里芬", "info": "PC:02R 白色变身角色名；候选译名", "status": "pending"}
 ]

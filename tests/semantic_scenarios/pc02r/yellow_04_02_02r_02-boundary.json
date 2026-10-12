@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_04_02_02r_02_boundary",
+  "card_id": "yellow_04_02_02r_02",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n自分の黄の種族「ドラゴン」を持つミニオン1体を\n手札に戻す。そうした場合、そのミ二オンの本来の\nBPとDPをこのミ二オンに付与する。 EN: [When Summoned]\nReturn one of your Yellow Minions\nbelonging to the Dragon class to your hand. If\nyou do, this minion receives that minion's\noriginal BP and DP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_04_02_02r_02",
+        "zone": "hand",
+        "seed": 2402777836,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "non_dragon": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Lucia with no allied Yellow Dragon",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_04_02_02r_02"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Lucia receives no stats from a non-Dragon Minion",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_04_02_02r_02",
+        "effectiveBp": 400,
+        "effectiveDp": 1
+      }
+    },
+    {
+      "name": "the ineligible Minion stays on the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_01",
+        "effectiveBp": 300,
+        "effectiveDp": 1
+      }
+    }
+  ]
+}

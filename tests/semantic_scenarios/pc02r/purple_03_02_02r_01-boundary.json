@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_03_02_02r_01_boundary",
+  "card_id": "purple_03_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n「マッドピッド」1枚を手札に加る。\\n(ゲーム外\\nから手札に加える） EN: [When Summoned]\\nAdd one Mud Pit to your hand. (This is\\nadded from outside of the game.)",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_03_02_02r_01",
+        "zone": "hand",
+        "seed": 1554866712,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_01_03_01_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Club Skeleton",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "purple_03_02_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Club Skeleton enters the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_03_02_02r_01"
+      }
+    },
+    {
+      "name": "Mud Pit is in hand from the outside-game source",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "purple_01_03_01_00"
+      }
+    }
+  ]
+}

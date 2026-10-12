@@ -1,0 +1,278 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_07_02_02r_01_positive",
+  "card_id": "purple_07_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【変形時】\\n他の種族「ドラゴン」を持つミニオン全てを破壊する。\\n【アタック時】\\n自分のトラッシュにある、コスト3以下のフィールド・ミニオ\\nンドX枚を出す。Xは相手の破壊さフスの数と同\\nじとする。 EN: Charge\\n[When Transformed]\\nDestroy all other minions belonging to the Dragon\\nclass.\\n[When Attacking]\\nRetrieve X Field Minion cards with a cost of 3 or\\nlower from your trash and put them on your field, where\\nX is the number of your opponent's Forces that have\\nbeen destroyed.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "zone": "field",
+        "seed": 3998211068,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "purple_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "purple_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_06_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_06_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "transform the Purple source into Rekindled with matching Purple Bless",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$purple_mana",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "declare the attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "name": "target the opponent's Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "return the eligible Field Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the eligible Trash minion enters the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "the revived minion leaves Trash",
+      "path": "state.players.human.trash",
+      "op": "none_where",
+      "where": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "Rekindled has Charge (Rush)",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_07_02_02r_01",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "X counts the opponent destroyed Force",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "destroyed": true
+      }
+    },
+    {
+      "name": "X does not count a controller destroyed Force",
+      "path": "state.players.human.forces",
+      "op": "none_where",
+      "where": {
+        "destroyed": true
+      }
+    },
+    {
+      "name": "matching Purple Bless transforms the source into Rekindled",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "name": "Rekindled's transformation destroys the other Dragon on its side",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_06_02_02r_01"
+      }
+    },
+    {
+      "name": "Rekindled's transformation destroys the Dragon on the opposing side",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_06_02_02r_01"
+      }
+    },
+    {
+      "name": "Rekindled's transformation leaves a non-Dragon Field Minion",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "matching transform mana is banished",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

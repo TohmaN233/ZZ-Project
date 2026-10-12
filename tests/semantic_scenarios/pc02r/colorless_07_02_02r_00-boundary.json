@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_07_02_02r_00_boundary",
+  "card_id": "colorless_07_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n自分のマナ1つをアクティブにする。\\n【加護時】\\nこのミニオンに「【アタック時】相手のBP400以\\n下のミ二オン１体を破壊する。」を付与する。 EN: [When Summoned]\\nPut one of your mana in the Active State\\n[When Boosted]\\nThis minion receives the following ability\\n[When Attacking] Destroy one of your\\nopponent's minions with 400BP or lower",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_07_02_02r_00",
+        "zone": "field",
+        "seed": 687942471,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "host": {
+          "where": {
+            "cardId": "colorless_07_02_02r_00"
+          },
+          "field": "iid",
+          "path": "state.players.human.field"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P2",
+        "rested": false,
+        "zone": "field"
+      },
+      "capture": {
+        "enemy": {
+          "path": "debug.added.iid"
+        }
+      },
+      "path": "/api/debug/add-card"
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main",
+        "activeSide": "P1"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "attack before Anttiger receives Boost",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_07_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "attack the opposing Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass the first Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass the second Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "where": {
+        "iid": "$enemy"
+      },
+      "value": 1,
+      "name": "the unboosted Anttiger attack does not destroy a minion",
+      "op": "count_where",
+      "path": "state.players.opponent.field"
+    },
+    {
+      "where": {
+        "cardId": "colorless_07_02_02r_00"
+      },
+      "value": 1,
+      "name": "the unboosted Anttiger remains on the field",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    },
+    {
+      "name": "the unboosted attack does not put the opposing minion in Trash",
+      "path": "state.players.opponent.trash",
+      "op": "none_where",
+      "where": {
+        "iid": "$enemy"
+      }
+    }
+  ]
+}

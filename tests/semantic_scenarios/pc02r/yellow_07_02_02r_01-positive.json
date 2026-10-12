@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_07_02_02r_01_positive",
+  "card_id": "yellow_07_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【変形時】\nこのタ一ン中、他の自分のミ二オン全てをBP+200/DP+\n1する。\n【アタック時】\n次の相手のターン終了時まで、相手のコスト6以下のミ二\nオン1体はタックもブロックも移動もできない。 EN: Charge\n[When Transformed]\nAll your other minions gain +200BP/+1DP for the\nduration of the turn.\n[When Attacking]\nSelect one of your opponent's minions with a cost of\n6 or lower to prevent it from attacking, blocking or\nmoving until the end of your opponent's next turn",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_07_02_02r_00",
+        "zone": "field",
+        "seed": 226713888,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "yellow_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "yellow_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "ally": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "locked_minion": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02r_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02r_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "transform Hardin with Yellow Bless",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$yellow_bless",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "attack with Ascended Beast",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_07_02_02r_01"
+      }
+    },
+    {
+      "name": "target the opponent Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "choose the cost-six Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$locked_minion"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass opponent Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "end the controller turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the locked cost-six Minion remains on the Field",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_02_02r_00"
+      }
+    },
+    {
+      "name": "the locked Minion cannot attack during its next turn",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "attack",
+        "cardId": "yellow_06_02_02r_00"
+      }
+    },
+    {
+      "name": "the locked Minion cannot move during its next turn",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "move_card",
+        "cardId": "yellow_06_02_02r_00"
+      }
+    }
+  ]
+}

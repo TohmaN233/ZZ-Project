@@ -62,6 +62,8 @@ def _opponent(state: Any, player: Player) -> Player:
 
 
 def _card_color(card: Card) -> Color:
+    if card.printed_color is not None:
+        return card.printed_color
     if card.mana_color is not None:
         return card.mana_color
     return next((color for color in card.cost if color is not Color.COLORLESS), Color.COLORLESS)
@@ -96,6 +98,12 @@ _STANDARD_BLESS_COLORS = {
     "green_00_01_02_00": Color.GREEN,
     "blue_00_01_02_00": Color.BLUE,
     "purple_00_01_02_00": Color.PURPLE,
+}
+
+_PC02R_SAME_COLOR_BLESS_COLORS = {
+    "purple_00_01_02r_00": Color.PURPLE,
+    "green_00_01_02r_00": Color.GREEN,
+    "white_00_01_02r_00": Color.WHITE,
 }
 
 _ADVANCED_BLESS_COLORS = {
@@ -144,12 +152,44 @@ _DIVINE_BLESS_REQUIREMENTS: dict[str, tuple[Color | None, int]] = {
 }
 
 
+def _pc02r_costed_boost_target(mana: CardInstance, target: CardInstance) -> bool:
+    boost_rules = {
+        "yellow_00_01_02r_01": (Color.YELLOW, 6),
+        "purple_00_01_02r_01": (Color.PURPLE, 2),
+        "green_00_01_02r_01": (Color.GREEN, 6),
+        "white_00_01_02r_01": (Color.WHITE, 6),
+    }
+    rule = boost_rules.get(mana.card.id)
+    if rule is None:
+        return False
+    color, minimum_cost = rule
+    return _card_color(target.card) is color and _total_cost(target.card) >= minimum_cost
+
+
+def _pc02r_any_color_seven_cost_boost(mana: CardInstance, target: CardInstance) -> bool:
+    return (
+        mana.card.id == "colorless_00_01_02r_00"
+        and _total_cost(target.card) >= 7
+    )
+
+
 def bless_condition_matches(mana: CardInstance, target: CardInstance) -> bool:
+    if target.card.ignore_bless_conditions:
+        return True
     if target.card.id in _BLESS_CONDITION_OVERRIDE_TARGET_IDS:
         return True
-    if target.card.id in _ACTIVE_ONLY_BLESS_TARGET_IDS and target.rested:
-        return False
+    if mana.card.id in {
+        "yellow_00_01_02r_01",
+        "purple_00_01_02r_01",
+        "green_00_01_02r_01",
+        "white_00_01_02r_01",
+    }:
+        return _pc02r_costed_boost_target(mana, target)
+    if mana.card.id == "colorless_00_01_02r_00":
+        return _pc02r_any_color_seven_cost_boost(mana, target)
     mana_id = mana.card.id
+    if mana_id in _PC02R_SAME_COLOR_BLESS_COLORS:
+        return _card_color(target.card) is _PC02R_SAME_COLOR_BLESS_COLORS[mana_id]
     if mana_id in _STANDARD_BLESS_COLORS:
         return _card_color(target.card) is _STANDARD_BLESS_COLORS[mana_id]
     if mana_id in _ADVANCED_BLESS_COLORS:
@@ -174,12 +214,20 @@ def blessing_keywords(host: CardInstance) -> list[Keyword]:
     return keywords
 
 
-def blessing_stat_aura(host: CardInstance, target: CardInstance, state: Any) -> tuple[int, int]:
+def blessing_stat_aura(host: CardInstance, target: CardInstance, state: Any, *, blessing: CardInstance | None = None) -> tuple[int, int]:
     bp = dp = 0
-    if state.active is not host.owner:
+    if (
+        state.active is not host.owner
+        or host.area is not AreaType.FIELD
+        or host not in host.owner.field
+        or target.area is not AreaType.FIELD
+        or target not in target.owner.field
+    ):
         return 0, 0
-    for mana in host.blessings:
-        if mana.card.id == "red_00_01_02r_00":
+    if blessing is not None and blessing not in host.blessings:
+        raise RuntimeError("Bless aura source is not attached to its host")
+    for mana in host.blessings if blessing is None else (blessing,):
+        if mana.card.id == "red_00_01_02r_00" and mana.area is AreaType.BLESSING:
             if target.card.is_token and target.owner is host.owner and target is not host:
                 bp += 200
     return bp, dp
@@ -231,19 +279,6 @@ def _chachalka_life_refresh(host: CardInstance, state: Any, ctx: Context) -> Non
         host.rested = False
 
 
-def _omitsu_turn_start(host: CardInstance, state: Any, ctx: Context) -> None:
-    if state.active is host.owner:
-        state.engine.modify_stat(host, bp_delta=100, dp_delta=1, duration="turn")
-
-
-def _penny_damage_heal(host: CardInstance, state: Any, ctx: Context) -> None:
-    if state.active is not host.owner or ctx.source is not host:
-        return
-    selected = state.engine.select_target(host.owner, "ally_force", 1, 1, source=host)
-    for force in selected:
-        state.engine.heal_target(force, 1)
-
-
 _BLESSING_GRANTED_EFFECTS: dict[str, tuple[EffectSpec, ...]] = {
     "red_00_01_02_01": (
         _effect(EffectTiming.ON_BLOCK, _firely_debuff, condition=_firely_blocked, official_effect="ブロックしたミニオンにBP-200を付与", official_timing="アタック時/ブロック時"),
@@ -265,13 +300,6 @@ _BLESSING_GRANTED_EFFECTS: dict[str, tuple[EffectSpec, ...]] = {
     ),
     "green_00_01_02r_00": (
         _effect(EffectTiming.ON_DAMAGE_PLAYER, _chachalka_life_refresh, official_effect="ライフダメージ時にアクティブ", official_timing="相手のターン"),
-    ),
-    "yellow_00_01_02r_00": (
-        _effect(EffectTiming.TURN_START, _omitsu_turn_start, official_effect="BP+100/DP+1", official_timing="自分のターン開始時"),
-    ),
-    "white_00_01_02r_00": (
-        _effect(EffectTiming.ON_DAMAGE_PLAYER, _penny_damage_heal, official_effect="ダメージ時にフォース1回復", official_timing="自分のターン"),
-        _effect(EffectTiming.ON_DAMAGE_FORCE, _penny_damage_heal, official_effect="ダメージ時にフォース1回復", official_timing="自分のターン"),
     ),
 }
 
@@ -493,7 +521,7 @@ def _kungfu_summon(source: CardInstance, state: Any, ctx: Context) -> None:
     targets = state.engine.select_target(source.owner, "ally_minion", 1, 1, source=source)
     for target in targets:
         state.engine.modify_stat(target, bp_delta=200, duration="turn")
-        state.engine.add_keyword(target, Keyword.REAWAKEN)
+        state.engine.add_keyword(target, Keyword.REAWAKEN, duration="turn")
 
 
 def _milky_return(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -518,12 +546,7 @@ def _ryudou_summon(source: CardInstance, state: Any, ctx: Context) -> None:
 def _densai_summon(source: CardInstance, state: Any, ctx: Context) -> None:
     targets = state.engine.select_target(source.owner, "enemy_minion", 1, 1, source=source)
     for target in targets:
-        target.owner.field.remove(target)
-        state.engine._return_blessings_to_base(target)
-        state.engine._reset_card_zone_state(target)
-        target.area = AreaType.DECK
-        target.owner.deck.insert(0, target)
-        state.engine._record_zone_move(target, AreaType.FIELD, AreaType.DECK)
+        state.engine.return_to_deck(target, source=source, to_bottom=False)
 
 
 def _eisen_aura(source: CardInstance, target: CardInstance, state: Any) -> tuple[int, int]:
@@ -602,19 +625,8 @@ def _kanonen_win(source: CardInstance, state: Any, ctx: Context) -> bool:
     return state.active is source.owner and ctx.source is source
 
 
-def _remove_target(engine: Any, target: CardInstance, source: Any = None) -> None:
-    if target.area is not AreaType.FIELD:
-        return
-    from zz.pc02r import blocks_effect_destroy
-
-    if blocks_effect_destroy(target, source, engine.state):
-        return
-    target.owner.field.remove(target)
-    engine._return_blessings_to_base(target)
-    engine._reset_card_zone_state(target)
-    target.area = AreaType.REMOVED
-    target.owner.removed.append(target)
-    engine._record_zone_move(target, AreaType.FIELD, AreaType.REMOVED)
+def _remove_target(engine: Any, target: CardInstance, source: CardInstance | None = None) -> None:
+    engine.banish_target(target, source=source)
 
 
 def _remove_enemy(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -636,15 +648,14 @@ def _anima(source: CardInstance, state: Any, ctx: Context) -> None:
     if selected:
         target = selected[0]
         replace_iid = engine.select_base_replacement_iid(source.owner, source)
-        if len(source.owner.base) < 10 or replace_iid is not None:
-            engine._make_base_space(source.owner, replace_iid)
-            source.owner.deck.remove(target)
-            target.area = AreaType.BASE
-            target.rested = True
-            source.owner.base.append(target)
-            engine._record_zone_move(target, AreaType.DECK, AreaType.BASE)
-            engine.triggers.emit(EffectTiming.ON_PLACE_BASE, Context(controller=source.owner, source=target))
-            engine.triggers.resolve_all()
+        engine._make_base_space(source.owner, replace_iid)
+        source.owner.deck.remove(target)
+        target.area = AreaType.BASE
+        target.rested = True
+        source.owner.base.append(target)
+        engine._record_zone_move(target, AreaType.DECK, AreaType.BASE)
+        engine.triggers.emit(EffectTiming.ON_PLACE_BASE, Context(controller=source.owner, source=target))
+        engine.triggers.resolve_all()
     engine.rng.shuffle(source.owner.deck)
 
 
@@ -667,8 +678,8 @@ def _papilio_destroy(source: CardInstance, state: Any, ctx: Context) -> None:
 
 
 def _bayagan_bless(source: CardInstance, state: Any, ctx: Context) -> None:
-    state.engine.add_keyword(source, Keyword.RUSH)
-    state.engine.add_keyword(source, Keyword.REAWAKEN)
+    state.engine.add_keyword(source, Keyword.RUSH, duration="turn")
+    state.engine.add_keyword(source, Keyword.REAWAKEN, duration="turn")
 
 
 def _sylvie_summon(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -1262,9 +1273,7 @@ def adjust_effective_cost(
     if card.card.type in (CardType.B_MINION, CardType.F_MINION) and _has_race(card.card, "ドラゴン"):
         reduction = sum(source.card.id == "colorless_03_02_02_02" for source in player.field)
         adjusted[Color.COLORLESS] = max(0, adjusted.get(Color.COLORLESS, 0) - reduction)
-    from zz.pc02r import adjust_effective_cost as adjust_pc02r_cost
-
-    return adjust_pc02r_cost(player, card, state, adjusted)
+    return adjusted
 
 
 def consume_cost_override(player: Player, card: CardInstance) -> None:
@@ -1301,17 +1310,13 @@ def can_block(attacker: CardInstance, blocker: CardInstance, state: Any) -> bool
 
 def can_effect_select(source: CardInstance, target: CardInstance, state: Any) -> bool:
     if source.owner is target.owner:
-        from zz.pc02r import can_effect_select as pc02r_can_effect_select
-
-        return pc02r_can_effect_select(source, target, state)
+        return True
     if target.card.id == "white_04_02_02_00" and state.active is not target.owner:
         return False
     if target.card.id == "colorless_06_02_02_02":
         others = [card for card in target.owner.field if card is not target]
         return bool(others)
-    from zz.pc02r import can_effect_select as pc02r_can_effect_select
-
-    return pc02r_can_effect_select(source, target, state)
+    return True
 
 
 def can_effect_select_non_card(source: CardInstance, target: Any, state: Any) -> bool:
@@ -1352,11 +1357,8 @@ def on_targets_selected(player: Player, source: CardInstance | None, selected: I
 
 def _place_red_mana_rested(engine: Any, player: Player, source: CardInstance) -> None:
     replace_iid = engine.select_base_replacement_iid(player, source)
-    if len(player.base) >= 10 and replace_iid is None:
-        return
-    mana = engine.place_generated_colorless_mana(player, replace_base_iid=replace_iid)
-    mana.mana_color_override = Color.RED
-    mana.rested = True
+    engine.place_generated_colorless_mana(player, replace_base_iid=replace_iid,
+                                         mana_color=Color.RED, rested=True)
 
 
 def on_base_mana_removed(engine: Any, player: Player, mana: CardInstance, *, reason: str) -> None:
@@ -1377,7 +1379,7 @@ def on_damage_resolved(engine: Any, source: Any, target: Any, amount: int) -> No
         return
     target_owner = target if isinstance(target, Player) else target.owner
     if "turn:pc02_return_damager" in target_owner.flags and source.owner is not target_owner:
-        engine.return_to_hand(source)
+        engine.return_to_hand(source, effect_controller=target_owner)
     if source.card.id == "white_09_02_02_00" and source.owner is engine.state.active:
         opponent = _opponent(engine.state, source.owner)
         if opponent.field:

@@ -99,11 +99,12 @@ def test_online_home_entry_and_duel_action_route_are_live() -> None:
     start_lan_room = app.split("async function startLanRoom()", 1)[1].split(
         "async function stopLanHost()", 1
     )[0]
-    assert 'multiplayerUi.displayName = onlineInputValue("[data-online-name]"' in start_lan_room
+    assert 'persistOnlineDisplayName()' in start_lan_room
     discover_lan_rooms = app.split("async function discoverLanRooms()", 1)[1].split(
         "function joinDiscoveredLanRoom", 1
     )[0]
-    assert 'multiplayerUi.displayName = onlineInputValue("[data-online-name]"' in discover_lan_rooms
+    assert 'persistOnlineDisplayName()' in discover_lan_rooms
+    assert 'onlineInputValue("[data-online-name]"' in app
 
 
 def test_online_duel_uses_local_assets_shared_visual_pipeline_and_inert_card_backs() -> None:
@@ -118,7 +119,10 @@ def test_online_duel_uses_local_assets_shared_visual_pipeline_and_inert_card_bac
     assert "hydrateMultiplayerViewAssets" in apply_snapshot
     assert "stageDuelState" in apply_snapshot
     assert "lastAppliedMultiplayerViewKey" in apply_snapshot
-    assert "const localManaUrl" in app
-    assert '? localAssetUrl("card_back")' in app
+    hydrate_assets = app.split("function hydrateMultiplayerViewAssets", 1)[1].split(
+        "function ", 1
+    )[0]
+    assert 'const manaUrl = (catalog.manaAssets || {})[card.manaColor]' in hydrate_assets
+    assert 'card.assetUrl = localAssetUrl("card_back")' in hydrate_assets
     assert "MultiplayerCardPolicy.isCardInteractive" in render_card
     assert "data-card-iid" in render_card and "interactive ?" in render_card

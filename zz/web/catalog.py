@@ -11,10 +11,13 @@ from zz.decks import (
     DEMETE_GREEN_RECIPE,
     KANATANA_YELLOW_RECIPE,
     card_allows_unlimited_copies,
+    deck_card_copy_identity,
     deck_card_max_copies,
+    is_catalog_card_id,
     is_user_deck_card_id,
 )
 from zz.effects import (
+    _param_value,
     effect_template_catalog,
     official_condition_tags_for_card,
     official_effect_tags_for_card,
@@ -24,7 +27,7 @@ from zz.engine import LIFE_CAP
 from zz.forces import ALL_FORCES
 from zz.web.assets import AssetIndex, DEFAULT_OFFICIAL_CARDLIST
 from zz.web.filter_localization import filter_group_labels, filter_option_labels
-from zz.web.localization import card_translation, force_translation
+from zz.web.localization import card_japanese_ability, card_translation, force_translation
 from zz.web.profiles import character_catalog, home_guide_catalog
 
 
@@ -178,7 +181,7 @@ def _effect_spec_summary(card) -> list[dict[str, Any]]:
             "minTargets": spec.min_targets,
             "maxTargets": spec.max_targets,
             "optional": spec.optional,
-            "params": dict(spec.params or {}),
+            "params": _param_value(dict(spec.params or {})),
             "officialEffect": spec.official_effect,
             "officialCondition": spec.official_condition,
             "activeAreas": [area.value for area in spec.active_areas or ()],
@@ -192,12 +195,12 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
     bilingual_by_id = _read_tsv_by_id(DEFAULT_BILINGUAL_CARDLIST)
     cards = []
     for card in CARD_REGISTRY.values():
-        if not is_user_deck_card_id(card.id):
+        if not is_catalog_card_id(card.id):
             continue
         official = official_by_id.get(card.id, {})
         bilingual = bilingual_by_id.get(card.id, {})
         filter_values = _card_filter_values(card, official, bilingual)
-        ability_jp = _first(bilingual.get("ability_jp"), card.ability_jp)
+        ability_jp = card_japanese_ability(card)
         ability_en = _first(bilingual.get("ability_en"), card.ability_en)
         name_jp = _first(official.get("official_name_jp"), bilingual.get("name_jp"), card.name_jp)
         name_en = _first(bilingual.get("name_en"), card.name_en)
@@ -209,6 +212,8 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
         official_cost = _total_cost_label(card, official, bilingual)
         cards.append({
             "id": card.id,
+            "deckBuildable": is_user_deck_card_id(card.id),
+            "transformationIds": list(card.transformation_ids),
             "nameJp": name_jp,
             "nameEn": name_en,
             "nameZh": name_zh,
@@ -229,6 +234,7 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
             "keywords": [keyword.name for keyword in card.keywords],
             "unlimitedCopies": card_allows_unlimited_copies(card.id),
             "maxCopies": deck_card_max_copies(card.id),
+            "copyIdentity": deck_card_copy_identity(card.id),
             "packJp": pack_jp,
             "packOrder": pack_order,
             "raceJp": filter_values["race"],

@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_06_02_02r_00_boundary",
+  "card_id": "colorless_06_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n自分の[加護]が付与されているミ二オンがいる場\\n合、相手のプレイヤに1ダメージを与え、自分のプ\\nレイヤーを1回復する。 EN: [When Summoned]\\nIf you have a minion that has received\\nthe Boost effect, deal 1 damage to your\\nopponent's Life and restore 1 point to your\\nLife.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_06_02_02r_00",
+        "zone": "hand",
+        "seed": 3544373491,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "card": {
+          "where": {
+            "cardId": "colorless_06_02_02r_00"
+          },
+          "field": "iid",
+          "path": "state.players.human.hand"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P1",
+        "rested": false,
+        "zone": "field"
+      },
+      "capture": {
+        "host": {
+          "path": "debug.added.iid"
+        }
+      },
+      "path": "/api/debug/add-card"
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 8,
+        "side": "P1"
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 10,
+        "side": "P2"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main",
+        "activeSide": "P1"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon White Bat without a boosted friendly minion",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_06_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "where": {
+        "blessings": {
+          "none": [
+            {
+              "cardId": "colorless_00_01_02_01"
+            }
+          ]
+        },
+        "iid": "$host"
+      },
+      "value": 1,
+      "name": "the friendly minion remains unboosted",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    },
+    {
+      "value": 10,
+      "name": "opposing Life is unchanged",
+      "op": "eq",
+      "path": "state.players.opponent.life"
+    },
+    {
+      "value": 8,
+      "name": "controller Life is unchanged",
+      "op": "eq",
+      "path": "state.players.human.life"
+    },
+    {
+      "where": {
+        "cardId": "colorless_06_02_02r_00"
+      },
+      "value": 1,
+      "name": "White Bat still resolves onto the field",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    }
+  ]
+}

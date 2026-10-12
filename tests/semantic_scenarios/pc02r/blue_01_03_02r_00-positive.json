@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_01_03_02r_00_positive",
+  "card_id": "blue_01_03_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 自分はカードを1枚引き、自分の移動権を1消費す\\nる。消費した場合、無色マナ1つをレスト状態で\\nベースに置く。 EN: [Main]\\nDraw one card. Also, reduce Movement by 1, and if you do, place one Neutral\\ninto your base in the Rest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_01_03_02r_00",
+        "zone": "hand",
+        "seed": 1169702141,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_03_01_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "cast Cogito, Ergo Sum",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_01_03_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Cogito draws one card",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_03_01_01"
+      }
+    },
+    {
+      "name": "available Movement adds a rested Neutral",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "the supplied card is drawn",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "name": "Cogito spends exactly the available Movement",
+      "path": "state.players.human.movementRightCount",
+      "op": "eq",
+      "value": 0
+    }
+  ]
+}

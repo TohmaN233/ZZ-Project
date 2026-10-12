@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_02_02r_01_positive",
+  "card_id": "colorless_04_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分はカードを1枚引く\\n【常時】\\nこのミ二オンには条件を無視して[加護]を付与させるこ\\nとができる。\\n【加護時】\\n有色の加護である場合、加護しているマナをレスト状態で\\nベスに移動させ、その色に応じた姿に大変身する。 EN: [When Summoned]\\nDraw one card.\\n[Passive]\\nThis minion can receive the {Boost} effect while\\nignoring any required conditions.\\n[When Boosted]\\nIf Boosted by a Color Mana, move that mana to the<Base> in the Rest State. This card will Metamorphose\\naccording to that color.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02r_01",
+        "zone": "hand",
+        "seed": 2040701,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "anju": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "colorless_04_02_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "red_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_08_02_01_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Anju",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_04_02_02r_01"
+      }
+    },
+    {
+      "name": "Bless Anju with off-color Red mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$red_mana",
+        "target_iid": "$anju"
+      }
+    },
+    {
+      "name": "end Anju's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "place the opponent's turn-start Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "declare Griphone's attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_08_02_01_00"
+      }
+    },
+    {
+      "name": "target the opposing Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "block with transformed Anju",
+      "prompt_kind": "blocker",
+      "select": {
+        "cardIid": "$anju"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Anju draws one card when summoned",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "Anju's Red form persists after leaving the Field",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_04_02_02r_01"
+      }
+    },
+    {
+      "name": "off-color Bless mana returns to Base rested",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_01_02_00",
+        "rested": true
+      }
+    }
+  ]
+}

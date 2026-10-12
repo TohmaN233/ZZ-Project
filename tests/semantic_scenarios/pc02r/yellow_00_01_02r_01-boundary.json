@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_00_01_02r_01_boundary",
+  "card_id": "yellow_00_01_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 《ベース》\n【配置時】\n自分のミ二オン1体にBP+200を付与する。\nEＰIＣ EN: Boost: Yellow + Cost 6 or Higher\n<Base> [When Placed]\nSelect one of your minions to receive\n+200BP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_00_01_02r_01",
+        "zone": "hand",
+        "seed": 3215059089,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "opposing_minion": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "place Gus with no allied Field Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "yellow_00_01_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Gus cannot grant BP to an opposing Minion",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_01",
+        "effectiveBp": 300,
+        "effectiveDp": 1
+      }
+    }
+  ]
+}

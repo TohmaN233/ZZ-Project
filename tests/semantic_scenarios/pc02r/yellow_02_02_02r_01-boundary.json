@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_02_02_02r_01_boundary",
+  "card_id": "yellow_02_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【加護時】\n自分のデッキを上から3枚見て、その中のフィール\nド・ミニオンカード1枚を公開して手札に加える。\n残りをランダムにデッキの下に戻す。 EN: [When Boosted]\nLook at the top three cards of your deck\nand select one Field Minion. Reveal it to\nyour opponent and add it to your hand. Put\nthe rest back on the bottom of your deck\nin random order.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "zone": "hand",
+        "seed": 719880375,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "owl": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "yellow_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_01_03_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bless Blue Night Owl with no Field Minion in the look",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$yellow_mana",
+        "target_iid": "$owl"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "no Magic card enters hand as a Field Minion",
+      "path": "state.players.human.hand",
+      "op": "none_where",
+      "where": {
+        "cardId": "yellow_01_03_02r_00"
+      }
+    },
+    {
+      "name": "a private look does not publish an unselected card",
+      "path": "state.publicReveals",
+      "op": "length_eq",
+      "value": 0
+    },
+    {
+      "name": "the ineligible card remains in the deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

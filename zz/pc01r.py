@@ -54,6 +54,8 @@ def _opponent(state: Any, player: Player) -> Player:
 
 
 def _card_color(card: Card) -> Color:
+    if card.printed_color is not None:
+        return card.printed_color
     if card.mana_color is not None:
         return card.mana_color
     return next((color for color in card.cost if color is not Color.COLORLESS), Color.COLORLESS)
@@ -309,7 +311,7 @@ def _lock_enemy_minion(source: CardInstance, state: Any, ctx: Context) -> None:
 def _return_enemy_to_hand(source: CardInstance, state: Any, ctx: Context) -> None:
     targets = state.engine.select_target(source.owner, "enemy_minion", 1, 1, source=source)
     for target in targets:
-        state.engine.return_to_hand(target)
+        state.engine.return_to_hand(target, source=source)
 
 
 def _refresh_own_color_minion(color: Color) -> Callable[[CardInstance, Any, Context], None]:
@@ -332,7 +334,7 @@ def _return_all_minions(source: CardInstance, state: Any, ctx: Context) -> None:
     eng = state.engine
     for player in state.players:
         for target in list(player.field):
-            eng.return_to_hand(target)
+            eng.return_to_hand(target, source=source)
 
 
 def _damage_one_enemy_force(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -496,8 +498,6 @@ def _put_blue_minion_rested(source: CardInstance, state: Any, ctx: Context) -> N
     if not targets:
         return
     replace_iid = eng.select_base_replacement_iid(source.owner, source)
-    if len(source.owner.base) >= 10 and replace_iid is None:
-        return
     eng.put_base_minion_from_hand(
         source.owner,
         targets[0],

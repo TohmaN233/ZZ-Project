@@ -6,7 +6,7 @@ from zz.engine import LIFE_CAP
 from zz.enums import CardType, Color
 from zz.model import CardInstance, ForceInstance, Player
 from zz.web.assets import AssetIndex
-from zz.web.localization import card_translation, force_translation
+from zz.web.localization import card_japanese_ability, card_translation, force_translation
 
 
 def _area_value(obj) -> str:
@@ -77,7 +77,7 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
         "nameJp": ci.card.name_jp,
         "nameEn": ci.card.name_en,
         "nameZh": _first(translation.get("name_zh")),
-        "abilityJp": ci.card.ability_jp,
+        "abilityJp": card_japanese_ability(ci.card),
         "abilityEn": ci.card.ability_en,
         "abilityZh": _first(translation.get("ability_zh")),
         "type": ci.card.type.value,
@@ -91,8 +91,11 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
         "dpModifier": effective_dp - ci.card.dp,
         "turnBpModifier": ci.bp_mod,
         "turnDpModifier": ci.dp_mod,
+        "battleBpModifier": ci.battle_bp_mod,
+        "battleDpModifier": ci.battle_dp_mod,
         "permanentBpModifier": ci.permanent_bp_mod,
         "permanentDpModifier": ci.permanent_dp_mod,
+        "flags": sorted(ci.flags),
         "activeEffects": active_effects,
         "rested": ci.rested,
         "area": _area_value(ci.area),
@@ -181,6 +184,7 @@ def serialize_player(engine, player: Player, asset_index: AssetIndex,
         "movementRightTotal": max(player.movement_right_total, player.movement_right_count),
         "colorlessOnlyStreak": player.colorless_only_streak,
         "activeEffects": active_effects,
+        "turnTargetRestrictions": getattr(engine, "turn_target_restrictions", lambda item: [])(player),
         "hand": [
             serialize_card(engine, ci, asset_index, face_down=hide_hand)
             for ci in player.hand

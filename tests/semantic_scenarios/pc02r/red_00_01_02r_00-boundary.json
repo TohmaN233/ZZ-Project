@@ -1,0 +1,216 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_00_01_02r_00_boundary",
+  "card_id": "red_00_01_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: ［加護：赤］\\n《付与能力》\\n【自分のターン】\\n他の自分のミニオン・トークン全てをBP+200する。 EN: <Boost Ability> On your turn, all your other Token Minions gain +200BP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_00_01_02r_00",
+        "zone": "base",
+        "seed": 342964751,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "boost_mana": {
+          "path": "state.players.human.base",
+          "where": {
+            "cardId": "red_00_01_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02r_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_08_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "boost_host": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_03_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "neutral_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attach Iron Sprite to grant its token aura",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$boost_mana",
+        "target_iid": "$boost_host"
+      }
+    },
+    {
+      "name": "summon Ruler Golem to create a real S Golem token",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_02_02r_01"
+      }
+    },
+    {
+      "name": "destroy neutral mana for Ruler Golem",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$neutral_target"
+      }
+    },
+    {
+      "name": "replace one Field minion at token capacity",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "yellow_02_02_02r_00"
+      }
+    },
+    {
+      "name": "end the controller turn to test the aura window",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the token bonus expires when the controller turn ends",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "s_golem_token",
+        "effectiveBp": 100
+      }
+    },
+    {
+      "name": "the ordinary minion never receives the token-only aura",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02r_01",
+        "effectiveBp": 200
+      }
+    }
+  ]
+}

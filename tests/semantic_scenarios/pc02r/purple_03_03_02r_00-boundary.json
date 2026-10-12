@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_03_03_02r_00_boundary",
+  "card_id": "purple_03_03_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】\\n相手のフォース1つに1ダメージを与え、自分のプ\\nレイヤーを１回復する。\nEN: [Main]\\nDeal 1 damage to one of your opponent's Forces, and restore 1 point to your Life.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_03_03_02r_00",
+        "zone": "hand",
+        "seed": 2123430687,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 20
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 1,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "cast Ritual of Draining",
+      "select": {
+        "kind": "play_card",
+        "cardId": "purple_03_03_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "choose the one-Life opposing Force",
+      "select": {
+        "forceId": "force_kon"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 10,
+      "name": "healing respects the Life cap"
+    },
+    {
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_kon",
+        "destroyed": true
+      },
+      "name": "one damage destroys a Force at one Life"
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_05_03_02r_00_boundary",
+  "card_id": "yellow_05_03_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン」ノ【フラッシュ】\n自分はデッキの中からコスト4の黄のフィールド・\nミニオンカード1体を出す。その後、自分のデッキ\nをシャッフルする。 EN: [Main] / [Flash]\nSearch your deck for one Yellow Field Minion card with a cost of 4 and put it on your field.\nThen, shuffle your deck.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_05_03_02r_00",
+        "zone": "hand",
+        "seed": 1661728079,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        },
+        "starting_deck_count": {
+          "path": "state.players.human.deckCount"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attack to create a Flash window",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_06_02_02r_00"
+      }
+    },
+    {
+      "name": "target the opponent Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass opponent Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "cast Assault Dive with competing wrong-color and wrong-cost cards",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_05_03_02r_00"
+      }
+    },
+    {
+      "name": "choose the Yellow cost-four card rather than the wrong-color or wrong-cost cards",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "yellow_04_02_02r_00"
+      }
+    },
+    {
+      "name": "pass opponent Flash priority after the spell",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass controller Flash priority after the spell",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the Field keeps its original cost-six Skye without an extra copy",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_02_02r_00"
+      }
+    },
+    {
+      "name": "the wrong-color Blue Minion is not put onto the Field",
+      "path": "state.players.human.field",
+      "op": "none_where",
+      "where": {
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "the wrong-cost and wrong-color cards remain in the deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 2
+    }
+  ]
+}

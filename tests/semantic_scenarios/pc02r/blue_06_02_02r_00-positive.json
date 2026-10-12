@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_06_02_02r_00_positive",
+  "card_id": "blue_06_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【自分のターン】\\nこのミニオンが相手のプレイヤーにダメージを与え\\nるたび、自分のミニオンカードであるマナ1つを、\\nフィールドにアクティブ状態で移動させる。 EN: [On Your Turn]\\nWhenever this minion deals damage to\\nyour opponent's Life, move one of your\\nminions from your base to the field and put it\\nin the Active State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_06_02_02r_00",
+        "zone": "field",
+        "seed": 277307506,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "attack opponent Life with Tiger Shark",
+      "select": {
+        "kind": "attack",
+        "cardId": "blue_06_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "target opponent Life",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "move an allied Base minion into Field",
+      "select": {
+        "cardId": "blue_00_01_02_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Base minion enters Field active",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00",
+        "rested": false
+      }
+    },
+    {
+      "name": "one Blue minion leaves Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "blue_00_01_02_00"
+      }
+    }
+  ]
+}

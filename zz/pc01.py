@@ -318,6 +318,26 @@ def _total_cost(row: dict[str, str]) -> int:
 def _cost(row: dict[str, str], color: Color, card_type: CardType) -> dict[Color, int]:
     if card_type is CardType.B_MINION:
         return {}
+    if (row.get("cost_metadata_status") or "").strip() == "complete":
+        colored_cost = _parse_int(row.get("colored_cost"))
+        free_cost = _parse_int(row.get("free_cost"))
+        total_cost = _total_cost(row)
+        card_id = row.get("image_id", "<unknown>")
+        if colored_cost + free_cost != total_cost:
+            raise ValueError(
+                f"{card_id} has complete printed cost metadata that does not sum to its cost"
+            )
+        if colored_cost == 0:
+            return {Color.COLORLESS: free_cost} if free_cost else {}
+        cost_color_label = (row.get("cost_colors_jp") or "").strip()
+        cost_color = _COLOR_BY_SEESAA_LABEL.get(cost_color_label)
+        if cost_color is not None and cost_color is not Color.COLORLESS:
+            exact_cost = {cost_color: colored_cost}
+            if free_cost:
+                exact_cost[Color.COLORLESS] = free_cost
+            return exact_cost
+        # Multi-color pip labels do not identify each color's count. The explicit
+        # Seesaa cost remains the authoritative fallback for those rows below.
     official_cost = _seesaa_cost(row)
     if official_cost is not None:
         return official_cost
@@ -418,13 +438,16 @@ def _magic_timing_flags(ability_jp: str, card_type: CardType) -> tuple[bool, boo
     return True, False
 
 
-def _card_from_row(row: dict[str, str]) -> Card:
+def _card_from_row(row: dict[str, str], *, infer_effects: bool = True) -> Card:
     row = _row_with_face_overrides(row)
     card_id = row["image_id"].strip()
     card_type = _TYPE_BY_OFFICIAL[row["card_type"].strip()]
     color = _COLOR_BY_OFFICIAL[(row.get("attribute") or row.get("color") or "").strip()]
     ability_jp = _clean_text(row.get("ability_jp"))
     keywords = _keywords(ability_jp)
+    for keyword in _keywords(_clean_text(row.get("effect_tags_jp"))):
+        if keyword not in keywords:
+            keywords.append(keyword)
     keywords.extend(keyword for keyword in _EXTRA_KEYWORDS_BY_ID.get(card_id, ()) if keyword not in keywords)
     main_timing_ok, flash_timing_ok = _magic_timing_flags(ability_jp, card_type)
     return Card(
@@ -433,6 +456,7 @@ def _card_from_row(row: dict[str, str]) -> Card:
         name_en=_clean_text(row.get("name_en")),
         type=card_type,
         cost=_cost(row, color, card_type),
+        printed_color=color,
         bp=_parse_int(row.get("bp")),
         dp=_parse_int(row.get("dp")),
         mana_color=color if card_type is CardType.B_MINION else None,
@@ -440,7 +464,7 @@ def _card_from_row(row: dict[str, str]) -> Card:
         race_jp=_clean_text(row.get("race_jp")),
         ability_jp=ability_jp,
         ability_en=_clean_text(row.get("ability_en")),
-        effects=_effects(card_id, ability_jp),
+        effects=_effects(card_id, ability_jp) if infer_effects else [],
         aura=_extra_aura(card_id),
         keyword_aura=_extra_keyword_aura(card_id),
         main_timing_ok=main_timing_ok,
@@ -1056,8 +1080,6 @@ def _catherine_purple_force_destroy_reward(ci: CardInstance, state, ctx: Context
     if eng is None:
         return
     replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
-    if len(ci.owner.base) >= 10 and replace_iid is None:
-        return
     setattr(ctx, "_catherine_rewarded", True)
     eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid)
     eng.draw(ci.owner, 1)

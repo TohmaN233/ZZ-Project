@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_07_02_02r_00_positive",
+  "card_id": "green_07_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n緑マナ1つをベースに置く\n【常時】\nこのニがク状態でけば[加は付与\nれない。\n【加護時】\n緑の加護である場合、加護してるマナを除外して、「「森羅 EN: [When Summoned]\nPlace one Green Mana into your base.\n[Passive]\nThis minion cannot receive a Boost when not in the\nActive State.\n[When Boosted]\nIf Boosted by a Green Mana, banish that mana. This\ncard Transforms into \"Rory - Barbarian of the Earth\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_07_02_02r_00",
+        "zone": "hand",
+        "seed": 1701852706,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_07_02_02r_00",
+        "side": "P1",
+        "zone": "field"
+      },
+      "capture": {
+        "rory_host": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "rory_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02_01",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Rory stage zero",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_07_02_02r_00"
+      }
+    },
+    {
+      "name": "Bless the Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$rory_bless",
+        "target_iid": "$rory_host"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Rory transforms into stage one",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_07_02_02r_01"
+      }
+    },
+    {
+      "name": "summoning Rory creates Green Mana",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "mana_token",
+        "manaColor": "GREEN"
+      }
+    },
+    {
+      "name": "transformation banishes the Neutral Minion",
+      "path": "state.players.opponent.removedCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

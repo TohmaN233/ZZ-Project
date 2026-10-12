@@ -53,10 +53,10 @@
     </section>
 
     <section class="release-strip" aria-label="Release status">
-      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + EX01 + PC01 + PC01R + PC02</span></div>
+      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + EX01 + PC01 + PC01R + PC02 + PC02R DIVINE（新增 106 张）</span></div>
       <div><strong data-i18n="statusTwoTitle">对战方式</strong><span data-i18n="statusTwoBody">单机 / 局域网 / 在线</span></div>
       <div><strong data-i18n="statusThreeTitle">AI 档位</strong><span data-i18n="statusThreeBody">Greedy + 两档 RL</span></div>
-      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.3.2 · PC02</span></div>
+      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.4.0 候选 · 尚未发布</span></div>
     </section>
 
     <section class="section" id="features">
@@ -142,7 +142,7 @@
     <section class="section screenshots" aria-labelledby="screens-title">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="screensEyebrow">Actual UI</p>
-        <h2 id="screens-title" data-i18n="screensTitle">完整 ZZ 体验：当前卡池包含 PC02</h2>
+        <h2 id="screens-title" data-i18n="screensTitle">完整 ZZ 体验：新增 106 张 PC02R DIVINE 卡牌</h2>
       </div>
       <div class="screen-stage">
         <img src="assets/battle.webp" alt="ZENONZARD 对战画面" loading="lazy">
@@ -182,9 +182,9 @@
         <h2 data-i18n="contentTitle">当前内容边界</h2>
       </div>
       <div class="status-list">
-        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">当前包含基本卡、EX01、PC01、PC01R 与 PC02。</p></div>
+        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">当前包含基本卡、EX01、PC01、PC01R、PC02 与新增的 106 张 PC02R DIVINE 卡。</p></div>
         <div><strong data-i18n="testingTitle">测试</strong><p data-i18n="testingBody">个人项目无法覆盖足够多的组合测试，当前版本可能仍有小型规则或界面问题。</p></div>
-        <div><strong data-i18n="englishTitle">英文版</strong><p data-i18n="englishBody">英文卡图与文本是独立资源包；未覆盖的图仍可能回退到官网 URL。</p></div>
+        <div><strong data-i18n="englishTitle">英文版</strong><p data-i18n="englishBody">v0.4.0 的 asserts.7z 包含英文卡图；未覆盖的图仍可能回退到官网 URL。</p></div>
         <div><strong data-i18n="musicTitle">BGM</strong><p data-i18n="musicBody">顶部栏或基础设置中可选择对战 BGM；完整资源包包含 ZZ 各角色歌曲。</p></div>
         <div><strong data-i18n="thanksTitle">致谢</strong><p data-i18n="thanksBody">感谢 theFeri 提供 50+ 张高清 playmat 图，以及 Valkyrie 提供英文文本。</p></div>
       </div>
@@ -193,13 +193,13 @@
     <section class="section install" id="install">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="installEyebrow">INSTALLATION</p>
-        <h2 data-i18n="installTitle">Windows 安装包与大型资源分开下载</h2>
-        <p data-i18n="installLead">Windows 安装包已经包含可玩的桌面客户端、冻结后的 Python server 和默认模型；卡图、角色图、视频与音乐仍放在独立资源包中。</p>
+        <h2 data-i18n="installTitle">v0.4.0 候选包尚未公开；首次启动可自动获取资源</h2>
+        <p data-i18n="installLead">Windows 和 Linux 候选包包含可玩的游戏与默认模型。v0.4.0 尚未公开发布；缺少完整 asserts/ 时，桌面客户端会询问是否下载并安装包含英文卡图的 asserts.7z。</p>
       </div>
       <div class="install-grid">
         <ol class="steps">
-          <li><span>1</span><div><strong data-i18n="installStep1Title">下载 Windows 安装包</strong><p data-i18n="installStep1Body">从 GitHub Releases 下载 ZZ-Project-v0.3.2-Windows-Setup.exe 并运行；Linux/macOS 和开发者使用源码包。</p></div></li>
-          <li><span>2</span><div><strong data-i18n="installStep2Title">放入资源包</strong><p data-i18n="installStep2Body">下载 ZZ-Assets-PC02-v1.zip.001 与 .002，用 7-Zip 打开 .001；英文用户再下载独立的 ZZ-Assets-PC02-English-v1.zip。</p></div></li>
+          <li><span>1</span><div><strong data-i18n="installStep1Title">选择平台候选包</strong><p data-i18n="installStep1Body">Windows: ZZ-Project-v0.4.0-Windows-Setup.exe；Linux: ZZ-Project-v0.4.0-Linux.tar.gz。候选包尚未公开发布。</p></div></li>
+          <li><span>2</span><div><strong data-i18n="installStep2Title">首次启动获取资源</strong><p data-i18n="installStep2Body">若缺少 asserts/，客户端会询问是否下载 asserts.7z，校验 CRC 后解压到程序目录；包为 1.53 GB，展开后 1.58 GB，请预留 3.2 GB。包含英文卡图。</p></div></li>
           <li><span>3</span><div><strong data-i18n="installStep3Title">源码版本安装依赖</strong><p data-i18n="installStep3Body">Windows 安装包不需要 Python 或 Node.js；源码启动才需要 Python 3.10+、Node.js 20+ 与 npm install。</p></div></li>
           <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">安装包从开始菜单或桌面快捷方式启动；源码版本使用 .cmd、.sh 或 npm run electron:dev。</p></div></li>
         </ol>
@@ -212,11 +212,11 @@
             <div><dt data-i18n="reqGpu">显卡</dt><dd data-i18n="reqGpuBody">游玩不要求；本地训练需要 NVIDIA GPU / CUDA</dd></div>
           </dl>
           <div class="download-actions">
-            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Windows-Setup.exe" data-i18n="downloadCode">下载 Windows 安装包</a>
-            <a class="button secondary" data-linux-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Linux.tar.gz" data-i18n="downloadLinux">下载 Linux portable 包</a>
-            <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">下载资源包（含英文包）</a>
+            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases" data-i18n="downloadCode">查看公开版本（v0.4.0 尚未发布）</a>
+            <a class="button secondary" data-linux-link href="https://github.com/TohmaN233/ZZ-Project/releases" data-i18n="downloadLinux">查看 Linux 版本</a>
+            <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">打开 asserts.7z 资源文件夹（含英文卡图）</a>
           </div>
-          <p class="hash-note"><code>ZZ-Assets-PC02-v1.zip.001</code><br><code>ZZ-Assets-PC02-v1.zip.002</code><br><code>ZZ-Assets-PC02-English-v1.zip</code><br><span data-i18n="hashNote">两个主资源 volume 与英文 ZIP 的大小和 SHA-256 已记录在资源清单和发布说明中，便于检查下载完整性。</span></p>
+          <p class="hash-note"><code>asserts.7z · 1,534,680,950 bytes</code><br><span data-i18n="hashNote">桌面客户端捆绑 7-Zip 并校验 CRC。完整包展开后为 1,577,092,255 bytes；请预留至少 3.2 GB。v0.4.0 程序包仍是本地候选，未公开发布；公开链接和校验值以发布清单为准。</span></p>
         </aside>
       </div>
     </section>

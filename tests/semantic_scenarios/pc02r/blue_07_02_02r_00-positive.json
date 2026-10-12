@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_07_02_02r_00_positive",
+  "card_id": "blue_07_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分のデッを上から3枚見て、その中のカド1枚を公開して手札に\\n加える。残りをンダにデッの下に戻す。\\n【常時】\\nこのニンがクブ状態でなければ[加は付与ない\\n【加蔬時】\\n青の加護である場合、加護しているマナを除外して、「「荒波王」才\\nルカ」に変形する。\\nLEＧEND EN: [When Summoned]\\nLook at the top three cards of your deck and select one\\ncard. Reveal it to your opponent and add it to your hand. Put\\nthe rest back on the bottom of your deck in random order\\n[Passive]\\nThis minion cannot receive a Boost when not in the Active\\nState.\\n[When Boosted]\\nIf Boosted by a Blue Mana, banish that mana. This card\\nTransforms into \"Orka - The Tempestuous King\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_07_02_02r_00",
+        "zone": "hand",
+        "seed": 3176107434,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "card": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "blue_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_03_01_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_01_03_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "blue_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Orka",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_07_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "choose and reveal Tidal Wave",
+      "select": {
+        "cardId": "blue_02_03_01_01"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "transform Orka with Blue Bless",
+      "select": {
+        "kind": "bless",
+        "iid": "$blue_bless",
+        "target_iid": "$card"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Tidal Wave is selected into hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_03_01_01"
+      }
+    },
+    {
+      "name": "Orka becomes the Tempestuous King",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_07_02_02r_01"
+      }
+    },
+    {
+      "name": "Blue Bless mana is banished",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "two unchosen cards remain in deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "name": "event log contains only the selected top-card reveal",
+      "path": "state.logEvents",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "type": "reveal",
+        "reason": "top_cards",
+        "card": {
+          "cardId": "blue_02_03_01_01"
+        }
+      }
+    }
+  ]
+}

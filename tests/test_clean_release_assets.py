@@ -38,7 +38,10 @@ class CleanReleaseAssetTests(unittest.TestCase):
             ]
             self.assertEqual(non_ascii, [])
         else:
-            self.assertLessEqual(actual_entries - runtime_entries, {"card images", "db1.xml"})
+            # A developer may retain the published first-launch archive next
+            # to its extracted tree. Release asset trees still require exactly
+            # the six runtime directories above.
+            self.assertLessEqual(actual_entries - runtime_entries, {"card images", "db1.xml", "asserts.7z"})
 
     def test_card_force_token_and_audio_closure_matches_runtime(self) -> None:
         expected_cards = {

@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_04_02_02r_00_positive",
+  "card_id": "yellow_04_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\nこのタン中、自分の黄のミ二オン1体に【自分\nのターン】このミニオンは種族「ドラゴン」または\n「ドラゴニュート」を持たないミニオンにはブロッ\nクされない。」を与える。 EN: [When Summoned]\nFor the duration of this turn, one of your\nYellow Minions gains the following effect\n[On Your Turn] Only minions belonging\nto the Dragon or Dragonewt class can\nblock this minion's attacks.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_04_02_02r_00",
+        "zone": "hand",
+        "seed": 227557162,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "protected": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_04_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "dragon_blocker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "non_dragon_blocker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Karapace",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_04_02_02r_00"
+      }
+    },
+    {
+      "name": "choose a Yellow Minion to protect",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$protected"
+      }
+    },
+    {
+      "name": "attack with the protected Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_06_02_02r_00"
+      }
+    },
+    {
+      "name": "target the opponent Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass opponent Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "choose the eligible Dragon blocker",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$dragon_blocker"
+      }
+    },
+    {
+      "name": "end the controller turn and expire the grant",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the protected Minion remains after its Dragon-only block",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_02_02r_00",
+        "effectiveBp": 600
+      }
+    },
+    {
+      "name": "the Dragon can block the protected Minion",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_04_02_02r_00"
+      }
+    },
+    {
+      "name": "the non-Dragon is not forced to block",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_01",
+        "rested": false
+      }
+    },
+    {
+      "name": "the temporary dragon-only blocking marker clears at turn end",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_02_02r_00",
+        "flags": []
+      }
+    }
+  ]
+}

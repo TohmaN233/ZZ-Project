@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_02_02r_00_boundary",
+  "card_id": "red_02_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【加護時】\\nこのターン中、相手のプレイヤーとフォースに「こ\\nのライフは回復できず、ダメージを軽減できな\\nい。」を与える。 EN: [When Boosted]\\nDamage dealt to your opponent's Life and\\nForces cannot be reduced for the\\nduration of this turn.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_02_02r_00",
+        "zone": "field",
+        "seed": 3774062466,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_02_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "bless_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02r_01",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "life": 3
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "place the opponent Base Minion that reduces Force damage",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "white_00_01_02r_01"
+      }
+    },
+    {
+      "name": "end the opponent turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "finish the owner Mana phase",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "Boost the Lock Imp with Red mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$bless_mana",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "attack the opponent Force",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_02_02_02r_00"
+      }
+    },
+    {
+      "name": "target the Force with scheduled damage reduction",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_kon"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Boost applies the opponent damage and recovery restriction",
+      "path": "state.players.opponent.turnTargetRestrictions",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "sourceCardId": "red_02_02_02r_00",
+        "lifeRecoveryAllowed": false,
+        "damageReductionAllowed": false
+      }
+    },
+    {
+      "name": "the opponent Force reduction is blocked and one damage is dealt",
+      "path": "state.players.opponent.forces[0].life",
+      "op": "eq",
+      "value": 2
+    }
+  ]
+}

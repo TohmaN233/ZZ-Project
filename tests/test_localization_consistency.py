@@ -1,9 +1,12 @@
 from __future__ import annotations
 
-import re
+import csv
 import json
+import re
 from pathlib import Path
 
+from zz.cards import CARD_REGISTRY
+from zz.decks import is_user_deck_card_id
 from zz.forces import F_CYCLOPS
 from zz.web.localization import card_translations, force_translations
 from zz.web.server import RULEBOOK_FILES
@@ -56,9 +59,19 @@ def test_frontend_does_not_fall_back_to_another_content_language() -> None:
 def test_packaged_translations_are_available_without_external_workspace_files() -> None:
     cards = card_translations()
     forces = force_translations()
+    playable_card_ids = {
+        card_id
+        for card_id in CARD_REGISTRY
+        if is_user_deck_card_id(card_id)
+    }
+    with (ROOT / "data" / "official_cardlist.tsv").open(encoding="utf-8-sig", newline="") as handle:
+        official_rows = list(csv.DictReader(handle, delimiter="\t"))
+        official_pc02r_ids = {row["image_id"] for row in official_rows if row["pack_jp_official"] == "PC:02R DIVINE"}
+        official_card_ids = {row["image_id"] for row in official_rows}
+    expected_card_ids = playable_card_ids | official_pc02r_ids
 
-    assert len(cards) == 401
-    assert all(row.get("name_zh") for row in cards.values())
+    assert expected_card_ids <= set(cards) <= official_card_ids | playable_card_ids
+    assert all(row.get("name_zh") and row.get("ability_zh") for row in cards.values())
     assert len(forces) == 10
     assert all(row.get("name_zh") and row.get("ability_zh") for row in forces.values())
     assert all(row.get("name_en") and row.get("ability_en") for row in forces.values())

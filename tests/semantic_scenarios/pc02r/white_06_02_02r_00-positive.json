@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_06_02_02r_00_positive",
+  "card_id": "white_06_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分のフォース1つ毎に、\\nこのミニオンにBP+100\\nを付与する。\\n【アタック時】\\n相手のアクティブ状態であるミニオン1体を選択す\\nる。このバトル中、そのミニオンは必ずブロックす EN: [When Summoned]\\nThis minion receives +100BP for each of\\nyour Forces.\\n[When Attacking]\\nSelect one of your opponent's minions\\nthat is in the Active State. That minion must\\nblock during this battle.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_06_02_02r_00",
+        "zone": "hand",
+        "seed": 378388667,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_04_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "forced_blocker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "rested_distractor": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Aizalf",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_06_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "end P1 turn for summoning sickness",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "P2 places turn-start Mana",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "end P2 turn",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "P1 places turn-start Mana",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "attack P2 Force with Aizalf",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_06_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "target P2 Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "select the Active opposing Minion",
+      "select": {
+        "cardIid": "$forced_blocker"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P2 passes Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P1 passes Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "blocker",
+      "name": "the selected target must block",
+      "select": {
+        "cardIid": "$forced_blocker"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Aizalf gains 100 BP for each intact own Force",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_06_02_02r_00",
+        "effectiveBp": 700,
+        "rested": true
+      }
+    },
+    {
+      "name": "selected Active Minion is forced to block and destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$forced_blocker"
+      }
+    },
+    {
+      "name": "previously rested Minion was not forced to block",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$rested_distractor"
+      }
+    }
+  ]
+}

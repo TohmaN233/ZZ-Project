@@ -1,0 +1,1440 @@
+﻿image_id	total_cost_exact	colored_cost	free_cost	cost_colors_jp	face_pip_count	face_pip_count_raw	face_total_verified	text_total_verified	cost_conflict	ambiguous_pips	pip_scores	source
+blue_00_00_03_00												not_applicable_base_minion
+blue_00_00_03_01												not_applicable_base_minion
+blue_00_00_03_02												not_applicable_base_minion
+blue_00_00_03_03												not_applicable_base_minion
+blue_00_00_03_04												not_applicable_base_minion
+blue_00_00_03_05												not_applicable_base_minion
+blue_00_00_04_00												not_applicable_base_minion
+blue_00_00_04_01												not_applicable_base_minion
+blue_00_00_05_00												not_applicable_base_minion
+blue_00_00_EX03_00												not_applicable_base_minion
+blue_00_00_EX03_01												not_applicable_base_minion
+blue_00_00_EX03_02												not_applicable_base_minion
+blue_00_00_EX03_03												not_applicable_base_minion
+blue_00_00_EX03_04												not_applicable_base_minion
+blue_00_00_EX04_00												not_applicable_base_minion
+blue_00_00_EX04_01												not_applicable_base_minion
+blue_00_00_EX04_02												not_applicable_base_minion
+blue_00_00_EX04c_00												not_applicable_base_minion
+blue_00_00_EX04c_01												not_applicable_base_minion
+blue_00_00_EX04c_02												not_applicable_base_minion
+blue_00_01_00_00												not_applicable_base_minion
+blue_00_01_01_00												not_applicable_base_minion
+blue_00_01_01r_00												not_applicable_base_minion
+blue_00_01_02_00												not_applicable_base_minion
+blue_00_01_02_01												not_applicable_base_minion
+blue_00_01_02r_00												not_applicable_base_minion
+blue_00_01_02r_01												not_applicable_base_minion
+blue_00_01_EX03_00	0	0	0		0	0						local_japanese_face_pips
+blue_00_03_02_00	0	0	0		0	0						local_japanese_face_pips
+blue_01_01_03_00	1	0	1		1	1					38:106:77	local_japanese_face_pips
+blue_01_01_05_00	1	0	1		1	1					41:114:75	local_japanese_face_pips
+blue_01_01_06_00	2	1	1	青|紫	2	2					222:102:102|38:106:87	local_japanese_face_pips
+blue_01_01_EX03_00	1	0	1		1	1					34:102:68	local_japanese_face_pips
+blue_01_02_01_00	1	1	0	青	1	1					252:100:67	local_japanese_face_pips
+blue_01_02_02_00	1	1	0	青	1	1					245:114:84	local_japanese_face_pips
+blue_01_02_04_00	1	1	0	青	1	1					255:109:75	local_japanese_face_pips
+blue_01_02_04_01	1	1	0	青	1	1					250:102:59	local_japanese_face_pips
+blue_01_02_04_02	1	1	0	青	1	1					238:104:68	local_japanese_face_pips
+blue_01_02_05_00	1	1	0	青	1	1					255:102:79	local_japanese_face_pips
+blue_01_03_01r_00	1	1	0	青	1	1					227:87:76	local_japanese_face_pips
+blue_01_03_02r_00	1	1	0	青	1	1					240:102:95	local_japanese_face_pips
+blue_02_00_06_00												not_applicable_base_minion
+blue_02_01_03_00	2	1	1	青	2	2					252:95:66|35:102:66	local_japanese_face_pips
+blue_02_01_03_01	2	1	1	青	2	2					235:100:70|35:87:69	local_japanese_face_pips
+blue_02_01_03_02	2	1	1	青	2	2					241:101:70|35:88:70	local_japanese_face_pips
+blue_02_01_03_03	2	1	1	青	2	2					240:85:68|42:85:76	local_japanese_face_pips
+blue_02_01_06_00	5	2	3	青	5	5	5		official_total_vs_verified_face		247:107:76|247:106:57|35:76:35|35:76:70|35:76:70|76:76:76|76:76:76	local_japanese_face_manual_2026-09-24
+blue_02_01_06_01	2	1	1	青	2	2	2		official_total_vs_verified_face		231:102:81|35:78:81|43:43:43|71:71:71	local_japanese_face_manual_2026-09-24
+blue_02_01_EX03_00	2	1	1	青	2	2					235:108:68|35:87:80	local_japanese_face_pips
+blue_02_01_EX04_00	2	1	1	青	2	2					244:111:80|34:108:80	local_japanese_face_pips
+blue_02_01_EX04c_00	2	1	1	青	2	2					254:102:68|34:87:74	local_japanese_face_pips
+blue_02_02_00_00	2	1	1	青	2	2					250:106:79|45:108:79	local_japanese_face_pips
+blue_02_02_00_01	2	1	1	青	2	2					232:101:69|33:87:69	local_japanese_face_pips
+blue_02_02_01_00	2	1	1	青	2	2					253:104:67|47:85:67	local_japanese_face_pips
+blue_02_02_01r_00	2	1	1	青	2	2					248:100:70|39:87:85	local_japanese_face_pips
+blue_02_02_01r_01	2	1	1	青	2	2					243:106:78|38:110:79	local_japanese_face_pips
+blue_02_02_02_00	2	1	1	青	2	2					254:100:68|34:88:81	local_japanese_face_pips
+blue_02_02_02r_00	2	1	1	青	2	2					255:112:76|43:77:76	local_japanese_face_pips
+blue_02_02_04_00	2	1	1	青	2	2					255:102:81|41:81:81	local_japanese_face_pips
+blue_02_03_00_00	2	1	1	青	2	2					235:107:75|20:109:75	local_japanese_face_pips
+blue_02_03_01_00	2	1	1	青	2	2					254:88:68|36:88:68	local_japanese_face_pips
+blue_02_03_01_01	2	1	1	青	2	2					240:104:68|29:107:68	local_japanese_face_pips
+blue_02_04_00_00	2	0	2		2	2					34:94:66|34:94:69	local_japanese_face_pips
+blue_03_00_06_00												not_applicable_base_minion
+blue_03_01_03_00	3	1	2	青	3	3					243:98:70|36:89:70|36:86:61	local_japanese_face_pips
+blue_03_01_03_01	3	0	3		3	3					42:102:70|42:78:78|42:78:78	local_japanese_face_pips
+blue_03_01_03_02	3	2	1	青	3	3					246:109:78|229:95:80|35:101:71	local_japanese_face_pips
+blue_03_01_03_03	3	2	1	青	3	3					247:85:68|228:85:87|43:87:68	local_japanese_face_pips
+blue_03_01_04_00	3	1	2	青	3	3					233:107:68|44:85:69|44:89:53	local_japanese_face_pips
+blue_03_01_04_01	3	1	2	青	3	3					255:103:68|38:108:81|38:81:66	local_japanese_face_pips
+blue_03_01_04_02	3	1	2	青	3	3					248:103:68|34:85:77|34:85:54	local_japanese_face_pips
+blue_03_01_05_00	3	1	2	青	3	3					251:103:66|26:101:77|26:81:79	local_japanese_face_pips
+blue_03_01_05_01	3	2	1	青	3	3					243:102:81|243:111:81|34:81:34	local_japanese_face_pips
+blue_03_01_05_02	3	0	3		3	3					35:90:69|35:82:67|34:69:54	local_japanese_face_pips
+blue_03_01_06_00	1	1	0	青|紫	1	1					219:99:101	local_japanese_face_pips
+blue_03_01_EX03_00	3	1	2	青	3	3					238:88:68|35:88:73|35:90:57	local_japanese_face_pips
+blue_03_01_EX04_00	3	1	2	青	3	3					243:104:68|44:104:55|34:86:78	local_japanese_face_pips
+blue_03_01_EX04c_00	3	1	2	青	3	3					252:95:68|40:101:59|30:68:94	local_japanese_face_pips
+blue_03_02_00_00	3	1	2	青	3	3					255:91:72|39:91:54|39:72:35	local_japanese_face_pips
+blue_03_02_01_00	3	1	2	青	3	3					249:100:67|31:87:67|31:67:63	local_japanese_face_pips
+blue_03_02_01_01	3	1	2	青	3	3					240:102:77|41:77:83|41:102:73	local_japanese_face_pips
+blue_03_02_02_00	3	1	2	青	3	3					234:102:68|39:110:85|39:85:57	local_japanese_face_pips
+blue_03_02_02r_00	3	1	2	青	3	3					255:85:68|39:85:79|39:87:68	local_japanese_face_pips
+blue_03_02_03_00	3	2	1	青	3	3					252:98:63|232:100:78|27:78:58	local_japanese_face_pips
+blue_03_02_04_00	3	2	1	青	3	3					255:103:77|238:77:68|44:77:77	local_japanese_face_pips
+blue_03_02_04_01	3	2	1	青	3	3					249:94:87|229:94:74|26:87:69	local_japanese_face_pips
+blue_03_02_05_00	3	2	1	青	3	3					244:110:77|244:115:51|37:82:81	local_japanese_face_pips
+blue_03_02_EX03_00	3	2	1	青	3	3					244:97:76|247:97:76|40:76:52	local_japanese_face_pips
+blue_03_02_EX03_01	3	2	1	青	3	3					248:94:62|234:94:67|29:90:77	local_japanese_face_pips
+blue_03_02_EX04_00	3	1	2	青	3	3					214:87:73|46:87:46|41:73:79	local_japanese_face_pips
+blue_03_02_EX04c_00	3	1	2	青	3	3					238:109:81|17:76:81|65:81:78	local_japanese_face_pips
+blue_03_03_00_00	3	1	2	青	3	3					242:105:77|50:77:69|50:77:49	local_japanese_face_pips
+blue_03_03_00_01	3	1	2	青	3	3					234:102:76|29:91:76|29:76:76	local_japanese_face_pips
+blue_03_03_01r_00	3	1	2	青	3	3					247:94:64|28:104:64|28:85:70	local_japanese_face_pips
+blue_03_03_02_00	3	1	2	青	3	3					255:79:76|49:79:76|49:76:78	local_japanese_face_pips
+blue_04_01_03_00	4	2	2	青	4	4					255:112:83|242:109:83|39:83:69|39:69:72	local_japanese_face_pips
+blue_04_01_04_00	4	2	2	青	4	4					247:102:77|247:77:66|43:83:35|43:77:46	local_japanese_face_pips
+blue_04_01_04_02	4	2	2	青	4	4					229:99:62|242:97:60|34:100:67|34:67:62	local_japanese_face_pips
+blue_04_01_05_00	4	1	3	青	4	4					234:92:83|35:92:77|35:80:72|35:72:42	local_japanese_face_pips
+blue_04_01_06_00	8	3	5	青|紫	8	8					227:104:102|177:86:104|181:91:91|40:55:70|40:75:70|40:75:75|40:75:75|40:75:44	local_japanese_face_pips
+blue_04_01_06_01	2	1	1	青	2	2	2		official_total_vs_verified_face		249:85:68|43:85:74|43:43:43	local_japanese_face_manual_2026-09-24
+blue_04_01_06_02	3	1	2	青|紫	3	3					213:103:102|42:85:68|42:85:53	local_japanese_face_pips
+blue_04_01_06_03	4	2	2	青|紫	4	4					213:102:102|186:104:104|34:90:56|34:56:63	local_japanese_face_pips
+blue_04_01_EX03_00	4	2	2	青	4	4					236:116:77|248:77:81|35:81:35|35:79:72	local_japanese_face_pips
+blue_04_01_EX04_00	4	3	1	青	4	4					247:103:66|246:86:82|205:82:64|33:73:67	local_japanese_face_pips
+blue_04_01_EX04c_00	4	3	1	青	4	4					248:99:66|240:107:70|195:79:77|32:77:66	local_japanese_face_pips
+blue_04_02_01_00	4	1	3	青	4	4					255:111:76|43:77:76|43:76:35|43:76:70	local_japanese_face_pips
+blue_04_02_02_00	4	2	2	青	4	4					253:101:67|226:87:71|34:87:69|34:69:67	local_japanese_face_pips
+blue_04_02_02r_00	4	1	3	青	4	4					255:94:72|35:94:58|35:72:58|35:58:74	local_japanese_face_pips
+blue_04_02_02r_01	4	2	2	青	4	4					250:100:71|241:86:86|33:83:77|33:67:55	local_japanese_face_pips
+blue_04_02_02r_02	4	0	4		4	4					35:114:81|37:77:81|37:81:80|35:76:50	local_japanese_face_pips
+blue_04_02_04_00	4	1	3	青	4	4					248:105:80|19:110:80|19:80:77|19:77:77	local_japanese_face_pips
+blue_04_02_05_00	4	1	3	青	4	4					233:112:60|28:95:60|34:79:51|34:77:49	local_japanese_face_pips
+blue_04_03_01_00	4	2	2	青	4	4					249:102:66|227:112:66|37:66:78|37:78:77	local_japanese_face_pips
+blue_04_03_02r_00	4	2	2	青	4	4					252:97:64|239:97:73|29:86:67|29:84:61	local_japanese_face_pips
+blue_05_01_03_00	5	2	3	青	5	5					232:100:71|247:88:73|34:82:77|34:77:68|34:75:68	local_japanese_face_pips
+blue_05_01_03_01	5	2	3	青	5	5					250:99:73|237:88:71|35:85:66|35:66:40|35:74:65	local_japanese_face_pips
+blue_05_01_03_02	5	2	3	青	5	5					250:100:70|234:87:71|36:88:55|36:67:41|36:75:68	local_japanese_face_pips
+blue_05_01_04_00	5	2	3	青	5	5					254:98:61|234:91:61|36:82:53|36:70:43|36:76:68	local_japanese_face_pips
+blue_05_01_04_01	5	2	3	青	5	5					243:103:78|221:106:79|38:78:67|38:79:51|38:67:68	local_japanese_face_pips
+blue_05_01_05_00	5	2	3	青	5	5					248:115:76|250:108:76|17:76:78|46:78:45|40:78:78	local_japanese_face_pips
+blue_05_01_05_01	5	0	5		5	5					46:91:68|46:91:80|46:93:68|46:68:71|46:76:50	local_japanese_face_pips
+blue_05_01_06_00	4	2	2	青|紫	4	4					239:99:71|189:88:68|34:84:70|34:70:62	local_japanese_face_pips
+blue_05_01_EX04_00	5	2	3	青	5	5					224:104:68|230:85:73|34:85:52|34:57:44|36:77:77	local_japanese_face_pips
+blue_05_01_EX04_01	5	2	3	青	5	5					253:99:67|235:88:78|35:83:55|35:78:67|35:75:67	local_japanese_face_pips
+blue_05_01_EX04c_00	5	2	3	青	5	5					255:85:68|251:85:68|39:91:79|38:79:41|17:76:71	local_japanese_face_pips
+blue_05_01_EX04c_01	5	2	3	青	5	5					249:110:68|249:85:77|43:89:53|34:53:50|38:75:75	local_japanese_face_pips
+blue_05_02_00_00	5	2	3	青	5	5					255:108:75|243:76:75|42:75:39|42:77:45|42:77:49	local_japanese_face_pips
+blue_05_02_01_00	5	5	0	青	5	5					255:109:81|238:107:81|206:81:64|172:64:69|158:76:50	local_japanese_face_pips
+blue_05_02_01_01	5	2	3	青	5	5					248:107:68|243:108:76|42:76:36|42:76:68|42:76:68	local_japanese_face_pips
+blue_05_02_01_02	5	2	3	青	5	5					255:108:80|249:108:80|40:80:55|40:79:68|40:75:68	local_japanese_face_pips
+blue_05_02_01r_00	5	2	3	青	5	5					239:110:68|236:78:68|39:93:58|39:75:70|39:68:68	local_japanese_face_pips
+blue_05_02_02_00	4	2	2	青	4	4					253:99:70|231:89:77|36:89:66|36:78:62	local_japanese_face_pips
+blue_05_02_02_01	5	2	3	青	5	5					250:111:79|250:78:79|38:79:65|38:80:63|38:85:68	local_japanese_face_pips
+blue_05_02_02r_00	5	2	3	青	5	5					255:102:81|232:79:81|40:81:76|40:76:72|40:76:50	local_japanese_face_pips
+blue_05_02_03_00	5	2	3	青	5	5					240:104:60|238:110:60|16:60:77|16:77:77|16:77:77	local_japanese_face_pips
+blue_05_02_04_00	5	2	3	青	5	5					246:102:79|246:105:79|40:79:76|40:76:69|40:75:69	local_japanese_face_pips
+blue_05_02_06_00	6	2	4	青	6	6					255:102:83|238:83:59|17:110:81|17:81:81|17:81:81|17:81:81	local_japanese_face_pips
+blue_05_02_EX04_00	5	2	3	青	5	4	5				226:107:67|212:107:52|41:107:79|48:79:48|48:49:48	local_japanese_face_manual_2026-09-24
+blue_05_02_EX04c_00	5	2	3	青	5	5					252:121:68|252:80:75|39:102:77|39:75:40|43:77:77	local_japanese_face_pips
+blue_05_03_01r_00	5	2	3	青	5	5					255:111:80|231:111:77|17:77:76|17:76:76|17:76:76	local_japanese_face_pips
+blue_06_01_03_00	6	2	4	青	6	6					245:101:69|232:88:70|33:80:69|33:69:60|33:69:60|33:84:84	local_japanese_face_pips
+blue_06_01_03_01	6	2	4	青	6	6					255:90:68|234:90:75|38:91:57|38:79:70|38:76:70|38:76:76	local_japanese_face_pips
+blue_06_01_03_02	6	2	4	青	6	6					245:101:70|230:90:80|35:85:55|35:55:42|35:79:75|35:79:79	local_japanese_face_pips
+blue_06_01_04_00	6	2	4	青	6	6					255:104:80|238:77:80|42:80:79|42:79:42|42:76:51|42:76:76	local_japanese_face_pips
+blue_06_01_05_00	6	2	4	青	6	6					255:102:68|244:85:81|34:85:68|34:68:39|35:68:71|35:68:68	local_japanese_face_pips
+blue_06_01_05_01	6	0	6		6	6					42:103:68|34:104:71|34:87:54|34:85:43|37:85:68|36:68:68	local_japanese_face_pips
+blue_06_01_06_00	5	2	3	青|紫	5	5					240:91:69|178:91:70|37:85:66|37:66:60|37:74:60	local_japanese_face_pips
+blue_06_01_06_01	7	2	5	青	7	7					255:107:77|235:77:53|42:77:35|42:76:69|42:76:69|42:76:76|42:76:76	local_japanese_face_pips
+blue_06_01_EX03_00	6	2	4	青	6	6					221:105:82|206:107:82|44:82:68|38:76:44|17:68:68|17:68:68	local_japanese_face_pips
+blue_06_01_EX04_00	6	2	4	青	6	6					244:91:83|222:81:76|33:71:64|33:62:59|33:71:70|33:79:78	local_japanese_face_pips
+blue_06_01_EX04c_00	6	2	4	青	6	6					244:91:83|222:81:76|33:71:64|33:62:59|33:71:70|33:79:78	local_japanese_face_pips
+blue_06_02_01_00	6	2	4	青	6	6					251:109:70|245:78:79|41:102:68|41:79:68|41:68:68|41:68:68	local_japanese_face_pips
+blue_06_02_01r_00	6	2	4	青	6	6					238:99:73|215:88:70|38:86:66|38:64:64|38:82:64|38:84:84	local_japanese_face_pips
+blue_06_02_02_00	6	2	4	青	6	6					255:102:77|221:93:79|35:77:74|35:74:68|35:74:68|35:74:74	local_japanese_face_pips
+blue_06_02_02r_00	6	2	4	青	6	6					231:101:68|233:88:66|25:68:44|25:54:40|25:74:68|25:74:74	local_japanese_face_pips
+blue_06_02_02r_01	6	2	4	青	6	6					247:101:70|230:90:73|34:87:68|34:68:62|34:69:62|34:84:84	local_japanese_face_pips
+blue_06_02_03_00	6	2	4	青	6	6					253:96:65|240:96:65|28:90:60|28:74:70|28:79:70|28:79:79	local_japanese_face_pips
+blue_06_02_05_00	6	3	3	青	6	3	6				255:102:74|238:114:74|207:103:74|65:76:63|10:76:63|70:76:76	local_japanese_face_manual_2026-09-24
+blue_07_01_05_00	7	2	5	青	7	7					249:102:67|243:109:78|35:79:68|39:68:78|39:76:78|35:76:76|39:76:76	local_japanese_face_pips
+blue_07_01_06_00	2	1	1	青	2	2					247:100:67|34:90:68	local_japanese_face_pips
+blue_07_01_06_01	2	2	0	青	2	2					246:110:80|246:110:80	local_japanese_face_pips
+blue_07_01_EX03_00	7	4	3	青	7	7					252:102:79|246:106:82|183:79:77|175:77:41|43:74:71|46:74:74|17:74:74	local_japanese_face_pips
+blue_07_01_EX03_01	7	3	4	青	7	7					246:101:68|236:87:78|215:84:69|34:53:42|20:69:69|34:76:69|53:76:76	local_japanese_face_pips
+blue_07_01_EX04_00	7	1	6	青	7	7					255:102:74|34:79:74|38:74:56|34:85:69|35:76:69|34:76:76|35:76:76	local_japanese_face_pips
+blue_07_01_EX04c_00	7	1	6	青	7	7					255:108:77|36:106:75|39:75:76|38:76:71|39:75:71|39:75:75|38:75:75	local_japanese_face_pips
+blue_07_02_00_00	7	2	5	青	7	7					245:103:68|245:88:81|38:88:68|38:77:68|38:68:68|38:68:68|38:85:85	local_japanese_face_pips
+blue_07_02_01_00	7	2	5	青	7	7					252:99:67|232:91:63|33:84:76|33:76:69|33:76:69|33:76:76|33:76:76	local_japanese_face_pips
+blue_07_02_02r_00	7	1	6	青	7	7					238:95:62|30:96:62|30:62:65|30:77:60|30:68:60|30:85:85|30:85:85	local_japanese_face_pips
+blue_07_02_02r_01	7	0	7		7	7					34:91:61|34:91:61|34:61:69|34:83:43|34:66:60|34:86:86|34:86:86	local_japanese_face_pips
+blue_07_02_06_00	2	1	1	青|紫	2	2					212:93:112|47:93:68	local_japanese_face_pips
+blue_08_01_04_00	8	3	5	青	8	8					255:103:68|224:103:81|209:81:68|38:85:69|38:68:68|38:68:68|38:85:85|38:68:68	local_japanese_face_pips
+blue_08_01_04_01	8	3	5	青	8	8					252:98:70|230:87:73|205:86:45|30:76:63|30:76:63|30:76:76|30:76:76|30:76:63	local_japanese_face_pips
+blue_08_01_06_00	4	2	2	青|紫	4	4					241:89:72|181:89:72|34:92:59|34:59:60	local_japanese_face_pips
+blue_08_01_EX03_00	8	4	4	青	8	8					245:86:68|240:86:78|206:88:53|175:53:69|35:76:69|35:76:95|35:76:76|35:69:69	local_japanese_face_pips
+blue_08_01_EX03_01	8	3	5	青	8	8					241:97:72|225:82:71|196:106:67|36:51:67|36:53:67|37:67:67|37:75:75|36:75:53	local_japanese_face_pips
+blue_08_01_EX04_00	8	3	5	青	8	8					243:102:68|230:103:69|232:86:52|17:88:57|17:76:76|43:76:76|17:76:76|39:57:57	local_japanese_face_pips
+blue_08_01_EX04c_00	8	3	5	青	8	8					255:109:77|214:109:77|211:77:37|34:51:41|40:51:70|38:76:76|44:76:76|34:70:76	local_japanese_face_pips
+blue_08_02_01_00	8	3	5	青	8	8					247:102:73|239:88:67|189:85:49|34:57:67|34:74:67|34:74:74|34:74:74|34:67:67	local_japanese_face_pips
+blue_08_02_01_01	8	2	6	青	8	8					233:97:69|216:90:71|34:80:53|34:63:67|34:74:67|34:74:74|34:74:74|34:67:67	local_japanese_face_pips
+blue_08_02_01r_00	8	3	5	青	8	8					247:89:68|236:89:80|206:91:55|41:73:68|41:76:53|41:76:76|41:76:76|41:76:53	local_japanese_face_pips
+blue_09_01_05_00	9	3	6	青	9	8	9				236:104:70|236:98:67|179:103:96|35:88:41|35:68:68|35:96:96|35:74:74|35:74:68|35:41:41	local_japanese_face_manual_2026-09-24
+blue_09_02_02_00	9	3	6	青	9	9					242:106:68|222:85:79|207:87:54|42:72:70|42:75:70|42:75:75|42:75:75|42:75:70|34:70:39	local_japanese_face_pips
+colorless_00_00_03_00												not_applicable_base_minion
+colorless_00_00_03_01												not_applicable_base_minion
+colorless_00_00_03_02												not_applicable_base_minion
+colorless_00_00_04_00												not_applicable_base_minion
+colorless_00_00_04_01												not_applicable_base_minion
+colorless_00_00_04_02												not_applicable_base_minion
+colorless_00_00_04_03												not_applicable_base_minion
+colorless_00_00_05_00												not_applicable_base_minion
+colorless_00_00_05_01												not_applicable_base_minion
+colorless_00_00_EX03_00												not_applicable_base_minion
+colorless_00_01_01_00												not_applicable_base_minion
+colorless_00_01_01_01												not_applicable_base_minion
+colorless_00_01_01r_00												not_applicable_base_minion
+colorless_00_01_01r_01												not_applicable_base_minion
+colorless_00_01_02_00												not_applicable_base_minion
+colorless_00_01_02_01												not_applicable_base_minion
+colorless_00_01_02_02												not_applicable_base_minion
+colorless_00_01_02c_00												not_applicable_base_minion
+colorless_00_01_02r_00												not_applicable_base_minion
+colorless_00_01_EX02_00												not_applicable_base_minion
+colorless_00_02_02r_00	0	0	0		0	0						local_japanese_face_pips
+colorless_01_01_04_00	1	0	1		1	1					34:102:85	local_japanese_face_pips
+colorless_01_01_05_00	1	0	1		1	1					35:100:82	local_japanese_face_pips
+colorless_01_01_06_00	3	0	3		3	3					43:102:85|43:102:68|43:85:68	local_japanese_face_pips
+colorless_01_01_EX04_00	1	0	1		1	1					33:100:83	local_japanese_face_pips
+colorless_01_01_EX04_01	1	0	1		1	1					37:102:87	local_japanese_face_pips
+colorless_01_01_EX04_02	1	0	1		1	1					36:100:83	local_japanese_face_pips
+colorless_01_01_EX04_03	1	0	1		1	1					35:100:83	local_japanese_face_pips
+colorless_01_01_EX04c_00	1	0	1		1	1					38:102:90	local_japanese_face_pips
+colorless_01_01_EX04c_01	1	0	1		1	1					35:100:83	local_japanese_face_pips
+colorless_01_01_EX04c_02	1	0	1		1	1					37:102:87	local_japanese_face_pips
+colorless_01_01_EX04c_03	1	0	1		1	1					42:100:84	local_japanese_face_pips
+colorless_01_02_00_00	1	0	1		1	1					35:100:83	local_japanese_face_pips
+colorless_01_02_01_00	1	0	1		1	1					34:102:87	local_japanese_face_pips
+colorless_01_02_01_01	1	0	1		1	1					28:101:84	local_japanese_face_pips
+colorless_01_02_01r_00	1	0	1		1	1					35:100:83	local_japanese_face_pips
+colorless_01_02_02c_00	1	0	1		1	1					31:100:84	local_japanese_face_pips
+colorless_01_02_02c_01	1	0	1		1	1					38:102:87	local_japanese_face_pips
+colorless_01_02_02c_02	1	0	1		1	1					36:101:84	local_japanese_face_pips
+colorless_01_02_02c_03	1	0	1		1	1					34:102:85	local_japanese_face_pips
+colorless_01_02_02r_00	1	0	1		1	1					28:100:84	local_japanese_face_pips
+colorless_01_02_04_00	1	0	1		1	1					36:108:85	local_japanese_face_pips
+colorless_01_02_EX02_00	1	0	1		1	1					43:102:85	local_japanese_face_pips
+colorless_01_02_EX02_01	1	0	1		1	1					33:100:82	local_japanese_face_pips
+colorless_01_02_EX02_02	1	0	1		1	1					36:99:82	local_japanese_face_pips
+colorless_01_02_EX02_03	1	0	1		1	1					35:101:82	local_japanese_face_pips
+colorless_01_04_00_00	1	0	1		1	1					34:101:85	local_japanese_face_pips
+colorless_01_04_00_01	1	0	1		1	1					33:100:83	local_japanese_face_pips
+colorless_02_01_03_00	2	0	2		2	2					35:102:82|35:101:84	local_japanese_face_pips
+colorless_02_01_03_01	2	0	2		2	2					36:100:82|36:99:75	local_japanese_face_pips
+colorless_02_01_04_00	2	0	2		2	2					33:100:82|33:99:74	local_japanese_face_pips
+colorless_02_01_04_01	2	0	2		2	2					34:100:83|34:99:75	local_japanese_face_pips
+colorless_02_01_05_00	2	0	2		2	2					35:101:84|35:100:78	local_japanese_face_pips
+colorless_02_01_05_01	2	0	2		2	2					38:102:85|40:102:86	local_japanese_face_pips
+colorless_02_01_05_02	2	0	2		2	2					29:100:82|40:100:82	local_japanese_face_pips
+colorless_02_01_05_03	2	0	2		2	2					34:102:68|17:102:68	local_japanese_face_pips
+colorless_02_01_06_00	1	0	1		1	1					35:102:85	local_japanese_face_pips
+colorless_02_01_06_01	2	0	2		2	2					33:104:81|33:96:81	local_japanese_face_pips
+colorless_02_01_06_02	10	0	10		10	9	10				33:100:84|33:101:87|33:84:68|33:67:50|33:67:68|33:76:76|33:76:76|33:76:76|33:67:76	local_japanese_face_manual_2026-09-24
+colorless_02_01_EX04_00	2	0	2		2	2					36:101:84|24:101:85	local_japanese_face_pips
+colorless_02_01_EX04_01	2	0	2		2	2					34:102:85|34:102:85	local_japanese_face_pips
+colorless_02_01_EX04c_00	2	0	2		2	2					33:101:83|37:101:83	local_japanese_face_pips
+colorless_02_01_EX04c_01	2	0	2		2	2					35:100:83|35:100:84	local_japanese_face_pips
+colorless_02_02_00_00	2	0	2		2	2					33:100:83|33:100:84	local_japanese_face_pips
+colorless_02_02_00_01	2	0	2		2	2					35:102:85|35:103:85	local_japanese_face_pips
+colorless_02_02_00_02	2	0	2		2	2					41:102:85|41:102:68	local_japanese_face_pips
+colorless_02_02_00_03	2	0	2		2	2					38:100:82|38:101:82	local_japanese_face_pips
+colorless_02_02_01_00	2	0	2		2	2					43:102:85|43:102:68	local_japanese_face_pips
+colorless_02_02_01_01	2	0	2		2	2					34:100:84|34:100:74	local_japanese_face_pips
+colorless_02_02_01_02	2	0	2		2	2					32:99:82|32:99:74	local_japanese_face_pips
+colorless_02_02_01_03	2	0	2		2	2					34:100:82|34:99:82	local_japanese_face_pips
+colorless_02_02_01r_00	2	0	2		2	2					38:100:86|38:100:70	local_japanese_face_pips
+colorless_02_02_02_00	2	0	2		2	2					39:102:85|39:104:85	local_japanese_face_pips
+colorless_02_02_02_01	2	0	2		2	2					38:100:83|38:97:84	local_japanese_face_pips
+colorless_02_02_02c_00	2	0	2		2	2					40:102:85|40:102:68	local_japanese_face_pips
+colorless_02_02_02c_04	2	0	2		2	2					34:100:84|34:100:75	local_japanese_face_pips
+colorless_02_02_02c_05	2	0	2		2	2					37:102:85|37:102:86	local_japanese_face_pips
+colorless_02_02_02r_00	2	0	2		2	2					29:100:85|35:102:85	local_japanese_face_pips
+colorless_02_02_02r_01	2	0	2		2	2					36:99:82|36:101:74	local_japanese_face_pips
+colorless_02_02_EX02_00	2	0	2		2	2					39:102:85|39:102:68	local_japanese_face_pips
+colorless_02_02_EX02_04	2	0	2		2	2					25:101:83|25:101:83	local_japanese_face_pips
+colorless_02_02_EX02_05	2	0	2		2	2					34:101:82|34:101:82	local_japanese_face_pips
+colorless_02_02_ex01_00	2	0	2		2	2					42:102:85|42:102:68	local_japanese_face_pips
+colorless_03_01_03_00	3	0	3		3	3					33:99:86|33:99:85|33:82:70	local_japanese_face_pips
+colorless_03_01_03_01	3	0	3		3	3					33:100:82|33:99:85|33:84:67	local_japanese_face_pips
+colorless_03_01_03_02	3	0	3		3	3					29:100:85|29:99:85|29:86:72	local_japanese_face_pips
+colorless_03_01_03_03	2	0	2		2	2					38:100:82|38:100:75	local_japanese_face_pips
+colorless_03_01_04_00	3	0	3		3	3					34:102:85|34:102:85|34:85:68	local_japanese_face_pips
+colorless_03_01_04_02	3	0	3		3	3					40:102:85|40:102:85|40:85:68	local_japanese_face_pips
+colorless_03_01_05_00	3	0	3		3	3					33:99:87|33:99:76|33:82:57	local_japanese_face_pips
+colorless_03_01_05_01	3	0	3		3	3					34:103:83|34:100:84|34:86:71	local_japanese_face_pips
+colorless_03_01_05_02	3	0	3		3	3					34:103:83|34:99:75|34:91:66	local_japanese_face_pips
+colorless_03_01_05_03	3	0	3		3	3					41:102:85|34:102:68|34:85:68	local_japanese_face_pips
+colorless_03_01_05_04	3	0	3		3	3					24:100:85|33:99:82|33:84:66	local_japanese_face_pips
+colorless_03_01_06_00	4	0	4		4	4					35:100:82|35:100:82|35:84:67|35:67:50	local_japanese_face_pips
+colorless_03_01_06_01	3	0	3		3	3					33:100:83|33:103:83|33:84:68	local_japanese_face_pips
+colorless_03_01_EX03_00	3	0	3		3	3					24:100:88|36:99:88|24:88:68	local_japanese_face_pips
+colorless_03_01_EX04_01	3	0	3		3	3					34:102:85|34:102:87|36:87:53	local_japanese_face_pips
+colorless_03_01_EX04c_00	3	0	3		3	3					38:102:88|17:102:87|34:85:68	local_japanese_face_pips
+colorless_03_01_EX04c_01	3	0	3		3	3					34:102:85|38:102:68|34:85:68	local_japanese_face_pips
+colorless_03_02_00_00	3	0	3		3	3					34:102:85|34:102:85|34:85:68	local_japanese_face_pips
+colorless_03_02_00_01	3	0	3		3	3					33:100:82|33:99:82|33:84:67	local_japanese_face_pips
+colorless_03_02_00_02	3	0	3		3	3					35:106:85|35:105:85|35:85:68	local_japanese_face_pips
+colorless_03_02_00_03	3	0	3		3	3					35:100:82|35:99:75|35:84:66	local_japanese_face_pips
+colorless_03_02_00_04	3	0	3		3	3					35:102:86|35:102:86|35:85:68	local_japanese_face_pips
+colorless_03_02_01_00	3	0	3		3	3					39:102:85|39:102:85|39:85:66	local_japanese_face_pips
+colorless_03_02_01_01	3	0	3		3	3					34:99:82|34:99:74|34:82:67	local_japanese_face_pips
+colorless_03_02_01_02	3	0	3		3	3					34:100:84|34:100:85|34:84:69	local_japanese_face_pips
+colorless_03_02_01_03	3	0	3		3	3					35:102:85|35:102:68|35:85:68	local_japanese_face_pips
+colorless_03_02_01_04	3	0	3		3	3					37:101:82|37:93:74|37:82:67	local_japanese_face_pips
+colorless_03_02_01_05	3	0	3		3	3					34:100:83|34:101:86|34:84:68	local_japanese_face_pips
+colorless_03_02_01_06	3	0	3		3	3					34:99:83|34:100:83|34:82:67	local_japanese_face_pips
+colorless_03_02_01_07	3	0	3		3	3					25:100:84|25:99:86|25:84:65	local_japanese_face_pips
+colorless_03_02_01r_00	3	0	3		3	3					33:100:84|33:100:74|33:84:66	local_japanese_face_pips
+colorless_03_02_01r_01	3	0	3		3	3					33:100:82|33:99:82|33:86:67	local_japanese_face_pips
+colorless_03_02_01r_02	3	0	3		3	3					33:100:82|33:100:75|33:84:67	local_japanese_face_pips
+colorless_03_02_02_00	3	0	3		3	3					34:100:82|34:98:75|34:84:68	local_japanese_face_pips
+colorless_03_02_02_01	3	0	3		3	3					35:99:82|35:99:74|35:82:64	local_japanese_face_pips
+colorless_03_02_02_02	3	0	3		3	3					35:103:83|35:104:86|35:84:68	local_japanese_face_pips
+colorless_03_02_02c_00	3	0	3		3	3					38:100:85|38:100:83|38:86:70	local_japanese_face_pips
+colorless_03_02_02c_01	3	0	3		3	3					29:100:85|29:100:83|29:86:68	local_japanese_face_pips
+colorless_03_02_02c_02	3	0	3		3	3					35:106:81|35:97:78|35:87:65	local_japanese_face_pips
+colorless_03_02_02c_03	3	0	3		3	3					36:101:87|36:101:87|36:86:64	local_japanese_face_pips
+colorless_03_02_02r_00	3	0	3		3	3					34:100:82|34:97:75|34:84:68	local_japanese_face_pips
+colorless_03_02_02r_01	3	0	3		3	3					35:101:82|35:101:74|35:82:66	local_japanese_face_pips
+colorless_03_02_02r_02	3	0	3		3	3					36:100:82|36:99:83|36:84:66	local_japanese_face_pips
+colorless_03_02_02r_03	3	0	3		3	3					38:102:85|38:104:68|38:85:68	local_japanese_face_pips
+colorless_03_02_EX02_00	3	0	3		3	3					33:99:82|33:99:74|33:82:66	local_japanese_face_pips
+colorless_03_02_EX02_01	3	0	3		3	3					33:101:82|33:99:81|33:84:72	local_japanese_face_pips
+colorless_03_02_EX02_02	3	0	3		3	3					24:101:85|24:102:84|24:86:68	local_japanese_face_pips
+colorless_03_02_EX02_03	3	0	3		3	3					35:100:86|35:99:86|35:82:66	local_japanese_face_pips
+colorless_03_02_ex01_00	3	0	3		3	3					35:102:86|35:102:86|35:88:68	local_japanese_face_pips
+colorless_03_02_ex01_01	3	0	3		3	3					35:101:86|35:101:85|35:87:71	local_japanese_face_pips
+colorless_03_04_00_00	3	0	3		3	3					35:100:83|35:100:83|35:86:65	local_japanese_face_pips
+colorless_04_01_03_00	4	0	4		4	4					33:101:84|33:102:87|33:86:68|33:68:53	local_japanese_face_pips
+colorless_04_01_03_01	4	0	4		4	4					36:100:84|36:100:86|36:84:70|36:70:53	local_japanese_face_pips
+colorless_04_01_03_02	4	0	4		4	4					36:100:82|36:100:82|36:86:71|36:68:53	local_japanese_face_pips
+colorless_04_01_05_00	4	0	4		4	4					24:100:83|38:102:83|38:84:67|38:67:59	local_japanese_face_pips
+colorless_04_01_06_00	5	0	5		5	5					36:101:84|36:99:83|36:84:64|36:70:53|36:70:64	local_japanese_face_pips
+colorless_04_01_EX04_01	4	0	4		4	4					38:102:85|34:102:68|37:85:68|34:68:52	local_japanese_face_pips
+colorless_04_01_EX04c_00	4	0	4		4	4					25:100:83|25:102:83|38:84:69|34:83:54	local_japanese_face_pips
+colorless_04_01_EX04c_01	4	0	4		4	4					35:102:85|34:102:85|41:88:68|35:68:53	local_japanese_face_pips
+colorless_04_02_00_00	4	0	4		4	4					40:102:85|40:102:68|40:85:68|40:68:52	local_japanese_face_pips
+colorless_04_02_00_01	4	0	4		4	4					34:100:82|34:101:82|34:83:69|34:67:50	local_japanese_face_pips
+colorless_04_02_00_02	4	0	4		4	4					33:105:78|33:94:77|33:86:64|33:70:55	local_japanese_face_pips
+colorless_04_02_00_03	4	0	4		4	4					35:100:84|35:100:83|35:84:68|35:68:52	local_japanese_face_pips
+colorless_04_02_00_04	4	0	4		4	4					36:100:85|36:100:82|36:84:66|36:66:57	local_japanese_face_pips
+colorless_04_02_01_00	4	0	4		4	4					34:100:84|34:101:83|34:86:68|34:71:51	local_japanese_face_pips
+colorless_04_02_01_01	4	0	4		4	4					39:102:88|39:102:68|39:88:68|39:68:52	local_japanese_face_pips
+colorless_04_02_01_02	4	0	4		4	4					34:100:76|34:100:85|34:85:71|34:69:53	local_japanese_face_pips
+colorless_04_02_01_03	4	0	4		4	4					46:102:85|46:102:85|46:85:68|46:68:51	local_japanese_face_pips
+colorless_04_02_01_04	4	0	4		4	4					35:101:84|35:92:74|35:84:66|35:66:58	local_japanese_face_pips
+colorless_04_02_01_05	4	0	4		4	4					35:100:83|35:100:83|35:86:68|35:68:53	local_japanese_face_pips
+colorless_04_02_01_06	4	0	4		4	4					34:101:82|34:101:82|34:84:69|34:69:52	local_japanese_face_pips
+colorless_04_02_01r_00	4	0	4		4	4					34:102:82|34:99:85|34:85:66|34:66:53	local_japanese_face_pips
+colorless_04_02_02_00	4	0	4		4	4					30:100:82|30:100:74|30:82:69|30:66:53	local_japanese_face_pips
+colorless_04_02_02_01	4	0	4		4	4					43:102:85|43:102:68|43:85:68|43:68:51	local_japanese_face_pips
+colorless_04_02_02_02	4	0	4		4	4					35:101:82|35:101:84|35:85:66|35:68:53	local_japanese_face_pips
+colorless_04_02_02_03	4	0	4		4	4					35:102:82|35:100:83|35:86:63|35:71:53	local_japanese_face_pips
+colorless_04_02_02c_00	4	0	4		4	4					43:102:85|43:102:85|43:85:68|43:68:53	local_japanese_face_pips
+colorless_04_02_02c_01	4	0	4		4	4					45:102:85|45:102:68|45:85:68|45:68:52	local_japanese_face_pips
+colorless_04_02_02c_02	4	0	4		4	4					36:100:83|36:100:85|36:84:68|36:68:50	local_japanese_face_pips
+colorless_04_02_02c_03	4	0	4		4	4					34:100:88|34:101:74|34:82:66|34:66:58	local_japanese_face_pips
+colorless_04_02_02r_00	4	0	4		4	4					35:101:84|35:95:84|35:86:64|35:67:53	local_japanese_face_pips
+colorless_04_02_02r_01	3	0	3		3	3					34:102:85|34:102:85|34:85:85	local_japanese_face_pips
+colorless_04_02_02r_02	4	0	4		4	4					35:99:82|35:99:82|35:82:69|35:69:53	local_japanese_face_pips
+colorless_04_02_02r_03	4	0	4		4	4					34:103:82|34:92:74|34:82:66|34:66:53	local_japanese_face_pips
+colorless_04_02_04_00	4	0	4		4	4					43:110:90|43:86:85|43:86:68|43:68:55	local_japanese_face_pips
+colorless_04_02_04_01	4	0	4		4	4					36:100:75|36:100:75|36:86:67|36:67:54	local_japanese_face_pips
+colorless_04_02_EX02_00	4	0	4		4	4					34:102:85|34:102:68|34:85:68|34:68:53	local_japanese_face_pips
+colorless_04_02_EX02_01	4	0	4		4	4					30:100:82|30:99:82|30:84:68|30:68:50	local_japanese_face_pips
+colorless_04_02_EX02_02	4	0	4		4	4					25:100:83|25:100:83|25:84:68|25:68:54	local_japanese_face_pips
+colorless_04_02_EX02_03	4	0	4		4	4					34:99:82|34:99:74|34:82:69|34:66:57	local_japanese_face_pips
+colorless_04_02_ex01_00	4	0	4		4	4					43:102:86|43:103:68|43:85:68|43:68:51	local_japanese_face_pips
+colorless_04_02_ex01_01	3	0	3		3	3					34:100:85|34:99:75|34:85:67	local_japanese_face_pips
+colorless_04_02_ex01_02	4	0	4		4	4					24:100:82|24:101:75|24:84:70|24:67:54	local_japanese_face_pips
+colorless_04_04_00_00	4	0	4		4	4					35:99:82|35:99:74|35:82:66|35:66:57	local_japanese_face_pips
+colorless_04_04_00_01	4	0	4		4	4					34:100:82|34:99:83|34:84:66|34:68:50	local_japanese_face_pips
+colorless_05_01_04_00	5	0	5		5	5					33:100:82|33:100:74|33:82:59|33:74:49|33:74:59	local_japanese_face_pips
+colorless_05_01_04_01	5	0	5		5	5					35:102:85|35:103:85|35:85:68|35:68:51|35:68:68	local_japanese_face_pips
+colorless_05_01_05_00	5	0	5		5	5					25:100:86|31:100:87|25:86:57|31:74:58|31:74:57	local_japanese_face_pips
+colorless_05_01_05_01	5	0	5		5	5					34:100:84|34:103:75|34:84:68|34:68:54|34:68:68	local_japanese_face_pips
+colorless_05_01_06_00	6	0	6		6	6					41:100:83|41:100:83|41:84:67|41:67:53|41:67:67|41:76:76	local_japanese_face_pips
+colorless_05_01_EX04_00	5	0	5		5	5					34:102:85|35:102:68|35:85:68|35:68:52|35:68:68	local_japanese_face_pips
+colorless_05_01_EX04_01	5	0	5		5	5					33:100:82|33:99:84|33:84:66|33:67:50|33:67:66	local_japanese_face_pips
+colorless_05_01_EX04c_00	5	0	5		5	5					44:102:87|37:102:92|34:85:70|34:68:53|43:68:53	local_japanese_face_pips
+colorless_05_01_EX04c_01	5	0	5		5	5					34:102:85|34:105:68|34:85:68|34:68:52|34:68:52	local_japanese_face_pips
+colorless_05_02_00_00	5	0	5		5	5					36:100:82|36:99:82|36:84:68|36:68:56|36:68:66	local_japanese_face_pips
+colorless_05_02_00_01	5	0	5		5	5					34:100:83|34:100:75|34:83:67|34:68:50|34:68:57	local_japanese_face_pips
+colorless_05_02_00_02	5	0	5		5	5					34:102:85|34:102:68|34:85:68|34:68:51|34:68:68	local_japanese_face_pips
+colorless_05_02_01_00	5	0	5		5	5					33:100:82|33:100:82|33:84:58|33:68:52|33:68:58	local_japanese_face_pips
+colorless_05_02_01_01	5	0	5		5	5					38:102:89|38:99:87|38:86:66|38:71:52|38:71:68	local_japanese_face_pips
+colorless_05_02_01_02	5	0	5		5	5					34:100:82|34:99:75|34:84:63|34:68:56|34:68:63	local_japanese_face_pips
+colorless_05_02_01_03	5	0	5		5	5					34:101:83|34:101:83|34:85:68|34:68:55|34:68:66	local_japanese_face_pips
+colorless_05_02_01_04	5	0	5		5	5					34:102:85|34:102:85|34:85:68|34:68:52|34:68:68	local_japanese_face_pips
+colorless_05_02_01_05	5	0	5		5	5					40:102:87|40:102:68|40:85:68|40:68:53|40:68:68	local_japanese_face_pips
+colorless_05_02_01_06	5	0	5		5	5					33:101:84|33:99:85|33:84:68|33:66:58|33:66:58	local_japanese_face_pips
+colorless_05_02_01_07	5	0	5		5	5					33:101:85|33:102:87|33:86:66|33:71:53|33:71:68	local_japanese_face_pips
+colorless_05_02_01r_00	5	0	5		5	5					34:101:84|34:101:75|34:87:67|34:67:54|34:67:67	local_japanese_face_pips
+colorless_05_02_01r_01	5	0	5		5	5					34:99:82|34:99:74|34:82:68|34:66:49|34:66:59	local_japanese_face_pips
+colorless_05_02_02_00	5	0	5		5	5					33:100:83|33:98:75|33:85:68|33:68:53|33:68:68	local_japanese_face_pips
+colorless_05_02_02_01	5	0	5		5	5					38:100:83|38:100:75|38:84:59|38:68:50|38:68:59	local_japanese_face_pips
+colorless_05_02_02_03	5	0	5		5	5					42:102:85|42:102:85|42:85:68|42:68:52|42:68:68	local_japanese_face_pips
+colorless_05_02_02c_00	5	0	5		5	5					38:102:85|38:102:85|38:88:68|38:68:51|38:68:68	local_japanese_face_pips
+colorless_05_02_02c_01	5	0	5		5	5					34:100:83|34:100:85|34:84:53|34:70:53|34:70:71	local_japanese_face_pips
+colorless_05_02_02c_02	5	0	5		5	5					37:100:84|37:100:85|37:86:68|37:70:53|37:70:68	local_japanese_face_pips
+colorless_05_02_02c_03	5	0	5		5	5					34:100:84|34:100:84|34:84:68|34:68:53|34:68:68	local_japanese_face_pips
+colorless_05_02_02r_00	5	0	5		5	5					30:99:90|30:99:82|30:82:66|30:66:51|30:66:66	local_japanese_face_pips
+colorless_05_02_02r_01	5	0	5		5	5					40:102:85|40:104:85|40:85:68|40:68:51|40:68:68	local_japanese_face_pips
+colorless_05_02_EX02_00	5	0	5		5	5					35:101:84|35:103:84|35:84:71|35:70:53|35:70:71	local_japanese_face_pips
+colorless_05_02_EX02_01	5	0	5		5	5					35:100:88|35:100:84|35:86:68|35:68:53|35:68:68	local_japanese_face_pips
+colorless_05_02_EX02_02	5	0	5		5	5					35:99:83|35:99:74|35:82:66|35:66:52|35:66:60	local_japanese_face_pips
+colorless_05_02_EX02_03	5	0	5		5	5					34:100:86|34:100:70|34:86:70|34:70:53|34:70:70	local_japanese_face_pips
+colorless_05_02_EX02_04	5	0	5		5	5					30:100:82|30:100:84|30:84:68|30:68:50|30:68:68	local_japanese_face_pips
+colorless_05_02_cp_00	5	0	5		5	5					36:100:83|36:101:83|36:85:69|36:68:58|36:68:68	local_japanese_face_pips
+colorless_05_02_ex01_00	5	0	5		5	5					34:100:82|34:100:82|34:84:66|34:68:50|34:68:68	local_japanese_face_pips
+colorless_05_02_ex01_01	5	0	5		5	5					45:102:87|45:102:68|45:85:68|45:68:51|45:68:68	local_japanese_face_pips
+colorless_05_02_ex01_02	5	0	5		5	5					33:100:82|33:99:75|33:83:66|33:68:50|33:68:58	local_japanese_face_pips
+colorless_05_04_00_00	5	0	5		5	5					36:103:91|36:103:85|36:87:66|36:66:53|36:66:69	local_japanese_face_pips
+colorless_06_01_03_00	6	0	6		6	6					34:102:85|34:102:85|34:85:68|34:68:52|34:68:68|34:68:68	local_japanese_face_pips
+colorless_06_01_03_01	6	0	6		6	6					34:100:82|34:99:74|34:84:67|34:66:53|34:66:67|34:74:66	local_japanese_face_pips
+colorless_06_01_03_02	6	0	6		6	6					35:100:89|35:100:89|35:88:70|35:70:55|35:70:54|35:70:70	local_japanese_face_pips
+colorless_06_01_04_00	6	0	6		6	6					34:100:82|34:100:82|34:84:70|34:67:50|34:67:67|34:75:75	local_japanese_face_pips
+colorless_06_01_06_00	7	0	7		7	7					43:102:85|43:102:85|43:85:68|43:68:53|43:68:68|43:68:68|43:68:68	local_japanese_face_pips
+colorless_06_01_06_02	2	0	2		2	2					34:101:83|34:99:71	local_japanese_face_pips
+colorless_06_02_00_00	6	0	6		6	6					33:100:82|33:100:75|33:83:66|33:67:50|33:67:66|33:75:67	local_japanese_face_pips
+colorless_06_02_00_01	6	0	6		6	6					33:100:82|33:99:82|33:84:68|33:67:51|33:67:58|33:75:67	local_japanese_face_pips
+colorless_06_02_00_02	6	0	6		6	6					34:102:85|34:102:68|34:85:68|34:68:51|34:68:68|34:68:68	local_japanese_face_pips
+colorless_06_02_01_00	6	0	6		6	6					33:102:84|33:95:84|33:84:71|33:70:53|33:70:71|33:70:70	local_japanese_face_pips
+colorless_06_02_01_01	6	0	6		6	6					34:100:85|34:100:85|34:86:70|34:70:53|34:70:66|34:70:70	local_japanese_face_pips
+colorless_06_02_01_02	6	0	6		6	6					31:101:86|31:101:86|31:86:66|31:70:55|31:70:66|31:70:70	local_japanese_face_pips
+colorless_06_02_01_03	6	0	6		6	6					35:100:82|35:100:82|35:84:66|35:67:53|35:67:66|35:75:67	local_japanese_face_pips
+colorless_06_02_01_04	6	0	6		6	6					37:100:86|37:100:76|37:86:68|37:68:54|37:68:68|37:76:76	local_japanese_face_pips
+colorless_06_02_01r_00	6	0	6		6	6					40:102:88|40:102:88|40:85:68|40:68:53|40:68:68|40:68:68	local_japanese_face_pips
+colorless_06_02_01r_01	6	0	6		6	6					34:100:83|34:100:83|34:84:68|34:68:55|34:68:75|34:77:77	local_japanese_face_pips
+colorless_06_02_02_00	6	0	6		6	6					34:100:82|34:99:75|34:83:66|34:67:50|34:67:66|34:75:67	local_japanese_face_pips
+colorless_06_02_02_01	6	0	6		6	6					35:102:85|35:102:85|35:86:68|35:70:53|35:70:68|35:70:70	local_japanese_face_pips
+colorless_06_02_02_02	6	0	6		6	6					30:100:84|30:100:76|30:84:68|30:68:53|30:68:66|30:76:76	local_japanese_face_pips
+colorless_06_02_02c_00	6	0	6		6	6					40:102:85|40:103:68|40:85:68|40:68:52|40:68:68|40:68:68	local_japanese_face_pips
+colorless_06_02_02r_00	6	0	6		6	6					34:100:84|34:99:86|34:84:68|34:70:50|34:70:68|34:70:70	local_japanese_face_pips
+colorless_06_02_02r_01	6	0	6		6	6					36:100:82|36:99:82|36:84:66|36:67:53|36:67:68|36:75:67	local_japanese_face_pips
+colorless_06_02_EX02_00	6	0	6		6	6					35:101:83|35:98:83|35:86:69|35:67:53|35:67:69|35:76:76	local_japanese_face_pips
+colorless_06_02_EX02_01	6	0	6		6	6					34:100:82|34:97:82|34:86:63|34:70:54|34:70:63|34:70:70	local_japanese_face_pips
+colorless_06_02_cp_00	6	0	6		6	6					34:99:84|34:99:82|34:82:75|34:66:53|34:66:66|34:74:74	local_japanese_face_pips
+colorless_07_01_03_00	7	0	7		7	7					35:101:83|35:99:83|35:86:66|35:68:53|35:68:66|35:77:77|35:77:77	local_japanese_face_pips
+colorless_07_01_03_01	7	0	7		7	7					34:100:82|34:99:75|34:84:66|34:68:54|34:68:66|34:75:68|34:75:75	local_japanese_face_pips
+colorless_07_01_03_02	7	0	7		7	7					46:102:85|46:102:68|46:85:68|46:68:51|46:68:68|46:68:68|46:68:68	local_japanese_face_pips
+colorless_07_01_05_00	7	0	7		7	7					33:100:85|33:101:85|24:86:59|38:68:51|33:66:59|33:76:68|33:76:76	local_japanese_face_pips
+colorless_07_01_05_01	7	0	7		7	7					24:100:82|24:100:85|24:84:67|24:67:50|24:67:59|24:75:75|24:75:75	local_japanese_face_pips
+colorless_07_01_06_00	6	0	6		6	6					38:102:85|38:102:85|38:85:68|38:68:53|38:68:68|38:68:68	local_japanese_face_pips
+colorless_07_01_EX04c_00	7	0	7		7	7					38:102:85|38:102:85|39:85:68|34:68:68|17:68:68|34:68:68|38:85:85	local_japanese_face_pips
+colorless_07_02_00_00	7	0	7		7	7					34:100:86|34:100:78|34:87:59|34:67:60|34:67:59|34:78:67|34:78:78	local_japanese_face_pips
+colorless_07_02_01_00	7	0	7		7	7					37:101:82|37:99:74|37:82:64|37:66:53|37:66:64|37:74:74|37:82:82	local_japanese_face_pips
+colorless_07_02_01_01	7	0	7		7	7					34:100:84|34:100:75|34:86:69|34:68:56|34:68:69|34:75:68|34:75:75	local_japanese_face_pips
+colorless_07_02_01_02	7	0	7		7	7					34:102:85|34:102:85|34:85:68|34:68:52|34:68:68|34:85:85|34:85:85	local_japanese_face_pips
+colorless_07_02_01r_00	7	0	7		7	7					38:102:89|38:106:68|38:85:68|38:68:54|38:68:68|38:68:68|38:68:68	local_japanese_face_pips
+colorless_07_02_01r_01	7	0	7		7	7					38:102:86|38:106:68|38:85:68|38:68:51|38:68:68|38:68:68|38:68:68	local_japanese_face_pips
+colorless_07_02_01r_02	7	0	7		7	7					31:100:83|31:99:83|31:84:66|31:68:51|31:68:66|31:75:75|31:75:75	local_japanese_face_pips
+colorless_07_02_02_00	7	0	7		7	7					42:102:88|42:106:88|42:85:68|42:68:51|42:68:68|42:68:68|42:68:68	local_japanese_face_pips
+colorless_07_02_02_01	7	0	7		7	7					34:102:85|34:104:78|34:86:69|34:68:53|34:68:69|34:78:78|34:78:78	local_japanese_face_pips
+colorless_07_02_02c_00	7	0	7		7	7					34:101:86|34:101:86|34:86:70|34:70:53|34:70:70|34:70:70|34:83:83	local_japanese_face_pips
+colorless_07_02_02c_01	7	0	7		7	7					33:101:84|33:101:76|33:86:69|33:66:57|33:66:57|33:75:66|33:76:76	local_japanese_face_pips
+colorless_07_02_02c_02	7	0	7		7	7					34:102:85|34:102:85|34:88:68|34:68:53|34:68:68|34:68:68|34:68:68	local_japanese_face_pips
+colorless_07_02_02r_00	7	0	7		7	7					35:100:82|35:99:82|35:84:66|35:68:50|35:68:66|35:75:75|35:75:75	local_japanese_face_pips
+colorless_07_02_02r_01	7	0	7		7	7					33:101:84|33:93:85|33:84:66|33:70:51|33:70:66|33:70:70|33:84:84	local_japanese_face_pips
+colorless_07_02_04_00	7	0	7		7	7					39:102:86|39:105:86|39:85:68|39:68:53|39:68:68|39:68:68|39:68:68	local_japanese_face_pips
+colorless_07_02_EX02_00	7	0	7		7	7					32:103:84|32:99:86|32:86:66|32:70:55|32:70:55|32:70:70|32:84:70	local_japanese_face_pips
+colorless_07_02_EX02_01	7	0	7		7	7					36:100:85|36:100:85|36:86:67|36:67:53|36:67:67|36:76:76|36:76:76	local_japanese_face_pips
+colorless_07_02_EX02_02	7	0	7		7	7					34:100:85|34:99:85|34:86:68|34:68:51|34:68:68|34:76:76|34:76:76	local_japanese_face_pips
+colorless_07_02_ex01_00	7	0	7		7	7					31:100:83|31:100:75|31:84:70|31:67:53|31:67:70|31:75:75|31:75:75	local_japanese_face_pips
+colorless_08_01_06_00	6	0	6		6	6					35:100:85|35:100:77|35:87:68|35:68:55|35:68:68|35:77:77	local_japanese_face_pips
+colorless_08_01_EX04_00	8	0	8		8	8					31:100:83|40:99:86|40:83:66|40:70:55|40:70:66|31:70:70|31:86:70|31:70:70	local_japanese_face_pips
+colorless_08_01_EX04c_00	8	0	8		8	8					34:99:84|34:99:77|34:82:57|34:76:49|34:66:68|34:75:74|34:84:77|34:75:77	local_japanese_face_pips
+colorless_08_02_01_00	8	0	8		8	8					31:102:88|31:102:77|31:88:67|31:67:53|31:67:67|31:77:77|31:77:77|31:77:77	local_japanese_face_pips
+colorless_08_02_01_01	8	0	8		8	8					35:100:82|35:99:75|35:83:66|35:67:51|35:67:58|35:75:67|35:75:75|35:75:67	local_japanese_face_pips
+colorless_08_02_01_02	8	0	8		8	8					38:102:85|38:102:68|38:85:68|38:68:51|38:68:68|38:68:68|38:68:68|38:68:68	local_japanese_face_pips
+colorless_08_02_02_00	8	0	8		8	8					41:102:85|41:102:68|41:85:68|41:68:51|41:68:68|41:68:68|41:68:68|41:68:68	local_japanese_face_pips
+colorless_08_02_02c_00	8	0	8		8	8					34:102:89|34:102:89|34:85:68|34:68:53|34:68:68|34:68:68|34:68:68|34:68:68	local_japanese_face_pips
+colorless_08_02_02c_01	8	0	8		8	8					34:101:87|34:101:75|34:86:67|34:67:53|34:67:67|34:75:75|34:75:75|34:75:75	local_japanese_face_pips
+colorless_08_02_02r_00	8	0	8		8	8					35:100:82|35:99:74|35:84:66|35:66:57|35:66:57|35:74:74|35:82:74|35:74:74	local_japanese_face_pips
+colorless_08_02_EX02_00	8	0	8		8	8					36:100:85|36:104:76|36:84:67|36:67:54|36:67:68|36:76:67|36:76:76|36:76:76	local_japanese_face_pips
+colorless_08_02_EX02_01	8	0	8		8	8					33:101:84|33:101:78|33:84:68|33:68:54|33:68:68|33:78:78|33:78:78|33:78:78	local_japanese_face_pips
+colorless_08_02_ex01_00	7	0	7		7	7					37:102:68|37:102:68|34:85:68|34:68:68|37:68:68|34:68:68|37:68:68	local_japanese_face_pips
+colorless_09_01_03_00	9	0	9		9	9	9				33:100:82|33:100:82|33:84:67|33:67:53|33:67:67|33:74:74|33:74:74|33:74:74|33:67:67	local_japanese_face_manual_2026-09-24
+colorless_09_01_04_00	9	0	9		9	9	9				34:99:82|34:99:74|34:82:66|34:66:52|34:66:66|34:74:74|34:82:74|34:74:66|34:66:66	local_japanese_face_manual_2026-09-24
+colorless_09_01_05_00	9	0	9		9	9	9				31:100:84|31:100:76|31:84:72|31:68:51|31:68:72|31:76:68|31:76:76|31:76:68|31:68:68	local_japanese_face_manual_2026-09-24
+colorless_09_02_01_00	9	0	9		9	9		9			34:102:89|34:105:89|34:85:68|34:68:51|34:68:68|34:68:68|34:68:68|34:68:68|34:68:68	seesaa.tsv|runtime
+colorless_09_02_01_01	9	0	9		9	9		9			36:101:84|36:99:77|36:84:68|36:68:53|36:68:68|36:77:77|36:77:77|36:77:68|36:68:68	seesaa.tsv|runtime
+colorless_09_02_01_02	9	0	9		9	9		9			36:100:84|36:100:76|36:84:65|36:67:53|36:67:65|36:76:67|36:76:76|36:76:76|36:67:67	seesaa.tsv|runtime
+colorless_09_02_02c_00	9	0	9		9	9	9				34:100:83|34:100:82|34:86:67|34:67:53|34:67:67|34:76:76|34:76:76|34:76:76|34:67:67	local_japanese_face_manual_2026-09-24
+colorless_09_02_02c_01	9	0	9		9	9	9				33:101:86|33:99:85|33:86:67|33:70:53|33:70:70|33:70:70|33:82:85|33:70:70|33:70:70	local_japanese_face_manual_2026-09-24
+colorless_09_02_02r_00	9	0	9		9	9		9			33:99:82|33:99:82|33:82:71|33:68:51|33:68:68|33:76:76|33:77:77|33:76:76|33:68:68	seesaa.tsv
+colorless_09_02_EX02_00	9	0	9		9	9	9				33:99:82|33:99:83|33:82:66|33:74:51|33:74:66|33:74:74|33:82:74|33:74:74|33:74:74	local_japanese_face_manual_2026-09-24
+colorless_09_02_EX02_01	9	0	9		9	9	9				32:100:82|32:100:82|32:84:65|32:67:53|32:67:65|32:76:67|32:82:76|32:76:76|32:67:67	local_japanese_face_manual_2026-09-24
+colorless_09_02_ex01_00	9	0	9		9	9					32:102:84|32:101:81|32:82:66|32:71:55|32:71:60|32:71:71|32:79:80|32:71:80|32:71:71	local_japanese_face_pips
+colorless_10_01_03_00	10	0	10		10	9	10				33:101:82|33:99:82|33:82:66|33:74:54|33:74:66|33:74:74|33:82:74|33:74:74|33:74:74	local_japanese_face_manual_2026-09-24
+colorless_10_01_03_01	10	0	10		10	9	10				45:102:85|45:102:85|45:85:68|45:68:51|45:68:68|45:68:68|45:68:68|45:68:68|45:68:68	local_japanese_face_manual_2026-09-24
+colorless_10_01_05_00	10	0	10		10	9	10				33:100:82|33:99:75|33:84:67|33:67:53|33:67:65|33:75:75|33:75:75|33:75:75|33:67:67	local_japanese_face_manual_2026-09-24
+colorless_10_02_04_00	10	0	10		10	9	10				40:109:88|40:88:89|40:88:68|40:68:57|40:68:68|40:68:68|40:68:68|40:68:68|34:68:68	local_japanese_face_manual_2026-09-24
+colorless_11_01_EX03_00	11	0	11		11	9	11				37:102:85|37:102:85|43:85:68|34:68:51|37:68:51|43:68:68|39:87:68|37:85:68|39:68:68	local_japanese_face_manual_2026-09-24
+colorless_12_02_04_00	12	0	12		12	9	12				45:102:85|45:104:85|45:85:68|45:68:52|45:68:52|45:68:68|45:68:68|45:68:68|45:68:68	local_japanese_face_manual_2026-09-24
+green_00_00_03_00												not_applicable_base_minion
+green_00_00_03_01												not_applicable_base_minion
+green_00_00_03_02												not_applicable_base_minion
+green_00_00_03_03												not_applicable_base_minion
+green_00_00_03_04												not_applicable_base_minion
+green_00_00_03_05												not_applicable_base_minion
+green_00_00_04_00												not_applicable_base_minion
+green_00_00_04_01												not_applicable_base_minion
+green_00_00_05_00												not_applicable_base_minion
+green_00_00_05_01												not_applicable_base_minion
+green_00_00_05_02												not_applicable_base_minion
+green_00_00_EX03_00												not_applicable_base_minion
+green_00_00_EX03_01												not_applicable_base_minion
+green_00_00_EX03_02												not_applicable_base_minion
+green_00_00_EX03_03												not_applicable_base_minion
+green_00_00_EX03_04												not_applicable_base_minion
+green_00_00_EX04_00												not_applicable_base_minion
+green_00_00_EX04_01												not_applicable_base_minion
+green_00_00_EX04_02												not_applicable_base_minion
+green_00_00_EX04c_00												not_applicable_base_minion
+green_00_00_EX04c_01												not_applicable_base_minion
+green_00_00_EX04c_02												not_applicable_base_minion
+green_00_01_00_00												not_applicable_base_minion
+green_00_01_01_00												not_applicable_base_minion
+green_00_01_01r_00												not_applicable_base_minion
+green_00_01_02_00												not_applicable_base_minion
+green_00_01_02_01												not_applicable_base_minion
+green_00_01_02c_00												not_applicable_base_minion
+green_00_01_02c_01												not_applicable_base_minion
+green_00_01_02c_02												not_applicable_base_minion
+green_00_01_02r_00												not_applicable_base_minion
+green_00_01_02r_01												not_applicable_base_minion
+green_00_01_EX02_00												not_applicable_base_minion
+green_00_01_EX02_01												not_applicable_base_minion
+green_00_01_EX02_02												not_applicable_base_minion
+green_01_01_03_00	1	0	1		1	1					38:100:86	local_japanese_face_pips
+green_01_01_05_00	1	0	1		1	1					35:111:85	local_japanese_face_pips
+green_01_01_EX03_00	1	0	1		1	1					34:107:85	local_japanese_face_pips
+green_01_01_EX03_01	1	1	0	緑	1	1					204:99:86	local_japanese_face_pips
+green_01_02_01_00	1	1	0	緑	1	1					207:109:77	local_japanese_face_pips
+green_01_02_02_00	1	1	0	緑	1	1					205:102:85	local_japanese_face_pips
+green_01_02_03_00	1	1	0	緑	1	1					214:107:76	local_japanese_face_pips
+green_01_02_04_00	1	1	0	緑	1	1					207:103:85	local_japanese_face_pips
+green_01_02_04_01	1	1	0	緑	1	1					206:112:84	local_japanese_face_pips
+green_01_02_04_02	1	1	0	緑	1	1					213:113:77	local_japanese_face_pips
+green_01_02_05_00	1	1	0	緑	1	1					206:99:88	local_japanese_face_pips
+green_01_02_05_01	1	1	0	緑	1	1					200:100:82	local_japanese_face_pips
+green_01_03_00_00	1	1	0	緑	1	1					206:100:83	local_japanese_face_pips
+green_01_03_01_00	1	1	0	緑	1	1					209:91:72	local_japanese_face_pips
+green_01_03_01r_00	1	1	0	緑	1	1					206:104:83	local_japanese_face_pips
+green_01_03_02r_00	1	1	0	緑	1	1					213:103:82	local_japanese_face_pips
+green_02_00_06_00												not_applicable_base_minion
+green_02_00_06_01												not_applicable_base_minion
+green_02_01_03_00	2	1	1	緑	2	2					210:102:85|34:102:85	local_japanese_face_pips
+green_02_01_04_00	2	1	1	緑	2	2					213:108:80|34:111:80	local_japanese_face_pips
+green_02_01_05_00	2	1	1	緑	2	2					211:112:82|34:112:82	local_japanese_face_pips
+green_02_01_05_01	2	0	2		2	2					39:110:77|41:106:83	local_japanese_face_pips
+green_02_01_EX03_00	2	1	1	緑	2	2					206:102:95|35:113:88	local_japanese_face_pips
+green_02_01_EX04_00	2	1	1	緑	2	2					204:106:77|34:106:107	local_japanese_face_pips
+green_02_01_EX04c_00	2	1	1	緑	2	2					189:108:85|35:108:107	local_japanese_face_pips
+green_02_02_00_00	2	1	1	緑	2	2					200:101:84|34:105:84	local_japanese_face_pips
+green_02_02_00_01	2	1	1	緑	2	2					209:100:86|33:102:95	local_japanese_face_pips
+green_02_02_01r_00	2	1	1	緑	2	2					213:107:78|35:107:102	local_japanese_face_pips
+green_02_02_02c_00	2	1	1	緑	2	2					207:102:85|39:119:85	local_japanese_face_pips
+green_02_02_02c_03	2	1	1	緑	2	2					207:99:82|29:99:94	local_japanese_face_pips
+green_02_02_02r_00	2	1	1	緑	2	2					202:99:78|34:108:95	local_japanese_face_pips
+green_02_02_04_00	2	1	1	緑	2	2					205:100:84|28:102:86	local_japanese_face_pips
+green_02_02_04_01	2	1	1	緑	2	2					211:105:81|36:105:81	local_japanese_face_pips
+green_02_02_EX02_00	2	1	1	緑	2	2					214:99:85|29:104:95	local_japanese_face_pips
+green_02_02_EX02_03	2	1	1	緑	2	2					207:99:95|34:99:95	local_japanese_face_pips
+green_02_02_EX03_00	2	1	1	緑	2	2					208:112:78|24:110:78	local_japanese_face_pips
+green_02_02_EX04_00	2	1	1	緑	2	2					186:113:75|38:95:95	local_japanese_face_pips
+green_02_02_EX04c_00	2	1	1	緑	2	2					210:111:71|37:87:78	local_japanese_face_pips
+green_02_03_01_00	2	1	1	緑	2	2					211:112:78|39:112:102	local_japanese_face_pips
+green_02_03_01r_00	2	1	1	緑	2	2					211:102:87|36:102:87	local_japanese_face_pips
+green_02_03_02_00	2	1	1	緑	2	2					208:87:73|37:87:110	local_japanese_face_pips
+green_02_03_02c_00	2	1	1	緑	2	2					204:103:77|37:103:103	local_japanese_face_pips
+green_02_03_02r_00	2	1	1	緑	2	2					199:117:69|33:117:97	local_japanese_face_pips
+green_02_03_EX02_00	2	1	1	緑	2	2					212:105:77|39:105:77	local_japanese_face_pips
+green_03_01_03_00	3	1	2	緑	3	3					207:102:91|35:102:99|33:103:91	local_japanese_face_pips
+green_03_01_03_01	3	1	2	緑	3	3					207:104:82|40:99:84|40:99:99	local_japanese_face_pips
+green_03_01_03_02	3	1	2	緑	3	3					200:101:88|35:102:88|35:104:88	local_japanese_face_pips
+green_03_01_03_03	3	1	2	緑	3	3					201:99:79|36:107:95|36:107:95	local_japanese_face_pips
+green_03_01_03_04	3	1	2	緑	3	3					204:102:85|36:109:100|36:102:92	local_japanese_face_pips
+green_03_01_04_00	3	1	2	緑	3	3					204:104:96|34:104:96|34:107:96	local_japanese_face_pips
+green_03_01_05_00	3	1	2	緑	3	3					211:102:77|37:105:90|24:111:99	local_japanese_face_pips
+green_03_01_06_00	2	1	1	緑	2	2	2		official_total_vs_verified_face		218:109:85|36:109:85|85:85:85|106:106:106|106:106:106	local_japanese_face_manual_2026-09-24
+green_03_01_EX03_00	3	1	2	緑	3	3					219:110:83|35:115:83|35:112:83	local_japanese_face_pips
+green_03_01_EX03_01	3	2	1	緑	3	3					235:116:87|191:116:102|47:116:87	local_japanese_face_pips
+green_03_01_EX04_00	3	1	2	緑	3	3					200:102:85|34:102:85|37:102:106	local_japanese_face_pips
+green_03_01_EX04_01	3	1	2	緑	3	3					205:108:85|41:110:85|55:108:84	local_japanese_face_pips
+green_03_01_EX04c_00	3	1	2	緑	3	3					232:105:85|34:104:93|36:101:93	local_japanese_face_pips
+green_03_01_EX04c_01	3	1	2	緑	3	3					208:90:67|35:99:94|35:104:86	local_japanese_face_pips
+green_03_02_00_00	3	1	2	緑	3	3					206:102:90|36:103:90|36:103:99	local_japanese_face_pips
+green_03_02_01_00	3	1	2	緑	3	3					200:100:87|35:103:87|35:103:86	local_japanese_face_pips
+green_03_02_01_01	3	1	2	緑	3	3					212:104:73|35:104:81|35:104:80	local_japanese_face_pips
+green_03_02_01_02	3	1	2	緑	3	3					222:102:85|37:102:85|37:103:103	local_japanese_face_pips
+green_03_02_01r_00	3	1	2	緑	3	3					205:105:85|34:105:85|34:105:92	local_japanese_face_pips
+green_03_02_02_00	3	1	2	緑	3	3					210:99:84|33:103:93|33:103:93	local_japanese_face_pips
+green_03_02_02_01	3	1	2	緑	3	3					209:104:79|35:104:104|35:104:84	local_japanese_face_pips
+green_03_02_02c_00	3	1	2	緑	3	3					211:85:85|36:113:85|36:113:85	local_japanese_face_pips
+green_03_02_02r_00	3	1	2	緑	3	3					206:100:84|37:100:95|37:103:95	local_japanese_face_pips
+green_03_02_04_00	3	1	2	緑	3	3					207:109:82|38:109:82|38:109:109	local_japanese_face_pips
+green_03_02_05_00	3	1	2	緑	3	3					209:102:75|39:102:108|39:108:109	local_japanese_face_pips
+green_03_02_EX02_00	3	1	2	緑	3	3					207:103:90|29:107:90|29:106:82	local_japanese_face_pips
+green_03_02_EX04_00	3	1	2	緑	3	3					216:109:76|32:109:109|32:109:77	local_japanese_face_pips
+green_03_02_EX04c_00	3	1	2	緑	3	3					209:105:68|17:109:73|17:109:85	local_japanese_face_pips
+green_03_03_00_00	3	2	1	緑	3	3					205:107:86|170:107:86|36:102:95	local_japanese_face_pips
+green_03_03_01r_00	3	2	1	緑	3	3					199:98:86|182:108:86|34:108:99	local_japanese_face_pips
+green_03_03_02_00	3	2	1	緑	3	3					198:104:79|169:104:94|35:94:98	local_japanese_face_pips
+green_03_03_02c_00	3	2	1	緑	3	3					206:105:84|170:105:105|26:105:98	local_japanese_face_pips
+green_03_03_EX02_00	3	2	1	緑	3	3					210:111:78|170:111:90|40:111:80	local_japanese_face_pips
+green_04_00_06_00												not_applicable_base_minion
+green_04_01_03_00	4	1	3	緑	4	4					209:102:85|40:110:85|40:110:82|40:104:108	local_japanese_face_pips
+green_04_01_03_01	4	0	4		4	4					40:111:76|40:110:83|40:110:83|40:108:102	local_japanese_face_pips
+green_04_01_04_00	4	2	2	緑	4	4					202:102:85|174:102:85|35:105:102|35:102:102	local_japanese_face_pips
+green_04_01_04_01	4	2	2	緑	4	4					205:101:84|176:102:96|32:102:96|32:96:99	local_japanese_face_pips
+green_04_01_05_00	4	2	2	緑	4	4					202:101:72|179:107:87|35:107:91|36:105:91	local_japanese_face_pips
+green_04_01_EX03_00	4	2	2	緑	4	4					206:107:84|178:106:84|42:106:106|42:106:105	local_japanese_face_pips
+green_04_01_EX04_00	4	2	2	緑	4	4					213:102:85|178:103:103|17:103:102|34:108:102	local_japanese_face_pips
+green_04_01_EX04c_00	4	2	2	緑	4	4					209:105:85|179:105:83|34:106:83|35:107:107	local_japanese_face_pips
+green_04_02_01_00	4	2	2	緑	4	4					213:102:68|176:102:85|34:103:85|34:107:107	local_japanese_face_pips
+green_04_02_01_01	4	2	2	緑	4	4					211:110:78|178:110:82|35:110:82|35:108:107	local_japanese_face_pips
+green_04_02_02_00	4	2	2	緑	4	4					197:100:93|179:100:93|37:97:93|37:93:99	local_japanese_face_pips
+green_04_02_02c_00	4	2	2	緑	4	4					211:106:79|180:106:103|34:106:83|34:107:107	local_japanese_face_pips
+green_04_02_02r_00	4	2	2	緑	4	4					206:101:86|180:104:95|34:108:95|34:95:92	local_japanese_face_pips
+green_04_02_02r_01	4	0	4		4	4					34:110:95|35:102:95|34:102:95|35:107:107	local_japanese_face_pips
+green_04_02_03_00	4	2	2	緑	4	4					205:107:85|170:107:85|34:107:102|34:112:102	local_japanese_face_pips
+green_04_02_04_00	4	2	2	緑	4	4					209:109:78|170:109:102|40:109:77|40:110:110	local_japanese_face_pips
+green_04_02_05_00	4	1	3	緑	4	4					207:100:82|33:100:98|33:100:98|39:114:98	local_japanese_face_pips
+green_04_02_EX02_00	4	2	2	緑	4	4					204:102:86|177:102:101|30:102:86|30:101:99	local_japanese_face_pips
+green_04_02_EX03_00	4	2	2	緑	4	4					207:99:87|167:104:97|35:104:97|35:114:97	local_japanese_face_pips
+green_04_02_EX03_01	4	1	3	緑	4	4					206:115:85|26:110:85|44:110:85|26:111:102	local_japanese_face_pips
+green_04_03_00_00	4	2	2	緑	4	4					202:97:78|170:107:97|26:107:94|26:114:94	local_japanese_face_pips
+green_04_03_01_00	4	2	2	緑	4	4					209:107:76|170:107:104|41:107:102|41:110:102	local_japanese_face_pips
+green_05_01_03_00	5	2	3	緑	5	5					208:108:80|174:108:80|43:108:81|43:106:106|43:106:106	local_japanese_face_pips
+green_05_01_03_01	5	2	3	緑	5	5					214:100:88|179:100:88|33:112:99|33:106:99|33:114:106	local_japanese_face_pips
+green_05_01_03_02	5	2	3	緑	5	5					201:102:88|191:102:94|33:103:94|33:108:99|33:125:125	local_japanese_face_pips
+green_05_01_04_00	5	2	3	緑	5	5					210:111:80|176:115:80|39:112:82|39:108:107|39:107:107	local_japanese_face_pips
+green_05_01_05_00	5	2	3	緑	5	5					192:102:85|180:102:85|39:102:85|34:102:85|36:119:136	local_japanese_face_pips
+green_05_01_05_01	5	0	5		5	5					33:100:86|33:100:93|33:109:86|33:99:99|33:125:125	local_japanese_face_pips
+green_05_01_06_00	3	2	1	緑	3	3					213:109:77|183:112:77|38:112:84	local_japanese_face_pips
+green_05_01_06_01	2	1	1	緑	2	2					214:102:84|34:101:97	local_japanese_face_pips
+green_05_01_06_02	6	2	4	緑	6	6					202:100:72|179:100:95|33:100:95|33:95:99|33:115:115|33:139:128	local_japanese_face_pips
+green_05_01_EX04_00	6	2	4	緑	6	6					211:108:85|166:105:85|36:105:102|34:102:102|36:119:102|37:119:136	local_japanese_face_pips
+green_05_01_EX04c_00	6	2	4	緑	6	6					215:102:85|180:108:105|34:108:105|34:105:105|39:113:144|34:144:144	local_japanese_face_pips
+green_05_02_00_00	5	2	3	緑	5	5					205:102:83|187:103:83|33:100:92|33:105:92|33:125:125	local_japanese_face_pips
+green_05_02_01_00	5	2	3	緑	5	5					204:85:80|187:109:103|38:114:81|38:103:102|38:107:107	local_japanese_face_pips
+green_05_02_01_01	5	2	3	緑	5	5					212:103:83|179:103:92|36:100:92|36:104:108|36:125:125	local_japanese_face_pips
+green_05_02_01r_00	5	2	3	緑	5	5					215:103:85|182:102:85|37:102:88|37:104:99|37:116:116	local_japanese_face_pips
+green_05_02_02_00	5	2	3	緑	5	5					217:102:85|187:102:85|34:102:85|34:102:102|34:119:119	local_japanese_face_pips
+green_05_02_02c_00	5	2	3	緑	5	5					219:101:91|181:108:91|36:108:91|36:105:99|36:116:116	local_japanese_face_pips
+green_05_02_02r_00	5	2	3	緑	5	5					201:99:85|172:99:94|34:105:94|34:94:109|34:115:115	local_japanese_face_pips
+green_05_02_03_00	5	2	3	緑	5	5					214:113:98|171:130:98|50:98:98|50:110:110|50:110:110	local_japanese_face_pips
+green_05_02_04_00	5	2	3	緑	5	5					208:108:76|172:108:105|38:108:76|38:105:109|38:109:109	local_japanese_face_pips
+green_05_02_EX02_00	5	2	3	緑	5	5					218:103:86|188:103:86|32:101:88|32:106:99|32:128:106	local_japanese_face_pips
+green_06_01_03_00	6	2	4	緑	6	6					206:100:84|177:101:96|35:101:96|35:96:99|35:115:115|35:137:137	local_japanese_face_pips
+green_06_01_03_01	6	2	4	緑	6	6					207:100:85|170:102:85|35:102:102|35:102:94|35:115:115|35:137:137	local_japanese_face_pips
+green_06_01_03_02	6	2	4	緑	6	6					211:102:74|181:102:102|34:104:102|34:102:102|34:119:119|34:119:143	local_japanese_face_pips
+green_06_01_04_00	6	2	4	緑	6	6					213:102:88|181:102:88|35:111:101|35:101:100|35:115:115|35:132:132	local_japanese_face_pips
+green_06_01_04_01	6	3	3	緑	6	6					206:102:90|170:106:90|167:106:102|36:102:100|36:128:128|36:135:135	local_japanese_face_pips
+green_06_01_05_00	6	0	6		6	6					33:110:87|37:110:101|37:101:98|33:98:103|33:115:115|33:136:125	local_japanese_face_pips
+green_06_01_06_00	1	0	1		1	1	1		official_total_vs_verified_face		34:101:86|53:53:53|84:84:84|99:99:99|104:115:115	local_japanese_face_manual_2026-09-24
+green_06_01_EX03_00	6	2	4	緑	6	6					201:113:95|169:113:95|35:90:95|35:95:101|35:113:103|35:135:139	local_japanese_face_pips
+green_06_02_01_00	6	2	4	緑	6	6					207:102:85|179:102:85|34:102:84|34:103:105|34:105:105|34:143:143	local_japanese_face_pips
+green_06_02_01r_00	6	2	4	緑	6	6					212:106:77|176:106:95|34:114:95|34:95:102|34:124:124|34:135:135	local_japanese_face_pips
+green_06_02_02_00	6	2	4	緑	6	6					208:102:85|177:102:85|36:103:105|36:105:105|36:105:105|36:143:143	local_japanese_face_pips
+green_06_02_02c_00	6	3	3	緑	6	6					209:111:78|184:111:102|170:111:102|36:102:102|36:114:102|36:136:136	local_japanese_face_pips
+green_06_02_02r_00	6	1	5	緑	6	6					212:86:95|36:111:95|36:114:83|36:114:105|36:105:105|36:143:143	local_japanese_face_pips
+green_06_02_02r_01	6	2	4	緑	6	6					216:101:86|190:105:86|33:106:93|33:101:93|33:127:127|33:135:135	local_japanese_face_pips
+green_06_02_06_00	5	1	4	緑	5	5					218:106:77|42:106:77|42:106:102|42:111:102|42:111:111	local_japanese_face_pips
+green_06_02_EX02_00	6	3	3	緑	6	6					205:103:72|173:103:99|170:105:81|35:113:105|35:105:105|35:143:137	local_japanese_face_pips
+green_07_01_04_00	7	2	5	緑	7	7					214:102:85|177:102:85|34:102:85|34:102:102|34:119:104|34:119:119|34:143:143	local_japanese_face_pips
+green_07_01_04_01	7	2	5	緑	7	7					220:101:85|180:104:99|38:104:99|38:99:99|38:115:115|38:138:138|38:138:139	local_japanese_face_pips
+green_07_01_EX03_00	7	3	4	緑	7	7					219:102:85|213:119:85|170:105:84|34:105:102|54:119:119|40:119:140|34:143:140	local_japanese_face_pips
+green_07_01_EX04_00	7	2	5	緑	7	7					210:110:77|182:110:93|37:111:93|36:93:112|36:112:106|37:141:138|37:144:141	local_japanese_face_pips
+green_07_01_EX04c_00	7	2	5	緑	7	7					213:102:85|175:106:85|42:106:84|34:107:110|37:112:107|38:140:140|17:143:143	local_japanese_face_pips
+green_07_02_00_00	7	2	5	緑	7	7					211:102:85|179:102:85|35:102:85|35:102:104|35:119:104|35:137:137|35:144:144	local_japanese_face_pips
+green_07_02_01_00	7	2	5	緑	7	7					205:103:85|170:103:85|34:103:102|34:102:102|34:119:119|34:119:119|34:143:143	local_japanese_face_pips
+green_07_02_01r_00	7	2	5	緑	7	7					207:104:85|182:104:85|41:104:85|41:102:102|41:105:105|41:119:143|41:143:143	local_japanese_face_pips
+green_07_02_02r_00	7	1	6	緑	7	7					202:102:87|34:103:88|34:103:85|34:102:101|34:117:114|34:132:139|34:139:139	local_japanese_face_pips
+green_07_02_02r_01	7	0	7		7	7					33:104:87|33:104:87|33:103:101|33:102:102|33:119:117|33:133:133|33:137:133	local_japanese_face_pips
+green_08_01_04_00	8	2	6	緑	8	8					205:110:78|179:110:105|36:110:102|36:105:102|36:118:102|36:142:142|36:144:144|36:118:118	local_japanese_face_pips
+green_08_02_01_00	8	2	6	緑	8	8					208:104:70|178:104:96|35:110:96|35:96:102|35:114:114|35:144:144|35:144:144|35:114:114	local_japanese_face_pips
+green_08_02_02_00	8	1	7	緑	8	8					209:107:68|34:112:85|34:111:95|34:111:105|34:105:105|34:140:144|34:144:144|34:112:112	local_japanese_face_pips
+green_08_02_02c_00	8	2	6	緑	8	8					206:110:78|180:110:102|35:110:102|35:102:102|35:119:119|35:119:141|35:144:144|35:119:119	local_japanese_face_pips
+green_08_02_02c_01	8	0	8		8	8					34:94:75|34:106:103|34:116:88|34:103:103|34:114:114|34:137:137|34:137:137|34:114:114	local_japanese_face_pips
+green_08_02_02r_00	8	3	5	緑	8	8					210:111:82|187:113:102|170:113:82|35:102:102|35:119:119|35:136:136|35:136:136|35:119:119	local_japanese_face_pips
+green_08_02_EX02_00	8	2	6	緑	8	8					206:100:83|178:100:96|34:110:96|34:96:100|34:115:115|34:138:135|34:138:138|34:115:115	local_japanese_face_pips
+green_08_02_EX02_01	8	0	8		8	8					35:102:96|35:113:96|35:113:96|35:96:105|35:105:105|35:144:139|35:139:139|35:111:111	local_japanese_face_pips
+green_08_03_02_00	8	3	5	緑	8	8					203:103:83|170:103:83|167:100:94|30:110:100|30:110:110|30:136:136|30:136:136|30:110:110	local_japanese_face_pips
+green_09_01_05_00	9	3	6	緑	9	9	9				214:102:85|177:102:108|177:103:78|34:108:106|35:113:113|35:113:142|35:144:142|35:113:106|35:106:78	local_japanese_face_manual_2026-09-24
+green_09_01_EX04_00	10	3	7	緑	10	9	10				204:102:85|175:105:85|170:105:84|34:106:106|37:119:106|34:139:144|37:144:144|34:106:119|37:106:84	local_japanese_face_manual_2026-09-24
+green_09_01_EX04c_00	10	3	7	緑	10	9	10				212:108:68|178:102:85|170:108:77|34:109:105|39:107:107|39:112:144|39:144:144|39:112:109|39:109:77	local_japanese_face_manual_2026-09-24
+green_09_02_01_00	9	3	6	緑	9	9		9			214:100:83|187:102:97|167:102:97|33:97:102|33:115:115|33:138:135|33:138:138|33:115:115|33:88:88	seesaa.tsv|runtime
+green_09_02_02_00	9	3	6	緑	9	9					212:108:78|176:108:78|170:108:81|37:105:105|37:105:105|37:117:140|37:144:144|37:117:117|38:81:81	local_japanese_face_pips
+green_10_01_03_00	10	3	7	緑	10	9	10				206:105:84|195:105:100|167:99:102|34:100:85|34:123:123|34:123:123|34:139:139|34:123:123|34:102:82	local_japanese_face_manual_2026-09-24
+green_10_01_EX03_00	10	3	7	緑	10	9	10				219:113:85|180:112:102|170:107:102|35:102:102|35:119:119|34:119:141|34:141:144|35:119:119|34:83:83	local_japanese_face_manual_2026-09-24
+purple_00_00_03_00												not_applicable_base_minion
+purple_00_00_03_01												not_applicable_base_minion
+purple_00_00_03_02												not_applicable_base_minion
+purple_00_00_03_03												not_applicable_base_minion
+purple_00_00_03_04												not_applicable_base_minion
+purple_00_00_03_05												not_applicable_base_minion
+purple_00_00_04_00												not_applicable_base_minion
+purple_00_00_04_01												not_applicable_base_minion
+purple_00_00_04_02												not_applicable_base_minion
+purple_00_00_04_03												not_applicable_base_minion
+purple_00_00_04_04												not_applicable_base_minion
+purple_00_00_04_05												not_applicable_base_minion
+purple_00_00_04_06												not_applicable_base_minion
+purple_00_00_04_07												not_applicable_base_minion
+purple_00_00_05_00												not_applicable_base_minion
+purple_00_01_00_00												not_applicable_base_minion
+purple_00_01_01_00												not_applicable_base_minion
+purple_00_01_01r_00												not_applicable_base_minion
+purple_00_01_02_00												not_applicable_base_minion
+purple_00_01_02_01												not_applicable_base_minion
+purple_00_01_02r_00												not_applicable_base_minion
+purple_00_01_02r_01												not_applicable_base_minion
+purple_00_01_04_00	0	0	0		0	0						local_japanese_face_pips
+purple_01_01_03_00	1	0	1		1	1					36:111:84	local_japanese_face_pips
+purple_01_01_04_00	1	1	0	紫	1	1					217:101:70	local_japanese_face_pips
+purple_01_01_04_01	1	0	1		1	1					43:101:70	local_japanese_face_pips
+purple_01_01_05_00	1	0	1		1	1					36:104:71	local_japanese_face_pips
+purple_01_02_01_00	1	1	0	紫	1	1					245:99:82	local_japanese_face_pips
+purple_01_02_02_00	1	1	0	紫	1	1					242:103:78	local_japanese_face_pips
+purple_01_02_03_00	1	1	0	紫	1	1					217:88:69	local_japanese_face_pips
+purple_01_02_04_00	1	1	0	紫	1	1					232:94:82	local_japanese_face_pips
+purple_01_02_04_01	1	1	0	紫	1	1					222:102:62	local_japanese_face_pips
+purple_01_02_05_00	1	1	0	紫	1	1					223:88:66	local_japanese_face_pips
+purple_01_02_05_01	1	1	0	紫	1	1					224:100:78	local_japanese_face_pips
+purple_01_03_01_00	1	1	0	紫	1	1					212:100:70	local_japanese_face_pips
+purple_01_03_02_00	1	1	0	紫	1	1					211:94:68	local_japanese_face_pips
+purple_01_03_EX04_00	1	0	1		1	1					33:95:72	local_japanese_face_pips
+purple_01_03_EX04c_00	1	0	1		1	1					34:100:71	local_japanese_face_pips
+purple_02_00_06_00												not_applicable_base_minion
+purple_02_01_03_00	2	1	1	紫	2	2					225:100:75|25:102:75	local_japanese_face_pips
+purple_02_01_04_00	2	1	1	紫	2	2					208:102:74|34:102:85	local_japanese_face_pips
+purple_02_01_04_01	2	1	1	紫	2	2					210:92:68|30:107:87	local_japanese_face_pips
+purple_02_01_04_02	2	1	1	紫	2	2					209:107:68|38:78:85	local_japanese_face_pips
+purple_02_01_05_00	2	1	1	紫	2	2					206:100:70|34:108:85	local_japanese_face_pips
+purple_02_01_06_00	7	3	4	紫	7	7					214:115:78|179:109:82|138:108:72|40:82:72|40:108:108|40:115:115|40:115:115	local_japanese_face_pips
+purple_02_01_EX04_00	2	1	1	紫	2	2					240:107:84|34:100:85	local_japanese_face_pips
+purple_02_01_EX04c_00	2	1	1	紫	2	2					218:94:70|35:99:75	local_japanese_face_pips
+purple_02_02_00_00	2	1	1	紫	2	2					236:99:70|28:102:87	local_japanese_face_pips
+purple_02_02_00_01	2	1	1	紫	2	2					240:100:67|33:88:76	local_japanese_face_pips
+purple_02_02_01_00	2	1	1	紫	2	2					207:85:68|34:110:81	local_japanese_face_pips
+purple_02_02_01_01	2	2	0	紫	2	2					234:100:80|188:100:80	local_japanese_face_pips
+purple_02_02_01r_00	2	1	1	紫	2	2					217:131:68|45:78:99	local_japanese_face_pips
+purple_02_02_02_00	2	1	1	紫	2	2					240:94:77|35:99:75	local_japanese_face_pips
+purple_02_02_02r_00	2	1	1	紫	2	2					228:101:70|36:110:88	local_japanese_face_pips
+purple_02_02_03_00	2	1	1	紫	2	2					216:99:80|28:99:80	local_japanese_face_pips
+purple_02_02_04_00	2	1	1	紫	2	2					215:102:68|37:111:81	local_japanese_face_pips
+purple_02_03_00_00	2	1	1	紫	2	2					230:109:75|38:109:87	local_japanese_face_pips
+purple_02_03_00_01	2	1	1	紫	2	2					219:96:76|24:96:103	local_japanese_face_pips
+purple_02_04_00_00	2	0	2		2	2					33:105:72|33:101:83	local_japanese_face_pips
+purple_03_01_03_00	3	1	2	紫	3	3					232:99:70|34:104:82|34:95:93	local_japanese_face_pips
+purple_03_01_03_01	3	1	2	紫	3	3					229:94:72|34:99:83|34:83:92	local_japanese_face_pips
+purple_03_01_04_00	3	1	2	紫	3	3					207:89:68|41:89:96|41:100:89	local_japanese_face_pips
+purple_03_01_04_01	3	1	2	紫	3	3					240:99:70|40:90:84|40:92:70	local_japanese_face_pips
+purple_03_01_04_02	3	1	2	紫	3	3					227:103:67|37:92:85|37:105:90	local_japanese_face_pips
+purple_03_01_05_00	3	1	2	紫	3	3					211:102:68|40:102:85|17:102:74	local_japanese_face_pips
+purple_03_01_05_01	3	0	3		3	3					34:104:86|34:104:86|34:90:72	local_japanese_face_pips
+purple_03_01_05_02	3	1	2	紫	3	3					213:102:68|35:85:93|35:92:63	local_japanese_face_pips
+purple_03_01_05_03	3	0	3		3	3					35:104:67|35:104:85|35:107:76	local_japanese_face_pips
+purple_03_01_06_00	2	1	1	紫	2	2					240:101:70|33:102:80	local_japanese_face_pips
+purple_03_01_EX04_00	3	1	2	紫	3	3					207:101:70|35:99:82|35:106:78	local_japanese_face_pips
+purple_03_01_EX04c_00	3	1	2	紫	3	3					201:102:75|34:104:69|34:75:67	local_japanese_face_pips
+purple_03_02_00_00	3	1	2	紫	3	3					214:95:70|29:104:84|29:88:66	local_japanese_face_pips
+purple_03_02_01_00	3	2	1	紫	3	3					233:102:85|175:102:88|38:102:89	local_japanese_face_pips
+purple_03_02_01_01	3	1	2	紫	3	3					216:85:68|35:108:72|35:86:71	local_japanese_face_pips
+purple_03_02_01r_00	3	1	2	紫	3	3					248:86:85|34:86:85|34:102:85	local_japanese_face_pips
+purple_03_02_02_00	3	1	2	紫	3	3					221:97:72|34:103:75|34:101:93	local_japanese_face_pips
+purple_03_02_02r_00	3	1	2	紫	3	3					227:90:68|34:90:83|34:92:91	local_japanese_face_pips
+purple_03_02_02r_01	3	1	2	紫	3	3					234:97:80|36:93:80|36:91:73	local_japanese_face_pips
+purple_03_02_04_00	3	1	2	紫	3	3					213:87:70|28:87:81|28:81:55	local_japanese_face_pips
+purple_03_02_04_01	3	1	2	紫	3	3					212:96:86|30:105:84|30:84:103	local_japanese_face_pips
+purple_03_02_04_02	3	1	2	紫	3	3					217:93:64|27:107:73|27:99:98	local_japanese_face_pips
+purple_03_02_04_03	3	1	2	紫	3	3					215:92:72|32:107:95|32:95:63	local_japanese_face_pips
+purple_03_02_05_00	3	2	1	紫	3	3					214:95:82|146:98:108|37:82:56	local_japanese_face_pips
+purple_03_02_05_01	3	1	2	紫	3	3					225:99:68|28:106:77|28:102:77	local_japanese_face_pips
+purple_03_02_06_00	5	2	3	紫	5	5					212:94:85|170:108:70|25:85:72|25:72:81|25:107:104	local_japanese_face_pips
+purple_03_03_01_00	3	1	2	紫	3	3					209:100:71|29:87:66|29:98:66	local_japanese_face_pips
+purple_03_03_01r_00	3	1	2	紫	3	3					216:107:75|37:110:75|37:76:83	local_japanese_face_pips
+purple_03_03_02_00	3	1	2	紫	3	3					192:101:71|36:101:72|36:83:62	local_japanese_face_pips
+purple_03_03_02r_00	3	2	1	紫	3	3					210:102:57|172:111:97|38:97:59	local_japanese_face_pips
+purple_04_01_03_00	4	1	3	紫	4	4					218:100:86|35:105:99|35:99:91|35:87:85	local_japanese_face_pips
+purple_04_01_03_01	4	0	4		4	4					34:100:70|34:87:89|34:89:67|34:86:85	local_japanese_face_pips
+purple_04_01_03_02	4	1	3	紫	4	4					219:99:71|34:107:85|34:85:70|34:86:82	local_japanese_face_pips
+purple_04_01_03_03	4	1	3	紫	4	4					214:104:68|39:107:85|39:102:72|39:85:73	local_japanese_face_pips
+purple_04_01_03_04	4	1	3	紫	4	4					222:102:68|39:102:93|39:102:85|39:88:73	local_japanese_face_pips
+purple_04_01_04_00	4	1	3	紫	4	4					212:102:68|42:109:99|42:109:102|42:102:74	local_japanese_face_pips
+purple_04_01_04_04	4	2	2	紫	4	4					223:100:75|175:100:87|33:85:70|33:86:78	local_japanese_face_pips
+purple_04_01_05_00	3	1	2	紫	3	3					222:90:68|18:90:85|18:77:68	local_japanese_face_pips
+purple_04_01_06_00	3	1	2	紫	3	3					213:99:70|29:103:72|29:85:66	local_japanese_face_pips
+purple_04_01_EX04_00	4	2	2	紫	4	4					213:86:68|180:116:108|39:91:81|34:86:74	local_japanese_face_pips
+purple_04_01_EX04c_00	4	2	2	紫	4	4					198:100:76|155:100:78|28:96:72|48:96:85	local_japanese_face_pips
+purple_04_02_00_00	4	2	2	紫	4	4					225:100:70|158:102:87|34:101:69|34:85:77	local_japanese_face_pips
+purple_04_02_01_00	4	1	3	紫	4	4					207:100:70|34:108:87|34:88:83|34:83:85	local_japanese_face_pips
+purple_04_02_01r_00	4	2	2	紫	4	4					233:100:84|175:90:84|35:100:76|35:102:85	local_japanese_face_pips
+purple_04_02_02_00	4	2	2	紫	4	4					218:99:68|177:99:95|35:114:76|35:88:74	local_japanese_face_pips
+purple_04_02_02r_00	4	0	4		4	4					35:100:70|37:105:86|37:92:68|37:85:84	local_japanese_face_pips
+purple_04_02_02r_01	4	1	3	紫	4	4					213:101:86|35:103:85|35:88:76|35:86:76	local_japanese_face_pips
+purple_04_02_03_00	4	2	2	紫	4	4					207:103:75|174:107:75|45:82:74|45:74:78	local_japanese_face_pips
+purple_04_03_01r_00	4	2	2	紫	4	4					206:94:67|143:94:67|30:103:103|30:103:92	local_japanese_face_pips
+purple_04_03_02r_00	4	1	3	紫	4	4					213:100:63|27:91:82|27:94:82|27:82:77	local_japanese_face_pips
+purple_05_01_03_00	5	2	3	紫	5	5					233:102:71|180:101:80|33:95:92|33:92:85|33:96:93	local_japanese_face_pips
+purple_05_01_03_01	5	2	3	紫	5	5					208:103:79|175:90:79|41:100:73|41:73:80|41:109:101	local_japanese_face_pips
+purple_05_01_03_02	5	2	3	紫	5	5					201:101:71|158:101:84|36:114:77|36:88:84|36:97:97	local_japanese_face_pips
+purple_05_01_03_03	5	2	3	紫	5	5					213:103:68|168:105:87|36:88:82|36:82:86|36:96:92	local_japanese_face_pips
+purple_05_01_03_04	5	2	3	紫	5	5					217:99:71|187:102:84|37:85:80|37:86:86|37:96:92	local_japanese_face_pips
+purple_05_01_04_00	5	2	3	紫	5	5					210:88:74|178:88:85|38:102:90|38:88:73|38:90:107	local_japanese_face_pips
+purple_05_01_04_01	5	2	3	紫	5	5					222:100:69|166:104:95|37:99:76|37:76:63|37:109:99	local_japanese_face_pips
+purple_05_01_04_02	5	2	3	紫	5	5					219:99:71|193:105:84|30:84:86|30:86:81|30:86:81	local_japanese_face_pips
+purple_05_01_05_00	5	2	3	紫	5	5					229:87:68|164:101:83|36:86:79|36:84:84|36:109:84	local_japanese_face_pips
+purple_05_01_EX04_00	5	2	3	紫	5	5					207:111:77|171:111:86|34:103:83|35:86:73|35:107:83	local_japanese_face_pips
+purple_05_01_EX04c_00	5	2	3	紫	5	5					217:102:70|158:103:105|34:90:71|34:87:78|34:114:105	local_japanese_face_pips
+purple_05_02_00_00	5	2	3	紫	5	5					214:102:70|163:103:89|33:90:68|33:86:82|33:109:104	local_japanese_face_pips
+purple_05_02_01_00	5	1	4	紫	5	5					225:102:68|40:102:85|40:102:93|40:93:72|40:85:85	local_japanese_face_pips
+purple_05_02_02_00	5	1	4	紫	5	5					209:99:68|29:88:88|29:89:71|29:89:83|29:109:103	local_japanese_face_pips
+purple_05_02_02_01	5	2	3	紫	5	5					229:99:70|177:102:83|34:97:78|34:90:83|34:104:104	local_japanese_face_pips
+purple_05_02_02r_00	5	2	3	紫	5	5					239:99:89|173:107:90|34:93:79|34:86:70|34:110:101	local_japanese_face_pips
+purple_05_02_04_00	5	2	3	紫	5	5					214:102:68|170:111:78|37:68:78|37:78:76|37:100:107	local_japanese_face_pips
+purple_05_03_00_00	5	2	3	紫	5	5					208:101:74|149:101:86|36:86:101|36:101:80|36:104:104	local_japanese_face_pips
+purple_06_01_03_00	6	2	4	紫	6	6					232:101:87|155:87:87|34:94:79|34:85:83|34:110:83|34:110:110	local_japanese_face_pips
+purple_06_01_05_00	5	2	3	紫	5	5					228:99:70|167:102:97|36:103:76|36:76:76|36:117:106	local_japanese_face_pips
+purple_06_01_05_01	6	0	6		6	6					44:102:68|43:102:85|37:102:84|34:86:72|18:84:84|18:107:119	local_japanese_face_pips
+purple_06_02_01_00	6	2	4	紫	6	6					225:100:70|181:104:84|36:101:82|36:93:82|36:109:103|36:109:109	local_japanese_face_pips
+purple_06_02_01_01	6	2	4	紫	6	6					229:100:84|168:101:85|35:91:70|35:85:83|35:108:83|35:108:108	local_japanese_face_pips
+purple_06_02_01r_00	7	2	5	紫	7	7					202:106:71|190:103:80|33:101:76|33:76:76|33:108:105|33:108:108|33:108:108	local_japanese_face_pips
+purple_06_02_02_00	6	2	4	紫	6	6					234:100:80|164:101:85|38:80:78|38:103:82|38:109:82|38:109:109	local_japanese_face_pips
+purple_06_02_02r_00	6	2	4	紫	6	6					214:99:71|165:89:87|34:88:69|34:86:76|34:108:76|34:108:108	local_japanese_face_pips
+purple_06_02_02r_01	6	2	4	紫	6	6					207:99:71|161:101:80|35:99:76|35:76:66|35:108:75|35:108:108	local_japanese_face_pips
+purple_06_02_04_00	6	3	3	紫	6	6					217:95:76|160:102:76|141:84:88|30:88:80|30:88:109|30:88:117	local_japanese_face_pips
+purple_06_03_02_00	6	2	4	紫	6	6					218:102:62|166:112:80|39:112:76|39:80:75|39:75:108|39:121:121	local_japanese_face_pips
+purple_07_01_04_00	7	3	4	紫	7	7					226:99:71|177:102:85|139:100:88|34:88:75|34:90:106|34:109:109|34:109:109	local_japanese_face_pips
+purple_07_01_04_01	7	3	4	紫	7	7					213:87:68|174:87:76|138:92:83|40:74:73|40:108:73|40:117:117|40:117:117	local_japanese_face_pips
+purple_07_01_04_02	7	3	4	紫	7	7					217:102:71|167:104:99|138:85:72|35:81:63|35:107:102|35:107:107|35:107:107	local_japanese_face_pips
+purple_07_01_06_00	4	2	2	紫	4	4					209:99:83|154:105:83|36:83:80|36:85:76	local_japanese_face_pips
+purple_07_01_06_01	2	1	1	紫	2	2					213:102:68|34:102:70	local_japanese_face_pips
+purple_07_01_06_02	7	2	5	紫	7	7					215:100:86|170:90:86|39:86:68|39:86:81|39:108:81|39:108:108|39:108:108	local_japanese_face_pips
+purple_07_01_EX04_00	7	2	5	紫	7	7					207:112:70|179:112:87|35:92:72|35:92:87|35:92:87|25:111:111|35:111:133	local_japanese_face_pips
+purple_07_01_EX04c_00	7	2	5	紫	7	7					210:93:72|172:87:100|26:88:70|41:86:82|41:109:102|35:109:109|26:109:109	local_japanese_face_pips
+purple_07_02_01_00	7	3	4	紫	7	7					198:87:68|174:87:85|138:92:86|40:87:73|40:84:84|40:117:117|40:117:117	local_japanese_face_pips
+purple_07_02_01r_00	7	3	4	紫	7	7					211:100:70|167:105:85|122:87:67|30:83:86|30:95:88|30:109:109|30:109:109	local_japanese_face_pips
+purple_07_02_02r_00	7	1	6	紫	7	7					210:87:68|42:87:89|42:89:89|42:87:73|42:89:73|42:118:118|42:118:118	local_japanese_face_pips
+purple_07_02_02r_01	7	0	7		7	7					38:87:68|38:87:90|38:109:87|38:87:71|38:87:108|38:108:108|38:108:108	local_japanese_face_pips
+purple_07_03_01r_00	7	2	5	紫	7	7					213:102:81|169:110:74|46:110:77|46:106:76|46:76:76|46:106:106|46:106:113	local_japanese_face_pips
+purple_08_01_03_00	8	3	5	紫	8	8					239:99:71|166:103:78|139:87:77|35:77:80|35:110:80|35:110:110|35:110:110|35:80:80	local_japanese_face_pips
+purple_08_01_04_00	8	3	5	紫	8	8					216:94:66|170:114:83|139:78:71|34:82:73|34:110:106|34:110:110|34:110:110|34:110:110	local_japanese_face_pips
+purple_08_01_04_03	8	3	5	紫	8	8					211:88:68|157:88:81|138:93:74|35:81:72|35:74:74|35:120:120|35:120:120|35:74:74	local_japanese_face_pips
+purple_08_01_EX03_00	8	2	6	紫	8	8					215:90:63|159:90:79|34:93:81|34:103:82|34:109:82|34:109:103|34:109:109|34:82:82	local_japanese_face_pips
+purple_08_02_01_00	8	3	5	紫	8	8					213:107:70|176:106:81|138:106:68|42:81:73|42:77:108|42:113:113|42:113:113|42:108:77	local_japanese_face_pips
+purple_08_02_01_01	8	2	6	紫	8	8					209:99:71|165:101:86|37:100:76|37:86:81|37:109:81|37:109:109|37:109:109|37:81:81	local_japanese_face_pips
+purple_08_03_01_00	8	3	5	紫	8	8					211:93:76|157:98:76|142:99:87|30:87:78|30:87:111|30:112:112|30:112:112|30:111:87	local_japanese_face_pips
+purple_09_01_04_00	9	3	6	紫	9	9	9				234:86:68|184:86:91|138:90:73|40:79:64|40:73:73|40:108:108|40:108:108|40:107:73|34:64:64	local_japanese_face_manual_2026-09-24
+purple_09_01_04_01	9	5	4	紫	9	9	9			5	215:99:87|183:104:87|139:87:80|119:90:82|105:80:82|35:110:110|35:110:110|35:82:82|35:82:62	local_japanese_face_manual_2026-09-24
+purple_09_01_05_00	9	3	6	紫	9	9	9				212:86:85|171:91:85|130:99:83|35:102:74|34:110:109|35:109:102|37:110:109|35:74:109|35:74:74	local_japanese_face_manual_2026-09-24
+purple_09_02_02_00	9	3	6	紫	9	9					210:99:72|159:105:72|139:88:72|34:100:66|34:110:102|34:110:110|34:110:110|34:73:73|35:66:66	local_japanese_face_pips
+purple_10_01_EX03_00	10	3	7	紫	10	9	10				221:104:70|196:121:86|120:92:85|35:103:74|35:111:105|35:111:111|35:116:111|35:111:105|33:74:74	local_japanese_face_manual_2026-09-24
+red_00_00_03_00												not_applicable_base_minion
+red_00_00_03_01												not_applicable_base_minion
+red_00_00_03_02												not_applicable_base_minion
+red_00_00_03_03												not_applicable_base_minion
+red_00_00_03_04												not_applicable_base_minion
+red_00_00_03_05												not_applicable_base_minion
+red_00_00_04_00												not_applicable_base_minion
+red_00_00_04_01												not_applicable_base_minion
+red_00_00_04_02												not_applicable_base_minion
+red_00_00_04_03												not_applicable_base_minion
+red_00_00_04_04												not_applicable_base_minion
+red_00_00_04_05												not_applicable_base_minion
+red_00_00_04_06												not_applicable_base_minion
+red_00_00_04_07												not_applicable_base_minion
+red_00_00_05_00												not_applicable_base_minion
+red_00_01_00_00												not_applicable_base_minion
+red_00_01_01_00												not_applicable_base_minion
+red_00_01_01r_00												not_applicable_base_minion
+red_00_01_02_00												not_applicable_base_minion
+red_00_01_02_01												not_applicable_base_minion
+red_00_01_02c_00												not_applicable_base_minion
+red_00_01_02c_01												not_applicable_base_minion
+red_00_01_02c_02												not_applicable_base_minion
+red_00_01_02r_00												not_applicable_base_minion
+red_00_01_02r_01												not_applicable_base_minion
+red_00_01_04_00	0	0	0		0	0						local_japanese_face_pips
+red_00_01_EX02_00												not_applicable_base_minion
+red_00_01_EX02_01												not_applicable_base_minion
+red_00_01_EX02_02												not_applicable_base_minion
+red_01_00_04_00	1	1	0	赤	1	1					223:100:67	local_japanese_face_pips
+red_01_00_06_00												not_applicable_base_minion
+red_01_01_03_00	1	0	1		1	1					27:102:72	local_japanese_face_pips
+red_01_01_04_00	1	0	1		1	1					34:104:68	local_japanese_face_pips
+red_01_01_05_00	1	0	1		1	1					17:102:68	local_japanese_face_pips
+red_01_01_06_00	2	1	1	赤|黄	2	2					242:101:101|34:101:86	local_japanese_face_pips
+red_01_02_01_00	1	1	0	赤	1	1					213:102:68	local_japanese_face_pips
+red_01_02_02_00	1	1	0	赤	1	1					235:100:70	local_japanese_face_pips
+red_01_02_03_00	1	1	0	赤	1	1					229:103:85	local_japanese_face_pips
+red_01_02_04_00	1	1	0	赤	1	1					235:101:86	local_japanese_face_pips
+red_01_02_04_01	1	1	0	赤	1	1					238:113:81	local_japanese_face_pips
+red_01_02_05_00	1	1	0	赤	1	1					238:104:73	local_japanese_face_pips
+red_01_03_00_00	1	1	0	赤	1	1					233:107:78	local_japanese_face_pips
+red_01_03_01r_00	1	1	0	赤	1	1					234:104:68	local_japanese_face_pips
+red_01_03_EX04_00	1	0	1		1	1					36:99:82	local_japanese_face_pips
+red_01_03_EX04c_00	1	0	1		1	1					24:99:69	local_japanese_face_pips
+red_01_04_00_00	1	0	1		1	1					27:102:69	local_japanese_face_pips
+red_02_00_06_00												not_applicable_base_minion
+red_02_01_03_00	2	1	1	赤	2	2					217:100:67|37:91:67	local_japanese_face_pips
+red_02_01_03_01	2	1	1	赤	2	2					253:103:69|35:103:84	local_japanese_face_pips
+red_02_01_03_02	2	1	1	赤	2	2					255:103:69|34:103:84	local_japanese_face_pips
+red_02_01_03_03	2	1	1	赤	2	2					230:99:76|35:102:81	local_japanese_face_pips
+red_02_01_04_00	2	1	1	赤	2	2					244:99:70|38:105:87	local_japanese_face_pips
+red_02_01_04_02	2	1	1	赤	2	2					248:99:67|37:99:87	local_japanese_face_pips
+red_02_01_04_03	2	1	1	赤	2	2					236:100:68|36:88:67	local_japanese_face_pips
+red_02_01_05_00	2	1	1	赤	2	2					208:100:70|27:103:79	local_japanese_face_pips
+red_02_01_05_01	2	1	1	赤	2	2					230:102:68|34:88:74	local_japanese_face_pips
+red_02_01_05_02	2	0	2		2	2					19:99:70|35:101:85	local_japanese_face_pips
+red_02_02_00_00	2	1	1	赤	2	2					211:100:74|35:97:74	local_japanese_face_pips
+red_02_02_00_01	2	1	1	赤	2	2					232:101:69|35:105:82	local_japanese_face_pips
+red_02_02_01_00	2	1	1	赤	2	2					233:99:63|27:96:86	local_japanese_face_pips
+red_02_02_01r_00	2	1	1	赤	2	2					219:100:71|27:102:87	local_japanese_face_pips
+red_02_02_02_00	2	1	1	赤	2	2					218:100:72|37:103:85	local_japanese_face_pips
+red_02_02_02c_00	2	1	1	赤	2	2					252:103:70|35:88:84	local_japanese_face_pips
+red_02_02_02c_01	2	1	1	赤	2	2					234:104:72|35:101:87	local_japanese_face_pips
+red_02_02_02r_00	2	1	1	赤	2	2					214:101:69|34:101:72	local_japanese_face_pips
+red_02_02_02r_01	2	1	1	赤	2	2					232:100:68|34:100:73	local_japanese_face_pips
+red_02_02_04_00	2	1	1	赤	2	2					225:107:75|37:99:75	local_japanese_face_pips
+red_02_02_EX02_00	2	1	1	赤	2	2					248:102:70|31:104:86	local_japanese_face_pips
+red_02_02_EX02_01	2	1	1	赤	2	2					244:102:68|45:110:81	local_japanese_face_pips
+red_02_03_00_00	2	1	1	赤	2	2					232:99:72|33:102:84	local_japanese_face_pips
+red_02_03_00_01	2	1	1	赤	2	2					233:100:80|43:101:80	local_japanese_face_pips
+red_02_03_01_00	2	1	1	赤	2	2					235:99:68|39:102:83	local_japanese_face_pips
+red_02_03_01r_00	2	1	1	赤	2	2					225:89:73|42:108:73	local_japanese_face_pips
+red_02_03_02c_00	2	1	1	赤	2	2					225:93:79|24:93:79	local_japanese_face_pips
+red_02_03_02c_01	2	1	1	赤	2	2					229:104:71|33:106:80	local_japanese_face_pips
+red_02_03_02r_00	2	1	1	赤	2	2					234:95:86|38:104:86	local_japanese_face_pips
+red_02_03_02r_01	2	1	1	赤	2	2					235:97:68|30:97:72	local_japanese_face_pips
+red_02_03_EX02_00	2	1	1	赤	2	2					234:96:82|38:96:87	local_japanese_face_pips
+red_02_03_EX02_01	2	1	1	赤	2	2					235:99:67|29:99:86	local_japanese_face_pips
+red_03_01_03_00	3	1	2	赤	3	3					253:100:71|32:92:67|32:95:78	local_japanese_face_pips
+red_03_01_03_01	3	1	2	赤	3	3					237:101:68|41:89:92|41:88:72	local_japanese_face_pips
+red_03_01_04_00	3	1	2	赤	3	3					206:101:67|35:101:86|35:86:74	local_japanese_face_pips
+red_03_01_04_01	3	1	2	赤	3	3					239:102:68|34:102:71|34:88:76	local_japanese_face_pips
+red_03_01_04_02	3	1	2	赤	3	3					241:102:68|41:85:82|41:91:75	local_japanese_face_pips
+red_03_01_05_00	3	1	2	赤	3	3					212:102:68|43:85:85|21:85:76	local_japanese_face_pips
+red_03_01_05_01	3	0	3		3	3					40:107:77|40:107:77|40:111:76	local_japanese_face_pips
+red_03_01_06_00	1	1	0	赤	1	1					235:100:61	local_japanese_face_pips
+red_03_01_06_01	4	2	2	赤	4	4					235:100:68|208:96:79|34:89:79|34:79:70	local_japanese_face_pips
+red_03_01_06_02	3	2	1	赤	3	3					243:100:68|208:101:78|35:86:69	local_japanese_face_pips
+red_03_01_06_03	1	1	0	赤|黄	1	1					230:102:102	local_japanese_face_pips
+red_03_01_EX04_00	3	1	2	赤	3	3					246:96:69|35:96:70|35:87:75	local_japanese_face_pips
+red_03_01_EX04c_00	3	1	2	赤	3	3					199:99:67|24:115:71|36:101:69	local_japanese_face_pips
+red_03_02_00_00	3	1	2	赤	3	3					245:101:69|35:100:70|35:87:77	local_japanese_face_pips
+red_03_02_01_00	3	1	2	赤	3	3					238:102:68|47:102:85|47:85:68	local_japanese_face_pips
+red_03_02_01_01	3	2	1	赤	3	3					235:101:69|227:102:82|34:100:69	local_japanese_face_pips
+red_03_02_01_02	3	1	2	赤	3	3					243:112:78|46:112:76|46:76:78	local_japanese_face_pips
+red_03_02_01_03	3	3	0	赤	3	3					246:100:68|203:103:73|209:86:77	local_japanese_face_pips
+red_03_02_01r_00	3	1	2	赤	3	3					216:103:70|29:101:71|29:99:68	local_japanese_face_pips
+red_03_02_02_00	3	1	2	赤	3	3					214:110:78|39:115:78|39:105:78	local_japanese_face_pips
+red_03_02_02c_00	3	1	2	赤	3	3					231:100:68|35:103:70|35:100:70	local_japanese_face_pips
+red_03_02_04_00	3	2	1	赤	3	3					238:111:79|215:109:79|45:79:75	local_japanese_face_pips
+red_03_02_04_03	3	2	1	赤	3	3					220:103:71|213:87:80|33:86:73	local_japanese_face_pips
+red_03_02_04_04	3	2	1	赤	3	3					235:96:68|213:96:83|29:83:79	local_japanese_face_pips
+red_03_02_05_00	3	1	2	赤	3	3					221:113:74|37:108:74|42:108:79	local_japanese_face_pips
+red_03_02_05_01	3	2	1	赤	3	3					225:116:79|218:111:79|28:79:73	local_japanese_face_pips
+red_03_02_05_02	3	2	1	赤	3	3					238:125:79|220:105:78|41:79:79	local_japanese_face_pips
+red_03_02_06_00	5	2	3	赤|黄	5	5					217:102:82|247:100:83|37:101:69|37:69:78|37:67:78	local_japanese_face_pips
+red_03_02_EX02_00	3	1	2	赤	3	3					231:100:68|35:99:71|35:102:75	local_japanese_face_pips
+red_03_03_02_00	3	2	1	赤	3	3					238:107:73|217:90:73|43:73:75	local_japanese_face_pips
+red_03_03_02_01	3	1	2	赤	3	3					234:106:73|31:106:85|31:85:70	local_japanese_face_pips
+red_04_01_03_00	4	2	2	赤	4	4					235:100:66|214:101:77|36:103:71|36:85:55	local_japanese_face_pips
+red_04_01_03_02	4	1	3	赤	4	4					226:100:68|33:104:87|33:87:71|33:85:71	local_japanese_face_pips
+red_04_01_03_03	4	0	4		4	4					37:100:69|37:100:80|37:90:69|37:89:70	local_japanese_face_pips
+red_04_01_04_00	4	2	2	赤	4	4					248:99:68|198:103:87|37:90:71|37:85:65	local_japanese_face_pips
+red_04_01_04_01	4	2	2	赤	4	4					223:102:68|209:109:68|41:89:79|41:79:77	local_japanese_face_pips
+red_04_01_05_00	4	2	2	赤	4	4					214:102:85|206:102:85|34:85:68|34:85:68	local_japanese_face_pips
+red_04_01_06_00	3	1	2	赤	3	3					225:110:77|43:110:77|43:106:76	local_japanese_face_pips
+red_04_01_06_01	3	1	2	赤	3	3	3		official_total_vs_verified_face		240:102:68|40:102:78|40:85:68|74:74:74	local_japanese_face_manual_2026-09-24
+red_04_01_06_02	2	1	1	赤	2	2	2		official_total_vs_verified_face		235:100:68|34:104:87|69:69:69|69:69:69|86:86:86|86:87:87|90:90:87|86:86:86	local_japanese_face_manual_2026-09-24
+red_04_01_06_03	5	2	3	赤|黄	5	5					240:102:68|238:85:91|34:91:74|34:74:72|34:72:72	local_japanese_face_pips
+red_04_01_06_04	5	2	3	赤|黄	5	5					235:102:84|253:90:88|39:101:71|39:87:76|39:87:76	local_japanese_face_pips
+red_04_01_EX04_00	4	2	2	赤	4	4					242:102:68|242:87:84|47:85:68|34:85:74	local_japanese_face_pips
+red_04_01_EX04c_00	4	2	2	赤	4	4					225:98:67|225:107:67|34:87:83|34:83:70	local_japanese_face_pips
+red_04_02_00_00	4	1	3	赤	4	4					236:100:71|34:103:82|34:87:69|34:86:71	local_japanese_face_pips
+red_04_02_01_00	4	2	2	赤	4	4					232:100:71|207:100:71|35:108:68|35:87:66	local_japanese_face_pips
+red_04_02_01r_00	4	2	2	赤	4	4					254:102:71|216:90:81|35:86:72|35:88:71	local_japanese_face_pips
+red_04_02_02_00	4	2	2	赤	4	4					215:101:70|199:106:73|28:89:70|28:86:79	local_japanese_face_pips
+red_04_02_02c_00	4	1	3	赤	4	4					240:99:70|36:88:89|36:89:79|36:79:71	local_japanese_face_pips
+red_04_02_02r_00	4	1	3	赤	4	4					255:101:69|36:104:83|36:85:73|36:73:70	local_japanese_face_pips
+red_04_02_02r_01	4	0	4		4	4					24:109:67|33:109:85|35:85:71|35:71:71	local_japanese_face_pips
+red_04_02_04_00	4	2	2	赤	4	4					235:99:68|214:99:88|35:88:77|35:77:76	local_japanese_face_pips
+red_04_02_04_02	4	2	2	赤	4	4					235:97:69|213:108:87|30:87:80|30:80:77	local_japanese_face_pips
+red_04_02_06_00	2	1	1	赤	2	2					233:110:85|27:110:85	local_japanese_face_pips
+red_04_02_EX02_00	4	1	3	赤	4	4					221:100:69|37:88:82|37:87:70|37:86:71	local_japanese_face_pips
+red_04_03_01_00	4	1	3	赤	4	4					225:111:77|39:109:68|39:100:74|39:80:78	local_japanese_face_pips
+red_04_04_00_00	4	0	4		4	4					36:98:68|36:98:83|36:86:70|36:85:64	local_japanese_face_pips
+red_05_01_03_00	5	2	3	赤	5	5					234:102:72|212:103:84|34:86:71|34:85:64|34:81:64	local_japanese_face_pips
+red_05_01_03_01	5	2	3	赤	5	5					252:99:66|217:101:89|24:89:82|24:82:67|24:85:85	local_japanese_face_pips
+red_05_01_03_02	5	2	3	赤	5	5					253:95:66|213:95:66|24:110:80|24:80:68|24:82:85	local_japanese_face_pips
+red_05_01_03_03	5	2	3	赤	5	5					253:102:77|211:108:79|40:77:79|40:79:78|40:77:78	local_japanese_face_pips
+red_05_01_04_00	5	2	3	赤	5	5					239:101:71|203:102:87|37:100:74|37:74:80|37:80:80	local_japanese_face_pips
+red_05_01_04_01	5	2	3	赤	5	5					226:100:68|226:96:77|36:88:79|36:79:76|36:76:80	local_japanese_face_pips
+red_05_01_05_00	5	2	3	赤	5	5					237:109:76|217:109:77|42:111:78|42:78:79|18:79:77	local_japanese_face_pips
+red_05_01_05_01	5	0	5		5	5					41:102:69|20:88:88|41:88:75|41:100:79|41:75:79	local_japanese_face_pips
+red_05_01_06_00	4	2	2	赤|黄	4	4					247:102:70|245:88:84|29:86:69|29:69:78	local_japanese_face_pips
+red_05_01_06_01	3	1	2	赤|黄	3	3					249:109:109|34:86:85|34:85:85	local_japanese_face_pips
+red_05_01_EX04_00	5	3	2	赤	5	5					241:99:68|196:102:77|204:101:70|35:85:75|35:75:75	local_japanese_face_pips
+red_05_01_EX04c_00	5	3	2	赤	5	5					250:100:67|218:99:82|218:87:71|37:86:71|37:82:86	local_japanese_face_pips
+red_05_02_01_00	5	2	3	赤	5	5					217:100:69|225:107:74|35:103:72|35:85:70|35:86:84	local_japanese_face_pips
+red_05_02_01r_00	5	2	3	赤	5	5					214:101:70|211:105:88|25:88:74|25:74:76|25:76:76	local_japanese_face_pips
+red_05_02_02_00	5	1	4	赤	5	5					229:102:69|35:102:81|35:99:70|35:85:65|35:90:65	local_japanese_face_pips
+red_05_02_02r_00	5	2	3	赤	5	5					245:104:71|208:101:80|34:100:78|34:78:64|34:78:64	local_japanese_face_pips
+red_05_02_04_00	5	2	3	赤	5	5					234:105:73|214:105:64|41:73:80|41:80:70|41:83:78	local_japanese_face_pips
+red_05_02_06_00	3	1	2	赤|黄	3	3					238:111:112|42:103:74|42:77:72	local_japanese_face_pips
+red_05_03_01_00	5	2	3	赤	5	5					238:102:80|218:114:82|44:102:77|44:77:75|44:79:75	local_japanese_face_pips
+red_05_03_01r_00	5	2	3	赤	5	5					238:103:79|217:103:81|46:81:75|46:75:77|46:77:73	local_japanese_face_pips
+red_06_01_03_00	6	2	4	赤	6	6					234:102:68|234:107:72|38:87:80|38:80:78|38:80:78|38:78:78	local_japanese_face_pips
+red_06_01_04_00	6	2	4	赤	6	6					233:99:66|221:102:84|40:84:80|40:80:65|40:77:86|40:86:86	local_japanese_face_pips
+red_06_01_04_01	6	2	4	赤	6	6					249:105:77|215:109:77|41:77:77|41:77:62|41:76:85|41:85:85	local_japanese_face_pips
+red_06_01_EX03_00	6	3	3	赤	6	6					213:102:83|231:103:83|235:111:71|38:86:75|51:75:80|20:80:80	local_japanese_face_pips
+red_06_01_EX04_00	6	2	4	赤	6	6					209:99:71|215:93:71|34:102:53|34:75:75|34:75:75|34:109:80	local_japanese_face_pips
+red_06_01_EX04c_00	6	2	4	赤	6	6					216:101:70|206:102:86|36:90:73|24:86:70|36:89:70|36:90:87	local_japanese_face_pips
+red_06_02_01_00	6	2	4	赤	6	6					243:100:68|204:103:87|37:86:71|37:86:61|37:77:61|37:84:84	local_japanese_face_pips
+red_06_02_02_00	6	1	5	赤	6	6					216:101:70|35:105:70|35:86:75|35:76:77|35:77:79|35:79:79	local_japanese_face_pips
+red_06_02_02_01	6	2	4	赤	6	6					245:102:70|213:103:85|30:102:71|30:86:59|30:74:59|30:84:84	local_japanese_face_pips
+red_06_02_02c_00	6	2	4	赤	6	6					242:102:68|209:107:68|39:87:77|39:77:63|39:76:86|39:86:86	local_japanese_face_pips
+red_06_02_02c_01	6	2	4	赤	6	6					221:102:78|211:109:78|44:105:78|44:78:75|44:77:75|44:77:77	local_japanese_face_pips
+red_06_02_02r_00	6	2	4	赤	6	6					236:99:67|212:91:82|30:107:70|30:70:75|30:75:75|30:80:80	local_japanese_face_pips
+red_06_02_03_00	8	2	6	赤	8	8					226:113:80|215:114:68|40:80:78|40:78:75|42:78:75|40:75:75|27:110:75|27:75:75	local_japanese_face_pips
+red_06_02_EX02_00	6	2	4	赤	6	6					234:101:69|203:100:83|34:89:78|34:78:79|34:78:79|34:79:79	local_japanese_face_pips
+red_06_02_EX02_01	6	2	4	赤	6	6					232:99:66|219:102:84|32:84:69|32:86:67|32:76:84|32:84:84	local_japanese_face_pips
+red_07_01_03_00	7	2	5	赤	7	7					217:99:70|215:103:84|35:87:70|35:86:74|35:74:74|35:79:79|35:79:79	local_japanese_face_pips
+red_07_01_04_00	7	2	5	赤	7	7					233:103:70|206:103:75|36:89:79|36:79:72|36:78:72|36:79:79|36:79:79	local_japanese_face_pips
+red_07_01_05_00	7	2	5	赤	7	7					233:99:71|208:103:94|36:94:52|36:73:75|34:75:75|36:111:75|36:109:109	local_japanese_face_pips
+red_07_01_06_00	4	2	2	赤|黄	4	4					247:102:68|252:104:77|34:86:72|34:72:77	local_japanese_face_pips
+red_07_02_00_00	7	2	5	赤	7	7					234:101:73|206:106:73|34:110:80|34:80:74|34:80:74|34:79:79|34:79:79	local_japanese_face_pips
+red_07_02_01_00	7	2	5	赤	7	7					236:100:68|229:92:90|30:90:81|30:81:69|30:85:69|30:89:89|30:88:88	local_japanese_face_pips
+red_07_02_01r_00	6	3	3	赤	6	6					213:100:67|206:101:72|191:100:71|37:87:69|37:85:84|37:84:84	local_japanese_face_pips
+red_07_02_02c_00	7	0	7		7	7					38:89:75|38:89:69|38:75:76|38:76:79|38:76:79|38:77:77|38:77:77	local_japanese_face_pips
+red_07_02_02c_02	7	1	6	赤	7	7					244:102:68|38:102:85|38:85:76|38:76:79|38:76:79|38:79:77|38:79:79	local_japanese_face_pips
+red_07_02_02r_00	7	1	6	赤	7	7					241:101:68|35:97:81|35:89:70|35:86:70|35:88:70|35:87:87|35:87:87	local_japanese_face_pips
+red_07_02_02r_01	7	0	7		7	7					39:103:72|39:103:83|39:88:77|39:77:61|39:79:61|39:83:83|39:83:83	local_japanese_face_pips
+red_07_02_02r_02	7	3	4	赤	7	7					219:100:66|205:90:66|208:79:80|24:80:66|24:78:86|24:86:86|24:86:86	local_japanese_face_pips
+red_07_02_03_00	7	2	5	赤	7	7					234:99:71|216:108:88|36:88:71|36:85:72|36:72:72|36:75:75|36:75:75	local_japanese_face_pips
+red_07_02_EX02_00	7	0	7		7	7					35:100:71|35:88:71|35:85:71|35:86:63|35:79:79|35:83:83|35:83:83	local_japanese_face_pips
+red_07_02_EX02_02	7	1	6	赤	7	7					241:102:70|35:88:83|35:87:72|35:86:70|35:79:85|35:85:85|35:85:85	local_japanese_face_pips
+red_08_01_04_00	8	3	5	赤	8	8					251:110:85|212:102:82|212:85:74|44:74:74|44:74:74|44:77:77|44:77:77|44:74:74	local_japanese_face_pips
+red_08_01_04_01	8	3	5	赤	8	8					240:100:68|220:104:87|209:102:71|39:84:72|39:71:72|39:75:75|39:109:75|39:72:72	local_japanese_face_pips
+red_08_01_06_00	2	1	1	赤	2	2	2		official_total_vs_verified_face		229:102:70|40:89:70|73:73:73|73:73:73	local_japanese_face_manual_2026-09-24
+red_08_01_EX03_00	8	0	8		8	8					34:102:68|34:104:76|34:87:71|39:71:68|34:82:68|34:78:78|34:78:108|39:108:68	local_japanese_face_pips
+red_08_02_01_00	8	2	6	赤	8	8					245:101:70|199:102:72|36:103:72|36:87:70|36:79:70|36:89:89|36:90:90|36:90:90	local_japanese_face_pips
+red_08_02_02r_00	8	3	5	赤	8	8					244:95:67|202:95:67|209:81:60|34:84:71|34:84:84|34:84:84|34:84:84|34:84:84	local_japanese_face_pips
+red_08_03_02_00	8	3	5	赤	8	8					221:99:70|216:102:78|205:86:79|29:79:79|29:79:74|29:74:74|29:74:74|29:74:79	local_japanese_face_pips
+red_09_01_04_00	9	3	6	赤	9	9	9				239:100:77|213:102:92|198:92:81|34:81:74|34:82:74|34:78:78|34:78:78|34:74:74|33:74:74	local_japanese_face_manual_2026-09-24
+red_09_01_04_02	9	3	6	赤	9	9	9				232:100:77|209:91:77|202:77:78|24:78:74|24:80:74|24:79:79|24:79:79|24:74:74|34:74:74	local_japanese_face_manual_2026-09-24
+red_09_01_05_00	9	3	6	赤	9	9	9				240:105:68|240:102:68|220:85:53|33:107:76|33:76:76|33:79:76|33:76:79|33:79:79|41:76:79	local_japanese_face_manual_2026-09-24
+red_09_02_01_00	9	3	6	赤	9	9		9			250:103:71|210:103:85|222:102:69|37:87:69|37:88:86|37:86:86|37:86:86|37:86:86|35:69:69	seesaa.tsv|runtime
+red_09_02_02_00	9	3	6	赤	9	9					233:99:66|211:104:88|210:88:74|38:87:69|38:87:86|38:91:86|38:91:86|38:86:86|33:69:69	local_japanese_face_pips
+red_11_01_04_00	11	4	7	赤	11	9	11				210:102:68|177:107:74|195:90:79|185:74:81|35:79:81|35:81:81|35:81:81|35:81:81|34:81:81	local_japanese_face_manual_2026-09-24
+white_00_00_03_00												not_applicable_base_minion
+white_00_00_03_01												not_applicable_base_minion
+white_00_00_03_02												not_applicable_base_minion
+white_00_00_03_03												not_applicable_base_minion
+white_00_00_03_04												not_applicable_base_minion
+white_00_00_03_05												not_applicable_base_minion
+white_00_00_04_00												not_applicable_base_minion
+white_00_00_04_01												not_applicable_base_minion
+white_00_00_04_02												not_applicable_base_minion
+white_00_00_04_03												not_applicable_base_minion
+white_00_00_04_04												not_applicable_base_minion
+white_00_00_04_05												not_applicable_base_minion
+white_00_00_04_06												not_applicable_base_minion
+white_00_00_04_07												not_applicable_base_minion
+white_00_00_05_00												not_applicable_base_minion
+white_00_00_05_01												not_applicable_base_minion
+white_00_00_EX04_00												not_applicable_base_minion
+white_00_00_EX04_01												not_applicable_base_minion
+white_00_00_EX04_02												not_applicable_base_minion
+white_00_00_EX04c_00												not_applicable_base_minion
+white_00_00_EX04c_01												not_applicable_base_minion
+white_00_00_EX04c_02												not_applicable_base_minion
+white_00_01_00_00												not_applicable_base_minion
+white_00_01_01_00												not_applicable_base_minion
+white_00_01_01r_00												not_applicable_base_minion
+white_00_01_02_00												not_applicable_base_minion
+white_00_01_02_01												not_applicable_base_minion
+white_00_01_02r_00												not_applicable_base_minion
+white_00_01_02r_01												not_applicable_base_minion
+white_00_01_04_00	0	0	0		0	0						local_japanese_face_pips
+white_01_01_03_00	1	0	1		1	1					36:132:132	local_japanese_face_pips
+white_01_01_04_00	1	1	0	白	1	1					255:123:133	local_japanese_face_pips
+white_01_01_04_01	1	0	1		1	1					33:133:136	local_japanese_face_pips
+white_01_01_05_00	1	0	1		1	1					36:132:123	local_japanese_face_pips
+white_01_01_06_00	2	1	1	白|緑	2	2					233:119:133|39:150:168	local_japanese_face_pips
+white_01_02_01_00	1	1	0	白	1	1					255:130:137	local_japanese_face_pips
+white_01_02_02_00	1	1	0	白	1	1					255:120:132	local_japanese_face_pips
+white_01_02_04_00	1	1	0	白	1	1					255:128:128	local_japanese_face_pips
+white_01_02_04_02	1	1	0	白	1	1					255:147:147	local_japanese_face_pips
+white_01_02_05_00	1	1	0	白	1	1					255:143:140	local_japanese_face_pips
+white_01_03_01_00	1	1	0	白	1	1					255:127:127	local_japanese_face_pips
+white_02_00_06_00												not_applicable_base_minion
+white_02_01_03_00	2	1	1	白	2	2					255:120:134|37:153:170	local_japanese_face_pips
+white_02_01_04_00	2	1	1	白	2	2					255:123:123|27:148:166	local_japanese_face_pips
+white_02_01_04_01	2	1	1	白	2	2					255:120:132|37:148:170	local_japanese_face_pips
+white_02_01_04_02	2	1	1	白	2	2					255:120:133|35:153:170	local_japanese_face_pips
+white_02_01_05_00	2	1	1	白	2	2					255:136:136|46:154:170	local_japanese_face_pips
+white_02_01_05_01	2	0	2		2	2					34:132:137|34:151:174	local_japanese_face_pips
+white_02_01_EX04_00	2	1	1	白	2	2					255:120:120|40:153:170	local_japanese_face_pips
+white_02_01_EX04c_00	2	1	1	白	2	2					255:120:135|37:154:167	local_japanese_face_pips
+white_02_02_00_00	2	1	1	白	2	2					255:120:136|34:153:170	local_japanese_face_pips
+white_02_02_00_01	2	1	1	白	2	2					255:120:132|38:150:167	local_japanese_face_pips
+white_02_02_01_00	2	2	0	白	2	2					255:123:132|255:140:167	local_japanese_face_pips
+white_02_02_01r_00	2	1	1	白	2	2					255:119:136|34:153:170	local_japanese_face_pips
+white_02_02_02r_00	2	1	1	白	2	2					255:120:132|34:148:170	local_japanese_face_pips
+white_02_02_06_00	4	2	2	白|緑	4	4					255:129:129|166:144:170|36:160:178|36:178:201	local_japanese_face_pips
+white_02_02_EX04_00	2	1	1	白	2	2					255:113:132|20:140:157	local_japanese_face_pips
+white_02_02_EX04c_00	2	1	1	白	2	2					255:121:146|36:154:176	local_japanese_face_pips
+white_02_03_00_00	2	1	1	白	2	2					255:128:128|33:144:167	local_japanese_face_pips
+white_02_03_00_01	2	1	1	白	2	2					255:120:137|32:148:172	local_japanese_face_pips
+white_02_03_01r_00	2	1	1	白	2	2					255:128:128|16:143:167	local_japanese_face_pips
+white_02_03_01r_01	2	1	1	白	2	2					255:123:132|26:144:166	local_japanese_face_pips
+white_02_03_02r_00	2	1	1	白	2	2					255:127:127|28:145:167	local_japanese_face_pips
+white_03_01_03_00	3	1	2	白	3	3					255:123:132|36:148:171|36:163:179	local_japanese_face_pips
+white_03_01_03_01	3	1	2	白	3	3					255:123:138|39:154:171|39:165:170	local_japanese_face_pips
+white_03_01_03_02	3	1	2	白	3	3					255:122:133|38:148:167|38:166:174	local_japanese_face_pips
+white_03_01_04_00	3	1	2	白	3	3					255:120:132|34:152:166|34:163:174	local_japanese_face_pips
+white_03_01_04_01	3	1	2	白	3	3					255:119:136|39:153:170|39:170:170	local_japanese_face_pips
+white_03_01_04_02	3	1	2	白	3	3					255:123:132|35:148:174|35:156:188	local_japanese_face_pips
+white_03_01_05_00	3	1	2	白	3	3					255:120:129|37:148:162|37:162:182	local_japanese_face_pips
+white_03_01_05_01	3	0	3		3	3					38:136:139|38:153:170|38:153:188	local_japanese_face_pips
+white_03_01_06_00	1	1	0	白|緑	1	1					236:119:135	local_japanese_face_pips
+white_03_01_EX04_00	3	2	1	白	3	3					255:119:136|255:136:170|39:174:170	local_japanese_face_pips
+white_03_01_EX04_01	3	1	2	白	3	3					255:119:136|34:154:170|35:154:170	local_japanese_face_pips
+white_03_01_EX04c_00	3	2	1	白	3	3					255:120:133|255:141:170|24:153:170	local_japanese_face_pips
+white_03_01_EX04c_01	3	1	2	白	3	3					255:123:132|34:148:166|36:166:174	local_japanese_face_pips
+white_03_02_00_00	3	1	2	白	3	3					255:123:133|35:148:175|35:166:183	local_japanese_face_pips
+white_03_02_01_00	3	1	2	白	3	3					255:120:136|40:153:170|40:170:187	local_japanese_face_pips
+white_03_02_01r_00	3	2	1	白	3	3					255:123:132|255:145:170|36:165:183	local_japanese_face_pips
+white_03_02_02_00	3	1	2	白	3	3					255:130:130|34:152:168|34:165:174	local_japanese_face_pips
+white_03_02_02_01	3	1	2	白	3	3					255:123:132|33:149:166|33:157:174	local_japanese_face_pips
+white_03_02_02r_00	3	1	2	白	3	3					255:134:133|34:150:168|34:168:186	local_japanese_face_pips
+white_03_02_03_00	3	1	2	白	3	3					255:121:134|37:149:169|37:153:174	local_japanese_face_pips
+white_03_02_03_01	3	1	2	白	3	3					255:120:132|35:147:170|35:157:170	local_japanese_face_pips
+white_03_02_04_00	3	2	1	白	3	3					255:128:128|255:144:167|17:157:174	local_japanese_face_pips
+white_03_02_04_03	3	1	2	白	3	3					255:139:145|39:145:170|39:174:187	local_japanese_face_pips
+white_03_02_04_04	3	1	2	白	3	3					255:140:149|39:146:170|39:177:170	local_japanese_face_pips
+white_03_02_04_05	3	1	2	白	3	3					255:112:145|41:145:170|41:173:170	local_japanese_face_pips
+white_03_02_05_00	3	1	2	白	3	3					255:134:132|29:149:169|29:152:183	local_japanese_face_pips
+white_03_03_00_00	3	2	1	白	3	3					255:115:115|255:142:170|28:157:176	local_japanese_face_pips
+white_03_03_01_00	3	1	2	白	3	3					255:115:140|29:140:161|29:166:178	local_japanese_face_pips
+white_03_03_02_00	3	1	2	白	3	3					255:133:133|29:152:169|29:155:169	local_japanese_face_pips
+white_04_01_03_00	4	2	2	白	4	4					255:121:133|255:143:165|34:165:170|34:181:203	local_japanese_face_pips
+white_04_01_03_02	4	1	3	白	4	4					255:120:133|36:155:165|36:165:182|36:186:203	local_japanese_face_pips
+white_04_01_03_03	4	0	4		4	4					36:133:133|36:153:165|36:165:186|36:186:198	local_japanese_face_pips
+white_04_01_04_00	4	1	3	白	4	4					255:120:132|30:153:170|30:153:170|30:181:199	local_japanese_face_pips
+white_04_01_05_00	4	1	3	白	4	4					255:121:121|39:154:170|17:154:170|39:187:210	local_japanese_face_pips
+white_04_01_05_01	4	0	4		4	4					36:136:119|36:153:170|34:153:170|34:187:208	local_japanese_face_pips
+white_04_01_06_00	2	1	1	白	2	2	2		official_total_vs_verified_face		255:119:132|35:153:166|182:182:174|199:199:199|216:218:216	local_japanese_face_manual_2026-09-24
+white_04_01_06_01	5	2	3	白	5	5					255:121:121|255:151:165|33:165:169|33:186:206|33:214:214	local_japanese_face_pips
+white_04_01_06_02	3	1	2	白|緑	3	3					221:120:136|44:153:153|44:153:170	local_japanese_face_pips
+white_04_01_06_03	4	2	2	白|緑	4	4					242:124:141|219:141:157|35:157:174|35:183:200	local_japanese_face_pips
+white_04_01_06_04	5	2	3	白|緑	5	5					255:121:121|178:154:154|39:154:170|39:189:204|39:204:204	local_japanese_face_pips
+white_04_01_EX04_00	4	1	3	白	4	4					255:120:136|34:153:171|34:171:170|34:187:204	local_japanese_face_pips
+white_04_01_EX04c_00	4	1	3	白	4	4					255:134:132|36:150:165|24:157:173|36:189:206	local_japanese_face_pips
+white_04_02_01_00	4	2	2	白	4	4					255:120:132|255:140:170|28:157:183|28:181:199	local_japanese_face_pips
+white_04_02_01_01	3	1	2	白	3	3					255:120:135|35:152:165|35:166:169	local_japanese_face_pips
+white_04_02_01r_00	4	2	2	白	4	4					255:123:132|255:140:166|41:156:174|41:182:199	local_japanese_face_pips
+white_04_02_02_00	4	2	2	白	4	4					255:119:136|255:153:170|38:170:187|38:187:204	local_japanese_face_pips
+white_04_02_02_01	4	1	3	白	4	4					255:119:133|35:152:165|35:167:185|35:186:204	local_japanese_face_pips
+white_04_02_02r_00	4	0	4		4	4					38:133:133|34:150:170|38:164:187|35:186:206	local_japanese_face_pips
+white_04_02_02r_01	4	1	3	白	4	4					255:119:136|43:153:170|43:153:170|43:188:204	local_japanese_face_pips
+white_04_02_02r_02	4	2	2	白	4	4					255:121:133|255:143:170|25:169:184|25:186:198	local_japanese_face_pips
+white_04_02_04_00	4	2	2	白	4	4					255:127:127|255:145:170|29:157:184|29:187:202	local_japanese_face_pips
+white_04_02_04_01	4	2	2	白	4	4					255:112:145|255:145:170|42:174:170|42:192:204	local_japanese_face_pips
+white_04_02_04_02	4	2	2	白	4	4					255:123:132|255:141:169|29:157:174|29:181:202	local_japanese_face_pips
+white_04_02_05_00	4	2	2	白	4	4					255:125:132|255:144:167|41:161:174|38:187:199	local_japanese_face_pips
+white_04_02_05_01	4	2	2	白	4	4					255:111:139|255:146:170|36:175:170|36:188:204	local_japanese_face_pips
+white_04_02_06_00	3	1	2	白|緑	3	3					240:112:146|18:146:176|18:171:176	local_japanese_face_pips
+white_04_02_EX04_00	4	2	2	白	4	4					255:140:140|255:145:170|38:173:170|38:179:204	local_japanese_face_pips
+white_04_02_EX04c_00	4	2	2	白	4	4					255:119:139|255:157:170|18:153:190|40:189:204	local_japanese_face_pips
+white_04_03_01r_00	4	2	2	白	4	4					255:130:144|255:144:170|26:158:185|26:185:203	local_japanese_face_pips
+white_04_03_02_00	4	1	3	白	4	4					255:120:136|30:153:181|30:171:187|30:186:204	local_japanese_face_pips
+white_05_00_06_00												not_applicable_base_minion
+white_05_01_03_00	5	1	4	白	5	5					255:125:133|33:148:165|33:165:183|33:189:198|33:214:214	local_japanese_face_pips
+white_05_01_03_01	5	2	3	白	5	5					255:122:136|255:153:170|38:170:170|38:187:204|38:204:223	local_japanese_face_pips
+white_05_01_04_00	5	2	3	白	5	5					255:123:133|255:140:172|35:156:180|35:181:198|35:214:214	local_japanese_face_pips
+white_05_01_04_03	5	2	3	白	5	5					255:119:136|255:136:170|43:155:170|43:188:204|43:204:221	local_japanese_face_pips
+white_05_01_04_04	5	2	3	白	5	5					255:123:133|255:141:169|35:169:170|35:186:198|35:214:214	local_japanese_face_pips
+white_05_01_05_00	5	2	3	白	5	5					255:134:133|255:143:171|35:157:184|35:181:198|35:214:222	local_japanese_face_pips
+white_05_01_06_00	4	1	3	白	4	4					255:124:133|35:148:166|35:166:170|35:186:198	local_japanese_face_pips
+white_05_01_06_01	3	1	2	白	3	3	3		official_total_vs_verified_face		255:120:132|35:152:169|35:169:184|198:198:198	local_japanese_face_manual_2026-09-24
+white_05_01_06_02	4	2	2	白|緑	4	4					255:119:136|183:153:166|38:166:169|38:186:203	local_japanese_face_pips
+white_05_01_EX04_00	5	2	3	白	5	5					255:120:136|255:136:170|42:153:170|34:189:204|34:204:221	local_japanese_face_pips
+white_05_01_EX04_01	5	1	4	白	5	5					255:121:121|34:153:170|35:153:170|35:187:204|36:204:221	local_japanese_face_pips
+white_05_01_EX04c_00	5	2	3	白	5	5					255:119:136|255:153:170|34:171:170|34:188:204|34:204:239	local_japanese_face_pips
+white_05_01_EX04c_01	5	1	4	白	5	5					255:119:136|34:155:170|34:170:170|39:187:204|36:221:221	local_japanese_face_pips
+white_05_02_00_00	5	2	3	白	5	5					255:120:132|255:140:165|37:165:170|37:186:198|37:214:214	local_japanese_face_pips
+white_05_02_01_00	5	1	4	白	5	5					255:120:133|30:152:167|30:162:174|30:190:206|30:214:214	local_japanese_face_pips
+white_05_02_02_00	5	2	3	白	5	5					255:125:133|255:143:170|35:155:170|35:181:207|35:214:214	local_japanese_face_pips
+white_05_02_02r_00	5	2	3	白	5	5					255:120:133|255:145:170|25:169:185|25:186:204|25:214:214	local_japanese_face_pips
+white_05_02_06_00	2	1	1	白	2	2					255:139:145|39:145:170	local_japanese_face_pips
+white_05_03_01_00	5	2	3	白	5	5					255:116:142|255:142:172|17:157:179|17:179:203|17:216:216	local_japanese_face_pips
+white_05_03_02r_00	5	2	3	白	5	5					255:132:132|255:141:167|29:157:176|29:187:198|29:216:219	local_japanese_face_pips
+white_06_01_03_00	6	2	4	白	6	6					255:120:135|255:148:177|36:165:170|36:187:198|36:214:214|36:239:231	local_japanese_face_pips
+white_06_01_03_02	6	2	4	白	6	6					255:120:120|255:136:170|42:171:170|42:187:204|42:204:221|42:238:221	local_japanese_face_pips
+white_06_01_04_00	6	2	4	白	6	6					255:120:136|255:153:170|41:170:170|41:187:204|41:204:221|41:238:221	local_japanese_face_pips
+white_06_01_04_01	6	2	4	白	6	6					255:119:132|255:141:176|33:156:170|33:186:202|33:214:222|33:241:231	local_japanese_face_pips
+white_06_01_04_02	6	2	4	白	6	6					255:119:136|255:159:170|45:156:187|45:187:204|45:204:221|45:238:221	local_japanese_face_pips
+white_06_01_05_00	6	2	4	白	6	6					255:135:133|255:151:165|35:164:170|35:186:199|35:217:214|35:239:231	local_japanese_face_pips
+white_06_01_06_00	2	1	1	白	2	2	2		official_total_vs_verified_face		255:119:135|33:152:165|184:184:184|198:198:198|214:214:214	local_japanese_face_manual_2026-09-24
+white_06_01_EX04_00	6	2	4	白	6	6					255:119:136|255:157:170|37:172:170|34:187:204|37:204:221|37:238:238	local_japanese_face_pips
+white_06_01_EX04c_00	6	2	4	白	6	6					255:120:136|255:156:170|34:153:170|34:187:204|36:204:221|36:238:239	local_japanese_face_pips
+white_06_02_00_00	6	2	4	白	6	6					255:120:134|255:141:170|33:153:181|33:187:200|33:214:214|33:239:231	local_japanese_face_pips
+white_06_02_01_00	6	2	4	白	6	6					255:123:132|255:148:173|34:156:181|34:189:198|34:214:214|34:239:231	local_japanese_face_pips
+white_06_02_01_01	6	3	3	白	6	6					255:121:136|255:136:170|238:153:170|41:187:204|41:204:224|41:238:221	local_japanese_face_pips
+white_06_02_01_02	6	2	4	白	6	6					255:121:133|255:144:170|37:165:170|37:181:198|37:214:214|37:241:231	local_japanese_face_pips
+white_06_02_01r_00	6	2	4	白	6	6					255:120:135|255:148:170|37:165:184|37:181:198|37:214:214|37:242:231	local_japanese_face_pips
+white_06_02_02_00	6	2	4	白	6	6					255:124:132|255:148:169|35:158:181|35:181:198|35:214:214|35:239:231	local_japanese_face_pips
+white_06_02_02r_00	6	2	4	白	6	6					255:123:133|255:140:165|34:156:173|34:181:200|34:214:214|34:239:231	local_japanese_face_pips
+white_06_02_02r_01	6	1	5	白	6	6					255:121:135|35:155:166|35:166:184|35:187:200|35:216:219|35:240:231	local_japanese_face_pips
+white_06_03_02_00	6	3	3	白	6	6					255:115:135|255:146:167|247:156:176|24:186:204|24:217:220|24:236:231	local_japanese_face_pips
+white_07_01_03_00	7	2	5	白	7	7					255:120:133|255:141:169|34:165:169|34:186:208|34:214:214|34:239:231|34:239:239	local_japanese_face_pips
+white_07_01_03_01	7	2	5	白	7	7					255:121:136|255:136:170|40:153:170|40:187:204|40:204:221|40:238:221|40:238:238	local_japanese_face_pips
+white_07_01_03_02	7	2	5	白	7	7					255:120:136|255:154:170|35:171:170|35:189:204|35:204:221|35:238:221|35:238:238	local_japanese_face_pips
+white_07_01_04_00	7	2	5	白	7	7					255:120:137|255:157:170|39:171:188|39:187:204|39:204:221|39:238:221|39:238:238	local_japanese_face_pips
+white_07_01_04_03	7	2	5	白	7	7					255:121:136|255:156:170|44:153:170|44:187:204|44:204:221|44:238:221|44:238:238	local_japanese_face_pips
+white_07_01_06_00	4	2	2	白|緑	4	4					255:120:134|185:153:171|37:154:176|37:186:205	local_japanese_face_pips
+white_07_01_EX04_00	7	3	4	白	7	7					255:121:121|255:153:170|238:155:170|34:188:204|40:204:221|36:238:239|36:238:238	local_japanese_face_pips
+white_07_01_EX04c_00	7	3	4	白	7	7					255:121:136|255:136:170|255:154:170|34:188:204|34:225:221|34:238:242|37:238:238	local_japanese_face_pips
+white_07_02_01r_00	7	3	4	白	7	7					255:124:124|255:146:165|247:157:185|30:181:207|30:214:214|30:240:231|30:248:239	local_japanese_face_pips
+white_07_02_02r_00	7	1	6	白	7	7					255:120:133|34:153:167|34:168:184|34:186:206|34:214:214|34:239:231|34:247:239	local_japanese_face_pips
+white_07_02_02r_01	7	0	7		7	7					34:133:134|34:150:165|34:165:170|34:190:198|34:214:214|34:239:231|34:247:239	local_japanese_face_pips
+white_07_02_03_00	7	2	5	白	7	7					255:122:133|255:145:169|28:154:180|28:187:201|28:211:220|28:231:231|28:239:239	local_japanese_face_pips
+white_08_01_04_00	8	3	5	白	8	8					255:119:133|255:142:170|247:153:183|34:191:207|34:214:214|34:239:224|34:248:239|34:231:224	local_japanese_face_pips
+white_08_01_06_00	6	2	4	白	6	6					255:120:134|255:143:164|34:164:185|34:191:198|34:214:214|34:239:231	local_japanese_face_pips
+white_08_01_EX03_00	8	3	5	白	8	8					255:133:133|255:141:165|247:153:170|34:191:198|34:214:214|34:240:231|34:247:239|34:231:222	local_japanese_face_pips
+white_08_02_01_00	8	3	5	白	8	8					255:125:132|255:143:165|247:153:173|34:191:207|34:214:214|34:239:231|34:247:239|34:231:231	local_japanese_face_pips
+white_08_02_01_01	8	2	6	白	8	8					255:120:132|255:141:174|34:157:174|34:189:198|34:214:214|34:239:231|34:247:239|34:231:233	local_japanese_face_pips
+white_09_01_03_00	9	4	5	白	9	9	9				255:119:119|255:153:170|238:154:188|238:188:204|35:204:222|35:238:221|35:238:238|36:242:221|35:222:204	local_japanese_face_manual_2026-09-24
+white_09_01_04_00	9	3	6	白	9	9	9				255:120:132|255:143:170|247:153:170|33:186:199|33:214:222|33:240:231|33:247:239|20:231:232|33:223:215	local_japanese_face_manual_2026-09-24
+white_09_01_04_01	9	3	6	白	9	9	9				255:134:133|255:141:170|247:156:183|37:181:198|37:214:214|37:240:231|37:239:239|37:231:233|37:225:214	local_japanese_face_manual_2026-09-24
+white_09_01_05_00	9	3	6	白	9	9	9				255:120:132|255:148:170|247:153:179|34:186:206|34:214:222|33:239:231|34:239:239|34:231:231|34:222:219	local_japanese_face_manual_2026-09-24
+white_09_01_EX03_00	9	0	9		9	9	9				34:133:120|39:155:168|34:168:183|39:186:198|34:214:220|39:231:231|39:247:239|19:231:232|39:225:220	local_japanese_face_manual_2026-09-24
+white_09_01_EX04_00	9	3	6	白	9	9	9				255:120:120|255:136:154|238:154:195|38:188:204|38:226:222|38:238:238|39:255:238|38:238:222|38:204:222	local_japanese_face_manual_2026-09-24
+white_09_01_EX04c_00	9	3	6	白	9	9	9				255:121:121|255:153:170|238:154:170|34:188:188|35:204:221|34:238:238|41:255:238|35:251:221|34:221:221	local_japanese_face_manual_2026-09-24
+white_09_02_01_00	9	3	6	白	9	9		9			255:119:119|255:136:170|238:155:170|46:189:204|46:204:223|46:238:221|46:238:238|35:238:221|46:223:204	seesaa.tsv|runtime
+white_09_02_02_00	9	3	6	白	9	9					255:120:133|255:144:170|247:153:183|34:186:198|34:214:214|34:240:231|34:248:239|34:231:231|34:224:214	local_japanese_face_pips
+yellow_00_00_03_00												not_applicable_base_minion
+yellow_00_00_03_01												not_applicable_base_minion
+yellow_00_00_03_02												not_applicable_base_minion
+yellow_00_00_03_03												not_applicable_base_minion
+yellow_00_00_03_04												not_applicable_base_minion
+yellow_00_00_03_05												not_applicable_base_minion
+yellow_00_00_04_00												not_applicable_base_minion
+yellow_00_00_04_02												not_applicable_base_minion
+yellow_00_00_05_00												not_applicable_base_minion
+yellow_00_00_EX03_00												not_applicable_base_minion
+yellow_00_00_EX03_01												not_applicable_base_minion
+yellow_00_00_EX03_02												not_applicable_base_minion
+yellow_00_00_EX03_03												not_applicable_base_minion
+yellow_00_00_EX03_04												not_applicable_base_minion
+yellow_00_01_00_00												not_applicable_base_minion
+yellow_00_01_01_00												not_applicable_base_minion
+yellow_00_01_01r_00												not_applicable_base_minion
+yellow_00_01_02_00												not_applicable_base_minion
+yellow_00_01_02_01												not_applicable_base_minion
+yellow_00_01_02c_00												not_applicable_base_minion
+yellow_00_01_02c_01												not_applicable_base_minion
+yellow_00_01_02c_03												not_applicable_base_minion
+yellow_00_01_02r_00												not_applicable_base_minion
+yellow_00_01_02r_01												not_applicable_base_minion
+yellow_00_01_EX02_00												not_applicable_base_minion
+yellow_00_01_EX02_01												not_applicable_base_minion
+yellow_00_01_EX02_03												not_applicable_base_minion
+yellow_01_00_06_00												not_applicable_base_minion
+yellow_01_01_03_00	1	0	1		1	1					35:111:102	local_japanese_face_pips
+yellow_01_01_05_00	1	0	1		1	1					33:104:78	local_japanese_face_pips
+yellow_01_01_EX03_00	1	0	1		1	1					35:109:109	local_japanese_face_pips
+yellow_01_02_01_00	1	1	0	黄	1	1					253:119:94	local_japanese_face_pips
+yellow_01_02_02_00	1	1	0	黄	1	1					253:108:82	local_japanese_face_pips
+yellow_01_02_03_00	1	1	0	黄	1	1					255:104:90	local_japanese_face_pips
+yellow_01_02_04_00	1	1	0	黄	1	1					252:101:95	local_japanese_face_pips
+yellow_01_02_04_01	1	1	0	黄	1	1					253:114:80	local_japanese_face_pips
+yellow_01_02_05_00	1	1	0	黄	1	1					254:116:116	local_japanese_face_pips
+yellow_01_03_00_00	1	1	0	黄	1	1					255:103:87	local_japanese_face_pips
+yellow_01_03_01r_00	1	1	0	黄	1	1					254:113:99	local_japanese_face_pips
+yellow_01_03_02r_00	1	1	0	黄	1	1					253:102:88	local_japanese_face_pips
+yellow_02_01_03_00	2	1	1	黄	2	2					254:110:88|34:110:104	local_japanese_face_pips
+yellow_02_01_03_01	2	1	1	黄	2	2					252:110:104|34:110:103	local_japanese_face_pips
+yellow_02_01_04_00	2	1	1	黄	2	2					251:111:103|35:111:111	local_japanese_face_pips
+yellow_02_01_04_01	2	1	1	黄	2	2					255:114:104|35:114:114	local_japanese_face_pips
+yellow_02_01_04_02	2	1	1	黄	2	2					252:116:87|36:117:102	local_japanese_face_pips
+yellow_02_01_05_00	2	1	1	黄	2	2					253:114:89|31:109:109	local_japanese_face_pips
+yellow_02_01_05_01	2	0	2		2	2					33:118:86|35:118:109	local_japanese_face_pips
+yellow_02_01_05_02	2	1	1	黄	2	2					254:114:90|31:114:90	local_japanese_face_pips
+yellow_02_01_06_00	1	1	0	黄	1	1					253:107:100	local_japanese_face_pips
+yellow_02_01_06_01	2	1	1	黄	2	2					250:108:89|38:121:103	local_japanese_face_pips
+yellow_02_01_EX03_00	2	1	1	黄	2	2					253:110:104|34:112:104	local_japanese_face_pips
+yellow_02_01_EX03_01	2	1	1	黄	2	2					254:120:109|34:114:92	local_japanese_face_pips
+yellow_02_01_EX03_02	2	1	1	黄	2	2					248:110:94|34:119:103	local_japanese_face_pips
+yellow_02_01_EX03_03	2	1	1	黄	2	2					255:110:102|33:110:90	local_japanese_face_pips
+yellow_02_01_EX03_04	2	1	1	黄	2	2					255:113:99|19:103:103	local_japanese_face_pips
+yellow_02_02_00_00	2	1	1	黄	2	2					253:113:93|37:113:117	local_japanese_face_pips
+yellow_02_02_00_01	2	1	1	黄	2	2					254:118:89|32:118:99	local_japanese_face_pips
+yellow_02_02_01r_00	2	1	1	黄	2	2					250:113:93|33:113:93	local_japanese_face_pips
+yellow_02_02_02c_00	2	1	1	黄	2	2					254:110:112|35:110:112	local_japanese_face_pips
+yellow_02_02_02r_00	2	1	1	黄	2	2					251:114:93|35:117:117	local_japanese_face_pips
+yellow_02_02_02r_01	2	1	1	黄	2	2					249:120:88|39:120:117	local_japanese_face_pips
+yellow_02_02_04_00	2	1	1	黄	2	2					255:111:102|59:116:116	local_japanese_face_pips
+yellow_02_02_04_01	2	1	1	黄	2	2					247:101:96|39:117:96	local_japanese_face_pips
+yellow_02_02_04_02	2	1	1	黄	2	2					239:104:85|29:113:103	local_japanese_face_pips
+yellow_02_02_05_00	2	1	1	黄	2	2					255:114:105|34:115:115	local_japanese_face_pips
+yellow_02_02_06_00	4	2	2	黄	4	4					253:115:108|234:119:117|33:117:121|33:121:121	local_japanese_face_pips
+yellow_02_02_EX02_00	2	1	1	黄	2	2					251:111:90|33:111:101	local_japanese_face_pips
+yellow_02_02_EX03_00	2	1	1	黄	2	2					249:111:79|16:111:103	local_japanese_face_pips
+yellow_02_03_00_00	2	1	1	黄	2	2					253:113:85|34:112:112	local_japanese_face_pips
+yellow_02_03_01_00	2	1	1	黄	2	2					254:113:110|48:116:116	local_japanese_face_pips
+yellow_02_03_02_00	2	1	1	黄	2	2					255:113:102|43:115:115	local_japanese_face_pips
+yellow_02_03_EX04_00	2	0	2		2	2					33:110:98|28:110:105	local_japanese_face_pips
+yellow_02_03_EX04c_00	2	0	2		2	2					34:101:88|35:120:114	local_japanese_face_pips
+yellow_03_01_03_00	3	1	2	黄	3	3					250:102:85|34:120:111|34:111:116	local_japanese_face_pips
+yellow_03_01_03_02	3	1	2	黄	3	3					254:109:89|38:121:104|38:120:105	local_japanese_face_pips
+yellow_03_01_03_03	3	0	3		3	3					33:111:87|33:111:100|33:104:100	local_japanese_face_pips
+yellow_03_01_03_04	3	1	2	黄	3	3					254:117:86|34:111:99|34:111:99	local_japanese_face_pips
+yellow_03_01_03_05	3	1	2	黄	3	3					254:102:85|34:112:112|34:112:102	local_japanese_face_pips
+yellow_03_01_04_00	3	2	1	黄	3	3					253:117:85|253:116:112|33:112:101	local_japanese_face_pips
+yellow_03_01_05_00	3	1	2	黄	3	3					255:104:102|35:108:102|35:108:118	local_japanese_face_pips
+yellow_03_01_EX03_00	3	1	2	黄	3	3					251:111:110|33:112:93|24:112:110	local_japanese_face_pips
+yellow_03_01_EX04_00	3	1	2	黄	3	3					251:102:102|36:112:102|36:112:106	local_japanese_face_pips
+yellow_03_01_EX04_01	3	1	2	黄	3	3					245:108:93|42:120:107|33:107:119	local_japanese_face_pips
+yellow_03_01_EX04_02	3	1	2	黄	3	3					251:106:92|33:106:104|19:104:104	local_japanese_face_pips
+yellow_03_01_EX04c_00	3	1	2	黄	3	3					255:111:103|35:111:103|35:121:116	local_japanese_face_pips
+yellow_03_01_EX04c_01	3	1	2	黄	3	3					253:116:88|45:120:119|23:119:121	local_japanese_face_pips
+yellow_03_01_EX04c_02	3	1	2	黄	3	3					255:109:111|34:109:108|43:117:117	local_japanese_face_pips
+yellow_03_02_00_00	3	1	2	黄	3	3					253:110:103|34:110:103|34:119:102	local_japanese_face_pips
+yellow_03_02_01_00	3	1	2	黄	3	3					253:115:87|34:115:100|34:115:105	local_japanese_face_pips
+yellow_03_02_01_01	3	1	2	黄	3	3					255:114:89|35:114:99|35:117:114	local_japanese_face_pips
+yellow_03_02_01_02	3	1	2	黄	3	3					250:113:105|37:107:107|37:107:105	local_japanese_face_pips
+yellow_03_02_02_00	3	1	2	黄	3	3					246:111:86|39:115:103|39:115:105	local_japanese_face_pips
+yellow_03_02_02c_00	3	1	2	黄	3	3					249:111:88|34:120:104|34:120:111	local_japanese_face_pips
+yellow_03_02_02r_00	3	1	2	黄	3	3					253:102:85|36:119:106|36:106:117	local_japanese_face_pips
+yellow_03_02_03_00	3	2	1	黄	3	3					255:117:82|248:117:109|38:117:109	local_japanese_face_pips
+yellow_03_02_05_00	3	2	1	黄	3	3					246:113:103|238:113:113|35:113:111	local_japanese_face_pips
+yellow_03_02_EX02_00	3	1	2	黄	3	3					254:122:90|33:115:98|33:115:98	local_japanese_face_pips
+yellow_03_03_01_00	3	1	2	黄	3	3					255:115:103|31:121:112|31:121:103	local_japanese_face_pips
+yellow_03_03_01r_00	3	2	1	黄	3	3					254:116:105|246:116:105|22:116:116	local_japanese_face_pips
+yellow_03_03_02_00	3	1	2	黄	3	3					255:102:85|44:108:108|44:108:117	local_japanese_face_pips
+yellow_03_03_02c_00	3	2	1	黄	3	3					255:109:98|236:109:116|13:116:98	local_japanese_face_pips
+yellow_03_03_EX02_00	3	2	1	黄	3	3					255:110:108|255:110:115|43:115:116	local_japanese_face_pips
+yellow_04_01_03_00	4	1	3	黄	4	4					254:108:103|43:108:109|43:118:109|43:109:106	local_japanese_face_pips
+yellow_04_01_04_00	4	2	2	黄	4	4					255:110:87|252:115:115|43:115:106|43:121:106	local_japanese_face_pips
+yellow_04_01_04_01	4	2	2	黄	4	4					255:110:87|252:112:112|43:112:118|43:118:118	local_japanese_face_pips
+yellow_04_01_05_00	4	2	2	黄	4	4					253:114:88|253:111:118|34:111:118|34:118:118	local_japanese_face_pips
+yellow_04_01_06_00	4	2	2	黄	4	4	4		official_total_vs_verified_face		251:108:87|251:108:101|33:110:101|33:118:103|132:132:132	local_japanese_face_manual_2026-09-24
+yellow_04_02_00_00	4	1	3	黄	4	4					253:111:106|34:112:112|34:112:107|34:110:119	local_japanese_face_pips
+yellow_04_02_01_00	4	2	2	黄	4	4					255:116:106|254:116:106|34:112:121|34:121:121	local_japanese_face_pips
+yellow_04_02_01_01	4	2	2	黄	4	4					252:102:88|252:110:110|33:110:119|33:119:119	local_japanese_face_pips
+yellow_04_02_01_02	4	1	3	黄	4	4					255:103:87|34:114:114|34:114:118|34:118:118	local_japanese_face_pips
+yellow_04_02_01r_00	4	2	2	黄	4	4					254:112:93|254:112:109|33:109:109|33:121:121	local_japanese_face_pips
+yellow_04_02_02_00	4	2	2	黄	4	4					255:112:93|255:112:118|34:118:117|34:117:117	local_japanese_face_pips
+yellow_04_02_02_01	4	2	2	黄	4	4					253:111:89|253:115:100|35:116:118|35:120:119	local_japanese_face_pips
+yellow_04_02_02_02	4	2	2	黄	4	4					248:112:103|250:112:114|32:114:121|32:121:132	local_japanese_face_pips
+yellow_04_02_02c_00	4	2	2	黄	4	4					251:114:94|251:114:111|34:111:106|34:122:106	local_japanese_face_pips
+yellow_04_02_02r_00	4	2	2	黄	4	4					255:108:86|247:108:104|33:104:104|33:117:120	local_japanese_face_pips
+yellow_04_02_02r_01	4	0	4		4	4					19:102:90|33:102:90|38:117:117|38:116:116	local_japanese_face_pips
+yellow_04_02_02r_02	4	1	3	黄	4	4					254:113:93|36:118:93|36:118:118|36:118:118	local_japanese_face_pips
+yellow_04_02_04_00	4	2	2	黄	4	4					250:111:78|250:118:117|30:118:117|30:117:117	local_japanese_face_pips
+yellow_04_02_05_00	4	1	3	黄	4	4					255:117:111|29:116:116|32:116:122|29:122:124	local_japanese_face_pips
+yellow_04_02_EX02_00	4	2	2	黄	4	4					251:109:86|243:109:102|34:118:104|34:107:132	local_japanese_face_pips
+yellow_04_03_00_00	4	2	2	黄	4	4					254:110:101|247:110:110|26:110:101|26:121:114	local_japanese_face_pips
+yellow_05_01_03_00	5	2	3	黄	5	5					255:119:103|251:119:114|33:114:120|33:120:116|33:135:135	local_japanese_face_pips
+yellow_05_01_03_01	5	2	3	黄	5	5					255:105:107|241:111:111|35:111:116|35:116:119|35:136:136	local_japanese_face_pips
+yellow_05_01_05_00	5	2	3	黄	5	5					253:115:93|247:114:114|38:114:120|38:120:120|33:137:137	local_japanese_face_pips
+yellow_05_01_06_00	6	2	4	黄	6	6					251:107:92|234:120:117|34:117:121|34:121:121|34:131:131|34:150:138	local_japanese_face_pips
+yellow_05_01_EX03_00	5	1	4	黄	5	5					255:111:111|36:111:111|36:111:111|17:117:117|17:117:136	local_japanese_face_pips
+yellow_05_01_EX04_00	5	2	3	黄	5	5					255:120:93|255:121:106|50:106:105|24:119:119|34:137:119	local_japanese_face_pips
+yellow_05_01_EX04c_00	5	2	3	黄	5	5					238:107:87|232:108:107|38:107:118|38:118:118|43:140:136	local_japanese_face_pips
+yellow_05_02_00_00	5	2	3	黄	5	5					252:115:95|252:111:111|35:111:95|35:119:119|35:138:138	local_japanese_face_pips
+yellow_05_02_01_00	5	1	4	黄	5	5					254:119:89|44:119:102|44:116:119|44:119:119|44:137:137	local_japanese_face_pips
+yellow_05_02_01r_00	5	2	3	黄	5	5					253:111:89|253:111:120|34:120:118|34:120:113|34:137:137	local_japanese_face_pips
+yellow_05_02_02_00	5	2	3	黄	5	5					251:111:108|245:111:111|35:111:111|35:111:111|35:136:136	local_japanese_face_pips
+yellow_05_02_02c_00	5	1	4	黄	5	5					253:110:106|35:109:109|35:109:105|35:121:121|35:121:121	local_japanese_face_pips
+yellow_05_02_03_00	5	2	3	黄	5	5					254:115:95|254:118:118|32:118:118|32:124:120|32:124:141	local_japanese_face_pips
+yellow_05_02_EX02_00	5	1	4	黄	5	5					249:111:104|38:122:103|38:103:114|38:114:119|38:135:135	local_japanese_face_pips
+yellow_05_03_01_00	5	2	3	黄	5	5					248:117:99|245:118:118|37:118:112|37:124:124|37:124:124	local_japanese_face_pips
+yellow_05_03_02r_00	5	2	3	黄	5	5					252:116:83|247:119:112|18:119:112|18:123:123|18:123:141	local_japanese_face_pips
+yellow_06_01_03_00	6	2	4	黄	6	6					255:118:89|252:118:114|39:114:115|39:115:115|39:131:131|39:152:144	local_japanese_face_pips
+yellow_06_01_03_01	6	2	4	黄	6	6					251:118:88|249:118:115|31:115:122|31:122:131|31:131:131|31:152:139	local_japanese_face_pips
+yellow_06_01_03_02	6	2	4	黄	6	6					255:121:89|241:121:112|31:112:119|31:119:119|31:131:131|31:152:151	local_japanese_face_pips
+yellow_06_01_03_03	6	2	4	黄	6	6					251:113:96|250:113:122|35:122:120|35:120:120|35:131:131|35:152:138	local_japanese_face_pips
+yellow_06_01_04_00	6	2	4	黄	6	6					254:111:105|246:116:116|36:116:118|36:118:118|36:146:118|36:146:146	local_japanese_face_pips
+yellow_06_01_05_00	6	2	4	黄	6	6					254:115:89|234:115:121|33:121:103|34:117:117|34:131:131|33:139:139	local_japanese_face_pips
+yellow_06_01_05_01	6	0	6		6	6					36:119:91|32:116:91|36:116:116|36:118:106|32:131:131|36:152:152	local_japanese_face_pips
+yellow_06_01_05_02	6	0	6		6	6					37:111:107|37:110:110|37:110:114|37:114:114|37:144:144|37:146:146	local_japanese_face_pips
+yellow_06_01_06_00	2	1	1	黄	2	2					254:112:97|33:122:97	local_japanese_face_pips
+yellow_06_01_06_01	2	1	1	黄	2	2	2		official_total_vs_verified_face		253:109:95|34:111:95|102:102:102|118:118:118|132:132:132|139:139:139|166:152:152	local_japanese_face_manual_2026-09-24
+yellow_06_01_EX04_00	6	2	4	黄	6	6					253:98:98|222:118:98|35:118:117|35:117:117|33:139:131|35:152:148	local_japanese_face_pips
+yellow_06_01_EX04_01	6	2	4	黄	6	6					254:108:91|243:117:99|24:117:91|24:125:133|34:133:133|24:155:139	local_japanese_face_pips
+yellow_06_01_EX04c_00	6	2	4	黄	6	6					252:115:91|237:107:113|33:100:91|33:118:118|33:134:134|33:152:144	local_japanese_face_pips
+yellow_06_01_EX04c_01	6	2	4	黄	6	6					254:111:98|248:111:117|34:116:100|34:117:117|37:144:136|37:153:153	local_japanese_face_pips
+yellow_06_02_01_00	6	2	4	黄	6	6					255:102:102|250:127:102|34:102:108|34:108:108|34:136:136|34:153:153	local_japanese_face_pips
+yellow_06_02_01r_00	6	2	4	黄	6	6					251:104:86|251:121:107|34:107:119|34:119:119|34:131:131|34:152:138	local_japanese_face_pips
+yellow_06_02_01r_01	6	2	4	黄	6	6					253:113:95|253:113:98|24:111:98|24:118:118|24:131:131|24:154:140	local_japanese_face_pips
+yellow_06_02_02_00	6	2	4	黄	6	6					254:117:86|248:117:107|35:107:120|35:120:120|35:131:131|35:152:139	local_japanese_face_pips
+yellow_06_02_02c_00	6	2	4	黄	6	6					249:102:85|251:120:117|34:119:117|34:117:117|34:140:140|34:140:140	local_japanese_face_pips
+yellow_06_02_02r_00	6	2	4	黄	6	6					254:116:94|247:117:96|24:117:96|24:122:107|24:122:122|24:145:141	local_japanese_face_pips
+yellow_06_02_04_00	6	2	4	黄	6	6					245:100:80|249:114:100|33:114:94|33:111:120|33:132:132|33:145:145	local_japanese_face_pips
+yellow_06_02_EX02_00	6	2	4	黄	6	6					251:111:104|252:111:104|33:112:117|33:117:128|33:132:132|33:152:152	local_japanese_face_pips
+yellow_06_03_02_00	6	3	3	黄	6	6					255:114:104|255:112:112|219:112:116|41:116:114|41:116:119|41:145:145	local_japanese_face_pips
+yellow_07_01_04_00	7	3	4	黄	7	7					254:111:91|248:116:105|230:116:98|33:120:119|33:134:132|33:152:139|33:152:152	local_japanese_face_pips
+yellow_07_01_04_01	7	2	5	黄	7	7					252:110:99|249:110:99|33:112:99|33:122:122|33:139:139|33:139:139|33:156:156	local_japanese_face_pips
+yellow_07_01_06_00	6	2	4	黄	6	6					254:112:100|250:112:119|35:119:121|35:121:121|35:132:132|35:150:138	local_japanese_face_pips
+yellow_07_01_EX03_00	7	2	5	黄	7	7					243:113:113|243:113:113|35:113:117|34:117:136|34:117:136|35:153:136|34:153:153	local_japanese_face_pips
+yellow_07_01_EX03_01	7	0	7		7	7					36:102:102|36:120:110|34:110:123|36:123:123|34:144:119|34:145:145|36:172:172	local_japanese_face_pips
+yellow_07_01_EX03_02	7	2	5	黄	7	7					251:109:107|251:110:107|37:109:117|37:117:117|34:117:119|35:145:145|37:171:145	local_japanese_face_pips
+yellow_07_02_01_00	7	2	5	黄	7	7					255:119:94|254:120:94|38:120:102|38:118:118|38:131:131|38:149:144|38:149:149	local_japanese_face_pips
+yellow_07_02_02c_00	7	1	6	黄	7	7					254:110:78|43:111:111|43:111:115|43:115:109|43:142:142|43:145:142|43:145:145	local_japanese_face_pips
+yellow_07_02_02r_00	7	1	6	黄	7	7					255:107:95|35:113:95|35:113:115|35:115:131|35:131:131|35:149:137|35:149:149	local_japanese_face_pips
+yellow_07_02_02r_01	7	0	7		7	7					34:111:102|34:113:113|34:113:115|34:115:115|34:137:137|34:153:153|34:153:153	local_japanese_face_pips
+yellow_07_02_04_00	7	3	4	黄	7	7					239:105:86|248:117:105|243:120:114|30:114:130|30:114:120|30:141:141|30:163:163	local_japanese_face_pips
+yellow_07_02_EX02_00	7	1	6	黄	7	7					252:110:78|37:111:111|37:111:118|37:118:118|37:143:143|37:145:145|37:145:145	local_japanese_face_pips
+yellow_07_03_01r_00	7	3	4	黄	7	7					250:103:93|252:103:103|238:121:115|29:115:115|29:115:141|29:141:141|29:164:164	local_japanese_face_pips
+yellow_08_01_03_00	8	2	6	黄	8	8					254:102:85|245:121:108|37:108:106|37:116:116|37:143:116|37:145:143|37:145:145|37:145:145	local_japanese_face_pips
+yellow_08_01_04_00	8	3	5	黄	8	8					255:102:91|248:121:107|247:122:99|34:125:125|34:125:146|34:159:146|34:159:159|34:140:140	local_japanese_face_pips
+yellow_08_02_01_00	9	3	6	黄	9	9		9			255:118:88|251:118:120|251:120:119|34:119:119|34:131:131|34:151:139|34:151:151|34:134:134|34:122:122	seesaa.tsv|runtime
+yellow_08_02_01_01	8	2	6	黄	8	8					252:112:97|250:112:116|33:116:121|33:121:121|33:140:140|33:167:140|33:167:167|33:140:140	local_japanese_face_pips
+yellow_08_02_02c_00	8	2	6	黄	8	8					253:108:105|247:109:109|43:109:111|43:111:119|43:145:145|43:145:145|43:145:145|43:145:145	local_japanese_face_pips
+yellow_08_02_02r_00	8	2	6	黄	8	8					253:112:91|253:115:106|35:106:117|35:117:117|35:131:131|35:152:139|35:152:152|35:134:148	local_japanese_face_pips
+yellow_08_02_EX02_00	8	2	6	黄	8	8					255:102:85|251:113:113|34:113:118|34:118:118|34:146:136|34:153:153|34:153:153|34:136:136	local_japanese_face_pips
+yellow_08_02_EX03_00	8	4	4	黄	8	8					254:115:98|235:115:115|236:115:117|239:117:119|25:117:117|42:143:149|25:161:161|25:117:143	local_japanese_face_pips
+yellow_09_01_05_00	9	3	6	黄	9	9	9				246:102:88|245:119:102|224:110:111|34:111:136|36:136:136|41:153:136|38:172:153|41:136:136|34:119:119	local_japanese_face_manual_2026-09-24
+yellow_09_02_02_00	9	3	6	黄	9	9					251:118:102|238:118:103|238:118:104|35:120:120|35:136:136|35:151:151|35:151:151|35:134:134|35:122:122	local_japanese_face_pips
+red_0_00_06_00												not_applicable_base_minion
+red_0_01_06_00	7	3	4	赤|黄	7	7					236:104:104|236:101:101|208:101:83|31:85:68|31:68:80|31:80:80|31:80:80	local_japanese_face_pips
+yellow_07_02_02c_1	7	0	7		7	7					37:110:102|37:113:113|37:113:107|37:117:117|37:142:117|37:145:145|37:145:171	local_japanese_face_pips
+yellow_07_02_EX02_1	7	0	7		7	7					36:110:110|36:110:110|36:110:120|36:120:120|36:120:120|36:145:143|36:145:145	local_japanese_face_pips
+yellow_011_03_02c_00	11	2	9	黄	11	9	11				255:115:98|238:115:98|47:115:100|47:98:100|47:116:119|47:136:136|47:153:136|47:153:153|47:153:144	local_japanese_face_manual_2026-09-24
+yellow_011_03_EX02_00	11	2	9	黄	11	9	11				255:111:105|238:111:115|43:115:117|43:117:113|43:117:117|43:148:148|43:162:143|43:162:162|43:143:143	local_japanese_face_manual_2026-09-24
+purple_0_01_06_00	7	2	5	紫	7	7					212:87:85|183:87:85|42:102:75|42:102:73|42:102:73|42:118:118|42:118:118	local_japanese_face_pips
+blue_0_00_06_00												not_applicable_base_minion
+blue_0_01_06_00	6	2	4	青	6	6					249:108:68|249:84:85|39:85:68|39:72:68|39:68:68|39:68:68	local_japanese_face_pips
+blue_7_02_06_00	7	2	5	青|紫	7	7					221:102:68|148:85:68|39:86:55|39:72:68|39:72:72|39:72:72|39:98:98	local_japanese_face_pips
+blue_010_03_02_00	10	5	5	青	10	8	10				236:100:82|223:115:82|198:82:57|192:81:43|154:76:76|30:76:76|30:76:99|30:76:76|39:43:43	local_japanese_face_manual_2026-09-24
+white_0_00_06_00												not_applicable_base_minion
+white_0_01_06_00	7	3	4	白|緑	7	7					239:122:135|218:141:153|209:153:153|34:184:203|34:215:214|34:231:223|34:239:231	local_japanese_face_pips
+white_010_01_06_00	6	2	4	白	6	6	6		official_total_vs_verified_face		255:119:136|255:159:170|38:154:170|38:188:204|38:204:223|38:238:221|238:238:238|221:238:221	local_japanese_face_manual_2026-09-24
+colorless_010_01_06_00	8	0	8		8	8					38:102:89|38:102:68|38:89:68|38:68:54|38:68:68|38:68:68|38:68:68|38:68:68	local_japanese_face_pips
+colorless_010_02_01_00	10	0	10		9	9		10			35:100:82|35:100:82|35:83:67|35:67:51|35:67:58|35:76:76|35:76:76|35:76:67|35:67:67	seesaa.tsv|runtime
+colorless_010_02_01r_00	10	0	10		9	9		10			34:101:86|34:101:86|34:86:69|34:69:53|34:69:53|34:69:69|34:86:69|34:69:69|34:69:69	seesaa.tsv|runtime
+colorless_010_02_02_00	10	0	10		10	10					34:100:82|34:99:76|34:85:64|34:69:53|34:69:64|34:69:69|34:76:76|34:76:69|34:69:69|53:100:100	local_japanese_face_pips
+colorless_010_02_02r_00	10	0	10		10	10					31:100:84|31:100:76|31:84:69|31:67:50|31:67:58|31:76:76|31:76:76|31:76:76|31:67:67|50:100:100	local_japanese_face_pips
+colorless_010_02_02c_00	10	0	10		10	9	10				34:100:82|34:100:82|34:84:71|34:67:50|34:67:58|34:76:76|34:76:76|34:76:67|34:67:67	local_japanese_face_manual_2026-09-24
+colorless_010_02_EX02_00	10	0	10		10	9	10				43:102:89|43:106:89|43:85:68|43:68:52|43:68:68|43:68:68|43:68:68|43:68:68|43:68:68	local_japanese_face_manual_2026-09-24
+colorless_012_02_01_00	12	0	12		9	9		12			34:100:85|34:100:83|34:88:67|34:67:53|34:67:54|34:67:67|34:77:77|34:77:77|34:77:77	seesaa.tsv|runtime

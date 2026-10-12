@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_02_02_02r_00_boundary",
+  "card_id": "green_02_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\nお互いの手札にある無色のフィールド・ミ二オン\\nカードのフリーコストを1増やす。\\n【破壊時】\\n相手のフォース1つをレストする。 EN: [Passive]\\nIncrease the basic cost of Neutral Field\\nMinion cards in both hands by 1.\\n[When Destroyed]\\nPut one of your opponent's Forces in the\\nRest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_02_02_02r_00",
+        "zone": "hand",
+        "seed": 1011391749,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "keeper": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "green_02_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$keeper",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "play a Neutral Field Minion while the Keeper is in Trash",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_02_02_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the card is playable for its printed cost outside the Keeper's Field aura",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "the two available Mana paid the printed cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      },
+      "value": 2
+    }
+  ]
+}

@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_02_02_02r_00_positive",
+  "card_id": "green_02_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【常時】\\nお互いの手札にある無色のフィールド・ミ二オン\\nカードのフリーコストを1増やす。\\n【破壊時】\\n相手のフォース1つをレストする。 EN: [Passive]\\nIncrease the basic cost of Neutral Field\\nMinion cards in both hands by 1.\\n[When Destroyed]\\nPut one of your opponent's Forces in the\\nRest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_02_02_02r_00",
+        "zone": "field",
+        "seed": 2630819467,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_03_03_01r_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "opponent plays a Neutral Field Minion under the Keeper aura",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "opponent ends its turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 receives its turn-start colorless Mana and enters Main",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "play the Neutral Field Minion under Sloth's passive",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "cast the draw Magic and sacrifice Sloth's Keeper",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "purple_03_03_01r_00"
+      }
+    },
+    {
+      "name": "destroy Sloth's Keeper",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "green_02_02_02r_00"
+      }
+    },
+    {
+      "name": "rest one opposing Force",
+      "prompt_kind": "effect_target",
+      "select": {
+        "forceId": "force_e"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the neutral minion used the increased three-Mana cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      },
+      "value": 5
+    },
+    {
+      "name": "the Neutral Field Minion entered the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "the Keeper's destruction rests the opponent's Force",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_e",
+        "rested": true
+      }
+    },
+    {
+      "name": "the Magic spends its one Purple colored cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_00_01_02_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "the opponent Neutral Field Minion enters the Field",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "the opponent pays the Keeper-increased three-Mana cost",
+      "path": "state.players.opponent.base",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    }
+  ]
+}

@@ -25,7 +25,7 @@ class AreaType(Enum):
     FIELD  = "field"
     FORCE  = "force"
     TRASH  = "trash"
-    REMOVED = "removed"   # 無色マナ destroyed go here (out of game)
+    REMOVED = "removed"   # Banished cards; generated objects retain no zone entry.
     BLESSING = "blessing" # Mana attached to a field minion by 加護
 
 

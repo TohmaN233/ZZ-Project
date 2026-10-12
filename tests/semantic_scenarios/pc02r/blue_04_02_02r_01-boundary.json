@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_04_02_02r_01_boundary",
+  "card_id": "blue_04_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 《ベース》\\n【後退時】\\n相手のミ二オン1体にBP-100と本来の数値にDP\\n1を付与する。 EN: <Base> [When Retreating]\\nDeal -100BP to one of your opponent's\\nminions and -1DP to that minion's original\\nDP value.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_04_02_02r_01",
+        "zone": "field",
+        "seed": 309313557,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "card": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_04_02_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "retreat Brighton with no enemy minion",
+      "select": {
+        "kind": "move_card",
+        "cardIid": "$card",
+        "direction": "field_to_base"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Brighton still retreats into Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_04_02_02r_01"
+      }
+    },
+    {
+      "name": "opposing Field remains empty",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 0
+    }
+  ]
+}

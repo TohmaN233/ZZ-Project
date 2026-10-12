@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_02_02_02r_00_positive",
+  "card_id": "blue_02_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【加護時】\nこのミニオンに[潜入]を付与する。 EN: [When Boosted]\nThis minion receives the Infiltrate effect.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_02_02_02r_00",
+        "zone": "field",
+        "seed": 4060910804,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_02_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "bless_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attach Blue Bless mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$bless_mana",
+        "target_iid": "$host"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Bless grants Sneaking to this minion",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_02_02r_00",
+        "keywords": {
+          "contains": [
+            "SNEAKING"
+          ]
+        }
+      }
+    }
+  ]
+}

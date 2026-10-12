@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_02_02_02r_00_positive",
+  "card_id": "yellow_02_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 飛来\nEN: Swoop",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "zone": "hand",
+        "seed": 752651831,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "play The Little Crow Tengu",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_02_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_00",
+        "keywords": {
+          "contains": [
+            "FLYING"
+          ]
+        }
+      },
+      "name": "Swoop provides Flying"
+    }
+  ]
+}

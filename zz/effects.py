@@ -25,11 +25,11 @@ class EffectTiming(Enum):
     ON_FORCE_DESTROYED = "on_force_destroyed"
     ON_BATTLE_WIN = "on_battle_win"
     ON_ENTER_FIELD = "on_enter_field"
+    ON_TRANSFORM = "on_transform"
     ON_BLESS = "on_bless"
     ON_DECK_DISCARD = "on_deck_discard"
     ON_MOVE_TO_FIELD = "on_move_to_field"
     MOVE_TO_BASE = "move_to_base"
-    ON_TRANSFORM = "on_transform"
     TURN_START = "turn_start"
     TURN_END = "turn_end"
     CONTINUOUS = "continuous"
@@ -53,6 +53,49 @@ class EffectSpec:
     official_condition: str | None = None
     active_areas: tuple[AreaType, ...] | None = None
     pre_target_fn: EffectFn | None = None
+
+
+EFFECT_TARGET_FILTER_PARAMS = frozenset({
+    "card_id", "card_ids", "exclude_card_id", "race", "races_any",
+    "card_type", "color", "exclude_color", "max_cost", "min_cost",
+    "max_bp", "min_bp", "max_dp", "min_dp", "bp_below_original",
+    "requires_blessing", "requires_boost", "only_rested", "only_active",
+    "exclude_tokens", "required_keyword",
+})
+
+
+def effect_target_filter(eng: Any, effect: EffectSpec, *, source: Any = None):
+    """The same declared target restrictions govern prompts and resolution."""
+    known_filters = EFFECT_TARGET_FILTER_PARAMS | {"exclude_source", "exclude_self", "max_dp_from_opponent_destroyed_forces"}
+    unknown_filters = {
+        key for key in effect.params
+        if key.startswith(("requires_", "required_", "only_", "exclude_", "bp_below_"))
+        and key not in known_filters
+    }
+    if unknown_filters:
+        raise ValueError(f"unsupported effect target filters: {sorted(unknown_filters)}")
+    params = {
+        key: value for key, value in effect.params.items()
+        if key in EFFECT_TARGET_FILTER_PARAMS and value is not None
+    }
+    matcher = _target_filter(eng, **params) if params else lambda target: True
+    exclude_source = bool(effect.params.get("exclude_source") or effect.params.get("exclude_self"))
+    dynamic_dp = bool(effect.params.get("max_dp_from_opponent_destroyed_forces"))
+    if dynamic_dp and source is None:
+        raise ValueError("dynamic opposing Force target limit requires an effect source")
+    max_dp = None
+    if dynamic_dp:
+        opponent = eng.state.players[1 - eng.state.players.index(source.owner)]
+        max_dp = eng.destroyed_forces_count(opponent)
+
+    def matches(target: Any) -> bool:
+        if exclude_source and target is source:
+            return False
+        if max_dp is not None and eng.effective_dp(target) > max_dp:
+            return False
+        return matcher(target)
+
+    return matches
 
 
 def effect_once_per_turn_used(effect: EffectSpec, source: Any) -> bool:
@@ -169,6 +212,11 @@ EFFECT_TEMPLATES: dict[str, EffectTemplate] = {
     "return_to_hand": EffectTemplate(
         "return_to_hand",
         "Return target to hand",
+        target_kinds=("enemy_minion", "enemy_minion_cost_at_most_4", "ally_minion", "any_minion"),
+    ),
+    "return_to_deck": EffectTemplate(
+        "return_to_deck",
+        "Return target to deck",
         target_kinds=("enemy_minion", "enemy_minion_cost_at_most_4", "ally_minion", "any_minion"),
     ),
     "return_self_to_hand": EffectTemplate("return_self_to_hand", "Return self to hand"),
@@ -451,7 +499,7 @@ def _stat_modifier(
         for target in targets[:max_targets]:
             eng.modify_stat(target, bp_delta=bp_delta, dp_delta=dp_delta, duration=duration)
             if keyword is not None:
-                eng.add_keyword(target, _keyword_from_value(keyword))
+                eng.add_keyword(target, _keyword_from_value(keyword), duration=duration)
     return fn
 
 
@@ -500,7 +548,7 @@ def _stat_modifier_all(
         ):
             eng.modify_stat(target, bp_delta=bp_delta, dp_delta=dp_delta, duration=duration)
             if keyword is not None:
-                eng.add_keyword(target, _keyword_from_value(keyword))
+                eng.add_keyword(target, _keyword_from_value(keyword), duration=duration)
     return fn
 
 
@@ -532,7 +580,7 @@ def _grant_unblockable(
             return
         targets = eng.select_target(ci.owner, target_kind, max_targets, max_targets, source=ci)
         for target in targets[:max_targets]:
-            eng.add_keyword(target, Keyword.UNBLOCKABLE)
+            eng.add_keyword(target, Keyword.UNBLOCKABLE, duration="turn")
             target.flags.add("turn:unblockable")
             if return_if_race and return_if_race in target.card.race_jp:
                 if ci in ci.owner.trash:
@@ -569,7 +617,24 @@ def _return_to_hand(
             )
         targets = eng.select_target(ci.owner, target_kind, max_targets, max_targets, filter_fn=filter_fn, source=ci)
         for target in targets[:max_targets]:
-            eng.return_to_hand(target)
+            eng.return_to_hand(target, source=ci)
+    return fn
+
+
+def _return_to_deck(
+    *,
+    target_kind: str | None,
+    max_targets: int = 1,
+    to_bottom: bool = True,
+    **_: Any,
+) -> EffectFn:
+    def fn(ci: Any, state: Any, ctx: Any) -> None:
+        eng = getattr(state, "engine", None)
+        if eng is None or target_kind is None:
+            return
+        targets = eng.select_target(ci.owner, target_kind, max_targets, max_targets, source=ci)
+        for target in targets[:max_targets]:
+            eng.return_to_deck(target, source=ci, to_bottom=to_bottom)
     return fn
 
 
@@ -577,7 +642,7 @@ def _return_self_to_hand(**_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
         eng = getattr(state, "engine", None)
         if eng is not None:
-            eng.return_to_hand(ci)
+            eng.return_to_hand(ci, source=ci)
     return fn
 
 
@@ -636,6 +701,7 @@ def _create_tokens(
     dp: int = 0,
     rested: bool = False,
     optional: bool = False,
+    token_recipient: str = "owner",
     race_jp: str = "",
     keywords: tuple[Keyword | str, ...] | list[Keyword | str] | None = None,
     **_: Any,
@@ -663,8 +729,14 @@ def _create_tokens(
         if selected_amount is None:
             selected_amount = amount
         selected_amount = max(0, min(amount, int(selected_amount)))
+        if token_recipient == "owner":
+            recipient = ci.owner
+        elif token_recipient == "opponent":
+            recipient = state.players[1 - state.players.index(ci.owner)]
+        else:
+            raise ValueError(f"unsupported token recipient {token_recipient!r}")
         eng.create_tokens(
-            ci.owner,
+            recipient,
             [token_card] * amount,
             source=ci,
             rested=rested,
@@ -972,8 +1044,6 @@ def _place_base_from_hand(
         replace_iid = None
         if eng is not None:
             replace_iid = eng.select_base_replacement_iid(owner, ci)
-            if len(owner.base) >= 10 and replace_iid is None:
-                return
             if replace_iid is not None:
                 eng._make_base_space(owner, replace_iid)
         elif len(owner.base) >= 10:
@@ -985,15 +1055,18 @@ def _place_base_from_hand(
     return fn
 
 
-def _place_colorless_mana(*, rested: bool = False, **_: Any) -> EffectFn:
+def _place_colorless_mana(*, rested: bool = False, mana_color: Color | str | None = None,
+                          consume_movement_right: bool = False, **_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
         eng = getattr(state, "engine", None)
         if eng is not None:
+            if consume_movement_right:
+                if ci.owner.movement_right_count <= 0:
+                    return
+                ci.owner.movement_right_count -= 1
             replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
-            if len(ci.owner.base) >= 10 and replace_iid is None:
-                return
-            token = eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid)
-            token.rested = rested
+            eng.place_generated_colorless_mana(ci.owner, replace_base_iid=replace_iid,
+                                              rested=rested, mana_color=_color_from_value(mana_color) or Color.COLORLESS)
     return fn
 
 
@@ -1055,9 +1128,6 @@ def _place_base_from_deck(
             if candidate not in ci.owner.deck:
                 continue
             replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
-            if len(ci.owner.base) >= 10 and replace_iid is None:
-                eng.rng.shuffle(ci.owner.deck)
-                return
             eng.place_from_deck_to_base(ci.owner, candidate, rested=rested, replace_base_iid=replace_iid)
         eng.rng.shuffle(ci.owner.deck)
     return fn
@@ -1128,12 +1198,21 @@ def _force_block(
     *,
     target_kind: str | None = None,
     choose_target: bool = False,
+    only_active: bool = False,
     **_: Any,
 ) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
         eng = getattr(state, "engine", None)
         if choose_target and eng is not None and target_kind is not None:
-            targets = eng.select_target(ci.owner, target_kind, 0, 1, source=ci)
+            filter_fn = (lambda target: not bool(getattr(target, "rested", False))) if only_active else None
+            if only_active and not eng._eligible_targets(
+                ci.owner,
+                target_kind,
+                filter_fn=filter_fn,
+                source=ci,
+            ):
+                return
+            targets = eng.select_target(ci.owner, target_kind, 0, 1, filter_fn=filter_fn, source=ci)
             if not targets:
                 return
             target = targets[0]
@@ -1188,27 +1267,43 @@ def _target_filter(
     min_bp: int | None = None,
     max_dp: int | None = None,
     min_dp: int | None = None,
+    bp_below_original: bool = False,
     color: Color | str | None = None,
     exclude_color: Color | str | None = None,
     card_id: str | None = None,
     card_ids: tuple[str, ...] | list[str] | None = None,
     exclude_card_id: str | None = None,
     race: str | None = None,
-    races: tuple[str, ...] | list[str] | None = None,
+    races_any: tuple[str, ...] | list[str] | str | None = None,
     card_type: CardType | str | None = None,
     requires_blessing: bool = False,
-    bp_below_printed: bool = False,
+    requires_boost: bool = False,
+    only_rested: bool = False,
+    only_active: bool = False,
+    exclude_tokens: bool = False,
+    required_keyword: Keyword | str | None = None,
 ):
     wanted_color = _color_from_value(color)
     excluded_color = _color_from_value(exclude_color)
     wanted_type = _card_type_from_value(card_type)
     wanted_card_ids = set(card_ids or ())
-    wanted_races = tuple(races or ())
+    wanted_races = (races_any,) if isinstance(races_any, str) else tuple(races_any or ())
 
     def matches(target: Any) -> bool:
+        if only_rested and not bool(getattr(target, "rested", False)):
+            return False
+        if only_active and bool(getattr(target, "rested", False)):
+            return False
         card = getattr(target, "card", None)
         if card is None:
-            return False
+            return bool(only_rested or only_active) and not any((
+                max_cost is not None, min_cost is not None, max_bp is not None,
+                min_bp is not None, max_dp is not None, min_dp is not None,
+                bp_below_original, wanted_color, excluded_color, card_id,
+                wanted_card_ids, exclude_card_id, race, wanted_races,
+                wanted_type, requires_blessing, requires_boost,
+                exclude_tokens, required_keyword,
+            ))
         if card_id is not None and card.id != card_id:
             return False
         if wanted_card_ids and card.id not in wanted_card_ids:
@@ -1217,12 +1312,22 @@ def _target_filter(
             return False
         if wanted_type is not None and card.type is not wanted_type:
             return False
+        if exclude_tokens and card.is_token:
+            return False
+        if required_keyword is not None and not eng.has_keyword(target, _keyword_from_value(required_keyword)):
+            return False
         if race is not None and race not in card.race_jp:
             return False
-        if wanted_races and not any(item in card.race_jp for item in wanted_races):
+        if wanted_races and not any(wanted_race in card.race_jp for wanted_race in wanted_races):
             return False
-        if requires_blessing and not getattr(target, "blessings", None):
-            return False
+        if requires_blessing or requires_boost:
+            if target.area is not AreaType.FIELD or target not in target.owner.field:
+                return False
+            if not any(
+                mana.area is AreaType.BLESSING and mana.owner is target.owner
+                for mana in target.blessings
+            ):
+                return False
         total_cost = sum(card.cost.values())
         if max_cost is not None and total_cost > max_cost:
             return False
@@ -1236,7 +1341,7 @@ def _target_filter(
             return False
         if min_dp is not None and eng.effective_dp(target) < min_dp:
             return False
-        if bp_below_printed and eng.effective_bp(target) >= card.bp:
+        if bp_below_original and eng.effective_bp(target) >= card.bp:
             return False
         if wanted_color is not None and _card_color(card) is not wanted_color:
             return False
@@ -1274,6 +1379,8 @@ def _owner_has_card(owner: Any, card_id: str) -> bool:
 
 
 def _card_color(card: Any) -> Color | None:
+    if getattr(card, "printed_color", None) is not None:
+        return card.printed_color
     if getattr(card, "mana_color", None) is not None:
         return card.mana_color
     for color in getattr(card, "cost", {}):
@@ -1301,6 +1408,7 @@ _EFFECT_BUILDERS: dict[str, Callable[..., EffectFn]] = {
     "grant_keyword": _grant_keyword,
     "grant_unblockable": _grant_unblockable,
     "return_to_hand": _return_to_hand,
+    "return_to_deck": _return_to_deck,
     "return_self_to_hand": _return_self_to_hand,
     "return_from_trash_to_hand": _return_from_trash_to_hand,
     "discard_target_draw": _discard_target_draw,

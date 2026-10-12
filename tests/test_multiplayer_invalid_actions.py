@@ -9,8 +9,9 @@ def _choice(
     client_action_id: str,
     option_id: str,
     expected_revision: int | None = None,
+    prompt_player_id: str | None = None,
 ) -> SubmittedAction:
-    prompt = match.session.prompt
+    prompt = match.get_view_for(prompt_player_id or player_id)["prompt"]
     assert prompt is not None
     return SubmittedAction(
         match_id=match.match_id,
@@ -35,6 +36,7 @@ def test_invalid_and_out_of_turn_actions_do_not_mutate_state() -> None:
         player_id="player_2",
         client_action_id="out-of-turn",
         option_id="keep",
+        prompt_player_id="player_1",
     ))
     assert out_of_turn.accepted is False
     assert out_of_turn.rejection.code == "NOT_YOUR_TURN"
@@ -101,9 +103,10 @@ def test_revision_and_action_id_are_idempotent() -> None:
 def test_invalid_payment_is_rejected_before_prompt_or_state_mutation() -> None:
     match = AuthoritativeMatch(InitialMatchSpec.standard(match_id="payment", seed=777))
     for index in range(3):
-        prompt = match.session.prompt
         owner = match.prompt_owner_id()
-        assert prompt is not None and owner is not None
+        assert owner is not None
+        prompt = match.get_view_for(owner)["prompt"]
+        assert prompt is not None
         result = match.submit_action(SubmittedAction(
             match_id=match.match_id,
             player_id=owner,
@@ -118,9 +121,10 @@ def test_invalid_payment_is_rejected_before_prompt_or_state_mutation() -> None:
         ))
         assert result.accepted is True
 
-    prompt = match.session.prompt
     owner = match.prompt_owner_id()
-    assert prompt is not None and owner is not None
+    assert owner is not None
+    prompt = match.get_view_for(owner)["prompt"]
+    assert prompt is not None
     play_option = next(option for option in prompt["options"] if option.get("kind") == "play_card")
     before_hash = match.state_hash()
     before_revision = match.revision

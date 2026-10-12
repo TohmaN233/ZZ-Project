@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_03_02_02r_03_boundary",
+  "card_id": "colorless_03_02_02r_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n自分の手札を好きな枚数破棄する。\\nその後、同じ枚数のカードを引く。\\n破棄したカードをランダムにデッキの下に戻す。 EN: ",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_03_02_02r_03",
+        "zone": "hand",
+        "seed": 966089270,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "kept_card": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Platoona and discard no cards",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02r_03"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "choose the explicit No effect option to discard zero cards",
+      "select": {
+        "kind": "effect_target_skip"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Platoona is summoned",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02r_03"
+      }
+    },
+    {
+      "name": "choosing zero discards leaves the other hand card unchanged",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$kept_card"
+      }
+    },
+    {
+      "name": "the unselected card is not discarded",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "iid": "$kept_card"
+      }
+    },
+    {
+      "name": "zero discard also means zero draw",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

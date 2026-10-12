@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_02_02_02r_00_positive",
+  "card_id": "white_02_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【加護時】\\n自分のフォース全てを1回復してアクティブにす EN: [When Boosted]\\nRestore 1 point to all your Forces and put\\nthem in the Active State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_02_02_02r_00",
+        "zone": "field",
+        "seed": 3838673912,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "white_02_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "bless_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 1,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 2,
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Bless the White Force healer",
+      "select": {
+        "kind": "bless",
+        "iid": "$bless_mana",
+        "target_iid": "$host"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "damaged Sho Force heals and readies",
+      "path": "state.players.human.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 2,
+        "rested": false
+      }
+    },
+    {
+      "name": "damaged Chi Force heals and readies",
+      "path": "state.players.human.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_chi",
+        "life": 3,
+        "rested": false
+      }
+    },
+    {
+      "name": "opponent Force remains unchanged",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 3,
+        "rested": true
+      }
+    }
+  ]
+}

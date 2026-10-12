@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_02_02_02r_01_boundary",
+  "card_id": "colorless_02_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n「スライム・ブロック・トークン」1体を、相手の\nフィールドに出す。そのミニオンに「【常時】この\nミニオンはブロックできない。」を付与する。\nEN: [When Summoned]\nOne Token Slime Block enters your opponent's field. That minion receives the following effect: [Passive] This minion cannot block.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "zone": "hand",
+        "seed": 2040602,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_06_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "replacement_candidate": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_06_02_02r_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02r_03",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Disaster Goblin",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "replace one Minion to make room for the opposing token",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$replacement_candidate"
+      }
+    },
+    {
+      "name": "attack the opponent Life with Gold Sunfish",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "target the opponent Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the unblocked attack reduces opposing Life",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 9
+    },
+    {
+      "name": "the token remains present and block-prohibited",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "slime_block_token",
+        "keywords": {
+          "contains": [
+            "CANNOT_BLOCK"
+          ]
+        }
+      }
+    },
+    {
+      "name": "a rested opposing Minion was replaced",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$replacement_candidate"
+      }
+    },
+    {
+      "name": "the opposing Field remains at capacity",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 5
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_04_02_02r_00_boundary",
+  "card_id": "yellow_04_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\nこのタン中、自分の黄のミ二オン1体に【自分\nのターン】このミニオンは種族「ドラゴン」または\n「ドラゴニュート」を持たないミニオンにはブロッ\nクされない。」を与える。 EN: [When Summoned]\nFor the duration of this turn, one of your\nYellow Minions gains the following effect\n[On Your Turn] Only minions belonging\nto the Dragon or Dragonewt class can\nblock this minion's attacks.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_04_02_02r_00",
+        "zone": "hand",
+        "seed": 797577475,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "red_minion": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Karapace with no allied Yellow Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_04_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the Red Minion remains unchanged when no Yellow target exists",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02r_01"
+      }
+    }
+  ]
+}

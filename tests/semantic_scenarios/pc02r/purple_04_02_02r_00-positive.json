@@ -1,0 +1,250 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_04_02_02r_00_positive",
+  "card_id": "purple_04_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【常時】\\nこの二オには条件を無視して[加を付与せるこ\\nとができる。\\n【アタック時】\\nお互いのデッキを上から1枚ずつ破棄する。\\n【加護時】\\n紫以外の有色の加護である場合、加護しているマナを除外\\nして、その色に応じ姿に大変身する。 EN: [Passive]\\nThis minion can receive the {Boost} effect while ignoring\\nany required conditions.\\n[When Attacking]\\nDiscard the top card from your and your opponent's deck\\n[When Boosted]\\nIf Boosted by a Color Mana that is not Purple, banish that\\nmana. This card will Metamorphose according to that color",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02r_01",
+        "zone": "field",
+        "seed": 1018297444,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true,
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_0": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_04_02_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "sourceId": "colorless_04_02_02r_01",
+        "targetId": "purple_04_02_02r_00"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_0"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "host": {
+          "path": "debug.moved.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "red_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Gold Sunfish for another Movement",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "attack with Anju before metamorphosing",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_04_02_02r_00"
+      }
+    },
+    {
+      "name": "target the opponent Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "attach off-color Red Bless mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$red_mana",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "move transformed Anju into the Base",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "move_card",
+        "cardId": "red_04_02_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Anju discarded the controller top card on attack",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_03_02_02r_00"
+      }
+    },
+    {
+      "name": "Anju discarded the opponent top card on attack",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "the Red form remains transformed after leaving the Field",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_04_02_02r_01"
+      }
+    },
+    {
+      "name": "the off-color Bless mana is banished",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_04_02_02r_01_boundary",
+  "card_id": "green_04_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\nこのミ二オンには条件を無視して[加護を付与させるこ\\nとができる。\\n【自分のターン終了時】\\n自分のプレイヤーを1回復する。\\n【加護時】\\n緑以外の有色の加護である場合、加護しているマナを除外\\nして、その色に応じた姿に大変身する EN: [Passive]\\nThis minion can receive the {Boost} effect while\\nignoring any required conditions.\\n[At the End of Your Turn]\\nRestore 1 Life point.\\n[When Boosted]\\nIf Boosted by a Color Mana that is not Green, banish\\nthat mana. This card will Metamorphose according to\\nthat color.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02r_01",
+        "zone": "field",
+        "seed": 3793133802,
+        "playerForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "opponentForces": [
+          "force_e",
+          "force_kon"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true,
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_0": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_04_02_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "sourceId": "colorless_04_02_02r_01",
+        "targetId": "green_04_02_02r_01"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_0"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "host": {
+          "path": "debug.moved.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 9
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "colorless_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attach Neutral Bless mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$colorless_mana",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "end the controller's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Neutral Bless stays attached without transforming Anju",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_04_02_02r_01",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "colorless_00_01_02_00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Neutral Bless is not banished",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "name": "Gaia restores one Life at own-turn end",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 10
+    }
+  ]
+}

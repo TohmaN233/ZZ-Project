@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_00_01_02r_01_positive",
+  "card_id": "yellow_00_01_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 《ベース》\n【配置時】\n自分のミ二オン1体にBP+200を付与する。\nEＰIＣ EN: Boost: Yellow + Cost 6 or Higher\n<Base> [When Placed]\nSelect one of your minions to receive\n+200BP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_00_01_02r_01",
+        "zone": "hand",
+        "seed": 1618459294,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "ally": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_06_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "boost_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02r_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "boost_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "place Gus in Base",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "yellow_00_01_02r_01"
+      }
+    },
+    {
+      "name": "choose the allied Field Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$ally"
+      }
+    },
+    {
+      "name": "Bless the Yellow cost-six Skye with Gus",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$boost_mana",
+        "target_iid": "$boost_target"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Gus grants the selected Minion permanent BP",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_01",
+        "effectiveBp": 500,
+        "effectiveDp": 1
+      }
+    },
+    {
+      "name": "Gus can Bless its matching Yellow cost-six target",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_02_02r_00",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "yellow_00_01_02r_01"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

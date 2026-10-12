@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_00_01_02r_01_positive",
+  "card_id": "white_00_01_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 《ベース》\\n【配置時】\\n次の相手のターン終了時まで、自分のフ才一スに与\\nえられるダメーを1軽减する。 EN: Boost: White + Cost 6 or Higher\\n<Base> [When Placed]\\nDamage dealt to your Forces is reduced\\nby 1 until the end of your opponent's turn.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_00_01_02r_01",
+        "zone": "hand",
+        "seed": 1444286415,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "source": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "white_00_01_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_07_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "opponent_griphone": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 2,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_01_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "place Nicold in Base",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "white_00_01_02r_01"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "end P1 turn",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "P2 places turn-start Mana",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "P2 attacks P1 Force",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_07_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "target P1 Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P1 passes Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P2 passes Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "P1 Force takes two damage reduced by one",
+      "path": "state.players.human.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 1,
+        "destroyed": false
+      }
+    }
+  ]
+}

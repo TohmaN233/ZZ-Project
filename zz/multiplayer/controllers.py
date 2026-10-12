@@ -14,10 +14,13 @@ class PolicyPromptController:
 
     def choose_action(self, match: Any, player_id: str) -> Mapping[str, Any]:
         session = match.session
-        prompt = session.prompt
+        player = player_for_id(session, player_id)
+        prompt = session.prompt_for_side(player.side.name)
         if prompt is None or match.prompt_owner_id() != player_id:
             raise RuntimeError("policy has no pending decision")
-        player = player_for_id(session, player_id)
+        _prompt, options, _pending_side = session._prompt_record_for_id(prompt["id"])
+        if options is None:
+            raise RuntimeError("policy prompt options are missing")
         kind = prompt["kind"]
         option_id: str
         payload: dict[str, Any] = {}
@@ -28,21 +31,21 @@ class PolicyPromptController:
             if selected:
                 payload["selectedCardIids"] = [card.iid for card in selected]
         elif kind == "main_action":
-            option_id = self._option_id(session, self.policy.choose(session.engine))
+            option_id = self._option_id(options, self.policy.choose(session.engine))
         elif kind == "attack_target":
-            targets = list(session._options.values())
+            targets = list(options.values())
             target = self.policy.choose_attack_target(session.engine, session._attack.attacker, targets)
-            option_id = self._option_id(session, target)
+            option_id = self._option_id(options, target)
         elif kind == "flash_action":
-            legal = list(session._options.values())
+            legal = list(options.values())
             action = self.policy.choose_flash(session.engine, legal)
-            option_id = self._option_id(session, action)
+            option_id = self._option_id(options, action)
         elif kind == "blocker":
-            blockers = [value for value in session._options.values() if value is not None]
+            blockers = [value for value in options.values() if value is not None]
             blocker = self.policy.choose_blocker(session.engine, session._attack.attacker, blockers)
-            option_id = self._option_id(session, blocker)
+            option_id = self._option_id(options, blocker)
         elif kind == "effect_target":
-            eligible = [value for value in session._options.values() if value is not None]
+            eligible = [value for value in options.values() if value is not None]
             minimum = int(prompt.get("minimumTargetCount", prompt.get("requiredTargetCount", 1)))
             maximum = int(prompt.get("maximumTargetCount", prompt.get("requiredTargetCount", 1)))
             selected = list(self.policy.choose_target(
@@ -53,14 +56,14 @@ class PolicyPromptController:
                 eligible,
             ))
             if selected:
-                selected_ids = [self._option_id(session, target) for target in selected]
+                selected_ids = [self._option_id(options, target) for target in selected]
                 option_id = selected_ids[0]
                 payload["selectedOptionIds"] = selected_ids
             else:
-                option_id = "none" if "none" in session._options else next(iter(session._options))
+                option_id = "none" if "none" in options else next(iter(options))
                 payload["selectedOptionIds"] = []
         else:
-            option_id = next(iter(session._options))
+            option_id = next(iter(options))
 
         return {
             "kind": CHOOSE_PROMPT_OPTION,
@@ -70,8 +73,8 @@ class PolicyPromptController:
         }
 
     @staticmethod
-    def _option_id(session: Any, selected: Any) -> str:
-        for option_id, value in session._options.items():
+    def _option_id(options: Mapping[str, Any], selected: Any) -> str:
+        for option_id, value in options.items():
             if value is selected or value == selected:
                 return option_id
         raise RuntimeError(f"policy selected value outside current prompt: {selected!r}")

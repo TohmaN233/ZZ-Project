@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_07_02_02r_01_positive",
+  "card_id": "green_07_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【変形時】\n無色のミニオン全てを除外する\n【アタック時】\n相手のミニオン1体をレストする。 EN: Charge\n[When Transformed]\nBanish all Neutral Minions.\n[When Attacking]\nPut one of your opponent's minions in\nthe Rest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_07_02_02r_00",
+        "zone": "field",
+        "seed": 3855006257,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "rory_host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "rory_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02_01",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bless stage zero Rory with Green Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$rory_bless",
+        "target_iid": "$rory_host"
+      }
+    },
+    {
+      "name": "declare Rory stage one attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "green_07_02_02r_01"
+      }
+    },
+    {
+      "name": "attack opposing player Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "choose enemy Minion to rest",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "red_02_02_02_00"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Rory transforms into stage one and keeps Rush",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_07_02_02r_01",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Neutral Minion is banished at transformation",
+      "path": "state.players.opponent.removedCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "Rory rests the selected enemy after attacking",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02_00",
+        "rested": true
+      }
+    }
+  ]
+}

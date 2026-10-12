@@ -17,6 +17,7 @@ from zz.decks import (
     DECKCODE0_YELLOW_FORCES,
     DEMETE_GREEN_RECIPE,
     KANATANA_YELLOW_RECIPE,
+    deck_card_copy_count,
     deck_card_max_copies,
     is_user_deck_card_id,
     validate_forces,
@@ -185,7 +186,7 @@ def recipe_slots(recipe: dict[str, int]) -> list[Card]:
 
 
 def _can_add(recipe: dict[str, int], card: Card) -> bool:
-    return recipe.get(card.id, 0) < deck_card_max_copies(card.id)
+    return deck_card_copy_count(recipe, card.id) < deck_card_max_copies(card.id)
 
 
 def _available_cards(candidates: list[Card], recipe: dict[str, int]) -> list[Card]:
@@ -375,12 +376,13 @@ def generate_completion_recipe(
     recipe = {str(card_id): int(count) for card_id, count in partial_recipe.items() if int(count) > 0}
     if sum(recipe.values()) > 40:
         raise ValueError("partial recipe cannot contain more than 40 cards")
-    for card_id, count in recipe.items():
+    for card_id in recipe:
         if card_id not in CARD_REGISTRY:
             raise ValueError(f"unknown card id: {card_id}")
         max_copies = deck_card_max_copies(card_id)
-        if count > max_copies:
-            raise ValueError(f"{card_id} allows at most {max_copies} copies (got {count})")
+        combined_count = deck_card_copy_count(recipe, card_id)
+        if combined_count > max_copies:
+            raise ValueError(f"{card_id} allows at most {max_copies} copies combined (got {combined_count})")
 
     cost_targets = _recipe_cost_targets(reference_recipe, recipe)
     type_targets = _recipe_type_targets(reference_recipe, recipe)

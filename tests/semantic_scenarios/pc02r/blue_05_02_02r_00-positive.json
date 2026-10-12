@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_05_02_02r_00_positive",
+  "card_id": "blue_05_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分の青の種族「ドラゴン」を持つミニオンがいる\\n場合、自分はデッキの中からマジックカード1枚を\\n公開して手札に加えることができる。そうした場\\n合、自分のデッキをシャッフルする。\\nLEＧEND EN: [When Summoned]\\nIf you have a Blue Minion belonging to\\nthe Dragon class on the field, you can\\nsearch your deck for one Magic card, reveal it\\nto your opponent and add it to your hand.\\nThen, shuffle your deck.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_05_02_02r_00",
+        "zone": "hand",
+        "seed": 2429941647,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_03_01_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02r_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Selene beside a Blue Dragon",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_05_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "search for Magic Tidal Wave",
+      "select": {
+        "cardId": "blue_02_03_01_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Selene enters the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_05_02_02r_00"
+      }
+    },
+    {
+      "name": "selected Magic enters hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_03_01_01"
+      }
+    },
+    {
+      "name": "the selected Magic is the only public deck-search reveal",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "blue_02_03_01_01"
+        }
+      }
+    },
+    {
+      "name": "one non-Magic card remains in deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

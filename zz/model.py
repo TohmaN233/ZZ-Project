@@ -43,6 +43,19 @@ class Card:
     # Reactive-keyword flash ability
     flash_ability: Optional[Callable[["CardInstance", "GameState", "Context"], None]] = None
     flash_ability_condition: Optional[Callable[["CardInstance", "GameState"], bool]] = None
+    # Shared card identity and effect metadata used by card-specific runtime callbacks.
+    printed_color: Optional[Color] = None
+    cost_aura: Optional[Callable[["CardInstance", "CardInstance", "GameState"], int]] = None
+    ignore_bless_conditions: bool = False
+    can_bless_while_rested: bool = True
+    stat_aura: Optional[Callable[["CardInstance", "CardInstance", "GameState"], tuple[int, int]]] = None
+    cost_lock: Optional[Callable[["CardInstance", "CardInstance", "GameState"], bool]] = None
+    effect_targetable: Optional[Callable[["CardInstance", Optional["CardInstance"], "GameState"], bool]] = None
+    effect_protection: Optional[Callable[["CardInstance", "CardInstance", str, "GameState"], bool]] = None
+    life_damage_reducer: Optional[Callable[["CardInstance", "Player", int, Any, str, "GameState"], int]] = None
+    # Deck/catalog metadata; transformed faces remain available for card details.
+    deck_buildable: bool = True
+    transformation_ids: tuple[str, ...] = ()
 
 
 @dataclass
@@ -51,6 +64,8 @@ class Context:
     controller: "Player"
     source: Optional[Any] = None    # may be CardInstance or ForceInstance
     target: Optional[Any] = None
+    # Preserve the declared attack destination through block triggers.
+    attack_target: Optional["AttackTarget"] = None
 
 
 @dataclass
@@ -85,6 +100,8 @@ class CardInstance:
     dp_mod: int = 0
     permanent_bp_mod: int = 0
     permanent_dp_mod: int = 0
+    battle_bp_mod: int = 0
+    battle_dp_mod: int = 0
     extra_keywords: list[Keyword] = field(default_factory=list)
     rested: bool = False
     summoning_sickness: bool = True
@@ -108,15 +125,19 @@ class CardInstance:
 
     @property
     def bp(self) -> int:
-        return max(0, self.card.bp + self.bp_mod + self.permanent_bp_mod)
+        return max(0, self.card.bp + self.bp_mod + self.permanent_bp_mod + self.battle_bp_mod)
 
     @property
     def dp(self) -> int:
-        return max(0, self.card.dp + self.dp_mod + self.permanent_dp_mod)
+        return max(0, self.card.dp + self.dp_mod + self.permanent_dp_mod + self.battle_dp_mod)
 
     @property
     def keywords(self) -> list[Keyword]:
-        return list(self.card.keywords) + list(self.extra_keywords)
+        keywords: list[Keyword] = []
+        for keyword in (*self.card.keywords, *self.extra_keywords):
+            if keyword not in keywords:
+                keywords.append(keyword)
+        return keywords
 
 
 @dataclass

@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_02_02r_01_boundary",
+  "card_id": "red_02_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n自分のミニオンカードでない無色マナ1つを破壊で\\n1体を出す。\nEN: [When Summoned]\\nYou can destroy one of your Neutral\\nMana that is not a minion card. If you do, one\\nToken Golem S enters your field.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_02_02r_01",
+        "zone": "hand",
+        "seed": 3868827883,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Ruler Golem",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_02_02r_01"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "decline the optional neutral mana destruction",
+      "select": {
+        "kind": "effect_target_skip"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "s_golem_token"
+      },
+      "name": "declining the optional cost creates no token"
+    },
+    {
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "cardId": "mana_token"
+      },
+      "name": "declined neutral mana remains in Base"
+    }
+  ]
+}

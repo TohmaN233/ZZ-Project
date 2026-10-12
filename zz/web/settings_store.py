@@ -22,6 +22,7 @@ def default_settings() -> dict[str, Any]:
         "bgmTrack": "bgm_01",
         "developerMode": False,
         "reducedMotion": False,
+        "duelScale": 100,
     }
 
 
@@ -44,6 +45,12 @@ def normalize_bgm_track(value: Any) -> str:
     if track not in BGM_TRACKS:
         raise ValueError(f"unknown BGM track: {value!r}")
     return track
+
+
+def normalize_duel_scale(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not 80 <= value <= 150 or value % 10:
+        raise ValueError(f"invalid duel scale: {value!r}")
+    return value
 
 
 def normalize_bool(value: Any) -> bool:
@@ -85,6 +92,7 @@ class SettingsStore:
             settings["bgmTrack"] = "bgm_01"
         settings["developerMode"] = normalize_bool(raw.get("developerMode"))
         settings["reducedMotion"] = normalize_bool(raw.get("reducedMotion"))
+        settings["duelScale"] = normalize_duel_scale(raw.get("duelScale", 100))
         return settings
 
     def save(self, payload: dict[str, Any]) -> dict[str, Any]:
@@ -102,6 +110,8 @@ class SettingsStore:
                 current["bgmTrack"] = normalize_bgm_track(payload.get("bgmTrack"))
             if "reducedMotion" in payload:
                 current["reducedMotion"] = normalize_bool(payload.get("reducedMotion"))
+            if "duelScale" in payload:
+                current["duelScale"] = normalize_duel_scale(payload["duelScale"])
         return self._write(current)
 
     def set_developer_mode(self, enabled: bool) -> dict[str, Any]:

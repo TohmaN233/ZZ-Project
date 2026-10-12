@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_02_02r_01_positive",
+  "card_id": "red_02_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分のミニオンカードでない無色マナ1つを破壊で\\n1体を出す。\nEN: [When Summoned]\\nYou can destroy one of your Neutral\\nMana that is not a minion card. If you do, one\\nToken Golem S enters your field.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_02_02r_01",
+        "zone": "hand",
+        "seed": 4256085250,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_03_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_08_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_03_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "neutral_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Ruler Golem",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_02_02r_01"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "destroy neutral mana",
+      "select": {
+        "cardIid": "$neutral_target"
+      }
+    },
+    {
+      "name": "replace one Field minion to create the S Golem at Field capacity",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "yellow_02_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02r_01"
+      },
+      "name": "Ruler Golem entered the Field"
+    },
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "s_golem_token"
+      },
+      "name": "S Golem token entered through shared token creation"
+    },
+    {
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 0,
+      "name": "destroyed generated mana does not count as a banished card"
+    },
+    {
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_02_02_02r_00"
+      },
+      "name": "shared full-Field replacement removes the chosen minion"
+    },
+    {
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "red_02_02_02r_01"
+      },
+      "name": "the summoned Ruler Golem is no longer in hand"
+    },
+    {
+      "name": "destroyed generated mana is absent from base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "iid": "$neutral_target"
+      }
+    },
+    {
+      "name": "destroyed generated mana is absent from trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "iid": "$neutral_target"
+      }
+    }
+  ]
+}

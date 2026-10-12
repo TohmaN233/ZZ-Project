@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_02_02_02r_01_positive",
+  "card_id": "colorless_02_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n「スライム・ブロック・トークン」1体を、相手の\nフィールドに出す。そのミニオンに「【常時】この\nミニオンはブロックできない。」を付与する。\nEN: [When Summoned]\nOne Token Slime Block enters your opponent's field. That minion receives the following effect: [Passive] This minion cannot block.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_02_02_02r_01",
+        "zone": "hand",
+        "seed": 2040601,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Disaster Goblin",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_02_02_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Disaster Goblin enters the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_02_02_02r_01"
+      }
+    },
+    {
+      "name": "one opposing token has CANNOT_BLOCK",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "slime_block_token",
+        "keywords": {
+          "contains": [
+            "CANNOT_BLOCK"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_08_02_02r_00_positive",
+  "card_id": "red_08_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP (verified card face): 【アタック時】相手のミニオン全てにBP-100を付与する。【破壊時】自分のターンである場合、このミニオンを手札に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_08_02_02r_00",
+        "zone": "field",
+        "seed": 3117042180,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_03_02_02r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_08_02_01_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "attack with Flair",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_08_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "attack the opposing Force",
+      "select": {
+        "forceId": "force_kon"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "pass Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "block with the minion whose BP remains higher after the attack modifier",
+      "prompt_kind": "blocker",
+      "select": {
+        "cardId": "white_08_02_01_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_03_02_02r_00",
+        "effectiveBp": 200
+      },
+      "name": "all opposing minions receive BP-100"
+    },
+    {
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_08_02_01_00",
+        "effectiveBp": 900
+      },
+      "name": "Flair's attack reduces the blocker but does not overcome its BP"
+    },
+    {
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_08_02_02r_00"
+      },
+      "name": "Flair returns to hand when destroyed during its controller's turn"
+    },
+    {
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "red_08_02_02r_00"
+      },
+      "name": "the own-turn destroy effect leaves no Flair in Trash"
+    }
+  ]
+}

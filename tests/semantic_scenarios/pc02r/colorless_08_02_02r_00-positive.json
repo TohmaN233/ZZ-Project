@@ -1,0 +1,163 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_08_02_02r_00_positive",
+  "card_id": "colorless_08_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【常時】\\n他の自分の種族「モンスター」を持つミニオン全て\\nに[奪命]を与える。 EN: Revenge\\n[Passive]\\nAll your other minions belongin\\nto the\\nMonster class gain the Revenge effect.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_08_02_02r_00",
+        "zone": "hand",
+        "seed": 2108090553,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "card": {
+          "where": {
+            "cardId": "colorless_08_02_02r_00"
+          },
+          "field": "iid",
+          "path": "state.players.human.hand"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P1",
+        "rested": false,
+        "zone": "field"
+      },
+      "capture": {
+        "friendly_monster": {
+          "path": "debug.added.iid"
+        }
+      },
+      "path": "/api/debug/add-card"
+    },
+    {
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P2",
+        "rested": false,
+        "zone": "field"
+      },
+      "capture": {
+        "enemy_monster": {
+          "path": "debug.added.iid"
+        }
+      },
+      "path": "/api/debug/add-card"
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main",
+        "activeSide": "P1"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Serpenteer",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_08_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "where": {
+        "iid": "$friendly_monster",
+        "keywords": {
+          "contains": [
+            "DEATH_BLOW"
+          ]
+        }
+      },
+      "value": 1,
+      "name": "the other friendly Monster gains Revenge",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    },
+    {
+      "where": {
+        "iid": "$enemy_monster",
+        "keywords": {
+          "none": [
+            "DEATH_BLOW"
+          ]
+        }
+      },
+      "value": 1,
+      "name": "the opponent Monster does not gain Revenge",
+      "op": "count_where",
+      "path": "state.players.opponent.field"
+    },
+    {
+      "where": {
+        "keywords": {
+          "contains": [
+            "DEATH_BLOW"
+          ]
+        },
+        "cardId": "colorless_08_02_02r_00"
+      },
+      "value": 1,
+      "name": "Serpenteer retains its own printed Revenge keyword",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    }
+  ]
+}

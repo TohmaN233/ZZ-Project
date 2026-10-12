@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02r_00_boundary",
+  "card_id": "colorless_01_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n自分はデッキの中から種族「ニンフ」を持つ、DP0で有\\n色のベース・ミニオンカード1枚を公開して手札に加える\\nことができる。そうした場合、自分のデッキをシャッフル\\nする。\\n【常時】\\nこのミニオンはベースに移動するとき、レスト状態で移動\\nする。 EN: [When Summoned]\\nYou can search your deck for a Color <Base>\\nMinion card belonging to the Nymph class that has\\na DP of 0, reveal it to your opponent and add it\\nto your hand. Then, shuffle your deck.\\n[Passive]\\nThis minion enters the Rest State when it moves\\nto the base.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "zone": "hand",
+        "seed": 3227616662,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "eligible_nymph": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Mappirat with eligible and ineligible Nymphs in Deck",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_01_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "decline the optional Deck search",
+      "select": {
+        "kind": "effect_target_skip"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Mappirat is summoned without selecting a Nymph",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02r_00"
+      }
+    },
+    {
+      "name": "the eligible Nymph remains in the Deck",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "iid": "$eligible_nymph"
+      }
+    },
+    {
+      "name": "the ineligible colorless Nymph remains hidden",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "reason": "deck_search"
+      }
+    },
+    {
+      "name": "declining the search leaves both cards in Deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 2
+    }
+  ]
+}

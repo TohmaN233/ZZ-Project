@@ -1,13 +1,14 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.3.2",
+  "releaseVersion": "0.4.0",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
     "EX01",
     "PC01",
     "PC01R",
-    "PC02"
+    "PC02",
+    "PC02R"
   ],
   "includedSurfaces": [
     "Python rules engine and card content",
@@ -27,44 +28,40 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.3.2-Windows-Setup.exe",
-    "bytes": 142837370,
-    "sha256": "E5703C4976E3A52692550066571E17DE42B5312363370745ACD61D922257BB7A",
+    "filename": "ZZ-Project-v0.4.0-Windows-Setup.exe",
     "contains": [
       "Electron desktop client",
-      "frozen Python web server",
-      "PC02 rules runtime",
-      "current runtime AI models"
+      "frozen Python web server with all 106 PC02R card modules",
+      "first-launch asset downloader and bundled 7-Zip",
+      "current PC01-trained runtime AI models"
     ],
-    "sampleDecks": "separate resources/data/decks directory; saved decks use the per-user game-data/decks directory",
+    "sampleDecks": "separate data/decks directory next to ZZ-Project.exe; saved decks use the per-user game-data/decks directory",
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "asserts": "external sibling directory next to ZZ-Project.exe"
+    "asserts": "external sibling directory next to ZZ-Project.exe",
+    "bytes": 148324406,
+    "sha256": "F7871D030CC2EC4D710BE52C9DED6446A0AC9F23EB847B116FEB13AECA3F109E"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.3.2-Linux.tar.gz",
-    "bytes": 21480331,
-    "sha256": "A9FF73C2088B0FC512C755318176289F76EA4ED3309536996E02D6F2D90FF7A2",
+    "filename": "ZZ-Project-v0.4.0-Linux.tar.gz",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
     ],
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
-    "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled"
+    "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
+    "bytes": 21701317,
+    "sha256": "683B8D93AE92DB45248697A579A9DA780656DA485CAE8F8D208EE43B03CD2F80"
   },
   "externalAssetPack": {
-    "archive": "ZZ-Assets-PC02-v1.zip",
-    "englishArchive": "ZZ-Assets-PC02-English-v1.zip",
-    "extractTo": ".",
-    "manifest": "ASSET_PACK_MANIFEST.json",
-    "distributionUrl": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing",
-    "driveMainVolumePattern": "ZZ-Assets-PC02-v1.zip.00N",
-    "driveMainVolumeCount": 2,
-    "driveMainVolumeBytes": [
-      629145600,
-      576401952
-    ]
+    "archive": "asserts.7z",
+    "fileId": "1f7AAwFqaFRLyX1z7pPF68YJ7fE9r3DXs",
+    "bytes": 1534680950,
+    "expandedBytes": 1577092255,
+    "extractTo": "asserts",
+    "distributionUrl": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ",
+    "installation": "startup consent, download, validate and extract automatically"
   },
   "runtimeModels": [
     {
@@ -90,5 +87,27 @@
     "non-current local training runs and experiment outputs",
     "local settings, caches, node_modules and git history",
     "large media assets stored in the external asset pack"
-  ]
+  ],
+  "releaseStatus": "local_candidate",
+  "sourcePackage": {
+    "filename": "ZZ-Project-v0.4.0-source.zip",
+    "contains": [
+      "current product source, build tools and deployment examples",
+      "focused tests and all 212 PC02R semantic scenarios",
+      "public runtime models and public Windows rebuild checkpoint"
+    ],
+    "bytes": 37827971,
+    "sha256": "18462BC6F9FFA10A60E4032EB684D5FDC6B281592508723FCCBE3D65795E3CC4"
+  },
+  "multiplayerServer": {
+    "filename": "ZZ-Multiplayer-v0.4.0.tar.gz",
+    "contains": [
+      "authoritative multiplayer server and all 106 PC02R card modules",
+      "public card data, translations, rules and deployment examples"
+    ],
+    "excluded": "desktop UI, media assets, AI model files and private training data",
+    "bytes": 641676,
+    "sha256": "7E70B05044F609587FC1B556CE6A6DA627BE39CBBFED759CEE41021CDBBCBE85"
+  },
+  "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts"
 }

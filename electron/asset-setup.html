@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ZZ-Project · 安装资源</title>
+  <link rel="stylesheet" href="asset-setup.css">
+  <script src="asset-setup-renderer.js" defer></script>
+</head>
+<body>
+  <main>
+    <div class="brand">ZZ-PROJECT</div>
+    <h1>正在准备游戏资源</h1>
+    <p id="status" role="status" aria-live="polite">正在连接下载服务器…</p>
+    <progress id="progress" max="100" aria-label="资源安装进度"></progress>
+    <p id="bytes">下载完成后会自动校验并解压。</p>
+    <p id="destination"></p>
+    <div class="actions"><button id="cancel" type="button">取消</button></div>
+  </main>
+</body>
+</html>

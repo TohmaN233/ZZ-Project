@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_03_02_02r_02_boundary",
+  "card_id": "colorless_03_02_02r_02",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【破壊時】\\n自分のプレイヤーに「次に受けるダメージを0にす\\nる」を付与する。\\n《トラッシュ》\\nこの力ーは効果で選択できない。 EN: [When Destroyed]\\nYou receive the following effect and banish\\nthis minion\\nThe next damage you receive to your Life\\nwill be reduced to 0.\\n<Trash>\\nThis card cannot be selected as a target for\\ncard effects.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_03_02_02r_02",
+        "zone": "hand",
+        "seed": 97196259,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_6": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_6",
+        "sourceId": "purple_07_02_02r_00",
+        "targetId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_6"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_6",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02r_02",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      },
+      "capture": {
+        "protected_suzaku": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02r_00",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      },
+      "capture": {
+        "other_candidate": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "attack the remaining P2 Force with Rekindled",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "target the remaining P2 Force",
+      "select": {
+        "forceId": "force_chi"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "retrieve the eligible Mappirat while Suzaku is protected",
+      "select": {
+        "cardIid": "$other_candidate"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P2 passes Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P1 passes Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Suzaku in Trash remains protected from effect targeting",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$protected_suzaku"
+      }
+    },
+    {
+      "name": "the other eligible low-cost Minion is retrieved",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$other_candidate",
+        "cardId": "colorless_01_02_02r_00"
+      }
+    },
+    {
+      "name": "the Trash target immunity does not banish either card",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 0
+    }
+  ]
+}

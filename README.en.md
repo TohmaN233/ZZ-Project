@@ -2,75 +2,78 @@
 
 [简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
 
-An unofficial, non-commercial desktop recreation of ZENONZARD and an experimental AI project.
+An unofficial, non-commercial desktop recreation of ZENONZARD and an AI experimentation project for players who want to play locally, study the rules, or contribute.
 
-[Project website](https://tohman233.github.io/ZZ-Project/) · [Installation](INSTALL.md) · [Online play](docs/ONLINE.md) · [English rulebook](docs/rules/zz_rulebook_en.md)
+[Project website](https://tohman233.github.io/ZZ-Project/) · [Installation guide](INSTALL.md) · [Online play](docs/ONLINE.md) · [English rulebook](docs/rules/zz_rulebook_en.md)
 
-## Current Features
+## System Requirements
 
-- **Game Lobby**: choose both decks, Codemen, playmats, turn order, and AI difficulty.
-- **Deck building**: search the card pool, create decks, and save them for battle.
-- **Three offline modes**: Human VS AI, omniscient mode with both hands visible and controllable, and AI VS AI.
-- **Three AI levels**: Easy uses a Greedy CPU; Medium and High use reinforcement-learning models.
-- **Codeman memory**: recent matches and Replays are stored locally. When a Codeman has a dedicated `.pt` model, that model is preferred for the opponent.
-- **AI suggestions**: click your Codeman during a match to see the AI's suggestion for the current decision.
-- **Replay & Training**: review recent matches and, with a suitable GPU / CUDA environment, run experimental local training.
-- **Online Game**: supports LAN play and online rooms through a personal server, with rock-paper-scissors for first player and same-room deck changes and rematches.
-- **Trilingual UI**: Simplified Chinese, Japanese, and English.
-- **BGM settings**: the complete asset pack includes ZENONZARD character songs.
-- **Update checks**: the desktop client checks GitHub Releases at startup and can open the release page when a newer version is available.
-- **Cross-platform launchers**: a Windows installer, a Linux portable `tar.gz` bundle, and `.sh` source launches for macOS and developers. The separate `.command` launcher was removed from this release.
-
-Story Mode has not been implemented. The long-term goal is an Agent-driven game that interacts with each player and generates a GAL-style frontend. The project also intends to learn from the SillyTavern community's work on characters, World Info, and long-term interaction to create a personal ZZ experience shared with the player's own Codeman.
-
-## About the AI
-
-This project does not present its experimental models as strong AI. The author has a statistics degree but has not taken reinforcement-learning courses, and their research is unrelated to reinforcement learning. Training resources are also limited. The current models remain considerably weaker than the AI used during ZENONZARD's official operation, and the in-game suggestions are primarily an entertainment feature.
-
-Important AI note: the computer AI was trained only with the PC01 card pool. PC01R, EX01, and PC02 were not part of that training, so do not expect the computer AI to understand the newer packs reliably. Playable PC02 rules do not mean that the AI has learned those cards.
-
-The AI code was written with assistance from Codex and refers to the public methods and engineering structure of [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
+- The Windows 10 or 11 installer runs on Windows; Linux players can use the portable package; macOS players and developers can launch from source.
+- Launching from source requires Python 3.10+ and Node.js 20+.
+- Regular matches do not require a dedicated GPU. Local AI training requires an NVIDIA GPU, compatible drivers, and a CUDA-enabled build of PyTorch.
 
 ## Installation
 
-Windows players should download and run [ZZ-Project-v0.3.2-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Windows-Setup.exe). The installer contains the playable desktop client, frozen Python server, rules code, and default models; Python and Node.js are not required. Large visual/audio assets remain separate: download both main-pack volumes, `ZZ-Assets-PC02-v1.zip.001` and `ZZ-Assets-PC02-v1.zip.002`, from the [Google Drive asset folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing). Open `.001` with 7-Zip and place the resulting `asserts/` directory next to the installed `ZZ-Project.exe`. English users should also download the separate `ZZ-Assets-PC02-English-v1.zip` and extract it into the same `asserts/` directory. See [INSTALL.md](INSTALL.md) for the full directory layout and troubleshooting steps.
+The v0.4.0 Windows installer, Linux portable package, source package, and multiplayer server package have been built, and the public online multiplayer service has been deployed. Public downloads for these packages are still pending, so this page does not provide direct v0.4.0 download links. The current public GitHub release is still 0.3.2, whose application version and rules checksum do not match the current v0.4.0 server.
 
-Linux players should download [ZZ-Project-v0.3.2-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Linux.tar.gz), extract it, and run `./launch-electron.sh`; the first launch prepares private runtimes in the user cache. macOS players and developers should use [ZZ-Project-v0.3.2-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-source.zip) and follow the source setup below.
+Once the public release is available, Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
+
+On first launch, if the complete `asserts/` directory is missing, the client asks whether to download `asserts.7z` from the [Google Drive resource folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ), then verifies and extracts it automatically. The resource archive is 1.53 GB and expands to 1.58 GB; reserve at least 3.2 GB of free space. Cancelling the download exits the game. If installed under Program Files, run as administrator for the first resource installation, or choose a writable installation directory.
+
+Before launching from source, install the dependencies from the project root:
 
 ```powershell
 python -m pip install -r requirements-runtime.txt
 npm install
 ```
 
-Place the asset pack's `asserts/` directory in the repository root, then use the launcher for your platform.
+## Configuration
+
+The default interface language is Simplified Chinese, and the opponent AI defaults to High difficulty. You can change the difficulty in the game lobby. Use the top bar or Settings page to switch between Chinese, Japanese, and English, and to select or turn off the background music. Easy uses the Greedy strategy; Medium and High use the runtime models provided by the project.
+
+## Quick Start
+
+Launch the Windows installer build from the Start menu or its desktop shortcut. The Linux portable package prepares its runtime in the user's cache directory on first launch. To launch from source, use the command for your platform:
 
 ```powershell
-# Windows
+# Windows source launch
 .\launch-electron.cmd
 ```
 
 ```bash
-# Linux
-./launch-electron.sh
-
-# macOS (source launch)
+# Linux or macOS source launch
 ./launch-electron.sh
 ```
 
-## Current Limitations
+## Current Features
 
-The current card pool contains the basic cards, EX01, PC01, PC01R, and PC02. As a personal project, it has not been tested across every possible card combination, so small rule or interface bugs may remain.
+- **Matches and decks**: play Human vs AI, in omniscient view, or AI vs AI; search the card pool, edit decks, and save them.
+- **Codeman and local training**: recent match memories are stored locally; the source build supports experimental training with a GPU / CUDA environment.
+- **Replay and AI suggestions**: review recent matches and see Codeman's suggestion for the current action during a match.
+- **Online play**: supports LAN and public rooms. The public client connects by default to `wss://zz.tgy233.top/multiplayer`; see the [online play guide](docs/ONLINE.md) to host your own server.
+- **Card pool and interface**: includes the basic cards, EX01, PC01, PC01R, PC02, and 106 PC02R DIVINE cards; the interface supports Simplified Chinese, Japanese, and English.
+- **Card display**: preview a transformed form in card details. Reprints with the same name count toward a shared deck limit of three copies.
 
-English card images and English text are distributed in a separate asset pack. Cards not covered by the local pack may still fall back to official website URLs, and some image/card mismatches may remain.
+Story Mode has not been implemented. The long-term goal is to design a game where an Agent automatically interacts with players and to build a GAL-style frontend. The project also plans to learn from the SillyTavern community's experience with characters, World Info, and long-term interaction, creating a ZZ experience for players to share with their own Codeman.
 
-## Acknowledgements
+## About AI Strength
 
-Special thanks to theFeri for providing 50+ high-resolution playmat images, and to **Valkyrie** for providing the English text.
+This project does not present its experimental models as strong AI. The author has a statistics degree but has not taken reinforcement-learning courses, and their research is unrelated to reinforcement learning. Training resources are also limited. The current models remain considerably weaker than the AI used during ZENONZARD's official operation, and the in-game suggestions are primarily an entertainment feature.
+
+The computer AI's training card pool currently covers PC01 only. PC01R, EX01, PC02, and PC02R DIVINE were not included in the current training process, so do not expect the computer AI to understand these newer packs correctly. Implementing playable rules does not mean the AI has learned those cards.
+
+Codex assisted with the AI-related code, which also draws on the public methods and engineering structure of [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
 
 ## Contributing
 
-Contributors with reinforcement-learning experience are especially welcome to investigate whether a stronger offline ZZ AI can be trained. Card data, English images and translations, rule testing, and bug reports are also valuable. Please use Issues or Discussions.
+Contributions are welcome through the [contribution guide](CONTRIBUTING.md). Before starting, please describe the work you plan to do in an Issue or Discussion to avoid duplication.
+
+## Acknowledgements
+
+Thanks to theFeri for providing more than 50 high-resolution playmat images, and to **Valkyrie** for providing the English text.
 
 ## Rights Notice
 
-This is an unofficial, non-commercial fan-development and research project. Rights to the ZENONZARD name, characters, card images, music, and related assets belong to their respective owners. This project is not affiliated with or endorsed by BANDAI, STRAIGHT EDGE, or SUNRISE.
+This is an unofficial, non-commercial fan development and research project. The rights to the ZENONZARD name, characters, card images, music, and related assets belong to their respective rights holders. This project is not affiliated with or authorized by BANDAI, STRAIGHT EDGE, or SUNRISE.
+
+The repository does not include an official open-source license for the project code. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for notes on referenced projects and third-party dependencies; that file does not replace their individual licenses.

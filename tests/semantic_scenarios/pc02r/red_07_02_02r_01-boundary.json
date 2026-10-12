@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_07_02_02r_01_boundary",
+  "card_id": "red_07_02_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【変形時】\\nこのターン中、相手のミ二オン全てをBP-300する。\\n【アタック時】\\nプレイヤにアタックした場合、自分はカドを1枚\\n引く。 EN: Charge\\n[When Transformed]\\nAll your opponent's minions lose -300BP\\nfor the duration of this turn.\\n[When Attacking]\\nIf this minion attacks your opponent's\\nLife, draw one card.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_07_02_02r_00",
+        "zone": "field",
+        "seed": 2141170807,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true,
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_0": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "sourceId": "red_07_02_02r_00",
+        "targetId": "red_07_02_02r_01"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_0"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_08_02_01_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attack an opposing Force instead of Life",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_07_02_02r_01"
+      }
+    },
+    {
+      "name": "target the opposing Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_kon"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the transformed form does not receive its transform effect on setup",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_08_02_01_00",
+        "effectiveBp": 1000
+      }
+    },
+    {
+      "name": "attacking a Force does not draw a card",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

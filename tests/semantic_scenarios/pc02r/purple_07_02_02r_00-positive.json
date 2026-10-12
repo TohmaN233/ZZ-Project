@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_07_02_02r_00_positive",
+  "card_id": "purple_07_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召唤時】\\n相手のフォース1つに2ダメージを与える。\\n【常時】\\nこのミニオンがアクティブ状態でなければ[加護]は付与さ\\nれない。\\n【加護時】\\n紫の加護である場合、加護しているマナを除外して、「「常\\n闇狼鬼」アンフェール」に変形する。\\nＬEＧEND EN: [When Summoned]\\nDeal 2 damage to one of your opponent's Forces.\\n[Passive]\\nThis minion cannot receive a Boost when not in the\\nActive State.\\n[When Boosted]\\nIf Boosted by a Purple Mana, banish that mana. This\\ncard Transtorms into \"Rekindled - The Darkened\\nDemon\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "zone": "hand",
+        "seed": 3481446812,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "source": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "purple_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "purple_bless_one": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "purple_bless_two": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Rekindled",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "purple_07_02_02r_00"
+      }
+    },
+    {
+      "name": "deal two damage to P2 Pegasus Force",
+      "prompt_kind": "effect_target",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "attach matching Purple Bless to Rekindled",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$purple_bless_two",
+        "target_iid": "$source"
+      }
+    },
+    {
+      "name": "end Rekindled's transformation turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 places turn-start Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "end P2 turn without further actions",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 places turn-start Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "move the transformed CardInstance into Base",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "move_card",
+        "cardId": "purple_07_02_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "On Summon deals two damage to the chosen Force",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 1
+      }
+    },
+    {
+      "name": "the original CardInstance retains its transformed face in Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "name": "the transformed face has left the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "purple_07_02_02r_01"
+      }
+    },
+    {
+      "name": "the Purple transform mana is banished",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

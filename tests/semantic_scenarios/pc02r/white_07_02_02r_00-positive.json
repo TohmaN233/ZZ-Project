@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_07_02_02r_00_positive",
+  "card_id": "white_07_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: [召唤時】\\n自分は力ドを2枚引く。その後、自分の手札2枚を破棄する。\\n【常時】\\nこのミニオンがアクティブ状態でなければ[加護は付与されな\\n【加護時】\\n白の加護である場合、加しているマナを除外して、「「氷雪械\\n竜グリフォンに変形する。\\nＬEGEND EN: [When Summoned]\\nDraw two cards. Then, discard two cards from your hand\\n[Passive]\\nThis minion cannot receive a Boost when not in the Active\\nState.\\n[When Boosted]\\nIf Boosted by a White Mana, banish that mana. This card\\nTransforms into \"Griphone - Droid of the Tundra\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_07_02_02r_00",
+        "zone": "hand",
+        "seed": 801878392,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "source": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "white_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_02_02r_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "discard_a": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_01_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "discard_b": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_04_02_02r_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_01_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "white_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_00_03",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "neutral_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_03_02r_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "blue_flash": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "summon Griphone",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_07_02_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "discard two cards after Griphone draws",
+      "select_many": [
+        {
+          "cardIid": "$discard_a"
+        },
+        {
+          "cardIid": "$discard_b"
+        }
+      ]
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Bless Griphone with White mana",
+      "select": {
+        "kind": "bless",
+        "iid": "$white_bless",
+        "target_iid": "$source"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "attack with transformed Griphone",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_07_02_02r_01"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "target P2 Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "P2 casts Blue Flash",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_04_03_02r_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "destroy P1 Neutral Minion",
+      "select": {
+        "cardIid": "$neutral_target"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "move transformed Griphone to Base",
+      "select": {
+        "cardId": "white_07_02_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "both chosen cards are discarded on summon",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$discard_a"
+      }
+    },
+    {
+      "name": "transformed face persists in Base after movement",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_07_02_02r_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "White Bless mana is banished",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "Blue Flash destroys P1 Neutral Minion",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$neutral_target"
+      }
+    }
+  ]
+}

@@ -305,7 +305,7 @@ def test_goldweather_session_choice_requests_base_replacement_when_base_is_full(
     assert any(card.iid == replaced_iid for card in player.trash)
 
 
-def test_goldweather_debug_base_overflow_replaces_one_card_per_entering_card() -> None:
+def test_goldweather_full_base_replaces_owner_chosen_card_without_overflow() -> None:
     session = GameSession(seed=410, mode="debug-card-lab")
     setup_debug_lab(
         session,
@@ -314,13 +314,6 @@ def test_goldweather_debug_base_overflow_replaces_one_card_per_entering_card() -
         compact_board=False,
         player_forces=[],
         opponent_forces=[],
-    )
-    add_debug_card_to_zone(
-        session,
-        "mana_token",
-        side="P1",
-        zone="base",
-        rested=False,
     )
     add_debug_card_to_zone(
         session,
@@ -359,7 +352,7 @@ def test_goldweather_debug_base_overflow_replaces_one_card_per_entering_card() -
     assert result["error"] is None
     assert target.area is AreaType.BASE
     assert target.rested is True
-    assert len(player.base) == 11
+    assert len(player.base) == 10
     assert any(card.iid == replaced_iid for card in player.trash)
 
 

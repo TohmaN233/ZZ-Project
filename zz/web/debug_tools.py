@@ -4,7 +4,7 @@ import re
 from typing import Any
 
 from zz.cards import CARD_REGISTRY
-from zz.decks import is_user_deck_card_id, validate_forces
+from zz.decks import is_catalog_card_id, is_user_deck_card_id, validate_forces
 from zz.engine import BASE_CAP, LIFE_CAP
 from zz.enums import AreaType, CardType, Color, Phase, Side, Step
 from zz.forces import ALL_FORCES
@@ -305,8 +305,10 @@ def add_debug_card_to_zone(
     if card_id == "mana_token":
         ci = _mana_token(session, player, area)
     else:
-        if card_id not in CARD_REGISTRY or not is_user_deck_card_id(card_id):
+        if not is_catalog_card_id(card_id):
             raise ValueError(f"unknown debug card id: {card_id}")
+        if not CARD_REGISTRY[card_id].deck_buildable:
+            raise ValueError(f"transformation-only card cannot be created directly: {card_id}")
         ci = _new_instance(session, card_id, player, area, rested=rested)
     _validate_card_area(ci, area)
     ci.rested = bool(rested) and _area_can_be_rested(area)
@@ -545,9 +547,16 @@ def setup_debug_lab(
     compact_board: bool = False,
     non_minion_mana_only: bool = False,
 ) -> dict[str, Any]:
-    if card_id not in CARD_REGISTRY or not is_user_deck_card_id(card_id):
+    if not is_catalog_card_id(card_id):
         raise ValueError(f"unknown debug card id: {card_id}")
     selected = CARD_REGISTRY[card_id]
+    if not selected.deck_buildable:
+        raise ValueError(f"transformation-only card cannot be created directly: {card_id}")
+    area = _area_for_zone(zone)
+    if area not in (AreaType.HAND, AreaType.FIELD, AreaType.BASE):
+        raise ValueError(f"unsupported debug setup zone: {zone}")
+    # Validate before clearing the current game or allocating any instances.
+    _validate_card_area(CardInstance(card=selected, owner=session.engine.state.players[0], iid=0, area=area), area)
     state = session.engine.state
     p1, p2 = state.players
     state.turn = 2

@@ -15,15 +15,18 @@ DEFAULT_DECK_ROOT = Path(__file__).resolve().parents[2] / "data" / "decks"
 class DeckStore:
     def __init__(self, root: str | Path | None = None):
         self.root = Path(root) if root is not None else DEFAULT_DECK_ROOT
+        self.load_warnings: list[dict[str, str]] = []
 
     def list_decks(self) -> list[dict[str, Any]]:
         self.root.mkdir(parents=True, exist_ok=True)
+        self.load_warnings = []
         decks = []
         for path in sorted(self.root.glob("*.json")):
             try:
                 deck = json.loads(path.read_text(encoding="utf-8"))
                 self._validate_stored_deck(deck)
-            except (OSError, ValueError, json.JSONDecodeError):
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                self.load_warnings.append({"file": path.name, "message": str(exc)})
                 continue
             decks.append(deck)
         return decks

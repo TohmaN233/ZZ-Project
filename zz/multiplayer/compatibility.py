@@ -24,8 +24,15 @@ _HELLO_FIELDS = {
 # These files define the card database and the rules path used by an
 # authoritative multiplayer match. New authoritative definition files must be
 # added here so the manifest freshness test detects them.
+_PC02R_CARD_MODULES = tuple(
+    f"zz/pc02r_cards/{path.name}"
+    for path in sorted((Path(__file__).resolve().parents[1] / "pc02r_cards").glob("*.py"))
+)
+
 AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
+    "data/card_transformations.tsv",
     "data/cards_bilingual_v4.tsv",
+    "data/official_cardlist.tsv",
     "zz/basic.py",
     "zz/cards.py",
     "zz/deckcode0.py",
@@ -42,8 +49,12 @@ AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "zz/model.py",
     "zz/multiplayer/match.py",
     "zz/pc01.py",
+    "zz/pc02r.py",
+    "zz/pc02r_data.tsv",
     "zz/triggers.py",
+    "zz/transformations.py",
     "zz/web/session.py",
+    *_PC02R_CARD_MODULES,
 )))
 
 

@@ -83,7 +83,9 @@ def test_two_independent_clients_join_ready_act_surrender_and_close() -> None:
     assert all("iid" not in card for card in first_view["players"]["opponent"]["hand"])
     assert all("iid" not in card for card in second_view["players"]["opponent"]["hand"])
     assert first_view.get("prompt") is not None
-    assert second_view.get("prompt") is None
+    assert second_view.get("prompt") is not None
+    assert first_view["prompt"]["kind"] == second_view["prompt"]["kind"] == "mulligan"
+    assert first_view["prompt"]["id"] != second_view["prompt"]["id"]
 
     before_hash = first_view["stateHash"]
     second.submit_action({

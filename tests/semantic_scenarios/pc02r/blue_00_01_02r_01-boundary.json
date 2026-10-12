@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_00_01_02r_01_boundary",
+  "card_id": "blue_00_01_02r_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 《ベー\\n【配置時】\\n自分のマナが（このマナを含めて）4つ以上の場\\n合、自分は力一ドを1枚引く。\\nTＥＰＩＣ EN: Boost: Blue + Cost 2 or Higher\\n<Base> [When Placed]\\nIf you have four or more mana (including\\nthis one) in your base, draw one card.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_00_01_02r_01",
+        "zone": "hand",
+        "seed": 2659784617,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_01_03_02r_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "place Cortney with two mana",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "blue_00_01_02r_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Cortney enters Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02r_01"
+      }
+    },
+    {
+      "name": "three total mana does not draw",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "blue_01_03_02r_00"
+      }
+    },
+    {
+      "name": "the card stays in the deck below threshold",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

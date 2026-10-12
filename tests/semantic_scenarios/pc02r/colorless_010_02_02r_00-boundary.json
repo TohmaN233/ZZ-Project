@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_010_02_02r_00_boundary",
+  "card_id": "colorless_010_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: ［襲撃］【アタック時】相手のプレイヤーに3ダメージを与える。このダメージは相手のフォース1つ毎に1軽減される。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_010_02_02r_00",
+        "zone": "field",
+        "seed": 2041002,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_kai"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "attack with Lord Alabaster",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_010_02_02r_00"
+      }
+    },
+    {
+      "name": "target the Minotauros Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_kai"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "pass Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "one destroyed opposing Force leaves two damage",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 8
+    }
+  ]
+}

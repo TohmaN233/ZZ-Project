@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_07_02_02r_00_boundary",
+  "card_id": "green_07_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n緑マナ1つをベースに置く\n【常時】\nこのニがク状態でけば[加は付与\nれない。\n【加護時】\n緑の加護である場合、加護してるマナを除外して、「「森羅 EN: [When Summoned]\nPlace one Green Mana into your base.\n[Passive]\nThis minion cannot receive a Boost when not in the\nActive State.\n[When Boosted]\nIf Boosted by a Green Mana, banish that mana. This\ncard Transforms into \"Rory - Barbarian of the Earth\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_07_02_02r_00",
+        "zone": "field",
+        "seed": 4016341088,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "rory_host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_07_02_02r_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$rory_host",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "rory_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "pass while Rory is rested",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "rested Rory remains stage zero",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_07_02_02r_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "rested Rory does not consume Green Bless",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_01_02_00",
+        "rested": false
+      }
+    }
+  ]
+}

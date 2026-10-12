@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_07_02_02r_00_boundary",
+  "card_id": "purple_07_02_02r_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召唤時】\\n相手のフォース1つに2ダメージを与える。\\n【常時】\\nこのミニオンがアクティブ状態でなければ[加護]は付与さ\\nれない。\\n【加護時】\\n紫の加護である場合、加護しているマナを除外して、「「常\\n闇狼鬼」アンフェール」に変形する。\\nＬEＧEND EN: [When Summoned]\\nDeal 2 damage to one of your opponent's Forces.\\n[Passive]\\nThis minion cannot receive a Boost when not in the\\nActive State.\\n[When Boosted]\\nIf Boosted by a Purple Mana, banish that mana. This\\ncard Transtorms into \"Rekindled - The Darkened\\nDemon\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "zone": "hand",
+        "seed": 349371981,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_07_02_02r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "rested_host": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "purple_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "advance through the Mana step",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "a rested Rekindled source exposes no Bless action",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "bless"
+      }
+    },
+    {
+      "name": "the rested source remains in its original face",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_07_02_02r_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "the unavailable Bless stays in Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_00_01_02_00",
+        "rested": false
+      }
+    }
+  ]
+}

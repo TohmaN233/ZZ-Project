@@ -1,0 +1,12 @@
+image_id	name_jp	card_bp	card_dp	boost_bp	boost_dp	source	applicability
+red_00_00_04_06	砲竜バル・ガンナー			+200	+1	clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/RED/red_00_00_04_06.png	boost_bp_not_card_bp|boost_dp_not_card_dp
+red_00_00_04_07	砲凰竜フェニック・キャノン		0	+300		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/RED/red_00_00_04_07.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+yellow_00_00_EX03_04	ハイドランディア		0	+200		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/YELLOW/yellow_00_00_EX03_04.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+purple_00_00_04_06	騎士王蛇ペンドラゴン		0	+200		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/PURPLE/purple_00_00_04_06.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+purple_00_00_04_07	デス・ヘイズ		0	+300		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/PURPLE/purple_00_00_04_07.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+green_00_00_EX03_04	刃狼ベオ・ウルフ			+200	+1	clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/GREEN/green_00_00_EX03_04.png	boost_bp_not_card_bp|boost_dp_not_card_dp
+blue_00_00_EX03_04	牙皇ケルベロード		0	+200		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/BLUE/blue_00_00_EX03_04.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+white_00_00_04_06	ホーク・ブレイカー		0	+300		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/WHITE/white_00_00_04_06.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+white_00_00_04_07	獣装甲メガバイソン			+100	+1	clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/WHITE/white_00_00_04_07.png	boost_bp_not_card_bp|boost_dp_not_card_dp
+colorless_00_00_04_03	コア		0	+300		clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_00_04_03.png	boost_bp_not_card_bp|printed_unsigned_dp_0
+colorless_00_01_02r_00	「花精」フィオレ			+200	+1	clean_runtime_release_v2/asserts/ZENONZARD_CARDLIST/COLORLESS/colorless_00_01_02r_00.png	boost_bp_not_card_bp|boost_dp_not_card_dp

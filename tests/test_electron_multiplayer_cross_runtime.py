@@ -89,11 +89,16 @@ const waitFor = async (predicate, label) => {
     if (first.view.players.opponent.hand.some((card) => Object.hasOwn(card, "iid"))) throw new Error("first hidden hand leaked");
     if (second.view.players.opponent.hand.some((card) => Object.hasOwn(card, "iid"))) throw new Error("second hidden hand leaked");
     first.surrender({ clientActionId: "electron-surrender" });
-    await waitFor(() => first.state === "IN_ROOM" && second.state === "IN_ROOM", "return to room");
+    await waitFor(() => (
+      first.state === "MATCH_FINISHED" && second.state === "MATCH_FINISHED"
+      && first.room?.status === "READY_CHECK" && second.room?.status === "READY_CHECK"
+    ), "match finish and room reset");
     process.stdout.write(JSON.stringify({
       firstState: first.state,
       secondState: second.state,
       roomCode: first.room.roomCode,
+      roomStatus: first.room.status,
+      winner: first.view.gameOver && first.view.gameOver.winner,
     }));
   } finally {
     first.disconnect();
@@ -122,5 +127,7 @@ const waitFor = async (predicate, label) => {
         )
 
     result = json.loads(completed.stdout)
-    assert result["firstState"] == result["secondState"] == "IN_ROOM"
+    assert result["firstState"] == result["secondState"] == "MATCH_FINISHED"
     assert result["roomCode"] == "EL1234"
+    assert result["roomStatus"] == "READY_CHECK"
+    assert result["winner"] == "Bob"

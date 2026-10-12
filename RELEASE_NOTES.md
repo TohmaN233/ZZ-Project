@@ -1,86 +1,47 @@
-# v0.3.2 - Duel Timing And Desktop Update
+# v0.4.0 Candidate - PC02R DIVINE and Rule Updates
 
-[Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
+[简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
+
+This is a local release candidate. The packages listed below have not been
+published or uploaded as release downloads. Final public availability, links,
+sizes, and SHA-256 values are tracked in
+[PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json).
 
 ## Highlights
 
-- Complete Game Lobby, deck building, and local card-battle flow.
-- Card pool expanded to Basic, EX01, PC01, PC01R, and PC02 CONTRACT.
-- Human VS AI, omniscient, and AI VS AI offline modes.
-- Easy Greedy CPU plus Medium and High experimental reinforcement-learning
-  models.
-- Codeman recent-match memory, dedicated-model preference, and in-game advice.
-- Replay review, local training entrypoints, LAN play, and personal-server
-  online play.
-- Simplified Chinese, Japanese, and English UI plus a trilingual rulebook.
-- The duel top bar opens the rulebook as a rendered in-game panel.
-- Optional battle BGM, Codeman profiles, and playmat profiles.
-- The large `asserts/` media pack stays a separate download; updating the
-  installer does not replace it.
-- Online play uses the same duel screen and local assets as offline. Players
-  choose rock, paper, or scissors for first turn, then can rematch in the same
-  room. Protocol `2`, rules `0.0.3`.
-- End-of-turn heals and exhausted cards resolve before the opponent draws.
-  Triggered card text follows the selected UI language.
-- The desktop client can download and launch the latest Windows or Linux package
-  from GitHub Releases after checksum verification.
+- Added the 106-card PC02R DIVINE set.
+- Transformation cards support private previews of their transformed faces.
+- Reprints of the same card share one combined deck limit of three.
+- Updated shared rules for effect-target filtering, damage and Force healing,
+  base-owner replacement, and Bless returns.
+- Added discard/draw animations and more detail for card buffs.
+- On first launch, the desktop client detects missing `asserts/` assets and
+  offers to download `asserts.7z`. The bundled 7-Zip validates the archive CRC
+  and extracts it at the application root. Cancelling exits without starting
+  the game; a failed installation can be retried.
+- The `asserts.7z` bundle includes English card faces. It is
+  1,534,680,950 bytes (1.53 GB / 1.43 GiB), expands to 1,577,092,255 bytes
+  (1.58 GB), and needs at least 3.2 GB of free space during setup.
 
-## Known limitations
+## AI coverage
 
-- PC02 is implemented, but a personal project cannot cover every card
-  combination. Small rules or interface bugs may remain.
-- The computer AI was trained only with the PC01 card pool. PC01R, EX01, and
-  PC02 were not included in the current training data. Do not expect the AI to
-  understand the newer packs reliably.
-- The Windows installer and Linux bundle are for playing. CUDA/PyTorch
-  training dependencies are available only through the source setup.
-- English card art and English text are distributed as a separate overlay pack.
-- The public server is in Canada, and cross-region stability has not been fully
-  verified. Mainland China users may need a proxy.
-- Story Mode is a future goal and is not included in this release.
+The computer AI is still trained only with the PC01 card pool. PC01R, EX01,
+PC02, and PC02R DIVINE are not covered by that training, so the new rules and
+cards do not imply new AI training or reliable play with those sets.
 
-## Download contents
+## Candidate packages
 
-1. [`ZZ-Project-v0.3.2-Windows-Setup.exe`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Windows-Setup.exe):
-   directly installable and playable Windows desktop package. It contains
-   Electron, the frozen Python server, the PC02 runtime, Torch-free current
-   runtime models, the desktop home background, and the top-bar BGM selector.
-   Size: `142837370` bytes.
-   SHA-256:
-   `E5703C4976E3A52692550066571E17DE42B5312363370745ACD61D922257BB7A`.
-2. [`ZZ-Project-v0.3.2-Linux.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-Linux.tar.gz):
-   portable Linux source/runtime bundle. Extract it and run
-   `./launch-electron.sh`; the first launch prepares user-scoped Node.js,
-   Electron, and Python runtime files, including the top-bar BGM selector.
-   Size: `21480331` bytes.
-   SHA-256:
-   `A9FF73C2088B0FC512C755318176289F76EA4ED3309536996E02D6F2D90FF7A2`.
-3. [`ZZ-Project-v0.3.2-source.zip`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Project-v0.3.2-source.zip):
-   source, tests, documentation, runtime models, and `image.png` for macOS
-   players and developers.
-4. [`ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz`](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.3.2/ZZ-Multiplayer-v0.3.2-f7a50d6.tar.gz):
-   latest authoritative server snapshot for people who want to host their own
-   room service. Older server archives are not kept. Size: `21786306` bytes.
-   SHA-256:
-   `04139BDC15FC9CD65A2F2B0D4F07B008161A8C94493B9F9B1DCB908145EED9CD`.
-   Setup: [docs/ONLINE.md](docs/ONLINE.md).
-5. [`ZZ-Assets-PC02-v1.zip.001` and `.002`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
-   main card art, characters, playmats, video, sound effects, and BGM. Download
-   both volumes, open `.001` with 7-Zip, and place the resulting `asserts/`
-   beside `ZZ-Project.exe` for Windows or at the bundle/project root for Linux
-   and source launches.
-6. [`ZZ-Assets-PC02-English-v1.zip`](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing):
-   English card, Force, and Mana faces. Extract it on top of the main
-   `asserts/` directory.
+These candidate artifacts are local files under `dist/releases/v0.4.0/`:
 
-The main asset volumes are intentionally at least about 500 MB each for a more
-reliable download. The English pack remains one ZIP. Exact sizes, file counts,
-and hashes are recorded in
-[`ASSET_PACK_MANIFEST.json`](ASSET_PACK_MANIFEST.json).
+1. `ZZ-Project-v0.4.0-Windows-Setup.exe` - Windows desktop installer.
+2. `ZZ-Project-v0.4.0-Linux.tar.gz` - portable Linux package.
+3. `ZZ-Project-v0.4.0-source.zip` - source, models, tests, and documentation.
+4. `ZZ-Multiplayer-v0.4.0.tar.gz` - self-hosted multiplayer server.
+
+These names are not download links. See [INSTALL.md](INSTALL.md) for setup and
+[docs/ONLINE.md](docs/ONLINE.md) for self-hosting instructions.
 
 ## Credits
 
 Special thanks to theFeri for providing 50+ high-resolution playmat images, and
 to **Valkyrie** for providing the English text.
-
-See [INSTALL.md](INSTALL.md) for the complete English installation guide.

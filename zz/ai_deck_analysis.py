@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from zz.cards import CARD_REGISTRY
-from zz.decks import deck_card_max_copies, is_user_deck_card_id, validate_user_deck_recipe
+from zz.decks import deck_card_copy_count, deck_card_max_copies, is_user_deck_card_id, validate_user_deck_recipe
 from zz.enums import CardType, Color
 from zz.forces import ALL_FORCES
 from zz.model import Card
@@ -163,7 +163,7 @@ def _choose_card_for_slot(
     wanted_cost: int,
 ) -> Card:
     def available(card: Card) -> bool:
-        return recipe.get(card.id, 0) < deck_card_max_copies(card.id)
+        return deck_card_copy_count(recipe, card.id) < deck_card_max_copies(card.id)
 
     pools = [
         [

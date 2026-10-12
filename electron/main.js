@@ -8,6 +8,9 @@ const path = require("node:path");
 const { createAdaptiveWebSocketClass } = require("./adaptive-websocket");
 const { LanManager } = require("./lan-manager");
 const { MultiplayerDesktopClient } = require("./multiplayer-client");
+const { assetRootLooksValid } = require("./asset-bootstrap");
+const { ensureStartupAssets } = require("./asset-setup");
+const assetSource = require("./asset-source.json");
 const {
   checkLatestRelease,
   LATEST_RELEASE_URL,
@@ -42,6 +45,10 @@ let shutdownPromise = null;
 let updateCheckPromise = null;
 let updateStatus = { status: "idle", currentVersion: null };
 let updateDownloadPromise = null;
+let startupAssetRoot = null;
+let startupInProgress = false;
+let startupAssetsPromise = null;
+const startupAbortController = new AbortController();
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -57,16 +64,22 @@ function packagedServerPath() {
 }
 
 function packagedAssetRoot() {
-  const configured = process.env.ZZ_ASSET_ROOT;
+  if (startupAssetRoot) return startupAssetRoot;
+  const configured = process.env.ZZ_ASSET_ROOT || process.env.ZENONZARD_ASSET_ROOT;
   if (configured) {
     const configuredCandidates = [
       path.resolve(configured),
       path.resolve(projectRoot(), configured),
       path.resolve(path.dirname(process.execPath), configured),
     ];
-    const configuredRoot = configuredCandidates.find(assetRootLooksValid);
+    const configuredRoot = configuredCandidates.flatMap((root) => [root, path.join(root, "asserts")]).find(assetRootLooksValid);
     if (configuredRoot) return configuredRoot;
-    appendLog(`Ignoring invalid ZZ_ASSET_ROOT: ${configured}`);
+    return path.isAbsolute(configured) ? path.resolve(configured)
+      : path.resolve(app.isPackaged ? path.dirname(process.execPath) : projectRoot(), configured);
+  }
+  if (!app.isPackaged) {
+    const primary = path.join(projectRoot(), "asserts");
+    return [primary, path.join(primary, "asserts")].find(assetRootLooksValid) || primary;
   }
   const primary = path.join(path.dirname(process.execPath), "asserts");
   const candidates = [
@@ -76,16 +89,6 @@ function packagedAssetRoot() {
     path.join(projectRoot(), "asserts"),
   ];
   return candidates.find(assetRootLooksValid) || primary;
-}
-
-function assetRootLooksValid(candidate) {
-  try {
-    return ["ZENONZARD_CARDLIST", "audio", "video"].every((name) =>
-      fsSync.statSync(path.join(candidate, name)).isDirectory()
-    );
-  } catch (_error) {
-    return false;
-  }
 }
 
 function packagedDeckRoot() {
@@ -468,7 +471,7 @@ function waitForHttp(url, timeoutMs = 15000) {
 }
 
 function pythonArgs(port) {
-  const assetRoot = app.isPackaged ? packagedAssetRoot() : null;
+  const assetRoot = startupAssetRoot || (app.isPackaged ? packagedAssetRoot() : null);
   if (assetRoot && app.isPackaged) {
     appendLog(`Packaged asset root: ${assetRoot}${assetRootLooksValid(assetRoot) ? "" : " (expected folders not found)"}`);
   }
@@ -476,7 +479,8 @@ function pythonArgs(port) {
     ? ["--host", "127.0.0.1", "--port", String(port), "--asset-root", assetRoot,
       "--user-data-root", packagedUserDataRoot(), "--bundled-deck-root", packagedDeckRoot()]
     : ["-m", "zz.web.server", "--host", "127.0.0.1", "--port", String(port)];
-  if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
+  if (!app.isPackaged && assetRoot) args.push("--asset-root", assetRoot);
+  else if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
   return args;
 }
 
@@ -819,12 +823,24 @@ function registerIpc() {
 }
 
 app.whenReady().then(async () => {
+  startupInProgress = true;
   installApplicationMenu();
   if (process.platform === "darwin" && app.dock) app.dock.setIcon(applicationIconPath());
+  startupAssetsPromise = ensureStartupAssets({
+    destination: packagedAssetRoot(), source: assetSource, dialog, BrowserWindow, ipcMain,
+    fetchImpl: (url, options) => net.fetch(url, options),
+    signal: startupAbortController.signal, onLog: appendLog,
+  });
+  startupAssetRoot = await startupAssetsPromise;
+  if (!startupAssetRoot || startupAbortController.signal.aborted) {
+    app.quit();
+    return;
+  }
   multiplayerRecoveryPath = path.join(app.getPath("userData"), "multiplayer-recovery.json");
   const shouldReconnect = await restoreMultiplayerRecovery();
   registerIpc();
   await createWindow();
+  startupInProgress = false;
   if (shouldReconnect) {
     try {
       multiplayerClient.reconnect();
@@ -838,17 +854,24 @@ app.whenReady().then(async () => {
       await createWindow();
     }
   });
+}).catch((error) => {
+  startupInProgress = false;
+  appendLog(`Application startup failed: ${error.message || error}`);
+  dialog.showErrorBox("ZZ-Project 启动失败", String(error.message || error));
+  app.quit();
 });
 
 app.on("before-quit", (event) => {
   if (shutdownPrepared) return;
   event.preventDefault();
   if (shutdownPromise !== null) return;
+  startupAbortController.abort();
   if (multiplayerReconnectTimer !== null) clearTimeout(multiplayerReconnectTimer);
   multiplayerReconnectTimer = null;
   if (multiplayerClient.getSnapshot().canReconnect) multiplayerClient.suspend();
   else multiplayerClient.disconnect();
   shutdownPromise = Promise.allSettled([
+    startupAssetsPromise,
     queueMultiplayerRecoveryWrite(),
     lanManager.stopHost(),
     stopServer(),
@@ -859,7 +882,7 @@ app.on("before-quit", (event) => {
 });
 
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+  if (!startupInProgress && process.platform !== "darwin") {
     app.quit();
   }
 });

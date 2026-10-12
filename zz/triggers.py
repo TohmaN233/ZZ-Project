@@ -59,12 +59,31 @@ class TriggerRegistry:
     def _trigger_active_in_area(self, ci: "CardInstance") -> bool:
         return ci.area is AreaType.FIELD
 
-    def emit(self, timing: TriggerTiming | EffectTiming, ctx: "Context") -> None:
+    def emit(self, timing: TriggerTiming | EffectTiming, ctx: "Context", *,
+             exclude_instance: "CardInstance" | None = None) -> None:
         state = self._engine.state
         # Active player's permanents fire first, then opponent's
         for player in (state.active, state.opponent):
-            for region in (player.field, player.base, player.trash):
+            blessing_cards = [
+                blessing
+                for host in player.field
+                for blessing in host.blessings
+            ]
+            regions = (
+                player.field,
+                player.base,
+                player.trash,
+                player.hand,
+                player.deck,
+                player.removed,
+                blessing_cards,
+            )
+            for region in regions:
                 for ci in region:
+                    # Source effects may already have resolved through the
+                    # leave-zone/cast path; other listeners still receive it.
+                    if ci is exclude_instance:
+                        continue
                     for effect in ci.card.effects:
                         if effect.timing is not timing:
                             continue
@@ -111,9 +130,15 @@ class TriggerRegistry:
             if isinstance(p.trigger, EffectSpec) and effect_once_per_turn_used(p.trigger, p.instance):
                 continue
             defer_choice = getattr(self._engine, "defer_trigger_choice", None)
-            if defer_choice is not None and defer_choice(p):
-                self._depth = 0
-                return
+            if defer_choice is not None:
+                choice_result = defer_choice(p)
+                if choice_result is None:
+                    self._queue.appendleft(p)
+                    self._depth = 0
+                    return
+                if choice_result:
+                    self._depth = 0
+                    return
             run_callback = getattr(self._engine, "_run_effect_callback", None)
             if run_callback is None:
                 record_effect = getattr(self._engine, "_record_effect_event", None)
@@ -124,5 +149,8 @@ class TriggerRegistry:
                 record_effect = getattr(self._engine, "_record_effect_event", None)
                 if record_effect is not None:
                     record_effect(p.instance, p.trigger, p.context)
-                run_callback(p.trigger.fn, p.instance, self._engine.state, p.context)
+                if isinstance(p.trigger, EffectSpec):
+                    run_callback(p.trigger.fn, p.instance, self._engine.state, p.context, effect=p.trigger)
+                else:
+                    run_callback(p.trigger.fn, p.instance, self._engine.state, p.context)
         self._depth = 0

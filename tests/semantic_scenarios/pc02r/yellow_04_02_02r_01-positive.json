@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_04_02_02r_01_positive",
+  "card_id": "yellow_04_02_02r_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【常時】\\nこのミ二オンには条件を無視して[加護を付与させることがで\\nきる。\\n【常時】\\nこのターに他の自分の二オンを召喚している場合、この二\\n才ンをBP+200/DP+1する。\\n【加護時】\\n黄以外の有色の加護でる場合、加護しているマナを除外し\\nその色に応じ姿に大変身する。\\nＬEGEND EN: [Passive]\\nThis minion can receive the {Boost} effect while ignoring\\nany required conditions.\\n[Passive]\\nIf you have summoned another minion this turn, this\\nminion gains +200BP/+1DP for the duration of the turn\\n[When Boosted]\\nIf Boosted by a Color Mana that is not Yellow, banish that\\nmana. This card will Metamorphose according to that color",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02r_01",
+        "zone": "field",
+        "seed": 4079456454,
+        "playerForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "opponentForces": [
+          "force_kon",
+          "force_so2"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true,
+        "rested": false
+      },
+      "capture": {
+        "prepared_form_0": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_04_02_02r_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "sourceId": "colorless_04_02_02r_01",
+        "targetId": "yellow_04_02_02r_01"
+      }
+    },
+    {
+      "path": "/fixture/return-to-hand",
+      "payload": {
+        "iid": "$prepared_form_0"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$prepared_form_0",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "anju": {
+          "path": "debug.moved.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "matching_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02r_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon another minion this turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_02_02_02r_00"
+      }
+    },
+    {
+      "name": "attach matching Yellow Bless mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$matching_mana",
+        "target_iid": "$anju"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_04_02_02r_01",
+        "effectiveBp": 1200,
+        "effectiveDp": 3
+      },
+      "name": "Anju keeps its summon bonus alongside the Yellow Bless bonus"
+    },
+    {
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_04_02_02r_01",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "yellow_00_01_02_00"
+            }
+          ]
+        }
+      },
+      "name": "a same-color Yellow Bless stays attached to Yellow Anju"
+    },
+    {
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 0,
+      "name": "same-color Yellow Bless does not banish its Mana"
+    }
+  ],
+  "seed": 4079456454
+}

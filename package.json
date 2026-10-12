@@ -1,6 +1,6 @@
 {
   "name": "zenonzard-clone",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "private": true,
   "description": "Local Zenonzard clone and debugging client.",
   "main": "electron/main.js",
@@ -8,10 +8,11 @@
   "scripts": {
     "electron:dev": "electron .",
     "electron:start": "electron .",
-    "electron:build-main": "esbuild electron/main.js --bundle --platform=node --format=cjs --outfile=dist/electron/main.cjs --external:electron",
+    "electron:build-main": "esbuild electron/main.js --bundle --platform=node --format=cjs --outfile=dist/electron/main.cjs --external:electron --external:7zip-bin",
     "package:windows": "python packaging/build_windows_package.py",
     "package:linux": "python packaging/build_linux_bundle.py",
     "test:update-checker": "node --test tests/electron_update_checker.test.js",
+    "test:asset-bootstrap": "node --test tests/electron_asset_bootstrap.test.js tests/electron_asset_setup.test.js",
     "test:multiplayer-electron": "node --test tests/electron_multiplayer_client.test.js tests/electron_lan_manager.test.js tests/electron_adaptive_websocket.test.js",
     "check:brain-manifest": "repo-harness run check-brain-manifest",
     "check:context-files": "repo-harness run check-context-files",
@@ -19,7 +20,8 @@
     "check:architecture-sync": "repo-harness run check-architecture-sync",
     "check:task-sync": "repo-harness run check-task-sync",
     "check:task-workflow": "repo-harness run check-task-workflow --strict",
-    "sync:brain-docs": "repo-harness run sync-brain-docs --all"
+    "sync:brain-docs": "repo-harness run sync-brain-docs --all",
+    "package:source": "python packaging/build_source_package.py --kind all"
   },
   "devDependencies": {
     "electron": "^39.0.0",
@@ -28,6 +30,7 @@
     "wait-on": "^8.0.0"
   },
   "dependencies": {
+    "7zip-bin": "5.2.0",
     "https-proxy-agent": "^7.0.6",
     "ws": "^8.21.1"
   },
@@ -47,7 +50,9 @@
       "image.png",
       "package.json",
       "node_modules/**/*",
-      "!asserts{,/**/*}"
+      "!asserts{,/**/*}",
+      "!zz/**/__pycache__{,/**/*}",
+      "!zz/**/*.pyc"
     ],
     "extraResources": [
       {

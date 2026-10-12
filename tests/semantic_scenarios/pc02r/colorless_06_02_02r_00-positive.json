@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_06_02_02r_00_positive",
+  "card_id": "colorless_06_02_02r_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\n自分の[加護]が付与されているミ二オンがいる場\\n合、相手のプレイヤに1ダメージを与え、自分のプ\\nレイヤーを1回復する。 EN: [When Summoned]\\nIf you have a minion that has received\\nthe Boost effect, deal 1 damage to your\\nopponent's Life and restore 1 point to your\\nLife.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_06_02_02r_00",
+        "zone": "hand",
+        "seed": 1854239033,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "card": {
+          "where": {
+            "cardId": "colorless_06_02_02r_00"
+          },
+          "field": "iid",
+          "path": "state.players.human.hand"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "payload": {
+        "cardId": "colorless_02_02_02r_00",
+        "side": "P1",
+        "rested": false,
+        "zone": "field"
+      },
+      "capture": {
+        "host": {
+          "path": "debug.added.iid"
+        }
+      },
+      "path": "/api/debug/add-card"
+    },
+    {
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "rested": false,
+        "zone": "base"
+      },
+      "capture": {
+        "booster": {
+          "path": "debug.added.iid"
+        }
+      },
+      "path": "/api/debug/add-card"
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 8,
+        "side": "P1"
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 10,
+        "side": "P2"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main",
+        "activeSide": "P1"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "boost a friendly minion",
+      "select": {
+        "iid": "$booster",
+        "kind": "bless",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "summon White Bat",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_06_02_02r_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "where": {
+        "iid": "$host",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "colorless_00_01_02_01"
+            }
+          ]
+        }
+      },
+      "value": 1,
+      "name": "the friendly minion has received Boost",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    },
+    {
+      "value": 9,
+      "name": "White Bat damages opposing Life",
+      "op": "eq",
+      "path": "state.players.opponent.life"
+    },
+    {
+      "value": 9,
+      "name": "White Bat restores its controller Life",
+      "op": "eq",
+      "path": "state.players.human.life"
+    },
+    {
+      "where": {
+        "cardId": "colorless_06_02_02r_00"
+      },
+      "value": 1,
+      "name": "White Bat resolves onto the field",
+      "op": "count_where",
+      "path": "state.players.human.field"
+    }
+  ]
+}
