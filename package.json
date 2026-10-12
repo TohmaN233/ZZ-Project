@@ -12,7 +12,7 @@
     "package:windows": "python packaging/build_windows_package.py",
     "package:linux": "python packaging/build_linux_bundle.py",
     "test:update-checker": "node --test tests/electron_update_checker.test.js",
-    "test:asset-bootstrap": "node --test tests/electron_asset_bootstrap.test.js tests/electron_asset_setup.test.js",
+    "test:asset-bootstrap": "node --test tests/electron_asset_bootstrap.test.js tests/electron_asset_setup.test.js tests/electron_asset_transport.test.js",
     "test:multiplayer-electron": "node --test tests/electron_multiplayer_client.test.js tests/electron_lan_manager.test.js tests/electron_adaptive_websocket.test.js",
     "check:brain-manifest": "repo-harness run check-brain-manifest",
     "check:context-files": "repo-harness run check-context-files",

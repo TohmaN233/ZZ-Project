@@ -6471,11 +6471,93 @@ var require_asset_bootstrap = __commonJS({
     var path2 = require("node:path");
     var crypto2 = require("node:crypto");
     var { spawn: spawn2 } = require("node:child_process");
+    var { Readable } = require("node:stream");
     var { path7za } = require("7zip-bin");
     var REQUIRED_DIRECTORIES = ["ZENONZARD_CARDLIST", "audio", "video"];
     var SEVEN_ZIP_MAGIC = Buffer.from([55, 122, 188, 175, 39, 28]);
     var MAX_HTML_BYTES = 256 * 1024;
     var MAX_TOOL_OUTPUT = 64 * 1024 * 1024;
+    function createElectronAssetFetch2(net2, { onLog = () => {
+    } } = {}) {
+      return (url, { signal, redirect, credentials } = {}) => {
+        if (redirect !== "manual" || credentials !== "omit") {
+          throw new TypeError("Asset requests require manual redirects and omitted credentials");
+        }
+        checkAbort(signal);
+        return new Promise((resolve, reject) => {
+          const target = new URL(url);
+          onLog(`Asset HTTP GET: ${target.origin}${target.pathname}`);
+          const request = net2.request({ url, method: "GET", redirect: "manual", credentials: "omit", useSessionCookies: false });
+          let settled = false;
+          let incoming = null;
+          let ended = false;
+          const cleanup = () => signal?.removeEventListener("abort", abort);
+          const fail = (error) => {
+            cleanup();
+            if (!settled) {
+              settled = true;
+              reject(error);
+            } else if (incoming && !ended) incoming.destroy(error);
+          };
+          const abort = () => {
+            fail(new DOMException("Asset installation cancelled", "AbortError"));
+            request.abort();
+          };
+          const headersFrom = (values) => {
+            const headers = new Headers();
+            for (const [name, value] of Object.entries(values)) {
+              for (const item of Array.isArray(value) ? value : [value]) headers.append(name, item);
+            }
+            return headers;
+          };
+          request.on("error", fail);
+          request.on("redirect", (status, method, location, values) => {
+            try {
+              if (method !== "GET") throw new Error("Unexpected asset redirect method");
+              const headers = headersFrom(values);
+              headers.set("location", location);
+              onLog(`Asset HTTP redirect: ${status} -> ${new URL(location, url).origin}`);
+              const response = new Response(null, { status, headers });
+              settled = true;
+              cleanup();
+              resolve(response);
+            } catch (error) {
+              fail(error);
+            }
+            request.abort();
+          });
+          request.on("response", (response) => {
+            incoming = response;
+            response.once("end", () => {
+              ended = true;
+              cleanup();
+            });
+            response.once("close", () => {
+              cleanup();
+              if (!ended) request.abort();
+            });
+            response.once("aborted", () => response.destroy(new DOMException("Asset HTTP response aborted", "AbortError")));
+            try {
+              onLog(`Asset HTTP response: ${response.statusCode} from ${target.hostname}`);
+              const body = Readable.toWeb(response, { strategy: { highWaterMark: 64 * 1024, size: (chunk) => chunk.byteLength } });
+              const result = new Response(
+                [204, 205, 304].includes(response.statusCode) ? null : body,
+                { status: response.statusCode, headers: headersFrom(response.headers) }
+              );
+              settled = true;
+              resolve(result);
+            } catch (error) {
+              fail(error);
+              response.destroy();
+              request.abort();
+            }
+          });
+          signal?.addEventListener("abort", abort, { once: true });
+          if (signal?.aborted) abort();
+          else request.end();
+        });
+      };
+    }
     function assetRootLooksValid2(root) {
       try {
         return [root, ...REQUIRED_DIRECTORIES.map((name) => path2.join(root, name))].every((item) => {
@@ -6787,7 +6869,7 @@ var require_asset_bootstrap = __commonJS({
         try {
           if (response?.body && !response.body.locked) await response.body.cancel();
         } catch (error) {
-          cleanupErrors.push(error);
+          if (error !== failure) cleanupErrors.push(error);
         }
         try {
           await fsp.rm(staging, { recursive: true });
@@ -6797,7 +6879,7 @@ var require_asset_bootstrap = __commonJS({
         if (cleanupErrors.length) throw new AggregateError(failure ? [failure, ...cleanupErrors] : cleanupErrors, `Failed to clean asset download or owned staging directory: ${staging}`);
       }
     }
-    module2.exports = { installAssetBundle, assetRootLooksValid: assetRootLooksValid2, formatAssetSize };
+    module2.exports = { installAssetBundle, assetRootLooksValid: assetRootLooksValid2, formatAssetSize, createElectronAssetFetch: createElectronAssetFetch2 };
   }
 });
 
@@ -7065,7 +7147,7 @@ var path = require("node:path");
 var { createAdaptiveWebSocketClass } = require_adaptive_websocket();
 var { LanManager } = require_lan_manager();
 var { MultiplayerDesktopClient } = require_multiplayer_client();
-var { assetRootLooksValid } = require_asset_bootstrap();
+var { assetRootLooksValid, createElectronAssetFetch } = require_asset_bootstrap();
 var { ensureStartupAssets } = require_asset_setup();
 var assetSource = require_asset_source();
 var {
@@ -7845,7 +7927,7 @@ app.whenReady().then(async () => {
     dialog,
     BrowserWindow,
     ipcMain,
-    fetchImpl: (url, options) => net.fetch(url, options),
+    fetchImpl: createElectronAssetFetch(net, { onLog: appendLog }),
     signal: startupAbortController.signal,
     onLog: appendLog
   });

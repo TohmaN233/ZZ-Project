@@ -8,7 +8,7 @@ const path = require("node:path");
 const { createAdaptiveWebSocketClass } = require("./adaptive-websocket");
 const { LanManager } = require("./lan-manager");
 const { MultiplayerDesktopClient } = require("./multiplayer-client");
-const { assetRootLooksValid } = require("./asset-bootstrap");
+const { assetRootLooksValid, createElectronAssetFetch } = require("./asset-bootstrap");
 const { ensureStartupAssets } = require("./asset-setup");
 const assetSource = require("./asset-source.json");
 const {
@@ -828,7 +828,7 @@ app.whenReady().then(async () => {
   if (process.platform === "darwin" && app.dock) app.dock.setIcon(applicationIconPath());
   startupAssetsPromise = ensureStartupAssets({
     destination: packagedAssetRoot(), source: assetSource, dialog, BrowserWindow, ipcMain,
-    fetchImpl: (url, options) => net.fetch(url, options),
+    fetchImpl: createElectronAssetFetch(net, { onLog: appendLog }),
     signal: startupAbortController.signal, onLog: appendLog,
   });
   startupAssetRoot = await startupAssetsPromise;

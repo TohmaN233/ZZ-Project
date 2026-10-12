@@ -4,6 +4,23 @@ This desktop shell opens the existing Python web client and keeps Python as the
 rules authority. Electron owns the native window, Python server lifecycle, and a
 small IPC surface for desktop-only helpers.
 
+## Resource installation
+
+Startup checks the external `asserts/` directory before starting Python. Missing
+resources require consent before downloading the archive pinned in
+`asset-source.json`. Installation validates each redirect, archive paths, size,
+and CRC before atomically installing the extracted directory.
+
+The download uses `createElectronAssetFetch` backed by `net.request` so Chromium
+can use the system proxy and expose manual redirect responses. Electron
+`net.fetch` rejects manual redirects with `Redirect was cancelled`; Node fetch
+mocks do not reproduce this behavior. HTTP stages and failures are recorded in
+the per-user `server.log`.
+
+Run `npm run test:asset-bootstrap` to verify both the Node checks and the real
+Electron redirect, confirmation, extraction, cancellation, and connection-error
+paths. The Electron test requires a desktop environment (or Xvfb on Linux).
+
 ## Dev Start
 
 Install Node dependencies once:

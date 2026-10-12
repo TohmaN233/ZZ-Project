@@ -215,6 +215,14 @@ GPU memory, time, and disk space.
 
 ## 10. Troubleshooting
 
+### Resource installation reports `Redirect was cancelled`
+
+The original v0.4.0 packages used an Electron network call that rejected manual
+HTTP redirects. The current v0.4.0 downloads include the fix. Download the
+package again from [GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.0)
+and reinstall it, then retry resource setup. The application version remains
+0.4.0, so the in-game version checker will not offer this replacement.
+
 ### Missing cards, characters, music, or video
 
 Confirm that `asserts.7z` finished downloading and that the client completed

@@ -6,6 +6,19 @@
 [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json). The public
 multiplayer server runs v0.4.0; update both clients before connecting.
 
+## v0.4.0 resource installation hotfix
+
+The Windows, Linux, and source downloads have been replaced with corrected
+packages. This fixes `Redirect was cancelled` during first-launch resource
+installation: Electron's Chromium transport now exposes manual redirects for
+validation instead of rejecting them. Download, CRC validation, extraction, and
+installation were verified using the complete public 1.53 GB resource archive.
+
+If you downloaded v0.4.0 before this fix, download the current package again and
+reinstall it. The version remains 0.4.0, so the version checker will not offer
+this replacement automatically. The multiplayer version and server runtime are
+unchanged. Use the updated checksum list for the replacement files.
+
 ## Highlights
 
 - Added the 106-card PC02R DIVINE set.

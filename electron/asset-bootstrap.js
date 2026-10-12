@@ -5,12 +5,82 @@ const fsp = fs.promises;
 const path = require("node:path");
 const crypto = require("node:crypto");
 const { spawn } = require("node:child_process");
+const { Readable } = require("node:stream");
 const { path7za } = require("7zip-bin");
 
 const REQUIRED_DIRECTORIES = ["ZENONZARD_CARDLIST", "audio", "video"];
 const SEVEN_ZIP_MAGIC = Buffer.from([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c]);
 const MAX_HTML_BYTES = 256 * 1024;
 const MAX_TOOL_OUTPUT = 64 * 1024 * 1024;
+
+// Electron net.fetch rejects manual redirects instead of returning their 3xx
+// response. Use ClientRequest so fetchPublic can validate every redirect before
+// issuing the next request, while retaining Chromium's system proxy support.
+function createElectronAssetFetch(net, { onLog = () => {} } = {}) {
+  return (url, { signal, redirect, credentials } = {}) => {
+    if (redirect !== "manual" || credentials !== "omit") {
+      throw new TypeError("Asset requests require manual redirects and omitted credentials");
+    }
+    checkAbort(signal);
+    return new Promise((resolve, reject) => {
+      const target = new URL(url);
+      onLog(`Asset HTTP GET: ${target.origin}${target.pathname}`);
+      const request = net.request({ url, method: "GET", redirect: "manual", credentials: "omit", useSessionCookies: false });
+      let settled = false;
+      let incoming = null;
+      let ended = false;
+      const cleanup = () => signal?.removeEventListener("abort", abort);
+      const fail = error => {
+        cleanup();
+        if (!settled) { settled = true; reject(error); }
+        else if (incoming && !ended) incoming.destroy(error);
+      };
+      const abort = () => {
+        fail(new DOMException("Asset installation cancelled", "AbortError"));
+        request.abort();
+      };
+      const headersFrom = values => {
+        const headers = new Headers();
+        for (const [name, value] of Object.entries(values)) {
+          for (const item of Array.isArray(value) ? value : [value]) headers.append(name, item);
+        }
+        return headers;
+      };
+      request.on("error", fail);
+      request.on("redirect", (status, method, location, values) => {
+        try {
+          if (method !== "GET") throw new Error("Unexpected asset redirect method");
+          const headers = headersFrom(values);
+          headers.set("location", location);
+          onLog(`Asset HTTP redirect: ${status} -> ${new URL(location, url).origin}`);
+          const response = new Response(null, { status, headers });
+          settled = true;
+          cleanup();
+          resolve(response);
+        } catch (error) { fail(error); }
+        // The next URL is checked by fetchPublic; never let Chromium follow it.
+        request.abort();
+      });
+      request.on("response", response => {
+        incoming = response;
+        response.once("end", () => { ended = true; cleanup(); });
+        response.once("close", () => { cleanup(); if (!ended) request.abort(); });
+        response.once("aborted", () => response.destroy(new DOMException("Asset HTTP response aborted", "AbortError")));
+        try {
+          onLog(`Asset HTTP response: ${response.statusCode} from ${target.hostname}`);
+          const body = Readable.toWeb(response, { strategy: { highWaterMark: 64 * 1024, size: chunk => chunk.byteLength } });
+          const result = new Response([204, 205, 304].includes(response.statusCode) ? null : body,
+            { status: response.statusCode, headers: headersFrom(response.headers) });
+          settled = true;
+          resolve(result);
+        } catch (error) { fail(error); response.destroy(); request.abort(); }
+      });
+      signal?.addEventListener("abort", abort, { once: true });
+      if (signal?.aborted) abort();
+      else request.end();
+    });
+  };
+}
 
 function assetRootLooksValid(root) {
   try {
@@ -325,10 +395,14 @@ async function installAssetBundle({ destination, source, fetchImpl = globalThis.
     throw error;
   } finally {
     const cleanupErrors = [];
-    try { if (response?.body && !response.body.locked) await response.body.cancel(); } catch (error) { cleanupErrors.push(error); }
+    try { if (response?.body && !response.body.locked) await response.body.cancel(); } catch (error) {
+      // Cancelling an already errored ReadableStream rejects with its original
+      // error. It was reported above; only a distinct cleanup failure is new.
+      if (error !== failure) cleanupErrors.push(error);
+    }
     try { await fsp.rm(staging, { recursive: true }); } catch (error) { cleanupErrors.push(error); }
     if (cleanupErrors.length) throw new AggregateError(failure ? [failure, ...cleanupErrors] : cleanupErrors, `Failed to clean asset download or owned staging directory: ${staging}`);
   }
 }
 
-module.exports = { installAssetBundle, assetRootLooksValid, formatAssetSize };
+module.exports = { installAssetBundle, assetRootLooksValid, formatAssetSize, createElectronAssetFetch };
