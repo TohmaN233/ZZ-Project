@@ -14,9 +14,11 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an AI experime
 
 ## Installation
 
-The v0.4.0 Windows installer, Linux portable package, source package, and multiplayer server package have been built, and the public online multiplayer service has been deployed. Public downloads for these packages are still pending, so this page does not provide direct v0.4.0 download links. The current public GitHub release is still 0.3.2, whose application version and rules checksum do not match the current v0.4.0 server.
+v0.4.0 is available, and the public multiplayer server has been updated. The application version and rules checksum in 0.3.2 do not match the current server; both players should use 0.4.0 clients.
 
-Once the public release is available, Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
+[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
+
+Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
 
 On first launch, if the complete `asserts/` directory is missing, the client asks whether to download `asserts.7z` from the [Google Drive resource folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ), then verifies and extracts it automatically. The resource archive is 1.53 GB and expands to 1.58 GB; reserve at least 3.2 GB of free space. Cancelling the download exits the game. If installed under Program Files, run as administrator for the first resource installation, or choose a writable installation directory.
 

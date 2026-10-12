@@ -2,9 +2,9 @@
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
-The v0.4.0 release artifacts are local candidates and have not been published.
-They are listed in `dist/releases/v0.4.0/`; public download links and final
-package checksums belong in [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json).
+The v0.4.0 packages are available on [GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.0).
+See [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json) for package
+sizes and SHA-256 values.
 The large media pack remains separate from the program packages, but the
 current desktop client can download and install it on first launch.
 
@@ -32,15 +32,13 @@ location. Changing the published archive requires updating
 
 ## 1. Choose a distribution
 
-The local v0.4.0 candidate files are:
+Download the package for your platform:
 
-- `dist/releases/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe`
-- `dist/releases/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz`
-- `dist/releases/v0.4.0/ZZ-Project-v0.4.0-source.zip`
-- `dist/releases/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz`
-
-These are not public download links. Publication details, sizes, and SHA-256
-values will be recorded in `PUBLIC_RELEASE_MANIFEST.json`.
+- [ZZ-Project-v0.4.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe)
+- [ZZ-Project-v0.4.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz)
+- [ZZ-Project-v0.4.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip)
+- [ZZ-Multiplayer-v0.4.0.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz)
+- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
 
 - **Windows players:** use the installable desktop package. It includes
   Electron, the frozen Python server, the PC02R DIVINE rules runtime, the current
@@ -65,7 +63,7 @@ values will be recorded in `PUBLIC_RELEASE_MANIFEST.json`.
 
 ## 3. Windows installer
 
-Run the v0.4.0 candidate installer when it is available to you. Python,
+Run the v0.4.0 Windows installer. Python,
 Node.js, and `npm install` are not required. Start the installed game from the
 Start menu or the desktop shortcut.
 
@@ -94,7 +92,7 @@ training actors are not packaged.
 
 ## 4. Linux portable bundle
 
-Extract the v0.4.0 Linux candidate bundle and run:
+Extract the v0.4.0 Linux bundle and run:
 
 ```bash
 tar -xzf ZZ-Project-v0.4.0-Linux.tar.gz
@@ -114,7 +112,7 @@ needed for the first bootstrap unless those runtime files are already cached.
 
 ## 5. Source launch and macOS
 
-Use the v0.4.0 source candidate ZIP or clone the repository. The source
+Use the v0.4.0 source ZIP or clone the repository. The source
 package contains the release snapshot, runtime models, tests, documentation,
 and `image.png`.
 
@@ -195,9 +193,11 @@ log.
 - **Internet:** the default personal server is in Canada. Cross-region
   stability has not been fully verified; users in mainland China may need a
   proxy.
-- **Self-hosted:** use the local candidate
-  `dist/releases/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz` when available, then
-  follow [docs/ONLINE.md](docs/ONLINE.md). It has not been publicly released.
+- **Self-hosted:** download [ZZ-Multiplayer-v0.4.0.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz)
+  and follow [docs/ONLINE.md](docs/ONLINE.md).
+- **Client compatibility:** the public server runs 0.4.0; both players should
+  update to 0.4.0 before joining.
+
 
 See [docs/ONLINE.md](docs/ONLINE.md) for the full online-play notes.
 

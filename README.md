@@ -14,9 +14,11 @@
 
 ## 安装
 
-v0.4.0 的 Windows 安装包、Linux 便携包、源码包和联机服务器包已经打包；公网联机服务也已部署。这些包的公开下载仍待发布，因此这里暂不提供 v0.4.0 下载直链。当前 GitHub 公共版仍为 0.3.2，其应用版本和规则校验值与当前 0.4.0 服务器不匹配。
+v0.4.0 已发布，公网联机服务器已更新。0.3.2 的应用版本和规则校验值与当前服务器不匹配，请双方使用 0.4.0 客户端。
 
-公开发布后，Windows 玩家使用安装包，Linux 玩家使用便携包；macOS 玩家和开发者使用源码包。完整步骤见[安装说明](INSTALL.md)。
+[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
+
+Windows 玩家使用安装包，Linux 玩家使用便携包；macOS 玩家和开发者使用源码包。完整步骤见[安装说明](INSTALL.md)。
 
 首次启动时，如果缺少完整的 `asserts/`，客户端会询问是否下载 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)中的 `asserts.7z`，并自动校验、解压。资源包为 1.53 GB，解压后为 1.58 GB，请预留至少 3.2 GB 空间；取消下载会退出游戏。若安装目录为 Program Files，首次安装资源需以管理员身份启动；也可选择可写的安装目录。
 

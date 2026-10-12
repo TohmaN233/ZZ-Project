@@ -14,9 +14,11 @@
 
 ## インストール
 
-v0.4.0 の Windows インストーラー、Linux ポータブル版、ソースパッケージ、オンライン対戦サーバーパッケージはビルド済みで、インターネット上のオンライン対戦サービスもデプロイ済みです。これらのパッケージはまだ一般公開されていないため、このページでは v0.4.0 の直接ダウンロードリンクを案内していません。現在 GitHub で公開されているバージョンは 0.3.2 で、アプリのバージョンとルールのチェックサムが現在の v0.4.0 サーバーと一致しません。
+v0.4.0 を公開しました。公開オンライン対戦サーバーも更新済みです。0.3.2 のアプリバージョンとルールのチェックサムは現在のサーバーと一致しないため、両者とも 0.4.0 クライアントを使用してください。
 
-一般公開後は、Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
+
+Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 
 初回起動時に完全な `asserts/` ディレクトリがない場合、クライアントは [Google Drive のリソースフォルダー](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)から `asserts.7z` をダウンロードするか確認し、自動で検証・展開します。リソースアーカイブは 1.53 GB、展開後は 1.58 GB です。3.2 GB 以上の空き容量を確保してください。ダウンロードをキャンセルするとゲームは終了します。Program Files にインストールした場合、初回のリソース導入は管理者として起動してください。または書き込み可能なインストール先を選んでください。
 

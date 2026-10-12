@@ -40,7 +40,8 @@
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
     "bytes": 148324406,
-    "sha256": "F7871D030CC2EC4D710BE52C9DED6446A0AC9F23EB847B116FEB13AECA3F109E"
+    "sha256": "F7871D030CC2EC4D710BE52C9DED6446A0AC9F23EB847B116FEB13AECA3F109E",
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe"
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.4.0-Linux.tar.gz",
@@ -51,8 +52,9 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "bytes": 21701317,
-    "sha256": "683B8D93AE92DB45248697A579A9DA780656DA485CAE8F8D208EE43B03CD2F80"
+    "bytes": 21701610,
+    "sha256": "1B112708D72077C21812875966B906BC98ED2970FE14CAE5CBAD1B3D33F19ECB",
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -88,7 +90,7 @@
     "local settings, caches, node_modules and git history",
     "large media assets stored in the external asset pack"
   ],
-  "releaseStatus": "local_candidate",
+  "releaseStatus": "published",
   "sourcePackage": {
     "filename": "ZZ-Project-v0.4.0-source.zip",
     "contains": [
@@ -96,8 +98,9 @@
       "focused tests and all 212 PC02R semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "bytes": 37827971,
-    "sha256": "18462BC6F9FFA10A60E4032EB684D5FDC6B281592508723FCCBE3D65795E3CC4"
+    "bytes": 37827922,
+    "sha256": "BEB5927269C3CCF9ED4AFA8679DD5FC8835AA6B50E79D23638B47E0BED4B0220",
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip"
   },
   "multiplayerServer": {
     "filename": "ZZ-Multiplayer-v0.4.0.tar.gz",
@@ -106,8 +109,11 @@
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "bytes": 641676,
-    "sha256": "7E70B05044F609587FC1B556CE6A6DA627BE39CBBFED759CEE41021CDBBCBE85"
+    "bytes": 641050,
+    "sha256": "6C7CB861D971C77E020F6CD9FD5A509D908BC510C864E4F209A5FC24FC24156B",
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz"
   },
-  "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts"
+  "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
+  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.0",
+  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt"
 }
