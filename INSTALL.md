@@ -2,13 +2,15 @@
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
-The v0.4.1 packages are available on [GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.1).
+The v0.4.2 packages are available on [GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.2).
 See [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json) for package
 sizes and SHA-256 values.
-This release fixes an online regression that could freeze a match after the
-opponent confirmed the opening mulligan. The online handshake requires the
-client and server `applicationVersion` values to match exactly, so both players
-and the server, including self-hosted servers, must use v0.4.1.
+v0.4.2 adjusts the proportions of the end-turn button and combines prompts
+with controls in a compact action bar, while retaining automatic hand scaling.
+The earlier v0.4.1 release fixed an online issue that could freeze a match
+after the opponent confirmed the opening mulligan. The online handshake
+requires the client and server `applicationVersion` values to match exactly,
+so both players and the server, including self-hosted servers, must use v0.4.2.
 The large media pack remains separate from the program packages, but the
 current desktop client can download and install it on first launch.
 
@@ -38,11 +40,11 @@ location. Changing the published archive requires updating
 
 Download the package for your platform:
 
-- [ZZ-Project-v0.4.1-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe)
-- [ZZ-Project-v0.4.1-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz)
-- [ZZ-Project-v0.4.1-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip)
-- [ZZ-Multiplayer-v0.4.1.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz)
-- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt)
+- [ZZ-Project-v0.4.2-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Windows-Setup.exe)
+- [ZZ-Project-v0.4.2-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Linux.tar.gz)
+- [ZZ-Project-v0.4.2-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-source.zip)
+- [ZZ-Multiplayer-v0.4.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz)
+- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt)
 
 - **Windows players:** use the installable desktop package. It includes
   Electron, the frozen Python server, the PC02R DIVINE rules runtime, the current
@@ -67,7 +69,7 @@ Download the package for your platform:
 
 ## 3. Windows installer
 
-Run the v0.4.1 Windows installer. Python,
+Run the v0.4.2 Windows installer. Python,
 Node.js, and `npm install` are not required. Start the installed game from the
 Start menu or the desktop shortcut.
 
@@ -96,11 +98,11 @@ training actors are not packaged.
 
 ## 4. Linux portable bundle
 
-Extract the v0.4.1 Linux bundle and run:
+Extract the v0.4.2 Linux bundle and run:
 
 ```bash
-tar -xzf ZZ-Project-v0.4.1-Linux.tar.gz
-cd ZZ-Project-v0.4.1
+tar -xzf ZZ-Project-v0.4.2-Linux.tar.gz
+cd ZZ-Project-v0.4.2
 ./launch-electron.sh --check
 ./launch-electron.sh
 ```
@@ -116,7 +118,7 @@ needed for the first bootstrap unless those runtime files are already cached.
 
 ## 5. Source launch and macOS
 
-Use the v0.4.1 source ZIP or clone the repository. The source
+Use the v0.4.2 source ZIP or clone the repository. The source
 package contains the release snapshot, runtime models, tests, documentation,
 and `image.png`.
 
@@ -197,11 +199,11 @@ log.
 - **Internet:** the default personal server is in Canada. Cross-region
   stability has not been fully verified; users in mainland China may need a
   proxy.
-- **Self-hosted:** download [ZZ-Multiplayer-v0.4.1.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz)
+- **Self-hosted:** download [ZZ-Multiplayer-v0.4.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz)
   and follow [docs/ONLINE.md](docs/ONLINE.md).
 - **Client compatibility:** the online handshake requires the client and server
   `applicationVersion` values to match exactly. Both players and the server
-  must use v0.4.1 to play together.
+  must use v0.4.2 to play together.
 
 
 See [docs/ONLINE.md](docs/ONLINE.md) for the full online-play notes.
@@ -222,8 +224,8 @@ GPU memory, time, and disk space.
 
 ### Resource installation reports `Redirect was cancelled`
 
-If resource installation reports this error, reinstall the v0.4.1 package from
-[GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.1)
+If resource installation reports this error, reinstall the v0.4.2 package from
+[GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.2)
 and retry resource setup. The in-game version checker does not offer replacement
 packages when the application version remains unchanged.
 

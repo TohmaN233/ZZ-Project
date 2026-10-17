@@ -14,9 +14,9 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an AI experime
 
 ## Installation
 
-v0.4.1 fixes an online regression that could freeze a match after the opponent confirmed the opening mulligan. The online handshake requires the client and server `applicationVersion` values to match exactly; both players and the server, including self-hosted servers, must use v0.4.1.
+v0.4.2 adjusts the proportions of the end-turn button and combines prompts with controls in a compact action bar, while retaining automatic hand scaling. v0.4.1 previously fixed an online issue that could freeze a match after the opponent confirmed the opening mulligan. The online handshake requires the client and server `applicationVersion` values to match exactly; both players and the server, including self-hosted servers, must use v0.4.2.
 
-[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt)
+[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt)
 
 Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
 

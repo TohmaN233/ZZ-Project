@@ -14,9 +14,9 @@
 
 ## インストール
 
-v0.4.1 では、オンライン対戦で相手が開局時の手札交換を確定した後に対局が停止する回帰を修正しました。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.4.1 を使用してください。
+v0.4.2 ではターン終了ボタンの比率を調整し、操作ガイドとボタンをコンパクトな操作バーにまとめました。手札の自動縮小も維持しています。v0.4.1 では、相手が開局時の手札交換を確定した後に対局が停止するオンライン問題を修正しました。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.4.2 を使用してください。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 

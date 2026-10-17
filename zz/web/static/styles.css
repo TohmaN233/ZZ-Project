@@ -339,6 +339,8 @@ button:disabled {
 }
 
 .cockpit-command-row {
+  --command-action-size: clamp(60px, 4.7vw, 68px);
+  --command-row-height: 56px;
   grid-area: command;
   min-height: 0;
   z-index: 6;
@@ -347,7 +349,7 @@ button:disabled {
 }
 
 .cockpit-command-row:has(.prompt.has-floating-actions) {
-  min-height: clamp(88px, 7.2vw, 110px);
+  min-height: var(--command-row-height);
 }
 
 .cockpit-hud .hand-count {
@@ -378,20 +380,28 @@ button:disabled {
 
 .cockpit-command-row .prompt.has-floating-actions {
   position: relative;
-  display: block;
-  min-height: clamp(88px, 7.2vw, 110px);
-  margin-right: clamp(98px, 8.2vw, 126px);
-  padding: 6px 10px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--command-action-size);
+  min-height: var(--command-row-height);
+  gap: 12px;
+  padding: 0 10px;
 }
 
 .cockpit-command-row .prompt-floating-actions {
-  position: absolute;
-  right: calc(-1 * clamp(102px, 8.5vw, 130px));
-  bottom: 0;
+  position: relative;
+  height: calc(var(--command-row-height) - 2px);
+  min-height: 0;
   z-index: 9;
   overflow: visible;
   justify-content: center;
+  align-items: center;
   align-content: center;
+}
+
+@media (max-width: 600px) {
+  .cockpit-command-row {
+    --command-action-size: clamp(44px, min(16vw, 11vh), 60px);
+  }
 }
 
 .cockpit-command-row .actions {
@@ -3321,6 +3331,13 @@ button.primary.action-art-button {
   background: transparent;
   box-shadow: none;
   overflow: visible;
+}
+
+.cockpit-command-row button.action-art-button {
+  width: var(--command-action-size);
+  min-width: var(--command-action-size);
+  height: var(--command-action-size);
+  min-height: var(--command-action-size);
 }
 
 button.action-art-button:hover,
