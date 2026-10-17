@@ -18,18 +18,20 @@ ROOT_FILES = (
 DEPLOY_FILES = (
     "deploy/zz-multiplayer.env.example", "deploy/nginx/zz-multiplayer.conf",
     "deploy/systemd/zz-multiplayer.service", "docs/multiplayer/vm-deployment.md",
-    "docs/ONLINE.md",
+    "docs/ONLINE.md", "docs/multiplayer/network-diagnostics.md",
 )
 TRANSLATIONS = ("GLOSSARY.json", "zz_card_pool_zh.tsv", "zz_force_pool_zh.tsv")
 RULEBOOKS = ("zz_rulebook_zh.md", "zz_rulebook_en.md", "zz_rulebook_ja.md")
 PACKAGING_FILES = (
     "build_linux_bundle.py", "build_source_package.py", "build_windows_package.py",
     "release_files.py", "runtime_model_export.py", "zz_server_entry.py",
+    "build_network_diagnostic.py",
 )
 SOURCE_TOOLS = (
     "__init__.py", "run_semantic_scenario.py", "card_translation_exchange.py",
     "normalize_japanese_card_text.py", "hidden_multiprocessing_spawn.py",
     "multiplayer_external_smoke.py", "multiplayer_soak.py",
+    "multiplayer_network_diagnostic.py",
 )
 SERVER_ZZ_MODULES = (
     "__init__", "ai", "basic", "cards", "codeman_memory", "deckcode0", "decks",
@@ -182,7 +184,7 @@ PUBLIC_TSVS = ('base_minion_face_verified.tsv', 'card_ability_face_verified.tsv'
 
 DEFAULT_DECKS = ('aice.json', 'deck-060837.json', 'deck-b70677.json', 'deck-c80751.json', 'deck-e83cf0.json', 'deck-f9b075.json', 'deck.json', 'h.json')
 
-FOCUSED_TESTS = ('electron_adaptive_websocket.test.js', 'electron_asset_bootstrap.test.js', 'electron_asset_setup.test.js', 'electron_asset_transport.test.js', 'electron_lan_manager.test.js', 'electron_multiplayer_client.test.js', 'electron_update_checker.test.js', 'frontend_multiplayer_card_policy.test.js', 'test_ai_vs_ai_mode.py', 'test_base_replacement_interface.py', 'test_card_japanese_text_integrity.py', 'test_card_pack_release.py', 'test_card_translation_exchange.py', 'test_clean_release_assets.py', 'test_codeman_replay_correction_vfx.py', 'test_cyclops_force.py', 'test_deck_reprint_limits.py', 'test_developer_mode_security.py', 'test_duel_scale_settings.py', 'test_duel_visual_timing.py', 'test_effect_target_contracts.py', 'test_electron_multiplayer_bridge.py', 'test_electron_multiplayer_cross_runtime.py', 'test_electron_shutdown.py', 'test_english_card_assets.py', 'test_force_base_replacement.py', 'test_forces.py', 'test_frontend_atomic_zone_transitions.py', 'test_frontend_deck_and_hand.py', 'test_frontend_duel_status.py', 'test_frontend_online_opening.py', 'test_frontend_rulebook.py', 'test_frontend_transformation_browser.py', 'test_frontend_visual_settle.py', 'test_game_session_choice_validation.py', 'test_localization_consistency.py', 'test_mana_asset_catalog.py', 'test_match_scoped_ids.py', 'test_multiplayer_client_transport.py', 'test_multiplayer_compatibility.py', 'test_multiplayer_deployment.py', 'test_multiplayer_deployment_artifacts.py', 'test_multiplayer_determinism.py', 'test_multiplayer_hidden_information.py', 'test_multiplayer_in_memory.py', 'test_multiplayer_invalid_actions.py', 'test_multiplayer_observability.py', 'test_multiplayer_protocol.py', 'test_multiplayer_reconnect.py', 'test_multiplayer_rematch_rps.py', 'test_multiplayer_room_queue.py', 'test_multiplayer_rooms.py', 'test_multiplayer_soak.py', 'test_multiplayer_websocket_integration.py', 'test_multiplayer_websocket_transport.py', 'test_pc02r_cards.py', 'test_pc02r_choice_feedback.py', 'test_pc02r_persistent_effects.py', 'test_pc02r_rule_corrections.py', 'test_pc02r_shared_runtime.py', 'test_public_base_rules.py', 'test_release_packaging_contract.py', 'test_shared_event_lifecycle.py', 'test_transformed_card_catalog.py')
+FOCUSED_TESTS = ('electron_renderer_logging.test.js', 'test_multiplayer_network_diagnostic.py', 'electron_adaptive_websocket.test.js', 'electron_asset_bootstrap.test.js', 'electron_asset_setup.test.js', 'electron_asset_transport.test.js', 'electron_lan_manager.test.js', 'electron_multiplayer_client.test.js', 'electron_update_checker.test.js', 'frontend_multiplayer_card_policy.test.js', 'test_ai_vs_ai_mode.py', 'test_base_replacement_interface.py', 'test_card_japanese_text_integrity.py', 'test_card_pack_release.py', 'test_card_translation_exchange.py', 'test_clean_release_assets.py', 'test_codeman_replay_correction_vfx.py', 'test_cyclops_force.py', 'test_deck_reprint_limits.py', 'test_developer_mode_security.py', 'test_duel_scale_settings.py', 'test_duel_visual_timing.py', 'test_effect_target_contracts.py', 'test_electron_multiplayer_bridge.py', 'test_electron_multiplayer_cross_runtime.py', 'test_electron_shutdown.py', 'test_english_card_assets.py', 'test_force_base_replacement.py', 'test_forces.py', 'test_frontend_atomic_zone_transitions.py', 'test_frontend_deck_and_hand.py', 'test_frontend_duel_status.py', 'test_frontend_online_opening.py', 'test_frontend_rulebook.py', 'test_frontend_transformation_browser.py', 'test_frontend_visual_settle.py', 'test_game_session_choice_validation.py', 'test_localization_consistency.py', 'test_mana_asset_catalog.py', 'test_match_scoped_ids.py', 'test_multiplayer_client_transport.py', 'test_multiplayer_compatibility.py', 'test_multiplayer_deployment.py', 'test_multiplayer_deployment_artifacts.py', 'test_multiplayer_determinism.py', 'test_multiplayer_hidden_information.py', 'test_multiplayer_in_memory.py', 'test_multiplayer_invalid_actions.py', 'test_multiplayer_observability.py', 'test_multiplayer_protocol.py', 'test_multiplayer_reconnect.py', 'test_multiplayer_rematch_rps.py', 'test_multiplayer_room_queue.py', 'test_multiplayer_rooms.py', 'test_multiplayer_soak.py', 'test_multiplayer_websocket_integration.py', 'test_multiplayer_websocket_transport.py', 'test_pc02r_cards.py', 'test_pc02r_choice_feedback.py', 'test_pc02r_persistent_effects.py', 'test_pc02r_rule_corrections.py', 'test_pc02r_shared_runtime.py', 'test_public_base_rules.py', 'test_release_packaging_contract.py', 'test_shared_event_lifecycle.py', 'test_transformed_card_catalog.py')
 
 SITE_ASSETS = ('battle.webp', 'codemen.webp', 'home.webp', 'lobby.webp', 'site.css', 'site.js', 'zzicon.webp')
 

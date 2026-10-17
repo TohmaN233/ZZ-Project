@@ -1423,21 +1423,28 @@ function removeVisualCardFromArea(player, area, iid) {
   }
   const cards = playerAreaCards(player, area);
   if (!cards) return null;
-  const index = cards.findIndex((card) => String(card.iid || "") === String(iid || ""));
+  let index = iid == null ? -1 : cards.findIndex((card) => card.iid != null && String(card.iid) === String(iid));
+  // Opponent hands expose anonymous backs, including when a played card becomes public.
+  if (index < 0 && area === "hand") {
+    index = cards.findIndex((card) => card.faceDown === true && card.iid == null);
+  }
   if (index < 0) return null;
   return cards.splice(index, 1)[0];
 }
 
 function addVisualCardToArea(player, area, card) {
   if (!player || !area || !card) return false;
+  const iid = card.iid;
+  if (iid == null && (card.faceDown !== true || !["hand", "deck"].includes(area))) {
+    throw new Error(`Visual zone transition missing card identity entering ${player.side}:${area}.`);
+  }
   if (area === "deck") {
     player.deckCount = Math.max(0, Number(player.deckCount || 0) + 1);
     return true;
   }
   const cards = playerAreaCards(player, area);
   if (!cards) return false;
-  const iid = card.iid;
-  if (players().some((sourcePlayer) => cardsFor(sourcePlayer).some((item) => String(item.iid || "") === String(iid || "")))) {
+  if (iid != null && players().some((sourcePlayer) => cardsFor(sourcePlayer).some((item) => item.iid != null && String(item.iid) === String(iid)))) {
     throw new Error(`Visual zone transition duplicated card ${iid} entering ${player.side}:${area}.`);
   }
   cards.push({ ...card, ownerSide: card.ownerSide || player.side, area });
@@ -1464,11 +1471,17 @@ function startAnimationEventVisualState(event) {
     const area = event.type === "destroy" ? "field" : event.fromArea;
     // Controller changes use the recipient side in the event. Locate the source
     // instance in its current zone instead of removing from the recipient.
-    const player = area === "deck"
+    let player = area === "deck"
       ? findPlayerBySide(event.side || card.ownerSide)
-      : players().find((player) => (playerAreaCards(player, area) || []).some((item) => String(item.iid) === String(card.iid)));
+      : card.iid != null
+        ? players().find((player) => (playerAreaCards(player, area) || []).some((item) => item.iid != null && String(item.iid) === String(card.iid)))
+        : null;
+    if (!player && area === "hand") {
+      const owner = findPlayerBySide(event.side || card.ownerSide);
+      if (owner && owner.hand.some((item) => item.faceDown === true && item.iid == null)) player = owner;
+    }
     if (!player) return false;
-    if (area !== "deck") {
+    if (area !== "deck" && card.iid != null) {
       activeAnimationSourceAnchor = captureBoardAnimationSourceAnchor(card.iid, player.side, area);
     }
     removeVisualCardFromArea(player, area, card.iid);
@@ -1537,10 +1550,13 @@ function settleHealVisualState(event) {
 function settleZoneMoveVisualState(event) {
   if (!state || !pendingVisualState || visualStateStaged || !event || event.type !== "zone_move") return false;
   const card = event.card || {};
+  if (card.iid == null && (card.faceDown !== true || ![event.fromArea, event.toArea].every((area) => ["hand", "deck"].includes(area)))) {
+    throw new Error(`Visual zone transition missing card identity moving ${event.fromArea}:${event.toArea}.`);
+  }
   const player = findPlayerBySide(event.side || card.ownerSide);
-  if (!player || !card.iid) return false;
+  if (!player) return false;
   addVisualCardToArea(player, event.toArea, pendingVisualCard(event, event.toArea));
-  hiddenZoneMoveSourceKeys.delete(zoneMoveSourceKey(card.iid, event.fromArea));
+  if (card.iid != null) hiddenZoneMoveSourceKeys.delete(zoneMoveSourceKey(card.iid, event.fromArea));
   refreshPlayerZoneCounts(player);
   syncUiStateFromCurrentState();
   return true;
@@ -5456,6 +5472,7 @@ function cardCanBeRested(card) {
 }
 
 function isActiveZoneMoveSourceCard(card) {
+  if (!card || card.iid == null) return false;
   if (card && hiddenZoneMoveSourceKeys.has(zoneMoveSourceKey(card.iid, card.area))) return true;
   if (!card || !activeAnimationEvent || activeAnimationEvent.type !== "zone_move") return false;
   if (activeAnimationEvent.fromArea === "deck") return false;

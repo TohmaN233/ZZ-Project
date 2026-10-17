@@ -14,9 +14,9 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an AI experime
 
 ## Installation
 
-v0.4.0 is available, and the public multiplayer server has been updated. The application version and rules checksum in 0.3.2 do not match the current server; both players should use 0.4.0 clients.
+v0.4.1 fixes an online regression that could freeze a match after the opponent confirmed the opening mulligan. The online handshake requires the client and server `applicationVersion` values to match exactly; both players and the server, including self-hosted servers, must use v0.4.1.
 
-[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
+[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt)
 
 Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
 
@@ -52,7 +52,7 @@ Launch the Windows installer build from the Start menu or its desktop shortcut. 
 - **Matches and decks**: play Human vs AI, in omniscient view, or AI vs AI; search the card pool, edit decks, and save them.
 - **Codeman and local training**: recent match memories are stored locally; the source build supports experimental training with a GPU / CUDA environment.
 - **Replay and AI suggestions**: review recent matches and see Codeman's suggestion for the current action during a match.
-- **Online play**: supports LAN and public rooms. The public client connects by default to `wss://zz.tgy233.top/multiplayer`; see the [online play guide](docs/ONLINE.md) to host your own server.
+- **Online play**: supports LAN and public rooms. The client connects by default to `wss://zz.tgy233.top/multiplayer`; see the [online play guide](docs/ONLINE.md) to host your own server.
 - **Card pool and interface**: includes the basic cards, EX01, PC01, PC01R, PC02, and 106 PC02R DIVINE cards; the interface supports Simplified Chinese, Japanese, and English.
 - **Card display**: preview a transformed form in card details. Reprints with the same name count toward a shared deck limit of three copies.
 

@@ -14,9 +14,9 @@
 
 ## 安装
 
-v0.4.0 已发布，公网联机服务器已更新。0.3.2 的应用版本和规则校验值与当前服务器不匹配，请双方使用 0.4.0 客户端。
+v0.4.1 修复了联机回归问题：对手确认开局换牌后，对局可能卡死。联机握手要求客户端与服务器的 `applicationVersion` 完全一致；双方客户端和服务器（包括自建服务器）都须使用 v0.4.1。
 
-[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
+[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt)
 
 Windows 玩家使用安装包，Linux 玩家使用便携包；macOS 玩家和开发者使用源码包。完整步骤见[安装说明](INSTALL.md)。
 
@@ -52,8 +52,8 @@ Windows 安装版从开始菜单或桌面快捷方式启动。Linux 便携包首
 - **对战与卡组**：支持人类对 AI、神视点和 AI 对 AI；可搜索卡池、编辑并保存卡组。
 - **Codeman 与本地训练**：本机保存近期对局记忆；源码版可在 GPU / CUDA 环境中进行实验训练。
 - **Replay 与 AI 建议**：回看最近对局；对战中可查看 Codeman 对当前行动的建议。
-- **联机**：支持局域网与公网房间。公网客户端默认连接已部署的 `wss://zz.tgy233.top/multiplayer`；自建服务器说明见[联机说明](docs/ONLINE.md)。
-- **卡池与界面**：包含基本卡、EX01、PC01、PC01R、PC02，以及新增的 106 张 PC02R DIVINE 卡牌；支持简体中文、日语和英语界面。
+- **联机**：支持局域网与公网房间。公网客户端默认连接 `wss://zz.tgy233.top/multiplayer`；自建服务器说明见[联机说明](docs/ONLINE.md)。
+- **卡池与界面**：包含基本卡、EX01、PC01、PC01R、PC02，以及 PC02R DIVINE 的 106 张卡牌；支持简体中文、日语和英语界面。
 - **卡牌呈现**：可在卡牌详情中预览变身形态；同名重印卡合并计算数量，套牌最多 3 张。
 
 Story Mode 尚未实现。长期目标是设计由 Agent 自动与玩家交互的游戏，并实现 GAL 风格前端；项目也计划吸收 SillyTavern 社群在角色、世界书和长期互动方面的经验，打造玩家与自己的 Codeman 共同经历的 ZZ 体验。
@@ -62,7 +62,7 @@ Story Mode 尚未实现。长期目标是设计由 Agent 自动与玩家交互�
 
 这个项目不会把实验模型包装成强 AI。作者有统计学学位，但没有修过强化学习课程，研究方向也与强化学习无关；个人项目的训练规模同样有限。当前模型与 ZENONZARD 正式运营时期万代使用的 AI 有明显差距，AI 建议也主要是娱乐功能。
 
-电脑 AI 的训练卡池目前只覆盖 PC01。PC01R、EX01、PC02 和 PC02R DIVINE 没有进入当前训练流程，因此不要期待电脑 AI 能正确理解这些新增卡包；规则可玩不代表 AI 已经学会这些卡。
+电脑 AI 的训练卡池目前只覆盖 PC01。PC01R、EX01、PC02 和 PC02R DIVINE 没有进入当前训练流程，因此不要期待电脑 AI 能正确理解这些卡包；规则可玩不代表 AI 已经学会这些卡。
 
 AI 相关代码由 Codex 协助编写，并参考了 [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent) 的公开方法与工程结构。更多说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 

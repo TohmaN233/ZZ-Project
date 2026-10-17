@@ -164,6 +164,29 @@ function appendLog(chunk) {
   }
 }
 
+function logRendererConsoleError(details) {
+  if (details.level !== "error") return;
+  const snapshot = multiplayerClient.getSnapshot();
+  const code = details.message.includes("Visual zone transition duplicated card")
+    ? "VISUAL_CARD_DUPLICATE"
+    : details.message.includes("Visual zone transition missing card identity")
+      ? "VISUAL_CARD_IDENTITY_MISSING"
+      : "RENDERER_ERROR";
+  const sourceFile = details.sourceId.split(/[?#]/, 1)[0].split(/[\\/]/).pop();
+  const knownSources = ["app.js", "preload.js", "api-client.js", "duel-layout.js", "multiplayer-card-policy.js"];
+  appendLog(`[Frontend error] ${JSON.stringify({
+    code,
+    source: knownSources.includes(sourceFile) ? sourceFile : "renderer",
+    line: details.lineNumber,
+    status: snapshot.state,
+    roomCode: snapshot.room && snapshot.room.roomCode,
+    matchId: snapshot.matchId,
+    playerId: snapshot.playerId,
+    revision: snapshot.view && snapshot.view.revision,
+    pendingActionId: snapshot.pendingAction && snapshot.pendingAction.clientActionId,
+  })}`);
+}
+
 function statusSnapshot() {
   return {
     state: serverState,
@@ -637,6 +660,7 @@ async function createWindow() {
       nodeIntegration: false,
     },
   });
+  mainWindow.webContents.on("console-message", logRendererConsoleError);
   rememberTrustedOrigin(serverUrl);
   mainWindow.webContents.on("will-navigate", (event, targetUrl) => {
     if (!isTrustedUrl(targetUrl)) {

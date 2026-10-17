@@ -14,9 +14,9 @@
 
 ## インストール
 
-v0.4.0 を公開しました。公開オンライン対戦サーバーも更新済みです。0.3.2 のアプリバージョンとルールのチェックサムは現在のサーバーと一致しないため、両者とも 0.4.0 クライアントを使用してください。
+v0.4.1 では、オンライン対戦で相手が開局時の手札交換を確定した後に対局が停止する回帰を修正しました。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.4.1 を使用してください。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 
@@ -52,7 +52,7 @@ Windows インストーラー版はスタートメニューまたはデスクト
 - **対戦とデッキ**：人間 VS AI、神視点、AI VS AI に対応します。カードプールを検索し、デッキを編集・保存できます。
 - **Codeman とローカル学習**：最近の対戦記憶をローカルに保存します。ソース版では GPU / CUDA 環境で実験的な学習を行えます。
 - **Replay と AI アドバイス**：最近の対戦を振り返り、対戦中に Codeman から現在の行動への提案を確認できます。
-- **オンライン対戦**：LAN と公開ルームに対応します。公開クライアントの接続先は既定で `wss://zz.tgy233.top/multiplayer` です。自分でサーバーを立てる場合は[オンライン対戦ガイド](docs/ONLINE.md)を参照してください。
+- **オンライン対戦**：LAN と公開ルームに対応します。クライアントの接続先は既定で `wss://zz.tgy233.top/multiplayer` です。自分でサーバーを立てる場合は[オンライン対戦ガイド](docs/ONLINE.md)を参照してください。
 - **カードプールと画面**：基本カード、EX01、PC01、PC01R、PC02、および PC02R DIVINE の 106 枚を収録しています。画面は簡体字中国語、日本語、英語に対応します。
 - **カード表示**：カード詳細で変身後の形態を確認できます。同名カードの再録分は合算され、デッキには最大 3 枚まで入れられます。
 

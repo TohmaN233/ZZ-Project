@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.4.0",
+  "releaseVersion": "0.4.1",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -28,7 +28,7 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.4.0-Windows-Setup.exe",
+    "filename": "ZZ-Project-v0.4.1-Windows-Setup.exe",
     "contains": [
       "Electron desktop client",
       "frozen Python web server with all 106 PC02R card modules",
@@ -39,12 +39,12 @@
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
-    "bytes": 148325327,
-    "sha256": "C33274277CCF94D93B2F406380505C072BF44C1E4BD3ACE9CFE3BEB4C4BBCF03",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Windows-Setup.exe"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Windows-Setup.exe",
+    "bytes": 148324377,
+    "sha256": "5B148E14E5DFD6D73EF6A92FFD216914CE43081B397B7886D563ABA06DB535DD"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.4.0-Linux.tar.gz",
+    "filename": "ZZ-Project-v0.4.1-Linux.tar.gz",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
@@ -52,9 +52,9 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "bytes": 21702926,
-    "sha256": "E6B2EB3D07566B1707C3B4FD6AA9F37F13FF442BEC0239D58CA57E08F54FC734",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-Linux.tar.gz"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-Linux.tar.gz",
+    "bytes": 21705628,
+    "sha256": "3602989BF8DF7F55DBC27F132F3ED2AE15530BDBC11E2F15DC0A0B4981589557"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -92,29 +92,29 @@
   ],
   "releaseStatus": "published",
   "sourcePackage": {
-    "filename": "ZZ-Project-v0.4.0-source.zip",
+    "filename": "ZZ-Project-v0.4.1-source.zip",
     "contains": [
       "current product source, build tools and deployment examples",
       "focused tests and all 212 PC02R semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "bytes": 37832565,
-    "sha256": "55A6D49A9751A2FC18AA17ADEE5002F3454FEFB3C9268BBB2E74FAE182122F94",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Project-v0.4.0-source.zip"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Project-v0.4.1-source.zip",
+    "bytes": 37855827,
+    "sha256": "499B75333325A54D937AE777C2B671D28630F8CA2FDB115AC5B3EF4C3F98AA49"
   },
   "multiplayerServer": {
-    "filename": "ZZ-Multiplayer-v0.4.0.tar.gz",
+    "filename": "ZZ-Multiplayer-v0.4.1.tar.gz",
     "contains": [
       "authoritative multiplayer server and all 106 PC02R card modules",
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "bytes": 641050,
-    "sha256": "6C7CB861D971C77E020F6CD9FD5A509D908BC510C864E4F209A5FC24FC24156B",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz",
+    "bytes": 643872,
+    "sha256": "E8F1DC9716A6EF4200B5F16BD20E2B92BC70D7C640C345808E59943590313C1B"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
-  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.0",
-  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt",
-  "resourceInstallationHotfix": "Replaced Windows, Linux and source packages to fix Electron manual redirects; application and multiplayer versions remain 0.4.0."
+  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.1",
+  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt",
+  "releaseSummary": "Fix the multiplayer regression that froze the duel after the opponent confirmed their opening mulligan."
 }

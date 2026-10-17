@@ -14,20 +14,20 @@ LAN 不需要单独的服务器包。
 
 客户端默认连接项目维护者的个人服务器（加拿大）。这是个人维护的服务，不承诺持续在线。中国大陆通常需要代理。
 
-当前公网服务已更新到 **0.4.0**，默认入口为 `wss://zz.tgy233.top/multiplayer`。请双方更新客户端后再连接。
+**0.4.1** 修复了联机模式中对手确认开局换牌后卡死的回归。默认入口为 `wss://zz.tgy233.top/multiplayer`。请双方更新客户端后再连接。
 
 双方必须使用同一应用版本、同一协议版本和同一规则 checksum。版本不兼容时先更新客户端。
 
 ## 自建服务器
 
-下载 [ZZ-Multiplayer-v0.4.0.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/ZZ-Multiplayer-v0.4.0.tar.gz)，并使用
-[SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.0/SHA256SUMS-PC02.txt) 校验文件。文件大小与校验值也记录在项目根目录的 `PUBLIC_RELEASE_MANIFEST.json`。
+下载 [ZZ-Multiplayer-v0.4.1.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/ZZ-Multiplayer-v0.4.1.tar.gz)，并使用
+[SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.1/SHA256SUMS-PC02.txt) 校验文件。文件大小与校验值也记录在项目根目录的 `PUBLIC_RELEASE_MANIFEST.json`。
 
 需要 Linux、Python 3.10+，以及一个带 TLS 的 HTTPS 域名。游戏客户端按 `PUBLIC_ORIGIN` 校验来源，所以公网入口必须是 `https://你的域名`，不能带路径。
 
 ```bash
 mkdir zz-multiplayer
-tar -xzf ZZ-Multiplayer-v0.4.0.tar.gz -C zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.4.1.tar.gz -C zz-multiplayer
 cd zz-multiplayer
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip
@@ -66,3 +66,7 @@ curl --fail https://your.example.com/healthz
 应返回带 `protocolVersion: 2` 的 JSON。然后在客户端 Online Game 里填写 `wss://your.example.com/`。
 
 玩家仍使用普通 Windows / Linux 客户端，不必下载这份服务器包。
+
+## 连接故障排查
+
+不开代理无法连接时，先按[联机网络检测](multiplayer/network-diagnostics.md)检查 DNS、TCP、TLS、WebSocket、游戏握手和持续心跳。检测工具不需要卡图或其他玩家，失败会输出具体阶段。公开大陆探针可先做基础连通性初筛，实际游戏协议仍需从对应网络运行检测工具验证。

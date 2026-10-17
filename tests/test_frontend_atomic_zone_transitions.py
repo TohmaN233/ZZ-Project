@@ -79,14 +79,15 @@ function check() {
     assert.equal(player.baseSummary.total, player.base.length);
     for (const area of ['hand', 'base', 'field', 'trash']) {
       for (const card of player[area]) {
-        ids.push(card.iid);
+        if (card.iid != null) ids.push(card.iid);
+        else assert.equal(card.faceDown, true, 'only hidden cards can omit identity');
         assert.equal(card.area, area, `card ${card.iid} area`);
       }
     }
     const hand = renderHandFan(player, 'bottom');
     assert.equal((hand.match(/class="hand-slot"/g) || []).length, player.hand.length);
     for (const card of player.hand) {
-      if (activeAnimationEvent?.type === 'zone_move' && activeAnimationEvent.fromArea === 'hand' && activeAnimationEvent.card.iid === card.iid) continue;
+      if (card.iid != null && activeAnimationEvent?.type === 'zone_move' && activeAnimationEvent.fromArea === 'hand' && activeAnimationEvent.card.iid === card.iid) continue;
       assert.ok(!isActiveZoneMoveSourceCard(card), 'no stale hidden source after re-entry');
     }
   }
@@ -432,6 +433,84 @@ state = packet[0]; stageDuelState(packet[1]); check(); drain(); check();
 assert.equal(state.players.human.handCount, 10);
 assert.deepEqual(state.players.human.hand, packet[1].players.human.hand);
 assert.equal(state.players.human.deckCount, packet[1].players.human.deckCount);
+""")
+
+
+@pytest.mark.parametrize("acting_player", ["player_1", "player_2"])
+@pytest.mark.parametrize("redraw_count", [1, 3, 6])
+def test_online_opponent_mulligan_settles_anonymous_cards_and_unblocks_prompt(acting_player, redraw_count):
+    from zz.multiplayer.actions import CHOOSE_PROMPT_OPTION, SubmittedAction
+    from zz.multiplayer.match import AuthoritativeMatch, InitialMatchSpec
+
+    match = AuthoritativeMatch(InitialMatchSpec.standard(match_id="anonymous-mulligan", seed=714))
+    viewer = "player_2" if acting_player == "player_1" else "player_1"
+    before = match.get_view_for(viewer)
+    owner_view = match.get_view_for(acting_player)
+    selected = [card["iid"] for card in owner_view["players"]["human"]["hand"][:redraw_count]]
+    result = match.submit_action(SubmittedAction(
+        match_id=match.match_id,
+        player_id=acting_player,
+        client_action_id="opponent-redraw",
+        expected_revision=match.revision,
+        action={
+            "kind": CHOOSE_PROMPT_OPTION,
+            "promptId": owner_view["prompt"]["id"],
+            "optionId": "redraw_selected",
+            "payload": {"selectedCardIids": selected},
+        },
+    ))
+    assert result.accepted, result.rejection
+    after = match.get_view_for(viewer)
+    assert any(event["type"] == "draw" for event in after["animationEvents"])
+    _run("const packet = " + json.dumps([before, after], ensure_ascii=True) + r""";
+state = packet[0];
+stageDuelState(packet[1]);
+assert.equal(activePrompt(), null, 'prompt must wait for redraw animation');
+while (activeAnimationEvent?.type !== 'draw') tick();
+const returned = packet[1].animationEvents.filter(event => event.type === 'zone_move' && event.toArea === 'deck').length;
+assert.equal(state.players.opponent.deckCount,
+  packet[0].players.opponent.deckCount + returned - activeAnimationEvent.count,
+  'anonymous returned cards must reach the deck before redraw');
+drain(); check();
+assert.equal(activeAnimationEvent, null);
+assert.equal(pendingVisualState, null);
+assert.equal(stagedDuelStateQueue.length, 0);
+assert.deepEqual(state, packet[1], 'latest online revision must become visible');
+assert.equal(activePrompt().id, packet[1].prompt.id, 'own mulligan must become actionable');
+for (const snapshot of snapshots) {
+  for (const hidden of snapshot.players.opponent.hand) {
+    assert.equal(hidden.faceDown, true);
+    assert.equal(hidden.iid, undefined);
+    assert.equal(hidden.cardId, undefined);
+  }
+}
+""")
+
+
+def test_anonymous_opponent_hand_departure_uses_event_side_and_public_identity():
+    _run(r"""
+const hidden = () => ({faceDown: true, area: 'hand', ownerSide: 'P2'});
+state = dto(player('P1', [card(1)]), [], null, player('P2', [hidden(), hidden()]));
+const publicCard = card(20, 'field', 'P2');
+const next = dto(player('P1', [card(1)]), [], null, player('P2', [hidden()], [], [publicCard]));
+next.animationEvents = [move(publicCard, 'hand', 'field', 'P2')];
+stageDuelState(next); check();
+assert.equal(state.players.opponent.handCount, 1, 'public play must remove one anonymous source');
+assert.equal(state.players.human.handCount, 1, 'other player must not lose a card');
+assert.equal(state.players.opponent.field.length, 0, 'public destination waits for landing');
+drain(); check();
+assert.deepEqual(state, next);
+""")
+
+
+@pytest.mark.parametrize("area", ["hand", "deck"])
+def test_face_up_visual_card_without_identity_is_rejected(area):
+    _run("const destination = " + json.dumps(area) + r""";
+state = dto(player('P1'));
+const original = structuredClone(state.players.human);
+assert.throws(() => addVisualCardToArea(state.players.human, destination, {area: destination, ownerSide: 'P1'}),
+  /missing card identity/);
+assert.deepEqual(state.players.human, original, 'invalid card must not change zone counts');
 """)
 
 
