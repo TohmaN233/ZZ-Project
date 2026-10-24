@@ -2943,7 +2943,8 @@ function localizedCardAttribute(card) {
 }
 
 function localizedCardSeries(card) {
-  return localizedFilterValue("series", card.packJp, "");
+  const [series] = (card.filterValues || {}).series || [];
+  return localizedFilterValue("series", series, "");
 }
 
 function localizedCardRace(value) {
