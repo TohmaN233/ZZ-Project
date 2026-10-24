@@ -44,3 +44,12 @@ def explicitly_equivalent_card_ids(left: str, right: str) -> bool:
     """Whether two IDs are paired by the project-confirmed equivalence table."""
     left_identity = explicit_deck_copy_identity(left)
     return left_identity is not None and left_identity == explicit_deck_copy_identity(right)
+
+
+def explicit_card_equivalence_pairs() -> tuple[tuple[str, str], ...]:
+    """Return each declared original/variant pair once, in source-table order."""
+    return tuple(
+        (canonical, card_id)
+        for card_id, canonical in _explicit_equivalences().items()
+        if card_id != canonical
+    )

@@ -36,6 +36,7 @@ def test_checksum_scope_covers_the_authoritative_card_and_rules_sources() -> Non
         "zz/deckcode0.py",
         "zz/effects.py",
         "zz/engine.py",
+        "zz/ex02.py",
         "zz/ex02c.py",
         "zz/ex02c_data.tsv",
         "zz/forces.py",

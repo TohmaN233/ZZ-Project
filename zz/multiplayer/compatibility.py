@@ -47,6 +47,7 @@ AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "zz/engine.py",
     "zz/enums.py",
     "zz/ex01.py",
+    "zz/ex02.py",
     "zz/ex02c.py",
     "zz/ex02c_data.tsv",
     "zz/pc01r.py",

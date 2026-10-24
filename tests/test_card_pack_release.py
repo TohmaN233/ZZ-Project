@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import csv
 from pathlib import Path
 import subprocess
 
@@ -11,6 +12,7 @@ from zz.pc01 import PC01_CARD_IDS
 from zz.pc01r import PC01R_CARD_IDS
 from zz.pc02 import PC02_CARD_IDS
 from zz.ex02c import EX02C_CARD_IDS
+from zz.ex02 import EX02_CARD_IDS
 from zz.web.assets import AssetIndex
 from zz.web.catalog import _series_filter_value, catalog_dto
 
@@ -32,6 +34,8 @@ def test_published_card_pack_inventory_is_complete() -> None:
     assert len(EX02C_CARD_IDS) == 70
     assert len(set(EX02C_CARD_IDS)) == 70
     assert len(set((*EX01_CARD_IDS, *PC01_CARD_IDS, *PC01R_CARD_IDS, *PC02_CARD_IDS, *EX02C_CARD_IDS))) == 395
+    assert len(EX02_CARD_IDS) == len(set(EX02_CARD_IDS)) == 70
+    assert len(set((*EX01_CARD_IDS, *PC01_CARD_IDS, *PC01R_CARD_IDS, *PC02_CARD_IDS, *EX02C_CARD_IDS, *EX02_CARD_IDS))) == 465
 
 
 def test_catalog_series_values_match_the_actual_dropdown_values(catalog) -> None:
@@ -40,6 +44,24 @@ def test_catalog_series_values_match_the_actual_dropdown_values(catalog) -> None
     for card in catalog["cards"]:
         assert len(card["filterValues"]["series"]) == 1
         assert set(card["filterValues"]["series"]) <= allowed, card["id"]
+
+
+def test_every_equivalent_face_is_registered_and_searchable_in_its_own_pack(catalog) -> None:
+    with (ROOT / "data/ex02_ex02c_equivalences.tsv").open(encoding="utf-8-sig", newline="") as handle:
+        pairs = list(csv.DictReader(handle, delimiter="\t"))
+    cards = {card["id"]: card for card in catalog["cards"]}
+    assert len(pairs) == 70
+    for pair in pairs:
+        original = cards[pair["canonical_card_id"]]
+        variant = cards[pair["variant_card_id"]]
+        assert original["packJp"] == "EX:02 幻影の剣士"
+        assert original["filterValues"]["series"] == ["EX:02 幻影の剣士"]
+        assert original["nameJp"] == pair["ex02_name_jp"]
+        assert variant["nameJp"] == pair["ex02c_name_jp"]
+        assert original["copyIdentity"] == variant["copyIdentity"]
+        assert original["deckBuildable"] == variant["deckBuildable"]
+        assert original["nameEn"]
+        assert variant["nameEn"] == variant["abilityEn"] == ""
 
 
 def test_series_filter_resolves_declared_labels_and_rejects_unknown_packs() -> None:
@@ -92,6 +114,12 @@ for (const language of ['zh', 'ja', 'en']) {
 setDeckFilter('series', 'CAMPAIGN');
 assert.equal(filteredDeckCatalogCards().length, 2);
 assert.ok(filteredDeckCatalogCards().every(card => card.id.includes('_cp_')));
+setDeckFilter('series', 'EX:02 幻影の剣士');
+const originals = filteredDeckCatalogCards();
+assert.equal(originals.length, 67, 'EX02 must expose every buildable original face');
+assert.ok(originals.every(card => card.id.includes('_EX02_')));
+battleDebugFilters = { series: 'EX:02 幻影の剣士' };
+assert.equal(battleDebugCards().length, 67);
 setDeckFilter('series', 'PC:02R DIVINE');
 assert.ok(filteredDeckCatalogCards().length > 0);
 assert.ok(filteredDeckCatalogCards().every(card => !card.id.includes('_02c_')));

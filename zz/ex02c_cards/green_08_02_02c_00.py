@@ -8,6 +8,7 @@ from zz.effects import EffectSpec, EffectTiming
 from zz.enums import AreaType, Color
 from zz.model import CardInstance, Context
 from zz.pc01 import _card_from_row
+from zz.transformations import transformation_target_id
 
 
 CARD_ID = "green_08_02_02c_00"
@@ -60,7 +61,8 @@ def _transform_on_green_bless(source: CardInstance, state: Any, ctx: Context) ->
     if state.engine._mana_color_of(mana) is not Color.GREEN:
         raise RuntimeError(f"{CARD_ID} transformation received non-Green Bless Mana")
     try:
-        transformed = copy(CARD_REGISTRY[TRANSFORMED_CARD_ID])
+        target_id = transformation_target_id(source.card.id, TRANSFORMED_CARD_ID)
+        transformed = copy(CARD_REGISTRY[target_id])
     except KeyError as exc:
         raise RuntimeError(f"{CARD_ID} transformed face is not registered: {TRANSFORMED_CARD_ID}") from exc
     transformed.cost = dict(transformed.cost)
