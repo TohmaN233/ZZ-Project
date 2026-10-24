@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_00_01_02c_00_boundary",
+  "card_id": "green_00_01_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\nこのミニオンはブロックできない。\\n《ベース》\\n【配置時】\\nフィールドに自分の種族「ソード」を持つミニオンが2体以上いる場合、自分のプレイヤーを1回復する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_00_01_02c_00",
+        "zone": "hand",
+        "seed": 46045789,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "alice": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "green_00_01_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 2
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_00",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "yellow_05_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Place Alice in Base beside one allied Sword",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "green_00_01_02c_00"
+      }
+    },
+    {
+      "name": "Move Alice into Field as a real Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "move_card",
+        "iid": "$alice",
+        "direction": "base_to_field"
+      }
+    },
+    {
+      "name": "End the controller turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "Place Colorless Mana and enter Main",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "Attack with Charlotte",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$attacker"
+      }
+    },
+    {
+      "name": "Attack the controller player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the defender Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the attacker Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "One allied Sword does not meet the two-Minions placement condition",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "name": "Alice moves into Field and is available as a blocker candidate",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_01_02c_00"
+      }
+    },
+    {
+      "name": "Alice cannot block even though she is in Field",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "blocker",
+        "cardIid": "$alice"
+      }
+    },
+    {
+      "name": "The normal Sword Minion remains a legal blocker",
+      "path": "state.prompt.options",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "kind": "blocker",
+        "cardIid": "$host"
+      }
+    },
+    {
+      "name": "The attack reaches the blocker decision",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "blocker"
+    }
+  ]
+}

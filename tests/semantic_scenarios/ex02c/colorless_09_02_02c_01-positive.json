@@ -1,0 +1,200 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_09_02_02c_01_positive",
+  "card_id": "colorless_09_02_02c_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【常時】\n『システム管理権限』他のBP1000以下のミニオン全ては、アタックもブロックも移動もできない。\n【自分のターン開始時】\nミニオン全てにBP+100を付与する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_09_02_02c_01",
+        "zone": "field",
+        "seed": 3852954955,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p1_low": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$p1_low",
+        "permanentBpModifier": 400
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p2_high": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$p2_high",
+        "permanentBpModifier": 401
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_00_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_00_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "end the initial P1 turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 places colorless Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "end P2 turn to begin P1’s next turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 places colorless Mana after the turn-start buff",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the BP900 Minion receives +100 and reaches BP1000",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p1_low",
+        "effectiveBp": 1000
+      }
+    },
+    {
+      "name": "the BP901 Minion receives +100 and reaches BP1001",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p2_high",
+        "effectiveBp": 1001
+      }
+    },
+    {
+      "name": "the next P1 main action is available",
+      "path": "state.prompt.options",
+      "op": "any_where",
+      "where": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "the BP1000 Minion has no attack, block, or move action option",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "iid": "$p1_low"
+      }
+    }
+  ]
+}

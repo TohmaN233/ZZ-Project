@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_08_02_02c_00_positive",
+  "card_id": "colorless_08_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【破壊時】\nこのターン終了時、自分のトラッシュにある「ソードゴーレム」1枚を手札に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_08_02_02c_00",
+        "zone": "field",
+        "seed": 1194075432,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "source": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_08_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_07_02_02c_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_08_02_02c_00",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      },
+      "capture": {
+        "equivalent": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_00_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Sinon to target Sword Golem",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_07_02_02c_00"
+      }
+    },
+    {
+      "name": "destroy Sword Golem with Sinon",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "colorless_08_02_02c_00"
+      }
+    },
+    {
+      "name": "end P2 turn to resolve the delayed return",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "choose the EX02 name-equivalent Sword Golem from Trash",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$equivalent"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the selected registered EX02C Sword Golem returns to its owner’s hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_08_02_02c_00",
+        "iid": "$equivalent"
+      }
+    },
+    {
+      "name": "the destroyed EX02C source remains in Trash after the one-card return",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_08_02_02c_00",
+        "iid": "$source"
+      }
+    }
+  ]
+}

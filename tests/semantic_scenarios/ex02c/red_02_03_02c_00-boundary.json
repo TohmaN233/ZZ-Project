@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_03_02c_00_boundary",
+  "card_id": "red_02_03_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: フィールドに自分の種族「黒の剣士」または「閃光」を持つミニオンがいる場合、自分の手札にあるこのカードのコストは0になる。\n【メイン】/【フラッシュ】\nこのターン中、自分のミニオン1体をBP+300する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_03_02c_00",
+        "zone": "hand",
+        "seed": 915642828,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Asuna’s Cooking with its normal cost and no allied Minion target",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_03_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Cooking resolves to Trash when no allied Minion can be selected",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_03_02c_00"
+      }
+    },
+    {
+      "name": "The red Mana was paid at the normal cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_01_02_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "One generic Mana was paid with the red Mana",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "The empty-target cast returns directly to Main",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "main_action"
+    },
+    {
+      "name": "No allied Minion is present to receive the effect",
+      "path": "state.players.human.field",
+      "op": "length_eq",
+      "value": 0
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_04_02_02c_00_boundary",
+  "card_id": "red_04_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 襲撃",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_04_02_02c_00",
+        "zone": "hand",
+        "seed": 3553326383,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with a newly arrived non-Rush Minion",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_02_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "A newly arrived non-Rush Minion cannot attack the player while Forces remain",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "player"
+      }
+    }
+  ]
+}

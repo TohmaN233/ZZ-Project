@@ -7,6 +7,7 @@ from typing import Callable
 import unicodedata
 
 from zz.cards import CARD_REGISTRY
+from zz.card_identity import explicit_deck_copy_identity
 from zz.deckcode0 import (
     DECKCODE0_GREEN_FORCES,
     DECKCODE0_YELLOW_FORCES,
@@ -18,6 +19,7 @@ import zz.basic  # noqa: F401 - registers Basic non-token cards not already hand
 import zz.ex01  # noqa: F401 - registers EX:01 cards
 import zz.pc01r  # noqa: F401 - registers PC:01R cards
 import zz.pc02  # noqa: F401 - registers PC:02 cards
+import zz.ex02c  # noqa: F401 - registers EX02C cards
 import zz.pc02r  # noqa: F401 - registers PC:02R DIVINE cards
 from zz.forces import ALL_FORCES
 from zz.enums import CardType
@@ -82,6 +84,9 @@ def _deck_card_japanese_source(card_id: str) -> tuple[str, str]:
 
 
 def deck_card_copy_identity(card_id: str) -> str:
+    explicit_identity = explicit_deck_copy_identity(card_id)
+    if explicit_identity is not None:
+        return explicit_identity
     name, ability = _deck_card_japanese_source(card_id)
     identity = f"{_normalize_copy_text(name)}\0{_normalize_copy_text(ability)}"
     return "jp:" + sha256(identity.encode("utf-8")).hexdigest()

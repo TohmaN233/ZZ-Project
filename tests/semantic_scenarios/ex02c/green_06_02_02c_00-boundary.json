@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_06_02_02c_00_boundary",
+  "card_id": "green_06_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【自分のターン】\n自分のプレイヤーのライフが7以上である場合、このミニオンは[襲撃]と[再起]を持ち、DP+1する。\n【自分のターン】\n『神聖術』相手のミニオンが1体以上レストするたび、自分のプレイヤーを1回復する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_06_02_02c_00",
+        "zone": "field",
+        "seed": 2802202614,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "initial": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_06_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 6
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_04_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with an allied Minion at six Life",
+      "select": {
+        "kind": "attack",
+        "cardId": "green_04_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the opponent player",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the defender Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the attacker Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Alice does not gain her Life-7 aura at six Life",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_06_02_02c_00",
+        "effectiveDp": 2
+      }
+    },
+    {
+      "name": "An allied Minion resting does not trigger Alice’s enemy-rest heal",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 6
+    }
+  ]
+}

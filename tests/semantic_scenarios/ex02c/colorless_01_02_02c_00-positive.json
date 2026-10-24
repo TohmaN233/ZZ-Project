@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02c_00_positive",
+  "card_id": "colorless_01_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「黒の剣士」自分はデッキの中から種族「ドラゴン」を持つ赤のベース・ミニオンカード1枚を公開して手札に加えることができる。その後、自分のデッキをシャッフルする。\n【常時】このミニオンはベースに移動するとき、レスト状態で移動する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02c_00",
+        "zone": "hand",
+        "seed": 942057641,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "colorless_01_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "dragon1": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "dragon2": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "wrong_item": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Silica",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_01_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Search for the first red Dragon Base Minion",
+      "select": {
+        "cardIid": "$dragon1"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon a Black Swordsman to Switch Silica",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Search for the second red Dragon Base Minion",
+      "select": {
+        "cardIid": "$dragon2"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Both searches add the red Dragon Base Minions",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_00_01_02c_00"
+      }
+    },
+    {
+      "name": "The non-Dragon Item Base Minion is not searched",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "The latest search publicly reveals only its chosen Dragon card",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "red_00_01_02c_00"
+        }
+      }
+    }
+  ]
+}

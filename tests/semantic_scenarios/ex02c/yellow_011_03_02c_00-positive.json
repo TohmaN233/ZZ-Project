@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_011_03_02c_00_positive",
+  "card_id": "yellow_011_03_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 相手の手札が4枚以上の場合、自分の手札にあるこのカードのフリーコストは0になる。\\n【フラッシュ】\\n相手のコスト4以下のミニオン1体を手札に戻し、フィールドに自分の種族「絶剣」または「閃光」を持つミニオンがいる場合、相手のコスト8以上のミニオン1体を手札に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_011_03_02c_00",
+        "zone": "hand",
+        "seed": 339574089,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_08_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with the opposing Charlotte",
+      "select": {
+        "kind": "attack",
+        "cardId": "green_02_02_02c_03"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the magic controller",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Cast the Flash magic with four opposing hand cards",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_011_03_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Return one opposing Minion of cost four or less",
+      "select": {
+        "cardId": "red_02_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Then return one opposing Minion of cost eight or more",
+      "select": {
+        "cardId": "colorless_08_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the attacker Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the defender Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The cost-four-or-less target returns to hand",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02c_00"
+      }
+    },
+    {
+      "name": "The cost-eight-or-more target returns because Asuna has the Flash race",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_08_02_02c_00"
+      }
+    },
+    {
+      "name": "The Flash magic resolves into its controller trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_011_03_02c_00"
+      }
+    }
+  ]
+}

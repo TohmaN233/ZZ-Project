@@ -561,7 +561,7 @@ def _protect_all_from_magic(source: CardInstance, state: Any, ctx: Context) -> N
 
 
 def _city_resident(source: CardInstance, state: Any, ctx: Context) -> None:
-    source.rested = True
+    state.engine.rest_target(source)
     targets = state.engine.select_target(
         source.owner,
         "trash_magic_cost_at_most_4",

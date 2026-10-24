@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_06_02_02c_00_boundary",
+  "card_id": "colorless_06_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\nスイッチ：「黒の剣士」自分のプレイヤーを1回復する。\n【破壊時】\nミニオンとのバトルで破壊された場合、自分のプレイヤーに1ダメージを与えることができる。そうした場合、このカードをフィールドに出す。（【召喚時】効果は発揮しない。）",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_06_02_02c_00",
+        "zone": "field",
+        "seed": 275954810,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 9
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_07_02_02c_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Sinon to destroy Terarria by effect",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_07_02_02c_00"
+      }
+    },
+    {
+      "name": "choose Terarria as the Colorless target",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "colorless_06_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "effect destruction does not offer the battle-only return payment",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 9
+    },
+    {
+      "name": "effect-destroyed Terarria remains in Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_06_02_02c_00"
+      }
+    },
+    {
+      "name": "Terarria does not return to Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "colorless_06_02_02c_00"
+      }
+    }
+  ]
+}

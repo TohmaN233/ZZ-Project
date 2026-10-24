@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_06_02_02c_00_positive",
+  "card_id": "colorless_06_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\nスイッチ：「黒の剣士」自分のプレイヤーを1回復する。\n【破壊時】\nミニオンとのバトルで破壊された場合、自分のプレイヤーに1ダメージを与えることができる。そうした場合、このカードをフィールドに出す。（【召喚時】効果は発揮しない。）",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_06_02_02c_00",
+        "zone": "field",
+        "seed": 2865032423,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "terra": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_06_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 9
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_07_02_02c_02",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_00_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon the Black Swordsman to activate Switch",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "end P1 turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 places colorless Mana before its main actions",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "attack P1 Life with Fatal Scythe",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$attacker"
+      }
+    },
+    {
+      "name": "target P1 Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "P1 passes Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "P2 passes Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "block with Terarria",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$terra"
+      }
+    },
+    {
+      "name": "pay one Life to return Terarria",
+      "prompt_kind": "optional_effect",
+      "select": {
+        "choice": "yes"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Switch healing reaches 10, then the optional battle return pays 1 Life",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 9
+    },
+    {
+      "name": "Teraria returns from Trash to Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_06_02_02c_00"
+      }
+    },
+    {
+      "name": "Teraria is no longer in Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "colorless_06_02_02c_00"
+      }
+    },
+    {
+      "name": "the attacker survives the stronger battle",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_07_02_02c_02"
+      }
+    }
+  ]
+}

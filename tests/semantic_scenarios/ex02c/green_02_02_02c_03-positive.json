@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_02_02_02c_03_positive",
+  "card_id": "green_02_02_02c_03",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【ブロック時】\\nこのミニオンにBP+100を付与する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "zone": "field",
+        "seed": 3401321686,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "blocker": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_02_02_02c_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 10
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with the opposing Charlotte",
+      "select": {
+        "kind": "attack",
+        "cardId": "green_02_02_02c_03"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the controller player",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the defender Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the attacker Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "blocker",
+      "name": "Block with Charlotte",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$blocker"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Charlotte gains permanent BP when she blocks",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_02_02_02c_03",
+        "effectiveBp": 400
+      }
+    },
+    {
+      "name": "The weaker attacker is destroyed in battle",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_02_02_02c_03"
+      }
+    }
+  ]
+}

@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_05_02_02c_00_positive",
+  "card_id": "colorless_05_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\nこのミニオンに［襲撃］を付与し、他に自分のミニオンがいない場合、このミニオンに［再起］を付与する。\\n【常時】\\n『二刀流』このミニオンには条件を無視して［加護］を付与させることができる。さらに、2つまで［加護］を付与させることができる。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_05_02_02c_00",
+        "zone": "hand",
+        "seed": 118349437,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "colorless_05_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "switch_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "bless_red": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "bless_red_cost": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Double Sword alone",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_05_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Argos after Kirito to gain a movement right",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attach Red Blessing despite its color condition",
+      "select": {
+        "kind": "bless",
+        "iid": "$bless_red",
+        "target_iid": "$primary"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attach a second Red Blessing despite its color condition",
+      "select": {
+        "kind": "bless",
+        "iid": "$bless_red_cost",
+        "target_iid": "$primary"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack immediately with Rush",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$primary"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the opponent’s Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass defender Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass attacker Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Solo Double Sword gains Rush",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_05_02_02c_00",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Solo Double Sword gains Reawaken",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_05_02_02c_00",
+        "keywords": {
+          "contains": [
+            "REAWAKEN"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Both distinct red Blessing mana are attached despite their conditions",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_05_02_02c_00",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "red_00_01_02_00"
+            },
+            {
+              "cardId": "red_00_01_02_01"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Both Blessing cards left Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "red_00_01_02_00"
+      }
+    },
+    {
+      "name": "The cost-restricted Blessing card left Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "red_00_01_02_01"
+      }
+    }
+  ]
+}

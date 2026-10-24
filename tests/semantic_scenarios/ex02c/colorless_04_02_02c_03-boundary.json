@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_02_02c_03_boundary",
+  "card_id": "colorless_04_02_02c_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\nこのミニオンは、相手のマジックの効果で選択できない。 EN: ",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02c_03",
+        "zone": "field",
+        "seed": 1982341672,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_04_02_02c_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_07_02_00_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {}
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Nue, a non-Magic effect source",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_07_02_00_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Nue is waiting for an effect target",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "effect_target"
+    },
+    {
+      "name": "A non-Magic source can select the GGO Kirito",
+      "path": "state.prompt.options",
+      "op": "any_where",
+      "where": {
+        "cardIid": "$primary"
+      }
+    }
+  ]
+}

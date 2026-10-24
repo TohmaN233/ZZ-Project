@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_02_02c_01_positive",
+  "card_id": "red_02_02_02c_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n＆スイッチ：「黒の剣士」フィールドに自分の種族「黒の剣士」を持つミニオンがいる場合、自分の移動権を1増やす。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_02_02c_01",
+        "zone": "hand",
+        "seed": 3156170365,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Argo beside a Black Swordsman",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon a second Black Swordsman",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Argo gains one Movement Right on summon and one on the Black Swordsman Switch",
+      "path": "state.players.human.movementRightTotal",
+      "op": "eq",
+      "value": 3
+    }
+  ]
+}

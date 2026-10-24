@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_09_02_02c_00_positive",
+  "card_id": "colorless_09_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n自分の種族「アイテム」を持つマナ1つ毎に、自分はカードを１枚引く。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_09_02_02c_00",
+        "zone": "hand",
+        "seed": 2424749517,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Administrator",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_09_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "one Item Base Minion in Base causes one draw",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "normal drawing does not publicly reveal the hidden Deck card",
+      "path": "state.publicReveals",
+      "op": "length_eq",
+      "value": 0
+    }
+  ]
+}

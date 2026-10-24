@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_00_01_02c_01_boundary",
+  "card_id": "green_00_01_02c_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 加護：コスト4以上\\n《付与能力》【アタック時】\\nこのターン中、相手のレスト状態であるミニオン1体をBP-400する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_00_01_02c_01",
+        "zone": "base",
+        "seed": 3470319741,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.base",
+          "where": {
+            "cardId": "green_00_01_02c_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "host": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "yellow_05_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_06_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_02c_03",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Bless the eligible cost-five Sword host",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$primary",
+        "target_iid": "$host"
+      }
+    },
+    {
+      "name": "Attack with the blessed host",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_05_02_02c_00"
+      }
+    },
+    {
+      "name": "Attack the opponent player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "A rested opposing Minion is the attack-time target",
+      "path": "state.prompt.options",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_06_02_02c_00",
+        "kind": "effect_target"
+      }
+    },
+    {
+      "name": "The active opposing Minion is excluded from the target prompt",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "cardId": "green_02_02_02c_03",
+        "kind": "effect_target"
+      }
+    },
+    {
+      "name": "The target choice is awaiting resolution",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "effect_target"
+    }
+  ]
+}

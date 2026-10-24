@@ -1,0 +1,176 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_02_02c_03_positive",
+  "card_id": "colorless_04_02_02c_03",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【常時】\\nこのミニオンは、相手のマジックの効果で選択できない。 EN: ",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02c_03",
+        "zone": "field",
+        "seed": 1494837588,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_04_02_02c_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "yuna": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_03_01_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "chimera": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with Yuna to open a Flash window",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_02_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the opponent’s Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Cast Chimera Vortex in the defender Flash window",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_02_03_01_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Chimera Vortex is waiting for a target",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "effect_target"
+    },
+    {
+      "name": "Opponent Magic cannot select the protected GGO Kirito",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "cardIid": "$primary"
+      }
+    },
+    {
+      "name": "The Magic can select an unprotected allied Minion",
+      "path": "state.prompt.options",
+      "op": "any_where",
+      "where": {
+        "cardIid": "$yuna"
+      }
+    }
+  ]
+}

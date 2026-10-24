@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_00_01_02c_00_boundary",
+  "card_id": "yellow_00_01_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "【常時】\nこのミニオンはブロックできない。\n《ベース》\n【配置時】\nフィールドに自分の種族「ソード」を持つミニオンがいる場合、自分はカードを1枚引く。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "zone": "hand",
+        "seed": 3185014099,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Place Tonki without a Sword in Field",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "yellow_00_01_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Tonki does not draw without a Sword in Field",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "colorless_01_02_02c_01"
+      }
+    },
+    {
+      "name": "The card remains in Deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

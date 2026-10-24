@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_05_02_02c_00_boundary",
+  "card_id": "yellow_05_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 飛来\\n【常時】\\nこのターンに相手のミニオンが手札に戻っている場合、このターン中、自分の手札にあるこのカードのフリーコストは0になる。\\n【自分のターン開始時】& スイッチ：「絶剣」\\n『ヒール』\\n自分のプレイヤーのライフが3以下である場合、自分のプレイヤーを1回復する。自分のプレイヤーのライフが4以上である場合、代わりに、このターン中、このミニオンをBP+300する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "zone": "field",
+        "seed": 1564469434,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 4
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_07_02_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "extra_asuna": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Start the Asuna controller turn",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "Finish the mana step and enter Main",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon the Absolute Sword Minion",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_07_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "At 4 Life the turn-start and Absolute Sword Switch branches each apply 300 BP",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_05_02_02c_00",
+        "effectiveBp": 1100
+      }
+    },
+    {
+      "name": "Switch on the Absolute Sword summon applies the marked effect again",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_05_02_02c_00",
+        "effectiveBp": 1100
+      }
+    },
+    {
+      "name": "The summoned Absolute Sword remains on the field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_07_02_02c_00"
+      }
+    },
+    {
+      "name": "The high-Life branch does not heal the player",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 4
+    },
+    {
+      "name": "The turn-start draw remains visible as a hand count",
+      "path": "state.players.human.handCount",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "name": "The extra Asuna remains in hand after Yuuki uses the remaining Yellow Mana",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$extra_asuna"
+      }
+    },
+    {
+      "name": "Without an opponent Minion return, the extra Asuna is absent from playable options",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "play_card",
+        "iid": "$extra_asuna"
+      }
+    }
+  ]
+}

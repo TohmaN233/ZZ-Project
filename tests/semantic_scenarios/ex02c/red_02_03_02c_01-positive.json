@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_03_02c_01_positive",
+  "card_id": "red_02_03_02c_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【メイン】／【フラッシュ】\nこのターン中、相手のミニオン1体をBP-300する。自分の種族「黒の剣士」を持つミニオンがいる場合、代わりにBP-600する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_03_02c_01",
+        "zone": "hand",
+        "seed": 961708844,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "first_vorpal": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "red_02_03_02c_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_07_02_02_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_03_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "empty_target_vorpal": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_03_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "flash_vorpal": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Vorpal Strike",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$first_vorpal"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Choose the opposing 1000 BP Minion",
+      "select": {
+        "cardId": "colorless_07_02_02_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack a Force with the Black Swordsman",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Target a P2 Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass P2 Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Cast the second Vorpal Strike during Flash",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$flash_vorpal"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Choose the weakened opposing Minion again",
+      "select": {
+        "cardId": "colorless_07_02_02_00"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass P2 Flash priority after Vorpal",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass P1 Flash priority after Vorpal",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Vorpal Strike at normal cost after the opponent has no Minions",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$empty_target_vorpal"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The two targeted casts reduce the 1000 BP target to zero and destroy it",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_07_02_02_00"
+      }
+    },
+    {
+      "name": "The empty-target cast also resolves Vorpal into P1 Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "cardId": "red_02_03_02c_01"
+      }
+    },
+    {
+      "name": "The no-target cast ends without an effect-target prompt",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "main_action"
+    },
+    {
+      "name": "The third red Mana source and third generic Mana source are paid normally",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_00_01_02_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "The generic sources are also paid for all three casts",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "The Black Swordsman remains after attacking",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "No opposing Minion remains when the final no-target cast is made",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 0
+    }
+  ]
+}

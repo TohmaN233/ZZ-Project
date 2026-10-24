@@ -1,0 +1,243 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_06_02_cp_00_positive",
+  "card_id": "colorless_06_02_cp_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n＆スイッチ：「閃光」自分はデッキの中から種族「アイテム」を持つベース・ミニオンカード1枚を公開して手札に加える。その後、自分のデッキをシャッフルする。\n【アタック時】\nプレイヤーにアタックした場合、相手のBP300以下のミニオン1体を破壊する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_06_02_cp_00",
+        "zone": "field",
+        "seed": 3079283034,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_05_02_02c_03",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "weak_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$weak_target",
+        "permanentBpModifier": -200
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "strong_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$strong_target",
+        "permanentBpModifier": -199
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Stacia to trigger Kirito Switch",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_05_02_02c_03"
+      }
+    },
+    {
+      "name": "reveal and take the Item Base Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "colorless_00_01_02c_00"
+      }
+    },
+    {
+      "name": "attack P2 Life with Kirito",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_06_02_cp_00"
+      }
+    },
+    {
+      "name": "target P2 Life",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "destroy the BP300 Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$weak_target"
+      }
+    },
+    {
+      "name": "P2 passes Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "P1 passes Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the searched Item is in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_00_01_02c_00"
+      }
+    },
+    {
+      "name": "the selected Item is the only public deck-search reveal",
+      "path": "state.logEvents",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "type": "reveal",
+        "reason": "deck_search",
+        "card": {
+          "cardId": "colorless_00_01_02c_00"
+        }
+      }
+    },
+    {
+      "name": "the BP300 Minion is destroyed by the player attack",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$weak_target"
+      }
+    },
+    {
+      "name": "the unselected BP301 Minion remains in the opponent Field",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "effectiveBp": 301,
+        "iid": "$strong_target"
+      }
+    },
+    {
+      "name": "the opponent loses 2 Life to Kirito’s attack with Stacia’s Sword aura",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 8
+    }
+  ]
+}

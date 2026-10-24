@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02c_03_boundary",
+  "card_id": "colorless_01_02_02c_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】自分のデッキを上から1枚見て、種族「黒の剣士」または「閃光」を持つフィールド・ミニオンカードの場合、公開して手札に加える。それ以外の場合、デッキの下に戻す。\n【常時】このミニオンはベースに移動するとき、レスト状態で移動する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02c_03",
+        "zone": "hand",
+        "seed": 8004321,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "first_yui": {
+          "path": "state.players.human.hand[0].iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_03",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "second_yui": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon the first Yui over a nonmatching top card",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$first_yui"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Inspect the Dragon and put the mismatch at Deck bottom",
+      "select": {
+        "cardId": "red_00_01_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Move the first Yui to Base rested",
+      "select": {
+        "kind": "move_card",
+        "iid": "$first_yui",
+        "direction": "field_to_base"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon the second Yui after bottoming the mismatch",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$second_yui"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Inspect the matching Black Swordsman",
+      "select": {
+        "cardId": "colorless_03_02_02c_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The nonmatching Dragon stays in Deck after Yui bottoms it",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "The matching Black Swordsman enters hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "Only the matching top card is publicly revealed",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "colorless_03_02_02c_01"
+        }
+      }
+    },
+    {
+      "name": "The bottomed Dragon is not publicly revealed",
+      "path": "state.publicReveals",
+      "op": "none_where",
+      "value": 0,
+      "where": {
+        "card": {
+          "cardId": "red_00_01_02c_00"
+        }
+      }
+    },
+    {
+      "name": "The first Yui rests in Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_03",
+        "rested": true
+      }
+    },
+    {
+      "name": "The second Yui remains in Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_03"
+      }
+    }
+  ]
+}

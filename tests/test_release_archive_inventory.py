@@ -38,7 +38,9 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
         assert "tools/card_translation_exchange.py" in files
         assert "ai_training/codeman_training.py" in files
         assert release.DEEP_SOURCE_RELATIVE.as_posix() in files
-        assert len([path for path in files if path.startswith("tests/semantic_scenarios/")]) == 212
+        assert len([path for path in files if path.startswith("tests/semantic_scenarios/pc02r/")]) == 212
+        assert len([path for path in files if path.startswith("tests/semantic_scenarios/ex02c/")]) == 141
+        assert {"tests/test_ex02c_cards.py", "tools/build_ex02c_correspondence.py"} <= files
     else:
         assert release.DEEP_SOURCE_RELATIVE.as_posix() not in files
 
@@ -48,7 +50,7 @@ def fixture_workspace(tmp_path: Path) -> Path:
     for relative in release.release_files(ROOT, "source"):
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        if relative.as_posix() == "zz/pc02r.py":
+        if relative.as_posix() in {"zz/pc02r.py", "zz/ex02c.py"}:
             shutil.copyfile(ROOT / relative, target)
         else:
             target.write_text("fixture", encoding="utf-8")

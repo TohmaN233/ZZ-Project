@@ -45,13 +45,16 @@ class Card:
     flash_ability_condition: Optional[Callable[["CardInstance", "GameState"], bool]] = None
     # Shared card identity and effect metadata used by card-specific runtime callbacks.
     printed_color: Optional[Color] = None
-    cost_aura: Optional[Callable[["CardInstance", "CardInstance", "GameState"], int]] = None
+    cost_aura: Optional[Callable[["CardInstance", "CardInstance", "GameState"], int | dict[Color, int]]] = None
+    bless_condition: Optional[Callable[["CardInstance", "CardInstance", "GameState"], bool]] = None
+    max_blessings: int = 1
     ignore_bless_conditions: bool = False
     can_bless_while_rested: bool = True
     stat_aura: Optional[Callable[["CardInstance", "CardInstance", "GameState"], tuple[int, int]]] = None
     cost_lock: Optional[Callable[["CardInstance", "CardInstance", "GameState"], bool]] = None
     effect_targetable: Optional[Callable[["CardInstance", Optional["CardInstance"], "GameState"], bool]] = None
     effect_protection: Optional[Callable[["CardInstance", "CardInstance", str, "GameState"], bool]] = None
+    action_restriction: Optional[Callable[["CardInstance", "CardInstance", str, "GameState"], bool]] = None
     life_damage_reducer: Optional[Callable[["CardInstance", "Player", int, Any, str, "GameState"], int]] = None
     # Deck/catalog metadata; transformed faces remain available for card details.
     deck_buildable: bool = True
@@ -66,6 +69,10 @@ class Context:
     target: Optional[Any] = None
     # Preserve the declared attack destination through block triggers.
     attack_target: Optional["AttackTarget"] = None
+    # Host whose marked EX02C Switch effect is being replayed.
+    switch_source: Optional["CardInstance"] = None
+    # The two Minions involved in a battle destruction; None otherwise.
+    battle_participants: Optional[tuple["CardInstance", "CardInstance"]] = None
 
 
 @dataclass

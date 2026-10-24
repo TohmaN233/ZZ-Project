@@ -310,7 +310,10 @@ def build_card_profile(card) -> CardProfile:
         and getattr(card, "dp", 0) <= 1,
         self_harm_effect=target_semantics.harmful and target_semantics.own_preferred,
         can_fizzle_without_targets=_can_fizzle_without_targets(card, target_semantics),
-        target_value_sensitive=any(effect.target_kind is not None for effect in getattr(card, "effects", [])),
+        target_value_sensitive=any(
+            effect.target_kind is not None or effect.target_kind_resolver is not None
+            for effect in getattr(card, "effects", [])
+        ),
     )
 
     return CardProfile(

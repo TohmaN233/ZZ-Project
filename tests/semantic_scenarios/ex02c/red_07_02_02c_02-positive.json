@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_07_02_02c_02_positive",
+  "card_id": "red_07_02_02c_02",
+  "scenario_kind": "positive",
+  "official_rule": "【召喚時】\nこのターン中、自分のプレイヤーに「自分の［加護］を持つマナ全ては、レスト状態でも付与することができる。」を与える。他に自分のミニオンがいない場合、自分の移動権を1増やす。\n【常時】\nこのミニオンがアクティブ状態でなければ［加護］は付与されない。\n【加護時】\n赤の加護である場合、加護しているマナを除外して、「「双剣」キリト」に変形する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_07_02_02c_02",
+        "zone": "hand",
+        "seed": 2927632359,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "red_kago": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon the Black Swordsman Kirito",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_07_02_02c_02"
+      }
+    },
+    {
+      "name": "Bless the summoned Kirito with the rested red Kago",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$red_kago"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Red Bless transforms Kirito and the transformed face is active",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_07_02_02c_00",
+        "rested": false
+      }
+    },
+    {
+      "name": "The attached red Bless mana is exiled",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "The transform effect rests opposing colorless mana",
+      "path": "state.players.opponent.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "Summoning Kirito alone granted one additional Movement",
+      "path": "state.players.human.movementRightTotal",
+      "op": "eq",
+      "value": 2
+    }
+  ]
+}

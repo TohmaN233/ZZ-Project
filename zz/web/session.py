@@ -38,8 +38,6 @@ TARGETED_ATTACK_CARD_KINDS = {}
 
 TARGETED_CARD_COUNTS = {}
 
-OPTIONAL_EFFECT_TARGET_KINDS = {"deck_base_minion", "top3_magic"}
-
 LOOK_WINDOW_SIZES = {
     "pc02_fossil_dragon": 3,
     "top3_magic": 3,
@@ -1702,6 +1700,14 @@ class GameSession:
         player = self._prompt_controller()
         return None if player is None else player.side.name
 
+    @staticmethod
+    def _effect_target_skip_option_ids(prompt: dict[str, Any]) -> set[str]:
+        return {
+            str(option["id"])
+            for option in prompt.get("options", [])
+            if option.get("kind") == "effect_target_skip" and option.get("id") is not None
+        }
+
     def validate_choice(
             self,
             prompt_id: str,
@@ -1759,15 +1765,31 @@ class GameSession:
                     raise IllegalActionError("selectedOptionIds contains duplicates")
                 if any(selected_id not in self._options for selected_id in selected_ids):
                     raise IllegalActionError("selected target is not legal")
-                required_count = int(self.prompt.get("requiredTargetCount", 1))
-                minimum_count = int(self.prompt.get("minimumTargetCount", required_count))
-                maximum_count = int(self.prompt.get("maximumTargetCount", required_count))
-                if self.prompt.get("allowVariableTargetCount"):
-                    valid_count = minimum_count <= len(selected_ids) <= maximum_count
+                skip_option_ids = self._effect_target_skip_option_ids(prompt)
+                selected_skip_ids = set(selected_ids).intersection(skip_option_ids)
+                selected_skip_option = option_id in skip_option_ids or bool(selected_skip_ids)
+                if selected_skip_option:
+                    if (
+                        not prompt.get("allowTargetRejection")
+                        or option_id not in skip_option_ids
+                        or (selected_skip_ids and selected_skip_ids != {option_id})
+                        or any(selected_id != option_id for selected_id in selected_ids)
+                    ):
+                        raise IllegalActionError("this effect target choice cannot be skipped")
                 else:
-                    valid_count = len(selected_ids) == required_count
-                if not valid_count:
-                    raise IllegalActionError("selected target count is not legal")
+                    if not selected_ids:
+                        raise IllegalActionError(
+                            "an empty target selection requires the explicit skip option"
+                        )
+                    required_count = int(prompt.get("requiredTargetCount", 1))
+                    minimum_count = int(prompt.get("minimumTargetCount", required_count))
+                    maximum_count = int(prompt.get("maximumTargetCount", required_count))
+                    if prompt.get("allowVariableTargetCount"):
+                        valid_count = minimum_count <= len(selected_ids) <= maximum_count
+                    else:
+                        valid_count = len(selected_ids) == required_count
+                    if not valid_count:
+                        raise IllegalActionError("selected target count is not legal")
 
             if "paymentBaseIids" in body:
                 raw_iids = body["paymentBaseIids"]
@@ -1815,33 +1837,41 @@ class GameSession:
         kind = prompt["kind"]
         value = options[option_id]
         selected_effect_targets = None
-        if kind == "effect_target" and payload and "selectedOptionIds" in payload:
-            selected_ids = list(dict.fromkeys(str(option) for option in payload.get("selectedOptionIds", [])))
-            required_count = int(self.prompt.get("requiredTargetCount", 1))
-            minimum_count = int(self.prompt.get("minimumTargetCount", required_count))
-            maximum_count = int(self.prompt.get("maximumTargetCount", required_count))
-            if self.prompt.get("allowVariableTargetCount"):
-                valid_count = minimum_count <= len(selected_ids) <= maximum_count
-                count_message = (
-                    f"Choose {minimum_count}-{maximum_count} targets."
-                    if minimum_count != maximum_count
-                    else f"Choose {maximum_count} targets."
-                )
-            else:
-                valid_count = len(selected_ids) == required_count
-                count_message = f"Choose {required_count} targets."
-            if not valid_count:
-                return self.state_dto({
-                    "code": "illegal_choice",
-                    "message": count_message,
-                })
-            unknown = [selected_id for selected_id in selected_ids if selected_id not in self._options]
-            if unknown:
-                return self.state_dto({
-                    "code": "illegal_choice",
-                    "message": f"Unknown option {unknown[0]}.",
-                })
-            selected_effect_targets = [self._options[selected_id] for selected_id in selected_ids]
+        if kind == "effect_target":
+            selected_ids = list(dict.fromkeys(
+                str(option) for option in (payload or {}).get("selectedOptionIds", [option_id])
+            ))
+            skip_option_ids = self._effect_target_skip_option_ids(prompt)
+            selected_skip_ids = set(selected_ids).intersection(skip_option_ids)
+            selected_skip_option = option_id in skip_option_ids or bool(selected_skip_ids)
+            if selected_skip_option:
+                selected_effect_targets = []
+            elif payload and "selectedOptionIds" in payload:
+                required_count = int(prompt.get("requiredTargetCount", 1))
+                minimum_count = int(prompt.get("minimumTargetCount", required_count))
+                maximum_count = int(prompt.get("maximumTargetCount", required_count))
+                if prompt.get("allowVariableTargetCount"):
+                    valid_count = minimum_count <= len(selected_ids) <= maximum_count
+                    count_message = (
+                        f"Choose {minimum_count}-{maximum_count} targets."
+                        if minimum_count != maximum_count
+                        else f"Choose {maximum_count} targets."
+                    )
+                else:
+                    valid_count = len(selected_ids) == required_count
+                    count_message = f"Choose {required_count} targets."
+                if not valid_count:
+                    return self.state_dto({
+                        "code": "illegal_choice",
+                        "message": count_message,
+                    })
+                unknown = [selected_id for selected_id in selected_ids if selected_id not in self._options]
+                if unknown:
+                    return self.state_dto({
+                        "code": "illegal_choice",
+                        "message": f"Unknown option {unknown[0]}."
+                    })
+                selected_effect_targets = [self._options[selected_id] for selected_id in selected_ids]
         value = self._apply_choice_payload(value, payload)
         if pending_side is None:
             self._clear_prompt()
@@ -2153,12 +2183,20 @@ class GameSession:
     def _declare_attack(self, attacker: CardInstance, target: AttackTarget) -> None:
         before = self._visual_state_snapshot()
         effect = self._targeted_effect_for_card(attacker.card, EffectTiming.ON_ATTACK)
+        context = Context(controller=attacker.owner, source=attacker, target=target.ref)
         if effect is not None and effect.condition is not None:
-            context = Context(controller=attacker.owner, source=attacker, target=target.ref)
             if not effect.condition(attacker, self.engine.state, context):
                 effect = None
-        effect_kind = effect.target_kind if effect is not None else TARGETED_ATTACK_CARD_KINDS.get(attacker.card.id)
-        attack_target_count = self._target_count_for_effect(attacker.owner, effect) if effect is not None else 1
+        effect_kind = (
+            self._resolve_effect_target_kind(attacker, effect, context)
+            if effect is not None
+            else TARGETED_ATTACK_CARD_KINDS.get(attacker.card.id)
+        )
+        attack_target_count = (
+            self._target_count_for_effect(attacker.owner, effect, source_ci=attacker)
+            if effect is not None
+            else 1
+        )
         defer_attack_effect = (
             self._is_user_controlled(attacker.owner)
             and effect_kind is not None
@@ -2621,6 +2659,10 @@ class GameSession:
         player = source.owner
         if not self._is_user_controlled(player):
             return False
+        if not effect.optional:
+            before_pre_target = self._visual_state_snapshot()
+            self.engine._run_pre_target_effect(effect, source, pending.context)
+            self._record_visual_changes(before_pre_target)
         sequence = self._custom_source_effect_sequence(source, effect, pending.context)
         if sequence:
             self._pending_effect = {
@@ -2689,12 +2731,17 @@ class GameSession:
                 source_ci=source,
             )
             return True
-        kind = effect.target_kind
+        kind = self._resolve_effect_target_kind(source, effect, pending.context)
+        if kind is None:
+            return False
         eligible = self._eligible_targets(player, kind, None, effect, source_ci=source)
         look_window = self._revealed_cards_for_effect(player, kind)
         if not eligible and not look_window:
             return False
-        target_count = min(self._target_count_for_effect(player, effect), len(eligible)) if eligible else 1
+        target_count = min(
+            self._target_count_for_effect(player, effect, source_ci=source),
+            len(eligible),
+        ) if eligible else 1
         self._pending_effect = {
             "mode": "trigger_deferred",
             "player": player,
@@ -2855,7 +2902,11 @@ class GameSession:
                 self._prompt_effect_target(player, "ally_base", None, 1, effect=effect, source_ci=source)
                 return True
             return False
-        kind = effect.target_kind
+        kind = self._resolve_effect_target_kind(
+            source,
+            effect,
+            ctx,
+        )
         eligible = self._eligible_targets(player, kind, None, effect, source_ci=source) if kind else []
         look_window = self._revealed_cards_for_effect(player, kind) if kind else []
         if not eligible and not look_window:
@@ -2884,7 +2935,10 @@ class GameSession:
                     )
                     return True
             return False
-        target_count = min(self._target_count_for_effect(player, effect), len(eligible)) if eligible else 1
+        target_count = min(
+            self._target_count_for_effect(player, effect, source_ci=source),
+            len(eligible),
+        ) if eligible else 1
         if target_count <= 0:
             return False
         self._pending_effect = {
@@ -3137,7 +3191,15 @@ class GameSession:
                 if selected_amount is None
                 else selected_amount
             )
-        elif effect.template_id == "summon_from_trash" or effect.target_kind == "ally_minion_base":
+        elif effect.template_id == "summon_from_trash":
+            field_entry_count = effect.params.get("field_entry_count")
+            if field_entry_count is None:
+                amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
+            elif isinstance(field_entry_count, bool) or not isinstance(field_entry_count, int) or field_entry_count < 0:
+                raise ValueError(f"invalid field_entry_count on effect: {field_entry_count!r}")
+            else:
+                amount = field_entry_count
+        elif effect.target_kind == "ally_minion_base":
             amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
         elif effect.params.get("puts_targets_on_field"):
             amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
@@ -3754,14 +3816,17 @@ class GameSession:
         self._record_visual_changes(before)
         self._log_event(f"{player.name}: {label}", event)
 
-        kind = effect.target_kind
+        kind = self._resolve_effect_target_kind(source, effect, ctx)
         eligible = (
             self._eligible_targets(player, kind, None, effect, source_ci=source)
             if kind is not None
             else []
         )
         if eligible:
-            target_count = min(self._target_count_for_effect(player, effect), len(eligible))
+            target_count = min(
+                self._target_count_for_effect(player, effect, source_ci=source),
+                len(eligible),
+            )
             self._pending_effect = {
                 "mode": "source_deferred",
                 "player": player,
@@ -3984,7 +4049,21 @@ class GameSession:
         return None
 
     def _effect_needs_target_choice(self, effect: EffectSpec) -> bool:
-        return bool(effect.target_kind) and not bool(effect.params.get("all_targets"))
+        return bool(effect.target_kind or effect.target_kind_resolver) and not bool(effect.params.get("all_targets"))
+
+    def _resolve_effect_target_kind(
+            self,
+            source: CardInstance,
+            effect: EffectSpec,
+            ctx: Context,
+    ) -> str | None:
+        resolver = effect.target_kind_resolver
+        if resolver is None:
+            return effect.target_kind
+        kind = resolver(source, self.engine.state, ctx)
+        if kind is not None and (not isinstance(kind, str) or not kind):
+            raise ValueError(f"invalid target kind from {source.card.id}: {kind!r}")
+        return kind
 
     def _targeted_effect_for_card(self, card, timing: EffectTiming | None) -> EffectSpec | None:
         if timing is None:
@@ -4087,7 +4166,12 @@ class GameSession:
             return None
         effect = self._targeted_effect_for_action(action, player)
         if effect is not None:
-            return effect.target_kind
+            source = self._play_action_card(player, action)
+            return self._resolve_effect_target_kind(
+                source,
+                effect,
+                Context(controller=player, source=source),
+            )
         card = self._play_action_card(player, action).card
         return TARGETED_CARD_KINDS.get(card.id)
 
@@ -4113,6 +4197,22 @@ class GameSession:
     ) -> int:
         if effect is None:
             return 1
+        if effect.params.get("exact_target_count_from_own_green_minions"):
+            if source_ci is None:
+                raise ValueError("dynamic Green Minion target count requires an effect source")
+            own_green_count = sum(
+                1
+                for minion in source_ci.owner.field
+                if self.engine._card_color(minion.card) is Color.GREEN
+            )
+            eligible = self._eligible_targets(
+                player,
+                effect.target_kind or "",
+                None,
+                effect,
+                source_ci=source_ci,
+            )
+            return min(own_green_count, len(eligible))
         if effect.params.get("exact_target_count_from_own_destroyed_forces"):
             return max(0, self.engine.destroyed_forces_count(player))
         if effect.params.get("exact_target_count_from_opponent_destroyed_forces"):
@@ -4201,15 +4301,12 @@ class GameSession:
             ])
         revealed = self._revealed_cards_for_effect(player, kind)
         no_target_look = bool(revealed) and not eligible_targets
-        optional_choice = (
-            not capacity_choice and (
-            kind in OPTIONAL_EFFECT_TARGET_KINDS
-            or bool(effect and effect.optional)
-            or no_target_look
-            )
+        optional_choice = not capacity_choice and bool(
+            (effect and (effect.optional or effect.min_targets == 0)) or no_target_look
         )
         exact_dynamic_targets = bool(effect and (
-            effect.params.get("exact_target_count_from_own_destroyed_forces")
+            effect.params.get("exact_target_count_from_own_green_minions")
+            or effect.params.get("exact_target_count_from_own_destroyed_forces")
             or effect.params.get("exact_target_count_from_opponent_destroyed_forces")
             or effect.params.get("discard_count_from_destroyed_forces")
         ))
@@ -4225,12 +4322,7 @@ class GameSession:
             if exact_dynamic_targets
             else 0 if optional_choice else max(0, effect.min_targets if effect else 1)
         )
-        if kind in OPTIONAL_EFFECT_TARGET_KINDS:
-            if kind == "top3_magic":
-                target_count = min(target_count, len(eligible_targets)) if eligible_targets else max(1, target_count)
-            else:
-                target_count = max(target_count, effect.max_targets if effect else 1)
-        elif eligible_targets:
+        if eligible_targets:
             if exact_dynamic_targets:
                 target_count = min(target_count, len(eligible_targets))
                 min_target_count = target_count
@@ -4266,6 +4358,7 @@ class GameSession:
         self.prompt["minimumTargetCount"] = min_target_count if variable_targets else target_count
         self.prompt["maximumTargetCount"] = target_count
         self.prompt["allowVariableTargetCount"] = variable_targets
+        self.prompt["allowTargetRejection"] = optional_choice
         if source_ci is not None:
             self.prompt["card"] = serialize_card(self.engine, source_ci, self.asset_index)
             if effect is not None:

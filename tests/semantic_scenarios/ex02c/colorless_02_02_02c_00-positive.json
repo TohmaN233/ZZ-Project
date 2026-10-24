@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_02_02_02c_00_positive",
+  "card_id": "colorless_02_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 《ベース》【後退時】このターン中、自分の[加護]が付与されているミニオン全てをBP+200する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_02_02_02c_00",
+        "zone": "field",
+        "seed": 866894684,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_02_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "asuna": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "kirito": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02c_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "blessing": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Place the Red Item in Base to gain a movement right",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "red_00_01_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attach the Green Blessing to Asuna",
+      "select": {
+        "kind": "bless",
+        "iid": "$blessing",
+        "target_iid": "$asuna"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Retreat Yuna to trigger her Base ability",
+      "select": {
+        "kind": "move_card",
+        "iid": "$primary",
+        "direction": "field_to_base"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The actually blessed Asuna gains 200 BP",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_05_02_02c_00",
+        "effectiveBp": 1000
+      }
+    },
+    {
+      "name": "The unblessed Black Swordsman receives no boost",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02c_01",
+        "effectiveBp": 500
+      }
+    },
+    {
+      "name": "Yuna enters Base active after retreat",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_02_02_02c_00",
+        "rested": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_04_02_02c_00_positive",
+  "card_id": "yellow_04_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "飛来\n【召喚時】＆スイッチ：「閃光」\nこのターン中、相手のコスト4以下のミニオン全てはアタックと移動ができない。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_04_02_02c_00",
+        "zone": "field",
+        "seed": 3985758546,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_06_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Flash-race Asuna to activate Kirito’s Switch",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_05_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Kirito’s Switch restrains the cost-one opponent after Asuna is summoned",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_01",
+        "flags": {
+          "contains": [
+            "turn:pc02_cannot_attack",
+            "cannot_move"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Kirito’s Switch leaves the cost-six opponent outside its limit",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_06_02_02c_01",
+        "flags": {
+          "none": [
+            "turn:pc02_cannot_attack",
+            "cannot_move"
+          ]
+        }
+      }
+    }
+  ]
+}

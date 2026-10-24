@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02c_00_boundary",
+  "card_id": "colorless_01_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「黒の剣士」自分はデッキの中から種族「ドラゴン」を持つ赤のベース・ミニオンカード1枚を公開して手札に加えることができる。その後、自分のデッキをシャッフルする。\n【常時】このミニオンはベースに移動するとき、レスト状態で移動する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02c_00",
+        "zone": "hand",
+        "seed": 3065885825,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "colorless_01_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "dragon": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_02",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Silica",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_01_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Decline Silica’s optional search",
+      "select": {
+        "kind": "effect_target_skip"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Death Gun without a Black Swordsman Switch",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_02"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Move Silica to Base after declining the optional search",
+      "select": {
+        "kind": "move_card",
+        "iid": "$primary",
+        "direction": "field_to_base"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Declining leaves the red Dragon in Deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "No card is publicly revealed after the decline and wrong-race summon",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "card": {
+          "cardId": "red_00_01_02c_00"
+        }
+      }
+    },
+    {
+      "name": "Silica enters Base rested after the declined search",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_00",
+        "rested": true
+      }
+    }
+  ]
+}

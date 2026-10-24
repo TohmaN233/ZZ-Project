@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_08_02_02c_01_boundary",
+  "card_id": "colorless_08_02_02c_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 飛来\n【召喚時】\n＆スイッチ：「黒の剣士」相手のBP400以下のミニオン全てを破壊する。破壊するミニオンがいない場合、次の自分のターン終了時まで、自分の種族「黒の剣士」または「閃光」を持つミニオン1体をBP+300/DP+1する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_08_02_02c_01",
+        "zone": "field",
+        "seed": 2734794685,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "black_sword": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p2_401": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$p2_401",
+        "permanentBpModifier": -99
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_02_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "yuna": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon the Black Swordsman; no opposing Minion is at BP400 or less",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "choose the Black Swordsman for the +300 BP/+1 DP fallback",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardIid": "$black_sword"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the selected Black Swordsman receives +300 BP/+1 DP",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$black_sword",
+        "effectiveBp": 800,
+        "effectiveDp": 2
+      }
+    },
+    {
+      "name": "the Sword-only Yuna does not receive the fallback bonus",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$yuna",
+        "effectiveBp": 200,
+        "effectiveDp": 1
+      }
+    },
+    {
+      "name": "the BP401 opposing Minion is not affected by the fallback branch",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p2_401",
+        "effectiveBp": 401
+      }
+    }
+  ]
+}

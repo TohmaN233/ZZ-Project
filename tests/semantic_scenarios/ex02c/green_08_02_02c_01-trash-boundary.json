@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_08_02_02c_01_trash_boundary",
+  "card_id": "green_08_02_02c_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 襲撃\n【変形時】\n自分の種族「ソード」を持つマナ全てをアクティブにする。\n【破壊時】＆スイッチ：「黒の剣士」\n相手のミニオン全ては、次の相手のスタンバイフェイズ終了時まで、アクティブにならない。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_08_02_02c_00",
+        "zone": "field",
+        "seed": 2802202619,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "initial": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_08_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_04_02_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_04_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "sourceId": "green_08_02_02c_00",
+        "targetId": "green_08_02_02c_01",
+        "iid": "$initial"
+      }
+    },
+    {
+      "path": "/api/debug/move-card",
+      "payload": {
+        "iid": "$initial",
+        "zone": "trash"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon a Black Swordsman while transformed Eugeo is in Trash",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_04_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "End the controller turn after Switch",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Transformed Eugeo is in Trash before the matching summon",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02c_01"
+      }
+    },
+    {
+      "name": "The Trash host does not Switch and the opposing Minion refreshes at Standby",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_04_02_02c_00",
+        "rested": false
+      }
+    }
+  ]
+}

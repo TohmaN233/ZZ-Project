@@ -10,10 +10,13 @@ from zz.enums import AreaType, CardType, Color, Keyword
 
 EffectFn = Callable[[Any, Any, Any], None]
 EffectCondition = Callable[[Any, Any, Any], bool]
+TargetKindResolver = Callable[[Any, Any, Any], str | None]
 
 
 class EffectTiming(Enum):
     ON_SUMMON = "on_summon"
+    ON_REST = "on_rest"
+    ON_RETURN_TO_HAND = "on_return_to_hand"
     ON_PLACE_BASE = "on_place_base"
     ON_CAST_MAGIC = "on_cast_magic"
     ON_ATTACK = "on_attack"
@@ -53,6 +56,7 @@ class EffectSpec:
     official_condition: str | None = None
     active_areas: tuple[AreaType, ...] | None = None
     pre_target_fn: EffectFn | None = None
+    target_kind_resolver: TargetKindResolver | None = None
 
 
 EFFECT_TARGET_FILTER_PARAMS = frozenset({
@@ -60,13 +64,16 @@ EFFECT_TARGET_FILTER_PARAMS = frozenset({
     "card_type", "color", "exclude_color", "max_cost", "min_cost",
     "max_bp", "min_bp", "max_dp", "min_dp", "bp_below_original",
     "requires_blessing", "requires_boost", "only_rested", "only_active",
-    "exclude_tokens", "required_keyword",
+    "exclude_tokens", "required_keyword", "explicitly_equivalent_to",
 })
 
 
 def effect_target_filter(eng: Any, effect: EffectSpec, *, source: Any = None):
     """The same declared target restrictions govern prompts and resolution."""
-    known_filters = EFFECT_TARGET_FILTER_PARAMS | {"exclude_source", "exclude_self", "max_dp_from_opponent_destroyed_forces"}
+    known_filters = EFFECT_TARGET_FILTER_PARAMS | {
+        "exclude_source", "exclude_self", "max_dp_from_opponent_destroyed_forces",
+        "protection_operation",
+    }
     unknown_filters = {
         key for key in effect.params
         if key.startswith(("requires_", "required_", "only_", "exclude_", "bp_below_"))
@@ -80,6 +87,12 @@ def effect_target_filter(eng: Any, effect: EffectSpec, *, source: Any = None):
     }
     matcher = _target_filter(eng, **params) if params else lambda target: True
     exclude_source = bool(effect.params.get("exclude_source") or effect.params.get("exclude_self"))
+    protection_operation = effect.params.get("protection_operation")
+    if protection_operation is not None:
+        if not isinstance(protection_operation, str) or not protection_operation:
+            raise ValueError(f"invalid protection_operation: {protection_operation!r}")
+        if source is None:
+            raise ValueError("protection_operation requires an effect source")
     dynamic_dp = bool(effect.params.get("max_dp_from_opponent_destroyed_forces"))
     if dynamic_dp and source is None:
         raise ValueError("dynamic opposing Force target limit requires an effect source")
@@ -90,6 +103,12 @@ def effect_target_filter(eng: Any, effect: EffectSpec, *, source: Any = None):
 
     def matches(target: Any) -> bool:
         if exclude_source and target is source:
+            return False
+        if protection_operation and not eng._can_effect_select(
+            source,
+            target,
+            protection_operation=protection_operation,
+        ):
             return False
         if max_dp is not None and eng.effective_dp(target) > max_dp:
             return False
@@ -122,6 +141,8 @@ def effect_once_per_turn_used(effect: EffectSpec, source: Any) -> bool:
 
 TIMING_LABELS = {
     EffectTiming.ON_SUMMON: "召喚時",
+    EffectTiming.ON_REST: "レスト時",
+    EffectTiming.ON_RETURN_TO_HAND: "手札に戻る時",
     EffectTiming.ON_PLACE_BASE: "配置時",
     EffectTiming.ON_CAST_MAGIC: "メイン/フラッシュ",
     EffectTiming.ON_ATTACK: "アタック時",
@@ -838,7 +859,10 @@ def _refresh_targets(
 
 def _rest_self(**_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
-        ci.rested = True
+        eng = getattr(state, "engine", None)
+        if eng is None:
+            raise RuntimeError("rest effect requires an engine")
+        eng.rest_target(ci)
     return fn
 
 
@@ -918,6 +942,7 @@ def _search_deck_to_hand(
     target_kind: str | None,
     optional: bool = False,
     card_id: str | None = None,
+    explicitly_equivalent_to: str | None = None,
     card_ids: tuple[str, ...] | list[str] | None = None,
     exclude_card_id: str | None = None,
     race: str | None = None,
@@ -932,6 +957,7 @@ def _search_deck_to_hand(
             filter_fn = _target_filter(
                 eng,
                 card_id=card_id,
+                explicitly_equivalent_to=explicitly_equivalent_to,
                 card_ids=card_ids,
                 exclude_card_id=exclude_card_id,
                 race=race,
@@ -1236,7 +1262,10 @@ def _refresh_self(**_: Any) -> EffectFn:
 def _move_to_base_rested(**_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
         if ctx.source is ci and ci.area is AreaType.BASE:
-            ci.rested = True
+            eng = getattr(state, "engine", None)
+            if eng is None:
+                raise RuntimeError("rest-on-move effect requires an engine")
+            eng.rest_target(ci)
     return fn
 
 
@@ -1271,6 +1300,7 @@ def _target_filter(
     color: Color | str | None = None,
     exclude_color: Color | str | None = None,
     card_id: str | None = None,
+    explicitly_equivalent_to: str | None = None,
     card_ids: tuple[str, ...] | list[str] | None = None,
     exclude_card_id: str | None = None,
     race: str | None = None,
@@ -1300,12 +1330,21 @@ def _target_filter(
                 max_cost is not None, min_cost is not None, max_bp is not None,
                 min_bp is not None, max_dp is not None, min_dp is not None,
                 bp_below_original, wanted_color, excluded_color, card_id,
-                wanted_card_ids, exclude_card_id, race, wanted_races,
+                explicitly_equivalent_to, wanted_card_ids, exclude_card_id,
+                race, wanted_races,
                 wanted_type, requires_blessing, requires_boost,
                 exclude_tokens, required_keyword,
             ))
         if card_id is not None and card.id != card_id:
             return False
+        if explicitly_equivalent_to is not None:
+            from zz.card_identity import explicitly_equivalent_card_ids
+
+            if card.id != explicitly_equivalent_to and not explicitly_equivalent_card_ids(
+                card.id,
+                explicitly_equivalent_to,
+            ):
+                return False
         if wanted_card_ids and card.id not in wanted_card_ids:
             return False
         if exclude_card_id is not None and card.id == exclude_card_id:

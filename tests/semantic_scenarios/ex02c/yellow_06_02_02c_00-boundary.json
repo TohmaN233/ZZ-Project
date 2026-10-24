@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_06_02_02c_00_boundary",
+  "card_id": "yellow_06_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【アタック時】\\n相手のDP0のミニオン１体を手札に戻す。その後、相手のDP1のミニオン1体を手札に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_06_02_02c_00",
+        "zone": "field",
+        "seed": 3242909314,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 10
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with Sakuya",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_06_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the opponent player",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Select the DP1 target for the second effect",
+      "select": {
+        "cardId": "red_02_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the opponent Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the controller Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The DP1 Minion is returned by the second effect after no DP0 target exists",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02c_00"
+      }
+    },
+    {
+      "name": "No other Minion is available as a first DP0 target",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "effectiveDp": 0
+      }
+    },
+    {
+      "name": "Sakuya deals its 2 damage to the opponent player",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 8
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_02_02_02c_00_positive",
+  "card_id": "yellow_02_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "【召喚時】＆スイッチ：「閃光」/「絶剣」\n自分のデッキを上から2枚見て、その中の種族「ソード」を持つフィールド・ミニオンカード1枚を公開して手札に加える。残りをランダムにデッキの下に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_02_02_02c_00",
+        "zone": "hand",
+        "seed": 2730409219,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_02_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_06_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Flash-race Asuna to activate Shiune’s Switch",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_06_02_02c_01"
+      }
+    },
+    {
+      "name": "Reveal the Sword among the top two cards",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "colorless_01_02_02c_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The selected Sword enters hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_01"
+      }
+    },
+    {
+      "name": "Only the chosen Sword is publicly revealed",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "colorless_01_02_02c_01"
+        }
+      }
+    },
+    {
+      "name": "The unchosen card remains in Deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    }
+  ]
+}

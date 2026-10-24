@@ -129,10 +129,10 @@ def _passive_chiron(fi: "ForceInstance", engine: "Engine") -> None:
     """知 ケイローン: own hand Magic cards' free cost -2."""
     def modifier_fn(ci, current_cost=None):
         if not _force_can_exert(fi) or ci.owner is not fi.owner:
-            return dict(current_cost or ci.card.cost)
+            return dict(ci.card.cost if current_cost is None else current_cost)
         if ci.card.type is not CardType.MAGIC:
-            return dict(current_cost or ci.card.cost)
-        new_cost = dict(current_cost or ci.card.cost)
+            return dict(ci.card.cost if current_cost is None else current_cost)
+        new_cost = dict(ci.card.cost if current_cost is None else current_cost)
         new_cost[Color.COLORLESS] = max(0, new_cost.get(Color.COLORLESS, 0) - 2)
         return new_cost
     modifier_fn._force_iid = id(fi)

@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_04_02_02c_00_positive",
+  "card_id": "red_04_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 襲撃",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_04_02_02c_00",
+        "zone": "hand",
+        "seed": 3182846487,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Klain",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_04_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack immediately with Rush",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_04_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Klain has Rush",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_04_02_02c_00",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Rush allows attacking the opponent player while Forces remain",
+      "path": "state.prompt.options",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "kind": "player"
+      }
+    }
+  ]
+}

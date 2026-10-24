@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_07_02_02c_02_positive",
+  "card_id": "colorless_07_02_02c_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【自分のターン】\n自分のミニオンがいない場合、自分の手札にあるこのカードのフリーコストは3減らされる。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_07_02_02c_02",
+        "zone": "hand",
+        "seed": 3051319890,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "play Fatal Scythe after its three-point discount",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_07_02_02c_02"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Fatal Scythe enters the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_07_02_02c_02"
+      }
+    },
+    {
+      "name": "four of the seven Mana tokens are rested for the discounted play",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 4,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "three Mana tokens remain ready",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "cardId": "mana_token",
+        "rested": false
+      }
+    }
+  ]
+}

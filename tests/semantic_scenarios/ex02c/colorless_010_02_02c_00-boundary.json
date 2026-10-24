@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_010_02_02c_00_boundary",
+  "card_id": "colorless_010_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n相手のミニオン全てにBP-Xを付与する。Xは自分のフォースのライフ全ての合計×100とする。\n【自分のターン終了時】\n自分のプレイヤーを1回復する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_010_02_02c_00",
+        "zone": "hand",
+        "seed": 218928059,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 10
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 1,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 2,
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p2_300": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$p2_300",
+        "permanentBpModifier": -200
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p2_301": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$p2_301",
+        "permanentBpModifier": -199
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_00_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Radius with three total P1 Force Life",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_010_02_02c_00"
+      }
+    },
+    {
+      "name": "end P1 turn at the player Life cap",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "BP300 is reduced to zero and destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p2_300"
+      }
+    },
+    {
+      "name": "BP301 becomes BP1 and survives",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p2_301",
+        "effectiveBp": 1
+      }
+    },
+    {
+      "name": "the turn-end recovery stays at the 10 Life cap",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 10
+    }
+  ]
+}

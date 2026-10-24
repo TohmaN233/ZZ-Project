@@ -60,6 +60,8 @@ def main() -> None:
         str(ROOT),
         "--collect-submodules",
         "zz.pc02r_cards",
+        "--collect-submodules",
+        "zz.ex02c_cards",
         "--add-data",
         add_data("zz/pc02r_data.tsv", "zz"),
         "--add-data",

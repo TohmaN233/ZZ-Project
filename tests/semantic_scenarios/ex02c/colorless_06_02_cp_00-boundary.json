@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_06_02_cp_00_boundary",
+  "card_id": "colorless_06_02_cp_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n＆スイッチ：「閃光」自分はデッキの中から種族「アイテム」を持つベース・ミニオンカード1枚を公開して手札に加える。その後、自分のデッキをシャッフルする。\n【アタック時】\nプレイヤーにアタックした場合、相手のBP300以下のミニオン1体を破壊する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_06_02_cp_00",
+        "zone": "field",
+        "seed": 3045674269,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "item_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "wrong_race_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_05_02_02c_03",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "strong_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$strong_target",
+        "permanentBpModifier": -199
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "weak_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$weak_target",
+        "permanentBpModifier": -200
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon a Black Swordsman, which does not match Kirito’s Flash Switch",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "attack P2 Force with Kirito",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_06_02_cp_00"
+      }
+    },
+    {
+      "name": "target P2 Sho Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "P2 passes Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "P1 passes Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "summon Stacia to trigger Kirito’s required Item search",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_05_02_02c_03"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the Black Swordsman summon does not trigger Kirito’s Flash search",
+      "path": "state.players.human.handCount",
+      "op": "eq",
+      "value": 0
+    },
+    {
+      "name": "no card is publicly revealed",
+      "path": "state.publicReveals",
+      "op": "length_eq",
+      "value": 0
+    },
+    {
+      "name": "BP301 is not destroyed by the attack trigger",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "effectiveBp": 301,
+        "iid": "$strong_target"
+      }
+    },
+    {
+      "name": "attacking a Force reduces Force Life by 1 without triggering Kirito’s player attack effect",
+      "path": "state.players.opponent.forces[0].life",
+      "op": "eq",
+      "value": 4
+    },
+    {
+      "name": "BP300 remains in Field because the attack targeted a Force",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$weak_target",
+        "effectiveBp": 300
+      }
+    },
+    {
+      "name": "the Switch search requires an Item target",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "effect_target"
+    },
+    {
+      "name": "the eligible Item Base Minion is offered",
+      "path": "state.prompt.options",
+      "op": "any_where",
+      "where": {
+        "kind": "effect_target",
+        "cardIid": "$item_target"
+      }
+    },
+    {
+      "name": "a non-Item Base Minion is excluded",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "value": 0,
+      "where": {
+        "cardIid": "$wrong_race_target"
+      }
+    },
+    {
+      "name": "the mandatory Switch search cannot be skipped",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "value": 0,
+      "where": {
+        "kind": "effect_target_skip"
+      }
+    }
+  ]
+}

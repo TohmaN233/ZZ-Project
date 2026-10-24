@@ -63,6 +63,25 @@ def test_hardin_hand_choice_filters_printed_cost_and_type_and_allows_declining(s
         assert any(card.iid == runner.captures["recruited"] for card in session.engine.state.players[0].field)
 
 
+def test_hardin_empty_target_list_requires_explicit_decline_option():
+    runner = scenario("yellow_07_02_02r_00")
+    session = runner.session
+    runner._run_action(runner.spec["actions"][0])
+    prompt = session.prompt
+    target = next(option for option in prompt["options"] if option.get("cardIid"))
+    owner = session.engine.state.players[0]
+    before = tuple(card.iid for card in owner.hand)
+
+    rejected = session.choose(prompt["id"], target["id"], {"selectedOptionIds": []})
+    assert rejected["error"]["code"] == "illegal_choice"
+    assert tuple(card.iid for card in owner.hand) == before
+    assert session.prompt["id"] == prompt["id"]
+
+    accepted_decline = session.choose(prompt["id"], "none", {"selectedOptionIds": []})
+    assert accepted_decline["error"] is None
+    assert tuple(card.iid for card in owner.hand) == before
+
+
 def test_ascended_hardin_attack_prompt_uses_attack_text_in_each_language():
     runner = scenario("yellow_07_02_02r_01")
     for action in runner.spec["actions"][:3]:

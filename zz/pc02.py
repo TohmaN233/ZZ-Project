@@ -701,12 +701,12 @@ def _blessed_ally_attack(source: CardInstance, state: Any, ctx: Context) -> bool
 def _rest_enemy(source: CardInstance, state: Any, ctx: Context) -> None:
     targets = state.engine.select_target(source.owner, "enemy_minion", 1, 1, source=source)
     for target in targets:
-        target.rested = True
+        state.engine.rest_target(target)
 
 
 def _rest_all_enemy(source: CardInstance, state: Any, ctx: Context) -> None:
     for target in _opponent(state, source.owner).field:
-        target.rested = True
+        state.engine.rest_target(target)
 
 
 def _hatoto_enemy_enter(source: CardInstance, state: Any, ctx: Context) -> bool:
@@ -716,7 +716,7 @@ def _hatoto_enemy_enter(source: CardInstance, state: Any, ctx: Context) -> bool:
 
 def _hatoto_rest(source: CardInstance, state: Any, ctx: Context) -> None:
     if isinstance(ctx.source, CardInstance):
-        ctx.source.rested = True
+        state.engine.rest_target(ctx.source)
 
 
 def _apprentice_summon(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -988,7 +988,7 @@ def _storm_rest(source: CardInstance, state: Any, ctx: Context) -> None:
         source=source,
     )
     for target in targets:
-        target.rested = True
+        state.engine.rest_target(target)
 
 
 def _hagen_summon(source: CardInstance, state: Any, ctx: Context) -> None:

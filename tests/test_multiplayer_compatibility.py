@@ -30,10 +30,14 @@ def test_static_manifest_matches_versions_and_authoritative_definitions() -> Non
 def test_checksum_scope_covers_the_authoritative_card_and_rules_sources() -> None:
     required = {
         "data/cards_bilingual_v4.tsv",
+        "data/ex02_ex02c_equivalences.tsv",
         "zz/basic.py",
+        "zz/card_identity.py",
         "zz/deckcode0.py",
         "zz/effects.py",
         "zz/engine.py",
+        "zz/ex02c.py",
+        "zz/ex02c_data.tsv",
         "zz/forces.py",
         "zz/multiplayer/match.py",
         "zz/pc01.py",
@@ -41,6 +45,12 @@ def test_checksum_scope_covers_the_authoritative_card_and_rules_sources() -> Non
     }
 
     assert required <= set(AUTHORITATIVE_DEFINITION_PATHS)
+    ex02c_modules = {
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "zz/ex02c_cards").glob("*.py")
+    }
+    assert len(ex02c_modules) == 71
+    assert ex02c_modules <= set(AUTHORITATIVE_DEFINITION_PATHS)
     assert all((ROOT / path).is_file() for path in AUTHORITATIVE_DEFINITION_PATHS)
 
 

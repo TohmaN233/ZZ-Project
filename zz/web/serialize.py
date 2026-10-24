@@ -96,6 +96,11 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
         "permanentBpModifier": ci.permanent_bp_mod,
         "permanentDpModifier": ci.permanent_dp_mod,
         "flags": sorted(ci.flags),
+        "actionRestrictions": [
+            action
+            for action in ("attack", "block", "move")
+            if engine._action_restricted(ci, action)
+        ],
         "activeEffects": active_effects,
         "rested": ci.rested,
         "area": _area_value(ci.area),

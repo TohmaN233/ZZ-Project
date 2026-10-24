@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_08_02_02c_00_boundary",
+  "card_id": "green_08_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「黒の剣士」\n自分の緑のミニオン1体毎に、相手のミニオン1体をレストする。\n【常時】\nこのミニオンがアクティブ状態でなければ［加護］は付与されない。\n【加護時】\n緑の加護である場合、加護しているマナを除外して、「「整合騎士」ユージオ」に変形する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_08_02_02c_00",
+        "zone": "field",
+        "seed": 2802202618,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "initial": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_08_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "yellow_item": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_08_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "rested_eugeo": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Bless Eugeo with Yellow Item Mana",
+      "select": {
+        "kind": "bless",
+        "iid": "$yellow_item",
+        "target_iid": "$initial"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Yellow Bless does not transform Eugeo",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02c_00",
+        "rested": false
+      }
+    },
+    {
+      "name": "Yellow Bless remains attached to original Eugeo",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02c_00",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "yellow_00_01_02c_01"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "A rested Eugeo remains in Field without a Yellow Bless",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02c_00",
+        "rested": true,
+        "blessings": []
+      }
+    }
+  ]
+}

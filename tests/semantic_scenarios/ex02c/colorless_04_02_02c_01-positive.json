@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_02_02c_01_positive",
+  "card_id": "colorless_04_02_02c_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\\nスイッチ：「黒の剣士」自分のフォース1つを1回復する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_02_02c_01",
+        "zone": "field",
+        "seed": 4009739454,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_04_02_02c_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "life": 2
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "black_sword": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon a Black Swordsman to Switch Asuna",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Heal the Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Asuna restores exactly one life to the chosen Force",
+      "path": "state.players.human.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 3
+      }
+    }
+  ]
+}
