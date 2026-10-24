@@ -147,7 +147,24 @@ def _total_cost_label(card, official: dict[str, str], bilingual: dict[str, str])
     return str(total) if total else ""
 
 
-def _card_filter_values(card, official: dict[str, str], bilingual: dict[str, str]) -> dict[str, list[str]]:
+def _series_filter_value(pack_jp: str, filters: list[dict[str, Any]]) -> str:
+    # Unprinted definitions can have no series at all.
+    if not pack_jp:
+        return ""
+    values = {
+        option["value"]
+        for group in filters if group["id"] == "series"
+        for option in group["options"]
+        if pack_jp in (option["value"], option["labelJp"])
+    }
+    if len(values) != 1:
+        raise ValueError(f"Card pack {pack_jp!r} must match exactly one series filter value")
+    return values.pop()
+
+
+def _card_filter_values(
+    card, official: dict[str, str], bilingual: dict[str, str], *, series_value: str,
+) -> dict[str, list[str]]:
     card_type = _first(official.get("card_type_jp"), TYPE_JP_BY_VALUE.get(card.type.value))
     attribute = _split_values(_first(official.get("attribute_jp")))
     if not attribute and card.mana_color is not None:
@@ -161,7 +178,7 @@ def _card_filter_values(card, official: dict[str, str], bilingual: dict[str, str
         "cardtype": [card_type] if card_type else [],
         "attribute": attribute,
         "cost": [cost] if cost else [],
-        "series": [_first(official.get("pack_jp_official"), bilingual.get("pack_jp"))],
+        "series": [series_value],
         "race": race,
         "reality": [_first(official.get("rarity_official"), bilingual.get("rarity_en"))],
         "dp": [_first(official.get("dp_official"), card.dp if card.dp is not None else "")],
@@ -193,13 +210,17 @@ def _effect_spec_summary(card) -> list[dict[str, Any]]:
 def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
     official_by_id = _read_tsv_by_id(DEFAULT_OFFICIAL_CARDLIST)
     bilingual_by_id = _read_tsv_by_id(DEFAULT_BILINGUAL_CARDLIST)
+    filters = _read_filter_groups(DEFAULT_OFFICIAL_FILTERS)
     cards = []
     for card in CARD_REGISTRY.values():
         if not is_catalog_card_id(card.id):
             continue
         official = official_by_id.get(card.id, {})
         bilingual = bilingual_by_id.get(card.id, {})
-        filter_values = _card_filter_values(card, official, bilingual)
+        pack_jp = _first(official.get("pack_jp_official"), bilingual.get("pack_jp"))
+        filter_values = _card_filter_values(
+            card, official, bilingual, series_value=_series_filter_value(pack_jp, filters),
+        )
         ability_jp = card_japanese_ability(card)
         ability_en = _first(bilingual.get("ability_en"), card.ability_en)
         name_jp = _first(official.get("official_name_jp"), bilingual.get("name_jp"), card.name_jp)
@@ -207,7 +228,6 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
         translation = card_translation(card.id)
         name_zh = _first(translation.get("name_zh"))
         ability_zh = _first(translation.get("ability_zh"))
-        pack_jp = _first(official.get("pack_jp_official"), bilingual.get("pack_jp"))
         pack_order = _int_or_none(official.get("pack_order"))
         official_cost = _total_cost_label(card, official, bilingual)
         cards.append({
@@ -284,7 +304,7 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
         "playmats": asset_index.playmat_catalog(),
         "manaAssets": asset_index.mana_asset_catalog(),
         "uiAssets": asset_index.ui_asset_catalog(),
-        "filters": _read_filter_groups(DEFAULT_OFFICIAL_FILTERS),
+        "filters": filters,
         "effectTemplates": effect_template_catalog(),
         "defaultDecks": [
             {
