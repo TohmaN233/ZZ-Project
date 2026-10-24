@@ -6,6 +6,7 @@ from zz.effects import EffectSpec, EffectTiming, build_effect
 from zz.enums import AreaType, CardType
 from zz.model import CardInstance, Context
 from zz.pc01 import _card_from_row
+from zz.card_identity import explicitly_equivalent_card_ids
 
 
 CARD_ID = "yellow_03_03_02c_00"
@@ -37,7 +38,7 @@ def _speedaholic_available_at_turn_end(source: CardInstance, state: Any, ctx: Co
         ctx.controller is source.owner
         and _RETURN_SPEEDAHOLIC in source.flags
         and source.area is AreaType.TRASH
-        and any(card.card.id == CARD_ID for card in source.owner.trash)
+        and any(explicitly_equivalent_card_ids(card.card.id, CARD_ID) for card in source.owner.trash)
     )
 
 
@@ -69,7 +70,7 @@ def build_card(row: dict[str, Any]):
             min_targets=1,
             max_targets=1,
             active_areas=(AreaType.TRASH,),
-            card_id=CARD_ID,
+            explicitly_equivalent_to=CARD_ID,
             card_type=CardType.MAGIC,
             official_effect="自分のトラッシュにある「スピードホリック」1枚を手札に戻す。",
             official_timing="自分のターン終了時",

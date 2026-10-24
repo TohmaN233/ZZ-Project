@@ -6,6 +6,7 @@ from zz.effects import EffectSpec, EffectTiming
 from zz.enums import AreaType, Color
 from zz.model import CardInstance, Context
 from zz.pc01 import _card_from_row
+from zz.transformations import transformation_target_id
 
 
 CARD_ID = "red_07_02_02c_02"
@@ -36,7 +37,8 @@ def _transform_on_red_bless(source: CardInstance, state: Any, ctx: Context) -> N
     state.engine.banish_blessing_mana(source, mana, source=source)
     from zz.cards import CARD_REGISTRY
 
-    state.engine.transform_card(source, CARD_REGISTRY[TRANSFORMED_CARD_ID], target=mana)
+    target_id = transformation_target_id(source.card.id, TRANSFORMED_CARD_ID)
+    state.engine.transform_card(source, CARD_REGISTRY[target_id], target=mana)
 
 
 def build_card(row: dict[str, Any]):

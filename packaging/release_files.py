@@ -36,7 +36,7 @@ SOURCE_TOOLS = (
 )
 SERVER_ZZ_MODULES = (
     "__init__", "ai", "basic", "cards", "codeman_memory", "deckcode0", "decks",
-    "card_identity", "effects", "engine", "enums", "ex01", "ex02c", "forces",
+    "card_identity", "effects", "engine", "enums", "ex01", "ex02", "ex02c", "forces",
     "house_rules", "keyword_rules", "model", "pc01", "pc01r", "pc02", "pc02r",
     "transformations", "triggers",
 )
@@ -116,6 +116,7 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.update(Path("tools") / name for name in SOURCE_TOOLS)
         paths.update(Path("tests") / name for name in (*FOCUSED_TESTS, "test_release_archive_inventory.py"))
         paths.add(Path("tests/test_ex02c_cards.py"))
+        paths.add(Path("tests/test_ex02_cards.py"))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
         paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))
         paths.add(Path("tests/semantic_scenarios/ex02c/green_08_02_02c_01-trash-boundary.json"))
@@ -190,7 +191,7 @@ def archive_filter(info):
 
 # Exact product allowlists are independent of Git tracking status. New runtime
 # surfaces require an explicit release-contract change instead of broad copying.
-ZZ_MODULES = ('__init__', 'action_q_residual_critic', 'action_records', 'action_set_dataset', 'action_set_listwise_model', 'action_set_model', 'action_set_runtime_scores', 'action_set_scoring_contracts', 'action_set_teacher_rebuild', 'action_set_training', 'action_set_ygo_policy', 'action_value_group_key', 'action_value_row_refresh', 'ai', 'ai_deck_analysis', 'ai_league', 'ai_registry', 'ai_runtime_stack', 'basic', 'batched_eval_profile', 'card_identity', 'card_profiles', 'card_slot_refs', 'cards', 'codeman_memory', 'codeman_replay_correction', 'codeman_semantic_audit', 'codeman_training', 'counterfactual_transition', 'current_policy_actor_contract', 'current_policy_runtime', 'deck_ai', 'deck_profiles', 'deckcode0', 'decks', 'deep_rl', 'deep_runtime', 'deep_v2_understanding', 'effects', 'engine', 'enums', 'ex01', 'ex02c', 'forces', 'greedy_ai', 'house_rules', 'keyword_rules', 'model', 'pc01', 'pc01r', 'pc02', 'pc02r', 'player_correction_model', 'policy_factories', 'rl_action_vocab', 'rl_ai', 'rl_tensor_schema', 'rl_training', 'rollout_store', 'rollout_task_specs', 'runtime_aux_compose', 'runtime_profile', 'sim', 'trace_counterfactual_transition', 'training_fast_path', 'transformations', 'triggers', 'turn_planner', 'ygo_failed_direct_guard', 'ygo_vector_actor_rollout')
+ZZ_MODULES = ('__init__', 'action_q_residual_critic', 'action_records', 'action_set_dataset', 'action_set_listwise_model', 'action_set_model', 'action_set_runtime_scores', 'action_set_scoring_contracts', 'action_set_teacher_rebuild', 'action_set_training', 'action_set_ygo_policy', 'action_value_group_key', 'action_value_row_refresh', 'ai', 'ai_deck_analysis', 'ai_league', 'ai_registry', 'ai_runtime_stack', 'basic', 'batched_eval_profile', 'card_identity', 'card_profiles', 'card_slot_refs', 'cards', 'codeman_memory', 'codeman_replay_correction', 'codeman_semantic_audit', 'codeman_training', 'counterfactual_transition', 'current_policy_actor_contract', 'current_policy_runtime', 'deck_ai', 'deck_profiles', 'deckcode0', 'decks', 'deep_rl', 'deep_runtime', 'deep_v2_understanding', 'effects', 'engine', 'enums', 'ex01', 'ex02', 'ex02c', 'forces', 'greedy_ai', 'house_rules', 'keyword_rules', 'model', 'pc01', 'pc01r', 'pc02', 'pc02r', 'player_correction_model', 'policy_factories', 'rl_action_vocab', 'rl_ai', 'rl_tensor_schema', 'rl_training', 'rollout_store', 'rollout_task_specs', 'runtime_aux_compose', 'runtime_profile', 'sim', 'trace_counterfactual_transition', 'training_fast_path', 'transformations', 'triggers', 'turn_planner', 'ygo_failed_direct_guard', 'ygo_vector_actor_rollout')
 
 WEB_MODULES = ('__init__', 'assets', 'catalog', 'debug_tools', 'deck_store', 'filter_localization', 'localization', 'profiles', 'serialize', 'server', 'session', 'settings_store')
 

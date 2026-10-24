@@ -20,6 +20,7 @@ import zz.ex01  # noqa: F401 - registers EX:01 cards
 import zz.pc01r  # noqa: F401 - registers PC:01R cards
 import zz.pc02  # noqa: F401 - registers PC:02 cards
 import zz.ex02c  # noqa: F401 - registers EX02C cards
+import zz.ex02  # noqa: F401 - registers the corresponding EX02 original faces
 import zz.pc02r  # noqa: F401 - registers PC:02R DIVINE cards
 from zz.forces import ALL_FORCES
 from zz.enums import CardType
