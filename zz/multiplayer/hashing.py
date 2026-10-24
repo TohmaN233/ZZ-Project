@@ -57,6 +57,7 @@ def _runtime_value(value: Any) -> Any:
                 "preTargetCallback": None if value.pre_target_fn is None else _callable_name(value.pre_target_fn),
                 "condition": None if value.condition is None else _callable_name(value.condition),
                 "targetKind": value.target_kind,
+                "targetKindResolver": None if value.target_kind_resolver is None else _callable_name(value.target_kind_resolver),
                 "minTargets": value.min_targets,
                 "maxTargets": value.max_targets,
                 "optional": value.optional,

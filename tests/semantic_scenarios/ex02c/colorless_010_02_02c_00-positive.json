@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_010_02_02c_00_positive",
+  "card_id": "colorless_010_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n相手のミニオン全てにBP-Xを付与する。Xは自分のフォースのライフ全ての合計×100とする。\n【自分のターン終了時】\n自分のプレイヤーを1回復する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_010_02_02c_00",
+        "zone": "hand",
+        "seed": 1966962901,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 9
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 3,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 2,
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P2",
+        "life": 5,
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p2_500": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "p2_600": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$p2_600",
+        "permanentBpModifier": 100
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_00_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "summon Radius with five total P1 Force Life",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_010_02_02c_00"
+      }
+    },
+    {
+      "name": "end P1 turn to resolve the Life recovery",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "the BP500 opposing Minion is reduced to zero and destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p2_500"
+      }
+    },
+    {
+      "name": "only P1 Force Life is counted; the BP600 Minion becomes BP100",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "iid": "$p2_600",
+        "effectiveBp": 100
+      }
+    },
+    {
+      "name": "Radius recovers its owner from 9 to the 10 Life cap",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 10
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_03_03_02c_00_positive",
+  "card_id": "yellow_03_03_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "【メイン】\n自分のミニオン1体をアクティブにする。そのミニオンが種族「ソード」を持つ場合、このターン終了時、自分のトラッシュにある「スピードホリック」1枚を手札に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_03_03_02c_00",
+        "zone": "hand",
+        "seed": 280586804,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Cast Speedaholic",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_03_03_02c_00"
+      }
+    },
+    {
+      "name": "Activate the rested Sword",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "colorless_01_02_02c_01"
+      }
+    },
+    {
+      "name": "Resolve Speedaholic’s end-of-turn recovery",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "Return Speedaholic from Trash to hand",
+      "prompt_kind": "effect_target",
+      "select": {
+        "cardId": "yellow_03_03_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The selected Sword becomes active",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_01",
+        "rested": false
+      }
+    },
+    {
+      "name": "Speedaholic returns from Trash to hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_03_03_02c_00"
+      }
+    },
+    {
+      "name": "No Speedaholic remains in Trash after recovery",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "yellow_03_03_02c_00"
+      }
+    }
+  ]
+}

@@ -28,19 +28,27 @@ _PC02R_CARD_MODULES = tuple(
     f"zz/pc02r_cards/{path.name}"
     for path in sorted((Path(__file__).resolve().parents[1] / "pc02r_cards").glob("*.py"))
 )
+_EX02C_CARD_MODULES = tuple(
+    f"zz/ex02c_cards/{path.name}"
+    for path in sorted((Path(__file__).resolve().parents[1] / "ex02c_cards").glob("*.py"))
+)
 
 AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "data/card_transformations.tsv",
     "data/cards_bilingual_v4.tsv",
+    "data/ex02_ex02c_equivalences.tsv",
     "data/official_cardlist.tsv",
     "zz/basic.py",
     "zz/cards.py",
+    "zz/card_identity.py",
     "zz/deckcode0.py",
     "zz/decks.py",
     "zz/effects.py",
     "zz/engine.py",
     "zz/enums.py",
     "zz/ex01.py",
+    "zz/ex02c.py",
+    "zz/ex02c_data.tsv",
     "zz/pc01r.py",
     "zz/pc02.py",
     "zz/forces.py",
@@ -55,6 +63,7 @@ AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "zz/transformations.py",
     "zz/web/session.py",
     *_PC02R_CARD_MODULES,
+    *_EX02C_CARD_MODULES,
 )))
 
 

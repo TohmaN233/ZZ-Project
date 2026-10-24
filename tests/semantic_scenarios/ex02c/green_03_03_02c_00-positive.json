@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_03_03_02c_00_positive",
+  "card_id": "green_03_03_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【メイン】／【フラッシュ】\n相手のミニオン1体を選択する。そのミニオンが有色の場合、レストする。そのミニオンが無色の場合、破壊する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_03_03_02c_00",
+        "zone": "hand",
+        "seed": 2802202607,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "spell": {
+          "path": "state.players.human.hand[0].iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_08_02_02c_00",
+        "side": "P2",
+        "zone": "field"
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field"
+      },
+      "capture": {
+        "colorless_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_03_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "spell_two": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_00_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_00_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_01_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "colored_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "sourceId": "green_08_02_02c_00",
+        "targetId": "green_08_02_02c_01",
+        "iid": "$attacker"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack with transformed Eugeo",
+      "select": {
+        "kind": "attack",
+        "attacker_iid": "$attacker"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the Force",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Cast Enhance Armament during the defender Flash window",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$spell"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Destroy the colorless Black Swordsman",
+      "select": {
+        "cardIid": "$colorless_target"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the attacker Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Cast the second copy during the defender Flash priority",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$spell_two"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Rest the opposing colored Minion",
+      "select": {
+        "cardId": "red_02_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the attacker priority after the first Flash cast",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the defender priority after the second Flash cast",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Flash destroys the colorless enemy Minion",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "name": "The attacking transformed Green Minion remains in Field after Flash",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02c_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "Enhance Armament resolves from hand during Flash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "green_03_03_02c_00"
+      }
+    },
+    {
+      "name": "The colored target is rested instead of destroyed",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_02_02c_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "Both Flash copies resolve to the controller trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "green_03_03_02c_00"
+      }
+    }
+  ]
+}

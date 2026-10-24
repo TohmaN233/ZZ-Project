@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_02_02_02c_04_positive",
+  "card_id": "colorless_02_02_02c_04",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「黒の剣士」自分はデッキの中から種族「アイテム」を持つベース・ミニオンカード1枚を公開して手札に加えることができる。その後、自分のデッキをシャッフルする。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_02_02_02c_04",
+        "zone": "hand",
+        "seed": 3823594468,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "colorless_02_02_02c_04"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "item1": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "item2": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "wrong_race": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "black_sword": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Lizbeth",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_02_02_02c_04"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Search the first Item Base Minion",
+      "select": {
+        "cardIid": "$item1"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon a Black Swordsman to Switch Lizbeth",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Search the second Item Base Minion",
+      "select": {
+        "cardIid": "$item2"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Both Item Base Minions enter hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "colorless_00_01_02c_00"
+      }
+    },
+    {
+      "name": "A non-Item Base Minion is not searched",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "The Switch search publicly reveals exactly its selected Item Base Minion",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "colorless_00_01_02c_00"
+        }
+      }
+    }
+  ]
+}

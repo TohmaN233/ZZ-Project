@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_08_02_02c_00_positive",
+  "card_id": "green_08_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「黒の剣士」\n自分の緑のミニオン1体毎に、相手のミニオン1体をレストする。\n【常時】\nこのミニオンがアクティブ状態でなければ［加護］は付与されない。\n【加護時】\n緑の加護である場合、加護しているマナを除外して、「「整合騎士」ユージオ」に変形する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_08_02_02c_00",
+        "zone": "field",
+        "seed": 2802202617,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "initial": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_08_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02c_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02c_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "green_item": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_06_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_04_02_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "target_one": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_02",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "target_two": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "target_three": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon a Black Swordsman to trigger Eugeo Switch",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_04_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Rest one opposing Minion for each controlled Green Minion",
+      "select_many": [
+        {
+          "cardIid": "$target_one"
+        },
+        {
+          "cardIid": "$target_two"
+        },
+        {
+          "cardIid": "$target_three"
+        }
+      ]
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Bless the active Eugeo with Green Item Mana and transform",
+      "select": {
+        "kind": "bless",
+        "iid": "$green_item",
+        "target_iid": "$initial"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Green Bless transforms Eugeo to the verified transformed face",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_08_02_02c_01"
+      }
+    },
+    {
+      "name": "Transformation refreshes the rested Sword Mana",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_01_02c_00",
+        "rested": false
+      }
+    },
+    {
+      "name": "The Green blessing Mana is banished by the transformation",
+      "path": "state.players.human.removedCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "The Black Swordsman Switch rests one Minion for each of three controlled Green Minions",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "rested": true
+      }
+    }
+  ]
+}

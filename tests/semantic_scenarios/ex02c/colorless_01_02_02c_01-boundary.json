@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02c_01_boundary",
+  "card_id": "colorless_01_02_02c_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 《ベース》【後退時】自分はデッキの中から種族「ウイング」を持つ黄のベース・ミニオンカード1枚を公開して手札に加えることができる。その後、自分のデッキをシャッフルする。\n【常時】このミニオンはベースに移動するとき、レスト状態で移動する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "zone": "field",
+        "seed": 2736157348,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_01_02_02c_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "wing": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Retreat Leafa to Base",
+      "select": {
+        "kind": "move_card",
+        "iid": "$primary",
+        "direction": "field_to_base"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Decline Leafa’s optional search",
+      "select": {
+        "kind": "effect_target_skip"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Leafa still enters Base rested after declining",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "Declining leaves the Yellow Wing in Deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "Leafa reveals no card after the decline",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "card": {
+          "cardId": "yellow_00_01_02c_00"
+        }
+      }
+    }
+  ]
+}

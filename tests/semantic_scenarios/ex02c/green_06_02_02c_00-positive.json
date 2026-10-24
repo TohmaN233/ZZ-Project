@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_06_02_02c_00_positive",
+  "card_id": "green_06_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【自分のターン】\n自分のプレイヤーのライフが7以上である場合、このミニオンは[襲撃]と[再起]を持ち、DP+1する。\n【自分のターン】\n『神聖術』相手のミニオンが1体以上レストするたび、自分のプレイヤーを1回復する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_06_02_02c_00",
+        "zone": "field",
+        "seed": 2802202613,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_03_02c_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "life": 8
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_04_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_02c_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Enhance Armament while Alice is active at eight Life",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_03_03_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Rest the first enemy Minion",
+      "select": {
+        "cardId": "green_04_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Alice heals exactly once for the rest batch",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 9
+    },
+    {
+      "name": "Alice gains one DP on her turn while Life is at least seven",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_06_02_02c_00",
+        "effectiveDp": 3
+      }
+    },
+    {
+      "name": "The chosen enemy Minion is rested",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "rested": true
+      }
+    },
+    {
+      "name": "Alice gains Rush on her turn at seven or more Life",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_06_02_02c_00",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Alice gains Reawaken on her turn at seven or more Life",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_06_02_02c_00",
+        "keywords": {
+          "contains": [
+            "REAWAKEN"
+          ]
+        }
+      }
+    }
+  ]
+}

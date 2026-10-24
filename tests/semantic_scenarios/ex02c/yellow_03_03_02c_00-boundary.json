@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_03_03_02c_00_boundary",
+  "card_id": "yellow_03_03_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "【メイン】\n自分のミニオン1体をアクティブにする。そのミニオンが種族「ソード」を持つ場合、このターン終了時、自分のトラッシュにある「スピードホリック」1枚を手札に戻す。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_03_03_02c_00",
+        "zone": "hand",
+        "seed": 2760328178,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_02c_01",
+        "side": "P2",
+        "zone": "deck",
+        "rested": false
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Speedaholic with its normal cost and no Minion target",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_03_03_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "End the turn without activating any Minion",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The empty-target cast resolves Speedaholic to Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_03_03_02c_00"
+      }
+    },
+    {
+      "name": "Both yellow Mana sources pay Speedaholic’s colored cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "yellow_00_01_02_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "One generic Mana source pays Speedaholic’s normal generic cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "No allied Minion was available for the spell",
+      "path": "state.players.human.field",
+      "op": "length_eq",
+      "value": 0
+    },
+    {
+      "name": "Without a selected Sword, Speedaholic stays in Trash",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "yellow_03_03_02c_00"
+      }
+    }
+  ]
+}

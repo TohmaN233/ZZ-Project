@@ -29,14 +29,16 @@ PACKAGING_FILES = (
 )
 SOURCE_TOOLS = (
     "__init__.py", "run_semantic_scenario.py", "card_translation_exchange.py",
+    "build_ex02c_correspondence.py",
     "normalize_japanese_card_text.py", "hidden_multiprocessing_spawn.py",
     "multiplayer_external_smoke.py", "multiplayer_soak.py",
     "multiplayer_network_diagnostic.py",
 )
 SERVER_ZZ_MODULES = (
     "__init__", "ai", "basic", "cards", "codeman_memory", "deckcode0", "decks",
-    "effects", "engine", "enums", "ex01", "forces", "house_rules", "keyword_rules",
-    "model", "pc01", "pc01r", "pc02", "pc02r", "transformations", "triggers",
+    "card_identity", "effects", "engine", "enums", "ex01", "ex02c", "forces",
+    "house_rules", "keyword_rules", "model", "pc01", "pc01r", "pc02", "pc02r",
+    "transformations", "triggers",
 )
 SERVER_WEB_MODULES = (
     "__init__", "assets", "localization", "profiles", "serialize", "session",
@@ -73,6 +75,20 @@ def pc02r_module_names(root: Path) -> tuple[str, ...]:
     return names
 
 
+def ex02c_module_names(root: Path) -> tuple[str, ...]:
+    tree = ast.parse((root / "zz/ex02c.py").read_text(encoding="utf-8"))
+    declaration = next(
+        node.value for node in tree.body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "_MODULES" for target in node.targets)
+    )
+    modules = tuple(module.removeprefix("zz.ex02c_cards.") for _, module in ast.literal_eval(declaration))
+    if len(modules) != 70 or len(modules) != len(set(modules)):
+        raise ValueError(f"Expected distinct EX02C card modules, got {len(modules)}")
+    if any(not name.isidentifier() for name in modules):
+        raise ValueError("Invalid EX02C release module name")
+    return modules
+
+
 def release_files(root: Path, kind: str) -> list[Path]:
     if kind not in {"linux", "source", "multiplayer"}:
         raise ValueError(f"Unknown release package kind: {kind!r}")
@@ -82,10 +98,11 @@ def release_files(root: Path, kind: str) -> list[Path]:
     paths.update(Path("zz/web") / f"{name}.py" for name in (SERVER_WEB_MODULES if server else WEB_MODULES))
     paths.update(Path("zz/multiplayer") / f"{name}.py" for name in MULTIPLAYER_MODULES)
     paths.update(Path("zz/pc02r_cards") / f"{name}.py" for name in ("__init__", *pc02r_module_names(root)))
+    paths.update(Path("zz/ex02c_cards") / f"{name}.py" for name in ("__init__", *ex02c_module_names(root)))
     paths.update(Path("zz/web/translations") / name for name in TRANSLATIONS)
     paths.update(Path("data") / name for name in PUBLIC_TSVS)
     paths.update(Path("docs/rules") / name for name in RULEBOOKS)
-    paths.update((Path("zz/pc02r_data.tsv"), Path("zz/multiplayer/compatibility.json")))
+    paths.update((Path("zz/pc02r_data.tsv"), Path("zz/ex02c_data.tsv"), Path("zz/multiplayer/compatibility.json")))
     if not server:
         paths.update(Path(name) for name in ("image.png", "launch-electron.sh", "launch-electron.cmd", "package.json", "package-lock.json", "docs/index.html"))
         paths.update(Path("electron") / name for name in ELECTRON_FILES)
@@ -98,7 +115,10 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.update(Path("packaging") / name for name in PACKAGING_FILES)
         paths.update(Path("tools") / name for name in SOURCE_TOOLS)
         paths.update(Path("tests") / name for name in (*FOCUSED_TESTS, "test_release_archive_inventory.py"))
+        paths.add(Path("tests/test_ex02c_cards.py"))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
+        paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))
+        paths.add(Path("tests/semantic_scenarios/ex02c/green_08_02_02c_01-trash-boundary.json"))
         paths.add(DEEP_SOURCE_RELATIVE)
     files = sorted(paths, key=lambda path: path.as_posix())
     for relative in files:
@@ -170,7 +190,7 @@ def archive_filter(info):
 
 # Exact product allowlists are independent of Git tracking status. New runtime
 # surfaces require an explicit release-contract change instead of broad copying.
-ZZ_MODULES = ('__init__', 'action_q_residual_critic', 'action_records', 'action_set_dataset', 'action_set_listwise_model', 'action_set_model', 'action_set_runtime_scores', 'action_set_scoring_contracts', 'action_set_teacher_rebuild', 'action_set_training', 'action_set_ygo_policy', 'action_value_group_key', 'action_value_row_refresh', 'ai', 'ai_deck_analysis', 'ai_league', 'ai_registry', 'ai_runtime_stack', 'basic', 'batched_eval_profile', 'card_profiles', 'card_slot_refs', 'cards', 'codeman_memory', 'codeman_replay_correction', 'codeman_semantic_audit', 'codeman_training', 'counterfactual_transition', 'current_policy_actor_contract', 'current_policy_runtime', 'deck_ai', 'deck_profiles', 'deckcode0', 'decks', 'deep_rl', 'deep_runtime', 'deep_v2_understanding', 'effects', 'engine', 'enums', 'ex01', 'forces', 'greedy_ai', 'house_rules', 'keyword_rules', 'model', 'pc01', 'pc01r', 'pc02', 'pc02r', 'player_correction_model', 'policy_factories', 'rl_action_vocab', 'rl_ai', 'rl_tensor_schema', 'rl_training', 'rollout_store', 'rollout_task_specs', 'runtime_aux_compose', 'runtime_profile', 'sim', 'trace_counterfactual_transition', 'training_fast_path', 'transformations', 'triggers', 'turn_planner', 'ygo_failed_direct_guard', 'ygo_vector_actor_rollout')
+ZZ_MODULES = ('__init__', 'action_q_residual_critic', 'action_records', 'action_set_dataset', 'action_set_listwise_model', 'action_set_model', 'action_set_runtime_scores', 'action_set_scoring_contracts', 'action_set_teacher_rebuild', 'action_set_training', 'action_set_ygo_policy', 'action_value_group_key', 'action_value_row_refresh', 'ai', 'ai_deck_analysis', 'ai_league', 'ai_registry', 'ai_runtime_stack', 'basic', 'batched_eval_profile', 'card_identity', 'card_profiles', 'card_slot_refs', 'cards', 'codeman_memory', 'codeman_replay_correction', 'codeman_semantic_audit', 'codeman_training', 'counterfactual_transition', 'current_policy_actor_contract', 'current_policy_runtime', 'deck_ai', 'deck_profiles', 'deckcode0', 'decks', 'deep_rl', 'deep_runtime', 'deep_v2_understanding', 'effects', 'engine', 'enums', 'ex01', 'ex02c', 'forces', 'greedy_ai', 'house_rules', 'keyword_rules', 'model', 'pc01', 'pc01r', 'pc02', 'pc02r', 'player_correction_model', 'policy_factories', 'rl_action_vocab', 'rl_ai', 'rl_tensor_schema', 'rl_training', 'rollout_store', 'rollout_task_specs', 'runtime_aux_compose', 'runtime_profile', 'sim', 'trace_counterfactual_transition', 'training_fast_path', 'transformations', 'triggers', 'turn_planner', 'ygo_failed_direct_guard', 'ygo_vector_actor_rollout')
 
 WEB_MODULES = ('__init__', 'assets', 'catalog', 'debug_tools', 'deck_store', 'filter_localization', 'localization', 'profiles', 'serialize', 'server', 'session', 'settings_store')
 
@@ -180,11 +200,11 @@ ELECTRON_FILES = ('adaptive-websocket.js', 'asset-bootstrap.js', 'asset-setup-pr
 
 STATIC_FILES = ('api-client.js', 'app.js', 'duel-layout.js', 'duel.html', 'duel.js', 'index.html', 'multiplayer-card-policy.js', 'styles.css')
 
-PUBLIC_TSVS = ('base_minion_face_verified.tsv', 'card_ability_face_verified.tsv', 'card_cost_face_verified.tsv', 'card_cost_pips.tsv', 'card_cost_text_verified.tsv', 'card_stat_face_verified.tsv', 'card_transformations.tsv', 'cards_bilingual_v4.tsv', 'forces.tsv', 'official_card_search.tsv', 'official_cardlist.tsv', 'official_filters.tsv', 'pc01r_image_reconciliation.tsv', 'pc02_image_reconciliation.tsv', 'seesaa.tsv')
+PUBLIC_TSVS = ('base_minion_face_verified.tsv', 'card_ability_face_verified.tsv', 'card_cost_face_verified.tsv', 'card_cost_pips.tsv', 'card_cost_text_verified.tsv', 'card_stat_face_verified.tsv', 'card_transformations.tsv', 'cards_bilingual_v4.tsv', 'ex02_ex02c_equivalences.tsv', 'forces.tsv', 'official_card_search.tsv', 'official_cardlist.tsv', 'official_filters.tsv', 'pc01r_image_reconciliation.tsv', 'pc02_image_reconciliation.tsv', 'seesaa.tsv')
 
 DEFAULT_DECKS = ('aice.json', 'deck-060837.json', 'deck-b70677.json', 'deck-c80751.json', 'deck-e83cf0.json', 'deck-f9b075.json', 'deck.json', 'h.json')
 
-FOCUSED_TESTS = ('electron_renderer_logging.test.js', 'test_multiplayer_network_diagnostic.py', 'electron_adaptive_websocket.test.js', 'electron_asset_bootstrap.test.js', 'electron_asset_setup.test.js', 'electron_asset_transport.test.js', 'electron_lan_manager.test.js', 'electron_multiplayer_client.test.js', 'electron_update_checker.test.js', 'frontend_multiplayer_card_policy.test.js', 'test_ai_vs_ai_mode.py', 'test_base_replacement_interface.py', 'test_card_japanese_text_integrity.py', 'test_card_pack_release.py', 'test_card_translation_exchange.py', 'test_clean_release_assets.py', 'test_codeman_replay_correction_vfx.py', 'test_cyclops_force.py', 'test_deck_reprint_limits.py', 'test_developer_mode_security.py', 'test_duel_scale_settings.py', 'test_duel_visual_timing.py', 'test_effect_target_contracts.py', 'test_electron_multiplayer_bridge.py', 'test_electron_multiplayer_cross_runtime.py', 'test_electron_shutdown.py', 'test_english_card_assets.py', 'test_force_base_replacement.py', 'test_forces.py', 'test_frontend_atomic_zone_transitions.py', 'test_frontend_deck_and_hand.py', 'test_frontend_duel_status.py', 'test_frontend_duel_layout.py', 'test_frontend_online_opening.py', 'test_frontend_rulebook.py', 'test_frontend_transformation_browser.py', 'test_frontend_visual_settle.py', 'test_game_session_choice_validation.py', 'test_localization_consistency.py', 'test_mana_asset_catalog.py', 'test_match_scoped_ids.py', 'test_multiplayer_client_transport.py', 'test_multiplayer_compatibility.py', 'test_multiplayer_deployment.py', 'test_multiplayer_deployment_artifacts.py', 'test_multiplayer_determinism.py', 'test_multiplayer_hidden_information.py', 'test_multiplayer_in_memory.py', 'test_multiplayer_invalid_actions.py', 'test_multiplayer_observability.py', 'test_multiplayer_protocol.py', 'test_multiplayer_reconnect.py', 'test_multiplayer_rematch_rps.py', 'test_multiplayer_room_queue.py', 'test_multiplayer_rooms.py', 'test_multiplayer_soak.py', 'test_multiplayer_websocket_integration.py', 'test_multiplayer_websocket_transport.py', 'test_pc02r_cards.py', 'test_pc02r_choice_feedback.py', 'test_pc02r_persistent_effects.py', 'test_pc02r_rule_corrections.py', 'test_pc02r_shared_runtime.py', 'test_public_base_rules.py', 'test_release_packaging_contract.py', 'test_shared_event_lifecycle.py', 'test_transformed_card_catalog.py')
+FOCUSED_TESTS = ('electron_renderer_logging.test.js', 'test_multiplayer_network_diagnostic.py', 'electron_adaptive_websocket.test.js', 'electron_asset_bootstrap.test.js', 'electron_asset_setup.test.js', 'electron_asset_transport.test.js', 'electron_lan_manager.test.js', 'electron_multiplayer_client.test.js', 'electron_update_checker.test.js', 'frontend_multiplayer_card_policy.test.js', 'test_ai_vs_ai_mode.py', 'test_base_replacement_interface.py', 'test_card_japanese_text_integrity.py', 'test_card_pack_release.py', 'test_card_translation_exchange.py', 'test_clean_release_assets.py', 'test_codeman_replay_correction_vfx.py', 'test_cyclops_force.py', 'test_deck_reprint_limits.py', 'test_developer_mode_security.py', 'test_duel_scale_settings.py', 'test_duel_visual_timing.py', 'test_effect_target_contracts.py', 'test_electron_multiplayer_bridge.py', 'test_electron_multiplayer_cross_runtime.py', 'test_electron_shutdown.py', 'test_ex02c_correspondence.py', 'test_ex02c_shared_runtime.py', 'test_english_card_assets.py', 'test_force_base_replacement.py', 'test_forces.py', 'test_frontend_atomic_zone_transitions.py', 'test_frontend_deck_and_hand.py', 'test_frontend_duel_status.py', 'test_frontend_duel_layout.py', 'test_frontend_online_opening.py', 'test_frontend_rulebook.py', 'test_frontend_transformation_browser.py', 'test_frontend_visual_settle.py', 'test_game_session_choice_validation.py', 'test_localization_consistency.py', 'test_mana_asset_catalog.py', 'test_match_scoped_ids.py', 'test_multiplayer_client_transport.py', 'test_multiplayer_compatibility.py', 'test_multiplayer_deployment.py', 'test_multiplayer_deployment_artifacts.py', 'test_multiplayer_determinism.py', 'test_multiplayer_hidden_information.py', 'test_multiplayer_in_memory.py', 'test_multiplayer_invalid_actions.py', 'test_multiplayer_observability.py', 'test_multiplayer_protocol.py', 'test_multiplayer_reconnect.py', 'test_multiplayer_rematch_rps.py', 'test_multiplayer_room_queue.py', 'test_multiplayer_rooms.py', 'test_multiplayer_soak.py', 'test_multiplayer_websocket_integration.py', 'test_multiplayer_websocket_transport.py', 'test_pc02r_cards.py', 'test_pc02r_choice_feedback.py', 'test_pc02r_persistent_effects.py', 'test_pc02r_rule_corrections.py', 'test_pc02r_shared_runtime.py', 'test_public_base_rules.py', 'test_release_packaging_contract.py', 'test_shared_event_lifecycle.py', 'test_transformed_card_catalog.py')
 
 SITE_ASSETS = ('battle.webp', 'codemen.webp', 'home.webp', 'lobby.webp', 'site.css', 'site.js', 'zzicon.webp')
 

@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_07_02_02c_02_boundary",
+  "card_id": "red_07_02_02c_02",
+  "scenario_kind": "boundary",
+  "official_rule": "【召喚時】\nこのターン中、自分のプレイヤーに「自分の［加護］を持つマナ全ては、レスト状態でも付与することができる。」を与える。他に自分のミニオンがいない場合、自分の移動権を1増やす。\n【常時】\nこのミニオンがアクティブ状態でなければ［加護］は付与されない。\n【加護時】\n赤の加護である場合、加護しているマナを除外して、「「双剣」キリト」に変形する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_07_02_02c_02",
+        "zone": "hand",
+        "seed": 2894133473,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_07_02_02c_02",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "yellow_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "End the turn with a non-red Kago",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "A non-red Kago does not transform Kirito",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_07_02_02c_02"
+      }
+    },
+    {
+      "name": "The non-red mana remains in Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_00_01_02_00"
+      }
+    }
+  ]
+}

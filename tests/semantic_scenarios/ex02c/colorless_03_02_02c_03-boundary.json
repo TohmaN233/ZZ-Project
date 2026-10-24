@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_03_02_02c_03_boundary",
+  "card_id": "colorless_03_02_02c_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「黒の剣士」自分はカードを1枚引く。その後、自分の手札1枚をデッキの下に戻す。\n【自分のターン】自分の種族「黒の剣士」を持つミニオンがいない場合、このミニオンはアタックできない。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_03_02_02c_03",
+        "zone": "field",
+        "seed": 1494521375,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_03_02_02c_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_02",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02c_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "not_drawn": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Death Gun without a Black Swordsman Switch",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_03_02_02c_02"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The wrong-race summon does not draw",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "Titania cannot attack without a Black Swordsman on its owner Field",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "attack",
+        "attacker_iid": "$primary"
+      }
+    },
+    {
+      "name": "The top card is not publicly revealed",
+      "path": "state.publicReveals",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "card": {
+          "cardId": "red_00_01_02c_00"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_02_03_02c_00_positive",
+  "card_id": "green_02_03_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【メイン】／【フラッシュ】\nこのターン中、ミニオン1体をBP+300して、DPを0にする。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_02_03_02c_00",
+        "zone": "hand",
+        "seed": 2802202603,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_04_02_02c_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Alice’s Bento",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_02_03_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Choose the allied Minion",
+      "select": {
+        "cardId": "green_04_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Bento grants 300 BP and sets DP to zero for this turn",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_04_02_02c_00",
+        "effectiveBp": 900,
+        "effectiveDp": 0
+      }
+    }
+  ]
+}

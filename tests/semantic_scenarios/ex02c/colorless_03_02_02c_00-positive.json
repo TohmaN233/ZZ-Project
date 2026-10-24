@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_03_02_02c_00_positive",
+  "card_id": "colorless_03_02_02c_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【破壊時】\\nこのターン中、相手のプレイヤーに「自分のミニオン全てはアクティブにならない。」を与える。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_03_02_02c_00",
+        "zone": "field",
+        "seed": 1047306670,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_03_02_02c_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$primary",
+        "permanentBpModifier": -200
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_05_02_02c_00",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      },
+      "capture": {
+        "kirito": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P2",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon the lone Double Sword Kirito",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_05_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack a Force with Rush",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_05_02_02c_00"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the controller’s Sho Force",
+      "select": {
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass defender Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass attacker Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "blocker",
+      "name": "Block with the weakened researcher",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$primary"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "End the affected player turn",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The researcher is destroyed and its effect triggers",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_02c_00"
+      }
+    },
+    {
+      "name": "The researcher prevents Double Sword from reawakening at turn end",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_05_02_02c_00",
+        "rested": true
+      }
+    }
+  ]
+}

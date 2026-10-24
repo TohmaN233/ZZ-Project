@@ -9,7 +9,7 @@ test = ["pytest>=7"]
 multiplayer = ["websockets>=16,<17"]
 
 [tool.setuptools.package-data]
-"zz" = ["pc02r_data.tsv"]
+"zz" = ["pc02r_data.tsv", "ex02c_data.tsv"]
 "zz.multiplayer" = ["compatibility.json"]
 "zz.web" = ["translations/*.tsv", "translations/*.json", "static/*"]
 
@@ -18,5 +18,6 @@ include = ["zz*"]
 exclude = ["data*", "deploy*", "tests*", "tools*"]
 
 [tool.pytest.ini_options]
+cache_dir = "work/.pytest_cache"
 testpaths = ["tests"]
 python_files = ["test_*.py"]

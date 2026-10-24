@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_02_02_02c_00_boundary",
+  "card_id": "green_02_02_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】＆スイッチ：「氷剣」\n他の自分の種族「ソード」を持つミニオンがいる場合、自分の種族「アイテム」を持つマナ1つをアクティブにする。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_02_02_02c_00",
+        "zone": "hand",
+        "seed": 2802202602,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02c_01",
+        "side": "P1",
+        "zone": "base",
+        "rested": true
+      },
+      "capture": {
+        "item": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Tiese without another own Sword Minion",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_02_02_02c_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Tiese does not refresh Item Mana without another own Sword Minion",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_01_02c_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "The unqualified summon leaves no pending target choice",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "main_action"
+    }
+  ]
+}

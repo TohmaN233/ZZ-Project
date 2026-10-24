@@ -1,0 +1,235 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_06_02_02c_01_positive",
+  "card_id": "red_06_02_02c_01",
+  "scenario_kind": "positive",
+  "official_rule": "【召喚時】＆スイッチ：「黒の剣士」\nこのターン中、相手のミニオン全てをBP-200し、自分の種族「黒の剣士」または「閃光」を持つミニオン全てをBP+200する。\n【アタック時】\nこのターン、次に自分の手札から種族「黒の剣士」を持つミニオンカードを召喚するとき、そのフリーコストを0にする。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_06_02_02c_01",
+        "zone": "hand",
+        "seed": 2892191281,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_06_02_02c_01",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "asuna_host": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_07_02_02_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "red_payer": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_07_02_02c_02",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Asuna attacks the opponent",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "red_06_02_02c_01"
+      }
+    },
+    {
+      "name": "Choose the opponent as the attack target",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass first Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass second Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Summon the Black Swordsman Kirito with the next free cost waived",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_07_02_02c_02"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon the Asuna copy from hand to resolve her own OnSummon effect",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_06_02_02c_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The Black Swordsman receives the Switch and own-summon boosts",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_07_02_02c_02",
+        "effectiveBp": 1000
+      }
+    },
+    {
+      "name": "The summoned Asuna receives her own +200 BP",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_06_02_02c_01",
+        "effectiveBp": 700
+      }
+    },
+    {
+      "name": "The opponent Minion is weakened by Asuna’s Switch and own summon",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_07_02_02_00",
+        "effectiveBp": 600
+      }
+    },
+    {
+      "name": "Two red sources pay Asuna and the third pays Kirito",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "cardId": "red_00_01_02_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "Asuna’s four generic pips leave two generic Mana sources unused",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "mana_token",
+        "rested": false
+      }
+    }
+  ]
+}

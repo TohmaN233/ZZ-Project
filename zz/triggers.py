@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 from zz.effects import EffectTiming, EffectSpec, effect_once_per_turn_used
-from zz.enums import AreaType, TriggerTiming
+from zz.enums import AreaType, CardType, TriggerTiming
 
 if TYPE_CHECKING:
     from zz.model import CardInstance, Context, GameState
@@ -62,6 +62,19 @@ class TriggerRegistry:
     def emit(self, timing: TriggerTiming | EffectTiming, ctx: "Context", *,
              exclude_instance: "CardInstance" | None = None) -> None:
         state = self._engine.state
+        switch_contexts: dict[int, Any] = {}
+        switch_races: set[str] = set()
+        summoned = getattr(ctx, "source", None)
+        if (
+            timing is EffectTiming.ON_SUMMON
+            and getattr(summoned, "card", None) is not None
+            and summoned.card.type is CardType.F_MINION
+            and summoned.area is AreaType.FIELD
+            and summoned in summoned.owner.field
+        ):
+            switch_races = {
+                race for race in summoned.card.race_jp.split("|") if race
+            }
         # Active player's permanents fire first, then opponent's
         for player in (state.active, state.opponent):
             blessing_cards = [
@@ -85,8 +98,40 @@ class TriggerRegistry:
                     if ci is exclude_instance:
                         continue
                     for effect in ci.card.effects:
-                        if effect.timing is not timing:
+                        params = getattr(effect, "params", {})
+                        effect_switch_races = params.get("ex02c_switch_races", ())
+                        if effect_switch_races and (
+                            not isinstance(effect_switch_races, (list, tuple, set, frozenset))
+                            or any(not isinstance(race, str) or not race for race in effect_switch_races)
+                        ):
+                            raise ValueError(
+                                f"invalid ex02c_switch_races on {ci.card.id}: {effect_switch_races!r}"
+                            )
+                        is_switch = bool(
+                            switch_races
+                            and ci is not summoned
+                            and summoned.owner is ci.owner
+                            and ci.area is AreaType.FIELD
+                            and effect_switch_races
+                            and switch_races.intersection(effect_switch_races)
+                        )
+                        if effect.timing is not timing and not is_switch:
                             continue
+                        effect_context = ctx
+                        pending_timing = timing
+                        if is_switch:
+                            effect_context = switch_contexts.get(ci.iid)
+                            if effect_context is None:
+                                from zz.model import Context
+
+                                effect_context = Context(
+                                    controller=ci.owner,
+                                    source=ci,
+                                    target=ci,
+                                    switch_source=ci,
+                                )
+                                switch_contexts[ci.iid] = effect_context
+                            pending_timing = effect.timing
                         # A card's own destroy effect resolves from the destroyed source.
                         # Field/base destroy listeners must opt in with an explicit condition.
                         if timing is EffectTiming.ON_DESTROY and effect.condition is None:
@@ -95,9 +140,9 @@ class TriggerRegistry:
                             continue
                         if isinstance(effect, EffectSpec) and effect_once_per_turn_used(effect, ci):
                             continue
-                        if effect.condition and not effect.condition(ci, state, ctx):
+                        if effect.condition and not effect.condition(ci, state, effect_context):
                             continue
-                        self._queue.append(_Pending(timing, ci, effect, ctx))
+                        self._queue.append(_Pending(pending_timing, ci, effect, effect_context))
                         should_duplicate = getattr(self._engine, "should_duplicate_summon_effect", lambda source: False)
                         if timing is EffectTiming.ON_SUMMON and ci is ctx.source and should_duplicate(ci):
                             self._queue.append(_Pending(timing, ci, effect, ctx))
@@ -150,6 +195,9 @@ class TriggerRegistry:
                 if record_effect is not None:
                     record_effect(p.instance, p.trigger, p.context)
                 if isinstance(p.trigger, EffectSpec):
+                    run_pre_target = getattr(self._engine, "_run_pre_target_effect", None)
+                    if run_pre_target is not None:
+                        run_pre_target(p.trigger, p.instance, p.context)
                     run_callback(p.trigger.fn, p.instance, self._engine.state, p.context, effect=p.trigger)
                 else:
                     run_callback(p.trigger.fn, p.instance, self._engine.state, p.context)

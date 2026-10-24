@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_03_03_02c_00_boundary",
+  "card_id": "green_03_03_02c_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】／【フラッシュ】\n相手のミニオン1体を選択する。そのミニオンが有色の場合、レストする。そのミニオンが無色の場合、破壊する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_03_03_02c_00",
+        "zone": "hand",
+        "seed": 2802202608,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "spell": {
+          "path": "state.players.human.hand[0].iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_03_02c_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "flash_spell": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P1",
+        "zone": "field"
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Cast Enhance Armament in Main without an enemy Minion",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$spell"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack a Force to open Flash priority",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$attacker"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the opposing Force",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass defender Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Cast the second copy in Flash without an enemy Minion",
+      "select": {
+        "kind": "play_card",
+        "cardIid": "$flash_spell"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass defender's second Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass attacker's second Flash priority",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "No enemy Minion is available as a target",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 0
+    },
+    {
+      "name": "Both no-target casts complete their shared magic lifecycle",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "green_03_03_02c_00"
+      }
+    },
+    {
+      "name": "The opponent still has no Minion target",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 0
+    },
+    {
+      "name": "Both casts pay their full green and colorless costs",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "rested": false
+      }
+    }
+  ]
+}

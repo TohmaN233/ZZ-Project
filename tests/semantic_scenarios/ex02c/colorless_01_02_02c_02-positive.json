@@ -1,0 +1,302 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_01_02_02c_02_positive",
+  "card_id": "colorless_01_02_02c_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【破壊時】自分はデッキの中から種族「アイテム」を持つ緑のベース・ミニオンカード1枚をレスト状態でベースに置く。その後、自分のデッキをシャッフルする。\n【常時】このミニオンはベースに移動するとき、レスト状態で移動する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_01_02_02c_02",
+        "zone": "field",
+        "seed": 978098545,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "colorless_01_02_02c_02"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02c_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      },
+      "capture": {
+        "green_item": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_02c_01",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      },
+      "capture": {
+        "replacement": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "prompt_kind": "main_action",
+      "name": "Attack the player with Kirito",
+      "select": {
+        "kind": "attack",
+        "cardId": "colorless_03_02_02c_01"
+      }
+    },
+    {
+      "prompt_kind": "attack_target",
+      "name": "Attack the player whose Forces are destroyed",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the controller Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "flash_action",
+      "name": "Pass the opponent Flash window",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "prompt_kind": "blocker",
+      "name": "Block with Gigas Cedar",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$primary"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Choose the Green Item Base Minion",
+      "select": {
+        "cardIid": "$green_item"
+      }
+    },
+    {
+      "prompt_kind": "effect_target",
+      "name": "Choose a mana token to replace at Base capacity",
+      "select": {
+        "cardIid": "$replacement"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Gigas Cedar is destroyed by battle",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_02c_02"
+      }
+    },
+    {
+      "name": "The Green Item enters Base rested",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_01_02c_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "One mana token is ejected for the placement",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 9,
+      "where": {
+        "cardId": "mana_token"
+      }
+    },
+    {
+      "name": "Base capacity remains ten after the placement",
+      "path": "state.players.human.base",
+      "op": "length_eq",
+      "value": 10
+    }
+  ]
+}
