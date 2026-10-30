@@ -60,7 +60,8 @@ def test_switch_replays_only_field_host_and_sets_switch_source():
 
     assert host.area is AreaType.FIELD and host in owner.field
     assert switch_sources == [host]
-    assert "skip_refresh:P2" in target.flags
+    assert not engine.refresh_target(target)
+    assert target.rested
 
     opponent_summon = _instance(CARD_REGISTRY["green_04_02_02c_00"], opponent, area=AreaType.FIELD)
     engine.triggers.emit(
@@ -141,13 +142,14 @@ def test_native_destroy_effect_can_resolve_in_trash_but_switch_cannot_replay_it(
 
     engine._destroy(host, source=attacker)
     assert host.area is AreaType.TRASH
-    assert "skip_refresh:P2" in target.flags  # Native ON_DESTROY resolved from Trash.
-    target.flags.discard("skip_refresh:P2")
+    assert not engine.refresh_target(target)  # Native ON_DESTROY resolved from Trash.
+    entered_later = _instance(Card("later-switch-target", "later", "later", CardType.F_MINION), opponent,
+                              area=AreaType.FIELD, rested=True)
 
     summoned = _instance(CARD_REGISTRY["green_04_02_02c_00"], owner, area=AreaType.FIELD)
     engine.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=owner, source=summoned))
     engine.triggers.resolve_all()
-    assert "skip_refresh:P2" not in target.flags
+    assert engine.refresh_target(entered_later)
 
 
 def test_kirito_required_switch_search_rejects_skip_and_empty_target_list():
@@ -726,10 +728,10 @@ def test_sword_golem_turn_end_prompt_includes_confirmed_equivalent_card():
         owner,
         area=AreaType.TRASH,
     )
+    session._clear_prompt()
     engine._destroy(source, source=destroyer)
     assert source.area is AreaType.TRASH
 
-    session._clear_prompt()
     engine.triggers.emit(EffectTiming.TURN_END, Context(controller=owner))
     engine.triggers.resolve_all()
     assert session.prompt is not None and session.prompt["kind"] == "effect_target"

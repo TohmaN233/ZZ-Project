@@ -83,6 +83,10 @@ class Engine:
         self._flushing_destroy_events = False
         self._resolving_state_based_actions = False
         self._delayed_turn_end_effects: list[tuple[Player, Callable[[], None]]] = []
+        self.standby_resolution_pending: Callable[[], bool] = lambda: False
+        self._pending_standby_player: Player | None = None
+        self._pending_standby_step: Step | None = None
+        self._continuing_standby = False
         self._turn_stat_modifiers: list[dict[str, Any]] = []
         self.observed_action_profile_by_player_side: dict[str, dict[str, int]] = {}
 
@@ -618,6 +622,12 @@ class Engine:
             effects.append({"kind": "forced_blocker"})
         if self._skip_refresh_flag(ci.owner.side) in ci.flags:
             effects.append({"kind": "skip_next_refresh"})
+        if self._standby_activation_lock_flag(ci.owner) in ci.flags:
+            effects.append({
+                "kind": "cannot_activate",
+                "sourceName": "Cannot activate until the end of your next Standby Phase",
+                "duration": "until_next_owner_standby_end",
+            })
         effects.extend(self._stat_bonus_effects(ci))
         if ci.area is not AreaType.FIELD:
             return effects
@@ -961,6 +971,11 @@ class Engine:
             "turn": self.state.turn,
         })
         self.state.summoned_this_turn.clear()
+        for player in self.state.players:
+            player.flags = {
+                flag for flag in player.flags
+                if not flag.startswith(("turn:placed_mana:", "turn:placed_mana_race:"))
+            }
         activation_lock = self._minion_activation_lock_flag(active)
         preserve_activation_lock = activation_lock in active.flags
         active.flags.clear()
@@ -978,22 +993,55 @@ class Engine:
         self._fire_turn_start_hooks()
         self.triggers.emit(EffectTiming.TURN_START, Context(controller=active))
         self.triggers.emit(TriggerTiming.TURN_START, Context(controller=active))
+        self._pending_standby_player = active
+        self._pending_standby_step = Step.REFRESH
         self.triggers.resolve_all()
-        # REFRESH — untap own field/base/forces; clear summoning sickness
-        self._set_step(Step.REFRESH)
-        self._record_phase_visual_event("refresh", active)
-        for ci in active.field + active.base:
-            self._refresh_rest_state(active, ci)
-            ci.summoning_sickness = False
-        for f in active.forces:
-            self._refresh_rest_state(active, f)
-        # DRAW — first-player turn 1 skips
-        self._set_step(Step.DRAW)
-        if not (self.state.turn == 1 and active.is_first_player):
-            self.draw(active, 1, deck_out_loses=True)
-        # MANA step (await decision)
-        self._set_step(Step.MANA)
-        self._record_phase_visual_event("mana", active)
+        self.continue_standby()
+
+    @property
+    def has_pending_standby(self) -> bool:
+        return self._pending_standby_player is not None
+
+    def continue_standby(self) -> bool:
+        """Resume after every Start/Draw trigger and interactive choice has finished."""
+        if not self.has_pending_standby:
+            return True
+        if self._continuing_standby or self.triggers.has_pending() or self.standby_resolution_pending():
+            return False
+        active = self._pending_standby_player
+        if active is not self.state.active:
+            raise RuntimeError("active player changed during pending Standby")
+        self._continuing_standby = True
+        try:
+            if self._pending_standby_step is Step.REFRESH:
+                self._set_step(Step.REFRESH)
+                self._record_phase_visual_event("refresh", active)
+                for ci in active.field + active.base:
+                    self._refresh_rest_state(active, ci)
+                    ci.summoning_sickness = False
+                for force in active.forces:
+                    self._refresh_rest_state(active, force)
+                self._set_step(Step.DRAW)
+                self._pending_standby_step = Step.MANA
+                if not (self.state.turn == 1 and active.is_first_player):
+                    self.draw(active, 1, deck_out_loses=True)
+            if self.triggers.has_pending() or self.standby_resolution_pending():
+                return False
+            for ci in active.field + active.base:
+                until_turn = self._standby_activation_lock_until_turn(ci)
+                if until_turn is not None and until_turn <= self.state.turn:
+                    ci.flags.discard(self._standby_activation_lock_flag(active))
+                    ci.flags = {
+                        flag for flag in ci.flags
+                        if not flag.startswith(self._standby_activation_deadline_prefix(active))
+                    }
+            self._pending_standby_player = None
+            self._pending_standby_step = None
+            self._set_step(Step.MANA)
+            self._record_phase_visual_event("mana", active)
+            return True
+        finally:
+            self._continuing_standby = False
 
     def advance_from_mana(self) -> None:
         """After mana action (or skip), enter MAIN."""
@@ -1246,10 +1294,16 @@ class Engine:
         ci.rested = False
         active.base.append(ci)
         self._record_zone_move(ci, AreaType.HAND, AreaType.BASE)
-        active.flags.add(f"turn:placed_mana:{self._mana_color_of(ci).name}")
+        self._record_mana_placement(ci)
         self.triggers.emit(EffectTiming.ON_PLACE_BASE, Context(controller=active, source=ci))
         self.triggers.resolve_all()
         self.advance_from_mana()
+
+    def _record_mana_placement(self, ci: CardInstance) -> None:
+        ci.owner.flags.add(f"turn:placed_mana:{self._mana_color_of(ci).name}")
+        for race in ci.card.race_jp.split("|"):
+            if race:
+                ci.owner.flags.add(f"turn:placed_mana_race:{race}")
 
     def place_colorless_mana(self, replace_base_iid: int | None = None) -> None:
         """無色マナの配置: place 1 colorless mana token to base."""
@@ -1804,7 +1858,7 @@ class Engine:
         self._record_zone_move(mana, AreaType.BLESSING, AreaType.BASE)
         from zz.pc02 import on_mana_moved_to_base
 
-        on_mana_moved_to_base(mana.owner, mana)
+        on_mana_moved_to_base(self, mana.owner, mana)
 
     def banish_blessing_mana(
             self,
@@ -2025,6 +2079,7 @@ class Engine:
         token.mana_color_override = mana_color
         player.base.append(token)
         self._record_zone_move(token, AreaType.REMOVED, AreaType.BASE)
+        self._record_mana_placement(token)
         return token
 
     def put_field_minion_from_hand(
@@ -2070,6 +2125,7 @@ class Engine:
         ci.summoning_sickness = True
         player.base.append(ci)
         self._record_zone_move(ci, AreaType.HAND, AreaType.BASE)
+        self._record_mana_placement(ci)
 
     def place_from_deck_to_base(
             self,
@@ -2087,6 +2143,7 @@ class Engine:
         ci.rested = rested
         player.base.append(ci)
         self._record_zone_move(ci, AreaType.DECK, AreaType.BASE)
+        self._record_mana_placement(ci)
 
     def summon_from_trash(
             self,
@@ -3393,7 +3450,7 @@ class Engine:
             selected = policy.choose_target(self, kind, min_n, max_n, eligible)
             from zz.pc02 import on_targets_selected
 
-            on_targets_selected(player, source, selected)
+            on_targets_selected(self, player, source, selected)
             return selected
         finally:
             if previous_context is None:
@@ -3675,9 +3732,48 @@ class Engine:
         return f"turn:zz03c_minions_cannot_activate:{self.state.turn}:{player.side.name}"
 
     def _minion_activation_locked(self, target: Any) -> bool:
-        if not isinstance(target, CardInstance) or target.card.type not in (CardType.F_MINION, CardType.B_MINION):
+        if (not isinstance(target, CardInstance) or target.area is not AreaType.FIELD
+                or target.card.type not in (CardType.F_MINION, CardType.B_MINION)):
             return False
-        return self._minion_activation_lock_flag(target.owner) in target.owner.flags
+        return (
+            self._minion_activation_lock_flag(target.owner) in target.owner.flags
+            or self._standby_activation_lock_until_turn(target) is not None
+        )
+
+    def _standby_activation_lock_flag(self, player: Player) -> str:
+        return f"cannot_activate_until_standby_end:{player.side.name}"
+
+    def _standby_activation_deadline_prefix(self, player: Player) -> str:
+        return f"cannot_activate_until_standby_end_turn:{player.side.name}:"
+
+    def _standby_activation_lock_until_turn(self, target: CardInstance) -> int | None:
+        if self._standby_activation_lock_flag(target.owner) not in target.flags:
+            return None
+        prefix = self._standby_activation_deadline_prefix(target.owner)
+        deadlines = [flag.removeprefix(prefix) for flag in target.flags if flag.startswith(prefix)]
+        if len(deadlines) != 1:
+            raise RuntimeError(f"Minion {target.iid} requires exactly one Standby activation deadline")
+        until_turn = int(deadlines[0])
+        if until_turn < 1:
+            raise ValueError(f"Minion {target.iid} has invalid Standby activation deadline {until_turn}")
+        return until_turn
+
+    def prevent_activation_until_next_standby_end(self, target: CardInstance) -> None:
+        if target.area is not AreaType.FIELD or target not in target.owner.field:
+            raise IllegalActionError("Standby activation restriction requires a Field Minion")
+        if target.card.type not in (CardType.F_MINION, CardType.B_MINION):
+            raise IllegalActionError("Standby activation restriction requires a Minion")
+        # state.turn counts complete P1/P2 rounds. An owner's current turn has
+        # already started, so its next Standby always belongs to the next round.
+        owner_idx = self.state.players.index(target.owner)
+        until_turn = self.state.turn + int(owner_idx <= self.state.active_idx)
+        previous_until_turn = self._standby_activation_lock_until_turn(target)
+        if previous_until_turn is not None:
+            until_turn = max(until_turn, previous_until_turn)
+        prefix = self._standby_activation_deadline_prefix(target.owner)
+        target.flags = {flag for flag in target.flags if not flag.startswith(prefix)}
+        target.flags.add(self._standby_activation_lock_flag(target.owner))
+        target.flags.add(f"{prefix}{until_turn}")
 
     def _skip_refresh_flag(self, side: Side) -> str:
         return f"skip_refresh:{side.name}"
@@ -3803,6 +3899,7 @@ class Engine:
             chosen.area = AreaType.BASE
             chosen.rested = False
             owner.base.append(chosen)
+            self._record_mana_placement(chosen)
         if fi in self.pending_force_base_choices:
             self.pending_force_base_choices.remove(fi)
         self.rng.shuffle(owner.deck)

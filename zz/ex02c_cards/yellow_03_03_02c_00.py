@@ -28,7 +28,7 @@ def _activate_minion(source: CardInstance, state: Any, ctx: Context) -> None:
     if not targets:
         return
     target = targets[0]
-    target.rested = False
+    state.engine.refresh_target(target)
     if "ソード" in target.card.race_jp.split("|"):
         source.flags.add(_RETURN_SPEEDAHOLIC)
 

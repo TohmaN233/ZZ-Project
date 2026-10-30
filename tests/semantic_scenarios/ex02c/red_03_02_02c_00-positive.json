@@ -73,7 +73,7 @@
       "payload": {
         "cardId": "red_00_01_02c_02",
         "side": "P1",
-        "zone": "base",
+        "zone": "hand",
         "rested": false
       }
     },
@@ -101,14 +101,22 @@
         "activeSide": "P1",
         "controlBoth": true,
         "preserveBoard": true,
-        "step": "main"
+        "step": "mana"
       }
     }
   ],
   "actions": [
     {
       "prompt_kind": "main_action",
-      "name": "Summon Egil with an Item in Base",
+      "name": "Place Item mana this turn",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "red_00_01_02c_02"
+      }
+    },
+    {
+      "prompt_kind": "main_action",
+      "name": "Summon Egil after placing Item mana this turn",
       "select": {
         "kind": "play_card",
         "cardId": "red_03_02_02c_00"

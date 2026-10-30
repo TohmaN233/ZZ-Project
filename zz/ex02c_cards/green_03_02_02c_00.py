@@ -26,7 +26,10 @@ def _place_item_base_minion(source: CardInstance, state: Any, _ctx: Context) -> 
         source=source,
     )
     if selected:
-        engine.put_base_minion_from_hand(source.owner, selected[0], rested=True)
+        replace_iid = engine.select_base_replacement_iid(source.owner, source)
+        engine.put_base_minion_from_hand(
+            source.owner, selected[0], rested=True, replace_base_iid=replace_iid,
+        )
 
 
 def build_card(row: dict[str, Any]):
@@ -50,6 +53,7 @@ def build_card(row: dict[str, Any]):
             params={
                 "race": "アイテム",
                 "card_type": CardType.B_MINION,
+                "puts_targets_on_base": True,
                 "ex02c_switch_races": ["黒の剣士"],
             },
             official_effect=(

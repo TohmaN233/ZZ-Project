@@ -291,27 +291,27 @@
       }
     },
     {
-      "name": "Destroying the transformed source marks the opponent Field for its next refresh",
+      "name": "Destroying the transformed source prevents activation until the opponent's next Standby ends",
       "path": "state.players.opponent.field",
       "op": "any_where",
       "where": {
         "cardId": "green_04_02_02c_00",
         "flags": {
           "contains": [
-            "skip_refresh:P2"
+            "cannot_activate_until_standby_end:P2"
           ]
         }
       }
     },
     {
-      "name": "The original destroy event from Trash marks opposing Minions for their next refresh",
+      "name": "The original destroy event from Trash prevents opposing Minion activation",
       "path": "state.players.opponent.field",
       "op": "any_where",
       "where": {
         "cardId": "green_04_02_02c_00",
         "flags": {
           "contains": [
-            "skip_refresh:P2"
+            "cannot_activate_until_standby_end:P2"
           ]
         }
       }

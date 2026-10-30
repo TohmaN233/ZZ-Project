@@ -56,6 +56,7 @@ AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "zz/house_rules.py",
     "zz/keyword_rules.py",
     "zz/model.py",
+    "zz/multiplayer/hashing.py",
     "zz/multiplayer/match.py",
     "zz/pc01.py",
     "zz/pc02r.py",

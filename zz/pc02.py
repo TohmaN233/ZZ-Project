@@ -250,7 +250,7 @@ def _chronora_win(host: CardInstance, state: Any, ctx: Context) -> bool:
 
 
 def _refresh_host(host: CardInstance, state: Any, ctx: Context) -> None:
-    host.rested = False
+    state.engine.refresh_target(host)
 
 
 def _griefi_attack(host: CardInstance, state: Any, ctx: Context) -> None:
@@ -276,7 +276,7 @@ def _chachalka_life_refresh(host: CardInstance, state: Any, ctx: Context) -> Non
     if state.active is host.owner:
         return
     if ctx.target is host.owner:
-        host.rested = False
+        state.engine.refresh_target(host)
 
 
 _BLESSING_GRANTED_EFFECTS: dict[str, tuple[EffectSpec, ...]] = {
@@ -617,7 +617,7 @@ def _ivan_bless(source: CardInstance, state: Any, ctx: Context) -> None:
 def _kanonen_summon(source: CardInstance, state: Any, ctx: Context) -> None:
     targets = state.engine.select_target(source.owner, "enemy_minion", 1, 1, source=source)
     for target in targets:
-        target.rested = False
+        state.engine.refresh_target(target)
         target.flags.add("turn:must_block")
 
 
@@ -648,12 +648,7 @@ def _anima(source: CardInstance, state: Any, ctx: Context) -> None:
     if selected:
         target = selected[0]
         replace_iid = engine.select_base_replacement_iid(source.owner, source)
-        engine._make_base_space(source.owner, replace_iid)
-        source.owner.deck.remove(target)
-        target.area = AreaType.BASE
-        target.rested = True
-        source.owner.base.append(target)
-        engine._record_zone_move(target, AreaType.DECK, AreaType.BASE)
+        engine.place_from_deck_to_base(source.owner, target, rested=True, replace_base_iid=replace_iid)
         engine.triggers.emit(EffectTiming.ON_PLACE_BASE, Context(controller=source.owner, source=target))
         engine.triggers.resolve_all()
     engine.rng.shuffle(source.owner.deck)
@@ -685,7 +680,7 @@ def _bayagan_bless(source: CardInstance, state: Any, ctx: Context) -> None:
 def _sylvie_summon(source: CardInstance, state: Any, ctx: Context) -> None:
     for mana in source.owner.base:
         if _has_race(mana.card, "ニンフ"):
-            mana.rested = False
+            state.engine.refresh_target(mana)
 
 
 def _blessed_ally_attack(source: CardInstance, state: Any, ctx: Context) -> bool:
@@ -761,7 +756,7 @@ def _giulio_move(source: CardInstance, state: Any, ctx: Context) -> bool:
 
 def _giulio_refresh(source: CardInstance, state: Any, ctx: Context) -> None:
     if isinstance(ctx.source, CardInstance):
-        ctx.source.rested = False
+        state.engine.refresh_target(ctx.source)
 
 
 def _rainbow_bless(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -1000,7 +995,7 @@ def _hagen_attack(source: CardInstance, state: Any, ctx: Context) -> None:
     if marker in source.flags:
         return
     source.flags.add(marker)
-    source.rested = False
+    state.engine.refresh_target(source)
 
 
 def _hydra_end(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -1015,7 +1010,7 @@ def _regenerate_summon(source: CardInstance, state: Any, ctx: Context) -> None:
     source.owner.flags.add(marker)
     for mana in source.owner.base:
         if state.engine._mana_color_of(mana) is not Color.COLORLESS:
-            mana.rested = False
+            state.engine.refresh_target(mana)
 
 
 def _draw_one(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -1343,7 +1338,7 @@ def death_blow_active(source: CardInstance, active: Player, state: Any) -> bool:
     return any(card.card.id == "purple_05_02_02_01" for card in source.owner.field)
 
 
-def on_targets_selected(player: Player, source: CardInstance | None, selected: Iterable[Any]) -> None:
+def on_targets_selected(engine: Any, player: Player, source: CardInstance | None, selected: Iterable[Any]) -> None:
     if source is None or source.owner is not player:
         return
     for target in selected:
@@ -1352,7 +1347,7 @@ def on_targets_selected(player: Player, source: CardInstance | None, selected: I
         marker = "turn:pc02_chohi_refresh"
         if marker not in target.flags:
             target.flags.add(marker)
-            target.rested = False
+            engine.refresh_target(target)
 
 
 def _place_red_mana_rested(engine: Any, player: Player, source: CardInstance) -> None:
@@ -1369,9 +1364,9 @@ def on_base_mana_removed(engine: Any, player: Player, mana: CardInstance, *, rea
         _place_red_mana_rested(engine, player, min(leaders, key=lambda card: card.iid))
 
 
-def on_mana_moved_to_base(player: Player, mana: CardInstance) -> None:
+def on_mana_moved_to_base(engine: Any, player: Player, mana: CardInstance) -> None:
     if _card_color(mana.card) is Color.BLUE and any(card.card.id == "blue_05_02_02_00" for card in player.field):
-        mana.rested = False
+        engine.refresh_target(mana)
 
 
 def on_damage_resolved(engine: Any, source: Any, target: Any, amount: int) -> None:

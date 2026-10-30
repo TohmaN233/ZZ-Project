@@ -140,6 +140,13 @@ class TriggerRegistry:
                         )
                         if effect.timing is not timing and not is_switch:
                             continue
+                        # A printed summon/Switch clause is a source effect,
+                        # not a listener for every summon of the same timing.
+                        # Other summons may replay it only through Switch's
+                        # owner, race and Field-source checks above.
+                        if (timing is EffectTiming.ON_SUMMON and effect_switch_races
+                                and ci is not summoned and not is_switch):
+                            continue
                         effect_context = ctx
                         pending_timing = timing
                         if is_switch:

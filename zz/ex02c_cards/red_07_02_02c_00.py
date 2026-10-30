@@ -24,7 +24,7 @@ def _starburst_stream(source: CardInstance, state: Any, ctx: Context) -> None:
 
 
 def _refresh_on_bless(source: CardInstance, state: Any, ctx: Context) -> None:
-    source.rested = False
+    state.engine.refresh_target(source)
 
 
 def build_card(row: dict[str, Any]):

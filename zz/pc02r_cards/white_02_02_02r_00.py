@@ -21,7 +21,7 @@ def _restore_and_ready_all_forces(source: CardInstance, state: Any, _ctx: Contex
         if force.destroyed:
             continue
         engine.heal_target(force, 1)
-        force.rested = False
+        engine.refresh_target(force)
 
 
 def build_card(row: dict[str, Any]):

@@ -222,6 +222,8 @@ def canonical_authoritative_state(
             "players": [_player_state(player) for player in state.players],
         },
         "engineRuntime": {
+            "pendingStandbyPlayer": _runtime_value(engine._pending_standby_player),
+            "pendingStandbyStep": _runtime_value(engine._pending_standby_step),
             "pendingForceBaseChoices": _runtime_value(engine.pending_force_base_choices),
             "pendingBlessingReturns": _runtime_value(engine.pending_blessing_returns),
             "triggerQueue": _runtime_value(list(engine.triggers._queue)),
