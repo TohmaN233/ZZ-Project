@@ -6,6 +6,7 @@ from zz.engine import BASE_CAP, Engine, IllegalActionError
 from zz.enums import AreaType, CardType, Side
 from zz.forces import F_OUROBOROS
 from zz.model import Card, CardInstance, ForceInstance, GameState, Player
+from zz.multiplayer.views import build_player_view
 from zz.web.session import GameSession
 
 
@@ -79,3 +80,30 @@ def test_user_force_destroy_on_full_base_prompts_ally_base_replacement() -> None
     assert chosen in owner.base
     assert all(card.iid != victim_iid for card in owner.base)
     assert len(owner.base) == BASE_CAP
+
+
+def test_force_search_candidates_are_private_and_selected_by_the_force_owner() -> None:
+    session = GameSession(seed=12, mode="god")
+    owner = session.engine.state.players[1]
+    owner.base = []
+    choices = [_bminion(owner, session.engine.state.allocate_iid(), f"base_{i}") for i in range(2)]
+    other = CardInstance(Card("field", "field", "field", CardType.F_MINION), owner,
+                         iid=session.engine.state.allocate_iid(), area=AreaType.DECK)
+    owner.deck = [*choices, other]
+    force = ForceInstance(force=F_OUROBOROS, owner=owner, life=F_OUROBOROS.initial_life)
+    owner.forces = [force]
+    session._clear_prompt()
+    session.engine.handle_force_destroy_base_search(force)
+    assert session._drain_or_prompt_force_base_choices()
+    owner_view = build_player_view(session, player_id="player_2", revision=1, state_hash="test")
+    opponent_view = build_player_view(session, player_id="player_1", revision=1, state_hash="test")
+    prompt = owner_view["prompt"]
+    assert prompt["kind"] == "force_base_choice" and prompt["playerSide"] == "P2"
+    assert {option["cardIid"] for option in prompt["options"]} == {card.iid for card in choices}
+    assert opponent_view["prompt"] is None
+    invalid = session.choose(prompt["id"], "illegal")
+    assert invalid["error"]["code"] == "illegal_choice" and not owner.base
+    option = next(option for option in prompt["options"] if option["cardIid"] == choices[1].iid)
+    result = session.choose(prompt["id"], option["id"])
+    assert result["error"] is None
+    assert owner.base == [choices[1]] and choices[1].area is AreaType.BASE

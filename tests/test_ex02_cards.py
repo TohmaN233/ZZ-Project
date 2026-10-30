@@ -79,6 +79,7 @@ def test_original_effect_prompts_keep_complete_own_face_text(original, variant):
 
 
 @pytest.mark.parametrize("original,prefix", [
+    ("red_00_01_EX02_01", "加护：费用3以上"),
     ("red_00_01_EX02_02", "加护：「剑」＋费用4以上"),
     ("green_00_01_EX02_01", "加护：费用4以上"),
     ("green_00_01_EX02_02", "加护：「剑」＋费用4以上"),

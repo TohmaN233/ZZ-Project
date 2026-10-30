@@ -25,6 +25,7 @@ class AreaType(Enum):
     FIELD  = "field"
     FORCE  = "force"
     TRASH  = "trash"
+    RESOLVING = "resolving"  # Paid Magic whose source clauses are still resolving.
     REMOVED = "removed"   # Banished cards; generated objects retain no zone entry.
     BLESSING = "blessing" # Mana attached to a field minion by 加護
 

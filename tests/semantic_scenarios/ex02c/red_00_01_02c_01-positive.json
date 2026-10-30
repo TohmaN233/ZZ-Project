@@ -3,7 +3,7 @@
   "scenario_id": "red_00_01_02c_01_positive",
   "card_id": "red_00_01_02c_01",
   "scenario_kind": "positive",
-  "official_rule": "JP: 《ベース》\n【配置時】\nフィールドに自分の種族「ソード」を持つミニオンが2体以上いる場合、自分の移動権を1増やす。",
+  "official_rule": "JP: 加護：コスト3以上\n《ベース》\n【配置時】\nフィールドに自分の種族「ソード」を持つミニオンが2体以上いる場合、自分の移動権を1増やす。",
   "setup": [
     {
       "path": "/api/debug/setup",

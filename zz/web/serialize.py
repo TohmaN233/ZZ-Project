@@ -78,7 +78,7 @@ def serialize_card(engine, ci: CardInstance, asset_index: AssetIndex,
         "nameEn": ci.card.name_en,
         "nameZh": _first(translation.get("name_zh")),
         "abilityJp": card_japanese_ability(ci.card),
-        "abilityEn": ci.card.ability_en,
+        "abilityEn": _first(translation.get("ability_en"), ci.card.ability_en),
         "abilityZh": _first(translation.get("ability_zh")),
         "type": ci.card.type.value,
         "cost": _cost_dict(ci),
@@ -201,6 +201,10 @@ def serialize_player(engine, player: Player, asset_index: AssetIndex,
         "base": [
             serialize_card(engine, ci, asset_index)
             for ci in player.base
+        ],
+        "resolving": [
+            serialize_card(engine, ci, asset_index)
+            for ci in player.resolving
         ],
         "trash": [
             serialize_card(engine, ci, asset_index)

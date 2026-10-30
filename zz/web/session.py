@@ -422,6 +422,7 @@ class GameSession:
             self._set_game_over(exc)
 
     def _set_game_over(self, exc: GameOver) -> None:
+        self.engine.finish_magic_casts_on_game_over()
         self._record_visual_changes()
         self._queue_animation_event({
             "type": "game_result",
@@ -800,7 +801,7 @@ class GameSession:
             "baseSummary",
         }
         compact = {key: player[key] for key in allowed_player_keys if key in player}
-        for key in ("hand", "field", "base", "trash"):
+        for key in ("hand", "field", "base", "resolving", "trash"):
             compact[key] = [
                 self._compact_codeman_trace_card(card)
                 for card in player.get(key, [])
@@ -1034,6 +1035,8 @@ class GameSession:
             return "graveyard"
         if from_area is AreaType.HAND:
             return "hand"
+        if from_area is AreaType.DECK:
+            return "deck"
         return None
 
     def _queue_zone_move_animation_event(
@@ -1271,6 +1274,8 @@ class GameSession:
                 "type": "destroy",
                 "side": ci.owner.side.name,
                 "card": serialize_card(self.engine, ci, self.asset_index),
+                "cause": event["cause"],
+                "sourceCard": event["sourceCard"],
             }
         if event_type == "zone_move":
             ci = event["card"]
@@ -2659,7 +2664,8 @@ class GameSession:
         player = source.owner
         if not self._is_user_controlled(player):
             return False
-        if not effect.optional:
+        self.engine._announce_effect_event(source, effect, pending.context)
+        if not effect.optional and effect.pre_target_fn is not None:
             before_pre_target = self._visual_state_snapshot()
             self.engine._run_pre_target_effect(effect, source, pending.context)
             self._record_visual_changes(before_pre_target)
@@ -2825,9 +2831,9 @@ class GameSession:
             return sequence
         return []
 
-    def _defer_source_effect_choice(self, source: CardInstance, effect: Any, ctx: Context) -> bool:
+    def _defer_source_effect_choice(self, source: CardInstance, effect: Any, ctx: Context) -> bool | None:
         if self.prompt is not None:
-            return False
+            return None
         if not isinstance(effect, EffectSpec):
             return False
         prompted = self._prompted_source_effect_resolution
@@ -2837,6 +2843,7 @@ class GameSession:
         player = source.owner
         if not self._is_user_controlled(player):
             return False
+        self.engine._announce_effect_event(source, effect, ctx)
         sequence = self._custom_source_effect_sequence(source, effect, ctx)
         if sequence:
             self._pending_effect = {
@@ -3363,6 +3370,9 @@ class GameSession:
                 instance=pending.get("source"),
                 trigger=pending.get("effect"),
             )
+            source = pending.get("source")
+            if isinstance(source, CardInstance):
+                self.engine.complete_magic_source_effect(source, pending.get("effect"), pending.get("context"))
         policy_batches: list[tuple[Any, list[Any]]] = []
 
         def add_policy_targets(owner: Player, targets: list[Any]) -> None:
@@ -3428,6 +3438,7 @@ class GameSession:
                 if not isinstance(target, CardInstance):
                     raise IllegalActionError("post-draw discard target must be a CardInstance")
                 self.engine.discard_from_hand(player, target)
+            self.engine.complete_magic_source_effect(pending["source"], pending["effect"], pending["context"])
             self.engine.triggers.resolve_all()
             self._record_visual_changes(before)
         else:
@@ -3548,6 +3559,8 @@ class GameSession:
                     return
                 self._resolve_pending_effect_with_targets(pending, [])
             else:
+                self.engine._cancel_effect_announcement(pending["source"], pending["effect"], pending["context"])
+                self.engine.complete_magic_source_effect(pending["source"], pending["effect"], pending["context"])
                 self.engine.triggers.resolve_all()
                 self._record_visual_changes(before)
             self._log_event(f"{player.name}: {'used' if use_effect else 'skipped'} optional effect", {
@@ -3593,6 +3606,9 @@ class GameSession:
                 instance=pending.get("source"),
                 trigger=pending.get("effect"),
             )
+            source = pending.get("source")
+            if isinstance(source, CardInstance):
+                self.engine.complete_magic_source_effect(source, pending.get("effect"), pending.get("context"))
         else:
             pending = {
                 **pending,
@@ -3766,6 +3782,7 @@ class GameSession:
             resolve_source_effects=False,
         )
         ctx = Context(controller=player, source=ci)
+        self.engine.prepare_manual_magic_effect(ci, effect, ctx)
         self.engine._record_effect_event(ci, effect, ctx)
         self.engine.draw(player, int(effect.params.get("draw_amount", 2)))
         self._record_visual_changes(before)
@@ -3777,12 +3794,15 @@ class GameSession:
                 effect.max_targets,
                 len(player.hand),
             )
+        else:
+            discard_count = min(effect.max_targets, len(player.hand))
         if discard_count:
             self._pending_effect = {
                 "mode": "post_draw_discard",
                 "player": player,
                 "source": ci,
                 "effect": effect,
+                "context": ctx,
                 "discard_count": discard_count,
             }
             self._prompt_effect_target(
@@ -3795,6 +3815,7 @@ class GameSession:
             )
             return
         before = self._visual_state_snapshot()
+        self.engine.complete_magic_source_effect(ci, effect, ctx)
         self.engine.triggers.resolve_all()
         self._record_visual_changes(before)
         self._log_public_reveals()
@@ -3812,6 +3833,8 @@ class GameSession:
             resolve_source_effects=False,
         )
         ctx = Context(controller=player, source=source)
+        self.engine.prepare_manual_magic_effect(source, effect, ctx)
+        self.engine._announce_effect_event(source, effect, ctx)
         self.engine._run_pre_target_effect(effect, source, ctx)
         self._record_visual_changes(before)
         self._log_event(f"{player.name}: {label}", event)

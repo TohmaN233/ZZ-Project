@@ -18,6 +18,8 @@ def _this_magic_was_cast(source: CardInstance, _state: Any, ctx: Context) -> boo
 def _buff_and_protect_selected_minion(source: CardInstance, state: Any, ctx: Context) -> None:
     engine = state.engine
     targets = engine.select_target(source.owner, "ally_minion", 1, 1, source=source)
+    if not targets and not engine._eligible_targets(source.owner, "ally_minion", source=source):
+        return
     if len(targets) != 1 or not isinstance(targets[0], CardInstance):
         raise RuntimeError("Metal Wall requires one allied Minion target")
     target = targets[0]

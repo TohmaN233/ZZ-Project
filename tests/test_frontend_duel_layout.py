@@ -58,12 +58,13 @@ def test_end_turn_control_preserves_readable_hands(duel_fixture, tmp_path, width
     origin, fixture = duel_fixture
     html = '''<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<base href="ORIGIN/"><link rel="stylesheet" href="static/styles.css"></head>
+<base href="ORIGIN/"><link rel="stylesheet" href="static/styles.css"><link rel="stylesheet" href="static/fx.css"></head>
 <body><main id="app" class="app duel-app"></main>
 <script>window.ZZ_DEFER_BOOT=true;</script>
 <script src="static/api-client.js"></script>
 <script src="static/multiplayer-card-policy.js"></script>
-<script src="static/duel-layout.js"></script><script src="static/app.js"></script>
+<script src="static/duel-layout.js"></script><script src="static/duel-dom.js"></script>
+<script src="static/fx-core.js"></script><script src="static/app.js"></script>
 <script>
 (async () => {
   const fixture = FIXTURE;

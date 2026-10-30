@@ -826,7 +826,6 @@ button:disabled {
 }
 
 .force.rested:not(.destroyed) {
-  opacity: 0.62;
   filter: grayscale(0.45);
   transform: rotate(4deg);
 }
@@ -983,6 +982,26 @@ button:disabled {
   padding: 4px 6px;
 }
 
+.battlefield .zone-meta {
+  flex-direction: column;
+  align-items: center;
+}
+
+.resolving-zone {
+  --mini-w: 36px;
+  --mini-h: calc(var(--mini-w) * 1.42);
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.resolving-label { color: var(--gold); font-size: 10px; }
+.resolving-zone:not(.occupied) .resolving-label { visibility: hidden; }
+.resolving-cards { display: flex; width: 100%; min-width: 0; flex-wrap: wrap; justify-content: center; gap: 3px; }
+.resolving-slot { display: block; width: var(--mini-w); height: var(--mini-h); }
+
 .base-zone,
 .base-lane {
   --mini-w: clamp(52px, 3.9vw, 60px);
@@ -1097,7 +1116,6 @@ button:disabled {
 
 .card.rested {
   transform: rotate(8deg);
-  opacity: 0.74;
 }
 
 .card.legal {
@@ -3370,7 +3388,6 @@ button.end-turn-action {
   white-space: nowrap;
 }
 
-.force-choice-card,
 .effect-choice-card {
   position: relative;
   --effect-choice-art-height: 112px;
@@ -3384,7 +3401,6 @@ button.end-turn-action {
   text-align: left;
 }
 
-.force-choice-card img,
 .effect-choice-card img,
 .force-choice-fallback {
   width: 100%;
@@ -3439,7 +3455,6 @@ button.end-turn-action {
   font-weight: 800;
 }
 
-.force-choice-card span:last-child,
 .effect-choice-card span:last-child {
   color: var(--gold);
   font-size: 12px;
@@ -3506,6 +3521,7 @@ button.end-turn-action {
   position: relative;
   width: min(92vw, 760px);
   max-height: 92vh;
+  overflow: auto;
   display: grid;
   grid-template-columns: minmax(260px, 0.76fr) minmax(220px, 0.54fr);
   gap: 16px;
@@ -3516,6 +3532,11 @@ button.end-turn-action {
     linear-gradient(145deg, rgba(50, 213, 200, 0.14), rgba(141, 114, 232, 0.1)),
     #071014;
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.62);
+}
+
+.card-detail-panel:has(> .detail-close) {
+  /* The close control owns a complete row, including with long wrapped titles. */
+  padding-top: 56px;
 }
 
 .detail-close {
@@ -3564,9 +3585,13 @@ button.end-turn-action {
   padding-right: 46px;
 }
 
+.card-detail-panel .card-detail-copy {
+  padding-right: 0;
+}
+
 .card-detail-title {
-  font-size: 22px;
-  line-height: 1.2;
+  font-size: 20px;
+  line-height: 1.35;
   font-weight: 900;
   color: var(--text);
   overflow-wrap: anywhere;
@@ -4080,7 +4105,6 @@ button.end-turn-action {
     inset 0 0 24px rgba(255, 80, 74, 0.32),
     0 0 28px rgba(255, 223, 128, 0.52);
   transform: translate(-50%, -50%);
-  animation: board-attack-target-ring 760ms ease-out both;
 }
 
 .board-attack-target-ring::before,
@@ -4145,20 +4169,6 @@ button.end-turn-action {
 .board-attack.persistent .board-attack-target-ring {
   opacity: 0.88;
   animation: board-attack-target-pulse 1120ms ease-in-out infinite;
-}
-
-.board-attack-impact {
-  z-index: 61;
-  position: absolute;
-  left: var(--to-x);
-  top: var(--to-y);
-  width: 58px;
-  height: 58px;
-  border: 3px solid rgba(255, 92, 78, 0.96);
-  border-radius: 50%;
-  box-shadow: 0 0 22px rgba(255, 92, 78, 0.72);
-  transform: translate(-50%, -50%);
-  animation: board-attack-impact 720ms ease-out both;
 }
 
 .board-clash-card.attacker {
@@ -5012,21 +5022,6 @@ button.end-turn-action {
   }
 }
 
-@keyframes board-attack-target-ring {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.46);
-  }
-  36% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(0.92);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.42);
-  }
-}
-
 @keyframes board-attack-target-pulse {
   0%,
   100% {
@@ -5034,20 +5029,6 @@ button.end-turn-action {
   }
   50% {
     transform: translate(-50%, -50%) scale(1.08);
-  }
-}
-
-@keyframes board-attack-impact {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.35);
-  }
-  45% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.8);
   }
 }
 
@@ -5348,7 +5329,6 @@ button.end-turn-action {
 .effect-choice-card.rested img,
 .effect-choice-card.rested .force-choice-fallback {
   transform: rotate(8deg);
-  opacity: 0.74;
 }
 
 .effect-choice-status {

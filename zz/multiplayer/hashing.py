@@ -83,6 +83,10 @@ def _runtime_value(value: Any) -> Any:
             "controller": _runtime_value(value.controller),
             "source": _runtime_value(value.source),
             "target": _runtime_value(value.target),
+            "attackTarget": _runtime_value(value.attack_target),
+            "switchSource": _runtime_value(value.switch_source),
+            "battleParticipants": _runtime_value(value.battle_participants),
+            "preTargetEffectsApplied": _runtime_value(getattr(value, "_pre_target_effects_applied", [])),
         }
     if isinstance(value, Mapping):
         return {
@@ -134,6 +138,7 @@ def _player_state(player: Player) -> dict[str, Any]:
         "base": [_card_state(card) for card in player.base],
         "field": [_card_state(card) for card in player.field],
         "trash": [_card_state(card) for card in player.trash],
+        "resolving": [_card_state(card) for card in player.resolving],
         "removed": [_card_state(card) for card in player.removed],
         "forces": [
             {
@@ -220,6 +225,8 @@ def canonical_authoritative_state(
             "pendingForceBaseChoices": _runtime_value(engine.pending_force_base_choices),
             "pendingBlessingReturns": _runtime_value(engine.pending_blessing_returns),
             "triggerQueue": _runtime_value(list(engine.triggers._queue)),
+            "magicCastFrames": _runtime_value(engine._magic_cast_frames),
+            "terminalGameOver": engine._terminal_game_over,
             "ignoreHandCap": engine.ignore_hand_cap,
             "passiveModifiers": passive_modifiers,
             "playerDamageReduction": _identity_map(engine._player_damage_reduction, refs),
@@ -230,6 +237,7 @@ def canonical_authoritative_state(
             "forceHealingBlocked": _identity_set(engine._force_healing_blocked, refs),
             "effectResolutionDepth": engine._effect_resolution_depth,
             "pendingDestroyEvents": _runtime_value(engine._pending_destroy_events),
+            "pendingRestMinions": _runtime_value(engine._pending_rest_minions),
             "flushingDestroyEvents": engine._flushing_destroy_events,
             "resolvingStateBasedActions": engine._resolving_state_based_actions,
             "delayedTurnEndEffects": delayed_effects,

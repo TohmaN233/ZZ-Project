@@ -1,0 +1,157 @@
+/* The board remains readable: particles sit below prompts and never take input. */
+.fx-canvas { position:absolute; inset:0; width:100%; height:100%; z-index:40; pointer-events:none; }
+.fx-status { position:absolute; right:8px; bottom:8px; z-index:42; padding:3px 7px;
+  border:1px solid #efb25a; border-radius:4px; background:#251e18; color:#ffd99c; font-size:11px; }
+.fx-flight { animation:none !important; will-change:transform,opacity; }
+
+/* Independent inner-card tilt leaves the fan, rested rotation and drag untouched. */
+.card-fx { position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:2;
+  opacity:0; background:radial-gradient(ellipse at var(--fx-x,50%) var(--fx-y,35%), #ffffff75, #ffffff08 40%, transparent 65%);
+  mix-blend-mode:soft-light; transition:opacity 180ms ease; }
+.card.fx-tilting, .catalog-art.fx-tilting {
+  transform:perspective(700px) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg));
+  transition:transform 100ms ease-out; }
+.card.rested.fx-tilting { transform:perspective(700px) rotate(8deg) rotateX(var(--fx-rx,0deg)) rotateY(var(--fx-ry,0deg)); }
+.fx-tilting > .card-fx, .card.selected-card > .card-fx, .catalog-art:focus-visible > .card-fx { opacity:.85; }
+.card-hover-actions, .mulligan-toggle, .card-action-dot { z-index:5; }
+.catalog-art { position:relative; isolation:isolate; }
+
+/* Foil is metadata-driven, never inferred from a hidden card or its back. */
+.card[data-rarity="R"], .catalog-card[data-rarity="R"] .catalog-art { border-color:#adbfd4; }
+.card[data-rarity="E"], .catalog-card[data-rarity="E"] .catalog-art { border-color:#a48cdb; }
+.card[data-rarity="L"], .catalog-card[data-rarity="L"] .catalog-art { border-color:#ead18a; }
+.card[data-rarity="E"] > .card-fx, .catalog-card[data-rarity="E"] .card-fx {
+  background:repeating-linear-gradient(118deg,#8df8ff50 0%,#ce8bff40 20%,#ffd47b30 38%,#84ffd440 55%,#8df8ff50 70%);
+  background-size:200% 200%; background-position:var(--fx-x,50%) var(--fx-y,50%); mix-blend-mode:soft-light; opacity:.15; }
+.card[data-rarity="L"] > .card-fx, .catalog-card[data-rarity="L"] .card-fx {
+  background:radial-gradient(ellipse at var(--fx-x,50%) var(--fx-y,30%),#fff5c9bb,transparent 47%),
+    repeating-linear-gradient(125deg,#ffe7a033 0%,#e2ad2d11 18%,#fff2c955 20%,#c59be022 30%,#ffe7a033 40%);
+  mix-blend-mode:soft-light; opacity:.24; }
+.card[data-rarity="E"].fx-tilting > .card-fx, .card[data-rarity="L"].fx-tilting > .card-fx,
+.catalog-card .fx-tilting > .card-fx { opacity:.75; }
+
+/* A static outer halo plus opacity pulse avoids repainting a moving box-shadow. */
+.duel-board .card.playable { animation:none; }
+.card.playable > .card-fx { opacity:.65; }
+.card.playable > .card-fx::after { content:""; position:absolute; inset:0; border-radius:inherit;
+  box-shadow:inset 0 0 18px 3px #45f5d8a0; animation:fx-ready 2s ease-in-out infinite; }
+@keyframes fx-ready { 0%,100% {opacity:.25} 50% {opacity:.85} }
+
+.visual-overlay.fx-turn { --turn-accent:#73fff0; overflow:hidden; }
+.visual-overlay.fx-turn.theirs { --turn-accent:#ff998d; }
+.visual-overlay.fx-turn::before { content:""; position:absolute; inset:34% -40%;
+  background:linear-gradient(105deg,transparent 35%,var(--turn-accent) 50%,transparent 65%);
+  opacity:.24; transform:skewX(-20deg); animation:fx-turn-sweep 700ms cubic-bezier(.25,.6,.3,1) both; }
+.fx-turn .visual-overlay-card { animation:fx-turn-title 700ms ease-out both; }
+.fx-turn .visual-overlay-text { color:var(--turn-accent); border-color:var(--turn-accent);
+  letter-spacing:.12em; text-shadow:0 0 24px color-mix(in srgb,var(--turn-accent),transparent 45%); }
+.fx-phase .visual-overlay-card { animation:fx-phase-title 800ms ease-out both; }
+@keyframes fx-turn-sweep { 0% {translate:-80% 0;opacity:0} 30% {opacity:.24} 100% {translate:80% 0;opacity:0} }
+@keyframes fx-turn-title { 0% {opacity:0;transform:translateY(12px) scale(.92)} 22%,75% {opacity:1;transform:translateY(0) scale(1)} 100% {opacity:0;transform:translateY(-8px) scale(1.02)} }
+@keyframes fx-phase-title { 0% {opacity:0;transform:scale(.85)} 20%,80% {opacity:1;transform:scale(1)} 100% {opacity:0;transform:scale(1.04)} }
+.game-result-card { position:relative; isolation:isolate; }
+.game-result-card::before { content:""; position:absolute; inset:-70%; z-index:-1;
+  background:conic-gradient(from 0deg,transparent,#efd17e25,transparent 22%,#7dfde722,transparent 50%,#efd17e25,transparent 80%);
+  animation:fx-result-rays 1750ms ease-out both; pointer-events:none; }
+@keyframes fx-result-rays { from {opacity:0;transform:rotate(-35deg) scale(.7)} 30% {opacity:1} to {opacity:0;transform:rotate(20deg) scale(1.2)} }
+
+/* Match the queue's 920ms destruction slot; the old 1120ms tail was truncated. */
+.board-destroy-card, .board-destroy-flash, .board-destroy-crack, .board-destroy-smoke, .board-destroy-label { animation-duration:880ms; }
+.board-life-float { font-variant-numeric:tabular-nums; text-shadow:0 2px 2px #000,0 0 20px currentColor; }
+
+/* Let the selected native emitter carry the impact shape, without stacking
+   the old red blast on every action. Numbers and targeting remain readable. */
+.fx-particles .board-clash-burst, .fx-particles .board-hit-burst.damage,
+.fx-particles .board-destroy-flash,
+.fx-particles .board-destroy-crack, .fx-particles .board-destroy-smoke,
+.fx-particles .board-destroy::before, .fx-particles .board-destroy::after,
+.fx-particles .board-clash::before, .fx-particles .board-clash::after,
+.fx-particles .board-graveyard-summon { display:none; }
+.board-animation-layer[data-fx-color] .board-zone-move-card {
+  border-color:color-mix(in srgb,var(--fx-accent),transparent 35%);
+  box-shadow:0 12px 22px #050b1060,0 0 16px color-mix(in srgb,var(--fx-accent),transparent 76%); }
+.board-animation-layer[data-fx-color] .board-block-shield {
+  border-color:var(--fx-accent); background:color-mix(in srgb,var(--fx-accent),transparent 91%);
+  box-shadow:inset 0 0 18px color-mix(in srgb,var(--fx-accent),transparent 75%),0 0 18px color-mix(in srgb,var(--fx-accent),transparent 70%); }
+.board-animation-layer[data-fx-color] .board-clash-card.blocker { border-color:var(--fx-accent); }
+.board-animation-layer[data-fx-color] .board-block-cut { background:linear-gradient(90deg,transparent,var(--fx-accent),transparent); }
+.fx-particles .board-block-banner { left:var(--mid-x); min-width:0; padding:5px 9px;
+  border:0; background:#071018c0; font-size:14px; letter-spacing:.1em;
+  color:var(--fx-accent); text-shadow:0 2px 8px #071018; }
+.fx-particles .board-block-banner::before, .fx-particles .board-block-banner::after { display:none; }
+.fx-particles[data-fx-color="blue"] .board-block-shield { clip-path:none; border-radius:50%; }
+.fx-particles[data-fx-color="green"] .board-block-shield { clip-path:none; border-radius:70% 15% 70% 15%; }
+.fx-particles[data-fx-color="purple"] .board-block-shield { clip-path:none; border-radius:50%; border-style:dashed; }
+.fx-particles[data-fx-color="white"] .board-block-shield { clip-path:none; border-radius:2px; }
+
+/* Destroying a physical card has a sustained exit. Life loss is one short,
+   localized hit followed by a crisp number, never a second destruction. */
+.board-life-float.damage { animation-name:fx-life-loss; background:transparent; border:0;
+  box-shadow:none; padding:0; min-width:0; font-size:40px; color:#ffb4a5; }
+@keyframes fx-life-loss {
+  0% {opacity:0;transform:translate(-50%,-25%) scale(.85)}
+  16%,52% {opacity:1;transform:translate(-50%,-65%) scale(1)}
+  100% {opacity:0;transform:translate(-50%,-115%) scale(.96)}
+}
+.board-destroy-card.fx-dissolving { box-shadow:0 10px 24px #050a1260;
+  animation:fx-card-fracture 840ms cubic-bezier(.2,.65,.3,1) both; }
+.board-destroy.fx-removal::before, .board-destroy.fx-removal::after,
+.fx-removal .board-destroy-flash, .fx-removal .board-destroy-crack,
+.fx-removal .board-destroy-smoke { display:none; }
+.fx-removal .board-destroy-card { animation:fx-card-remove 650ms ease-out both; }
+@keyframes fx-card-remove {
+  0%,12% { opacity:1; transform:translateY(0) scale(1); }
+  100% { opacity:0; transform:translateY(18px) scale(.94); }
+}
+.board-animation-layer[data-fx-color="red"] .fx-dissolving { animation-name:fx-card-burn; }
+.board-animation-layer[data-fx-color="blue"] .fx-dissolving { animation-name:fx-card-fracture; }
+.board-animation-layer[data-fx-color="yellow"] .fx-dissolving { animation-name:fx-card-discharge; }
+.board-animation-layer[data-fx-color="green"] .fx-dissolving { animation-name:fx-card-scatter; }
+.board-animation-layer[data-fx-color="purple"] .fx-dissolving { animation-name:fx-card-collapse; }
+.board-animation-layer[data-fx-color="white"] .fx-dissolving { animation-name:fx-card-erase; }
+.board-animation-layer[data-fx-color] .board-destroy-label { color:var(--fx-accent); border:0; background:transparent; text-shadow:0 2px 5px #000; }
+@keyframes fx-card-fracture {
+  0%,18% {opacity:1;transform:scale(1);filter:brightness(1)}
+  36% {opacity:1;transform:scale(1.035);filter:brightness(1.6)}
+  100% {opacity:0;transform:translateY(24px) scale(.92) rotate(5deg);filter:brightness(.65)}
+}
+@keyframes fx-card-burn {
+  0%,20% {opacity:1;clip-path:inset(0);filter:brightness(1)}
+  42% {opacity:1;clip-path:inset(8% 0 0);filter:brightness(1.65) sepia(.7)}
+  100% {opacity:0;clip-path:inset(100% 0 0);filter:brightness(.5) sepia(1);transform:translateY(-12px)}
+}
+@keyframes fx-card-discharge {
+  0%,18% {opacity:1;transform:scale(1);filter:brightness(1)}
+  28%,42% {opacity:1;transform:translateX(-3px);filter:brightness(2.2)}
+  34%,48% {opacity:.65;transform:translateX(3px);filter:brightness(1.4)}
+  100% {opacity:0;transform:scaleX(.08) scaleY(1.08);filter:brightness(2)}
+}
+@keyframes fx-card-scatter {
+  0%,22% {opacity:1;transform:translateY(0) rotate(0);filter:brightness(1)}
+  100% {opacity:0;transform:translate(24px,-45px) rotate(-12deg) scale(.88);filter:brightness(1.5)}
+}
+@keyframes fx-card-collapse {
+  0%,20% {opacity:1;transform:scale(1);filter:brightness(1)}
+  55% {opacity:.8;transform:scale(.72) rotate(6deg);filter:brightness(.7)}
+  100% {opacity:0;transform:scale(.04) rotate(22deg);filter:brightness(.25)}
+}
+@keyframes fx-card-erase {
+  0%,22% {opacity:1;transform:scale(1);filter:brightness(1)}
+  45% {opacity:.9;transform:scale(1);filter:brightness(2) grayscale(1)}
+  100% {opacity:0;transform:translateY(-20px) scale(1.025);filter:brightness(2.8) grayscale(1)}
+}
+
+.app.fx-reduced .fx-canvas { display:none; }
+.app.fx-reduced .card-fx::after, .app.fx-reduced .fx-turn::before, .app.fx-reduced .game-result-card::before { animation:none; display:none; }
+.app.fx-reduced .fx-tilting { transform:none; }
+.app.fx-reduced *, .app.fx-reduced *::before, .app.fx-reduced *::after {
+  animation-duration:1ms !important; animation-iteration-count:1 !important; transition-duration:1ms !important; }
+.app.fx-reduced .board-life-float { animation:none !important; opacity:1; }
+@media (hover:none), (pointer:coarse) {
+  .card.fx-tilting, .catalog-art.fx-tilting { transform:none; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .fx-canvas, .fx-turn::before, .game-result-card::before { display:none; }
+  .app *, .app *::before, .app *::after { animation-duration:1ms !important; animation-iteration-count:1 !important; transition-duration:1ms !important; }
+  .app .board-life-float { animation:none !important; opacity:1; }
+}

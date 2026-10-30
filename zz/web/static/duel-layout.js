@@ -57,7 +57,8 @@
     const observer = new ResizeObserver(refresh);
     for (const element of app.querySelectorAll(".arena .zone-cards, .cockpit")) observer.observe(element);
     window.addEventListener("resize", refresh);
-    return { disconnect() { observer.disconnect(); window.removeEventListener("resize", refresh); } };
+    return { refresh, setScale(value) { scale = normalizeScale(value); },
+      disconnect() { observer.disconnect(); window.removeEventListener("resize", refresh); } };
   }
 
   const api = { normalizeScale, zoneCardWidth, observe };

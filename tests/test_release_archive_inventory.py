@@ -50,7 +50,7 @@ def fixture_workspace(tmp_path: Path) -> Path:
     for relative in release.release_files(ROOT, "source"):
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        if relative.as_posix() in {"zz/pc02r.py", "zz/ex02c.py"}:
+        if relative.as_posix() in {"zz/pc02r.py", "zz/ex02c.py"} or relative.as_posix().startswith("zz/web/static/fx/"):
             shutil.copyfile(ROOT / relative, target)
         else:
             target.write_text("fixture", encoding="utf-8")
@@ -66,7 +66,8 @@ def test_inventory_rejects_missing_required_new_product_file(tmp_path):
 
 def test_inventory_does_not_admit_unrelated_files_in_product_directories(tmp_path):
     root = fixture_workspace(tmp_path)
-    unrelated = ("data/private.tsv", "electron/probe.js", "zz/probe.py", "tests/test_private_audit.py")
+    unrelated = ("data/private.tsv", "electron/probe.js", "zz/probe.py", "tests/test_private_audit.py",
+                 "zz/web/static/fx/unselected.efkefc")
     for name in unrelated:
         (root / name).write_text("must not ship", encoding="utf-8")
     files = {path.as_posix() for path in release.release_files(root, "source")}

@@ -18,10 +18,15 @@ def _has_two_sword_minions(source: CardInstance, _state: Any, _ctx: Context) -> 
     return sum("ソード" in ci.card.race_jp for ci in source.owner.field) >= 2
 
 
+def _cost_three_or_more(_mana: CardInstance, target: CardInstance, _state: Any) -> bool:
+    return sum(target.card.cost.values()) >= 3
+
+
 def build_card(row: dict[str, Any]):
     if str(row.get("image_id") or "").strip() != CARD_ID:
         raise ValueError(f"{CARD_ID} cannot build row {row.get('image_id')!r}")
     card = _card_from_row(row, infer_effects=False)
+    card.bless_condition = _cost_three_or_more
     card.effects = list(card.effects) + [
         build_effect(
             "increase_movement_right",

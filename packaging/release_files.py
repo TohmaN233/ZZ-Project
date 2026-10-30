@@ -29,6 +29,7 @@ PACKAGING_FILES = (
 )
 SOURCE_TOOLS = (
     "__init__.py", "run_semantic_scenario.py", "card_translation_exchange.py",
+    "import_duel_fx.py",
     "build_ex02c_correspondence.py",
     "normalize_japanese_card_text.py", "hidden_multiprocessing_spawn.py",
     "multiplayer_external_smoke.py", "multiplayer_soak.py",
@@ -107,16 +108,19 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.update(Path(name) for name in ("image.png", "launch-electron.sh", "launch-electron.cmd", "package.json", "package-lock.json", "docs/index.html"))
         paths.update(Path("electron") / name for name in ELECTRON_FILES)
         paths.update(Path("zz/web/static") / name for name in STATIC_FILES)
+        paths.update(duel_fx_files(root))
         paths.update(Path("docs/assets") / name for name in SITE_ASSETS)
         paths.update(Path("data/decks") / name for name in DEFAULT_DECKS)
         paths.add(NORMAL_MODEL_RELATIVE)
     if kind == "source":
+        paths.add(Path("docs/DUEL_FX.md"))
         paths.update(Path(name) for name in ("CONTRIBUTING.md", "smoke_clean_release.py", "ai_training/__init__.py", "ai_training/codeman_training.py", "build/installer.nsh"))
         paths.update(Path("packaging") / name for name in PACKAGING_FILES)
         paths.update(Path("tools") / name for name in SOURCE_TOOLS)
         paths.update(Path("tests") / name for name in (*FOCUSED_TESTS, "test_release_archive_inventory.py"))
         paths.add(Path("tests/test_ex02c_cards.py"))
         paths.add(Path("tests/test_ex02_cards.py"))
+        paths.update(Path("tests") / name for name in ("test_frontend_duel_dom.py", "test_frontend_fx.py", "test_frontend_fx_arrival.py"))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
         paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))
         paths.add(Path("tests/semantic_scenarios/ex02c/green_08_02_02c_01-trash-boundary.json"))
@@ -131,6 +135,25 @@ def release_files(root: Path, kind: str) -> list[Path]:
         if source.is_symlink() or not source.resolve().is_relative_to(root.resolve()):
             raise ValueError(f"Release file escapes workspace: {source}")
     return files
+
+
+def duel_fx_files(root: Path) -> list[Path]:
+    """Use the declared inventory, never sweep a local effect/export directory."""
+    directory = Path("zz/web/static/fx")
+    manifest = json.loads((root / directory / "manifest.json").read_text(encoding="utf-8"))
+    declared = manifest["files"]
+    required = {"effekseer.min.js", "effekseer.wasm", "effekseer-LICENSE.txt"}
+    if not required.issubset(declared):
+        raise ValueError("Duel FX manifest must include the pinned runtime and license")
+    result = [directory / "manifest.json"]
+    for name, expected in declared.items():
+        if not re.fullmatch(r"[A-Za-z0-9_.-]+", name):
+            raise ValueError(f"Invalid duel FX asset path: {name}")
+        source = root / directory / name
+        if sha256(source) != expected:
+            raise ValueError(f"Duel FX asset checksum mismatch: {source}")
+        result.append(directory / name)
+    return result
 
 
 def sha256(path: Path) -> str:
@@ -199,7 +222,7 @@ MULTIPLAYER_MODULES = ('__init__', 'actions', 'client', 'compatibility', 'contro
 
 ELECTRON_FILES = ('adaptive-websocket.js', 'asset-bootstrap.js', 'asset-setup-preload.js', 'asset-setup-renderer.js', 'asset-setup.css', 'asset-setup.html', 'asset-setup.js', 'asset-source.json', 'icon-256.png', 'icon.png', 'lan-manager.js', 'main.js', 'multiplayer-client.js', 'preload.js', 'README.md', 'update-checker.js')
 
-STATIC_FILES = ('api-client.js', 'app.js', 'duel-layout.js', 'duel.html', 'duel.js', 'index.html', 'multiplayer-card-policy.js', 'styles.css')
+STATIC_FILES = ('api-client.js', 'app.js', 'duel-dom.js', 'duel-layout.js', 'duel.html', 'duel.js', 'fx-core.js', 'fx.css', 'index.html', 'multiplayer-card-policy.js', 'styles.css')
 
 PUBLIC_TSVS = ('base_minion_face_verified.tsv', 'card_ability_face_verified.tsv', 'card_cost_face_verified.tsv', 'card_cost_pips.tsv', 'card_cost_text_verified.tsv', 'card_stat_face_verified.tsv', 'card_transformations.tsv', 'cards_bilingual_v4.tsv', 'ex02_ex02c_equivalences.tsv', 'forces.tsv', 'official_card_search.tsv', 'official_cardlist.tsv', 'official_filters.tsv', 'pc01r_image_reconciliation.tsv', 'pc02_image_reconciliation.tsv', 'seesaa.tsv')
 

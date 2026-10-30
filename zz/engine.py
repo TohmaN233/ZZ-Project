@@ -6,7 +6,7 @@ from zz.enums import AreaType, CardType, Color, Keyword, Phase, Side, Step, Trig
 from zz import keyword_rules
 from zz.effects import EffectTiming, EffectSpec, effect_once_per_turn_used
 from zz.model import (Action, AttackTarget, Card, CardInstance, Context,
-                       ForceInstance, GameState, Player)
+                       ForceInstance, GameState, MagicCastFrame, Player)
 from zz.triggers import TriggerRegistry
 
 
@@ -64,7 +64,7 @@ class Engine:
         self.defer_force_base_choice: Callable[[Player], bool] = lambda player: False
         self.defer_blessing_base_choice: Callable[[Player], bool] = lambda player: False
         self.defer_trigger_choice: Callable[[Any], bool | None] | None = None
-        self.defer_source_effect_choice: Callable[[CardInstance, Any, Context], bool] | None = None
+        self.defer_source_effect_choice: Callable[[CardInstance, Any, Context], bool | None] | None = None
         self.pending_blessing_returns: list[tuple[CardInstance, CardInstance]] = []
         self._player_damage_reduction: dict[int, int] = {}
         self._player_damage_reduction_blocked: set[int] = set()
@@ -76,6 +76,8 @@ class Engine:
         self._turn_target_restrictions: list[dict[str, Any]] = []
         self._scheduled_force_damage_reductions: list[dict[str, Any]] = []
         self._effect_resolution_depth = 0
+        self._magic_cast_frames: dict[int, MagicCastFrame] = {}
+        self._terminal_game_over = False
         self._pending_rest_minions: list[CardInstance] = []
         self._pending_destroy_events: list[tuple[CardInstance, Context]] = []
         self._flushing_destroy_events = False
@@ -119,9 +121,9 @@ class Engine:
     def _enter_effect_resolution(self) -> None:
         self._effect_resolution_depth += 1
 
-    def _leave_effect_resolution(self) -> None:
+    def _leave_effect_resolution(self, *, flush: bool = True) -> None:
         self._effect_resolution_depth = max(0, self._effect_resolution_depth - 1)
-        if self._effect_resolution_depth == 0:
+        if flush and self._effect_resolution_depth == 0 and not self._terminal_game_over:
             if self.pending_blessing_returns:
                 return
             self._resolve_state_based_actions()
@@ -130,7 +132,7 @@ class Engine:
             self._flush_pending_rest_events()
 
     def _flush_pending_rest_events(self) -> None:
-        if not self._pending_rest_minions:
+        if self._terminal_game_over or not self._pending_rest_minions:
             return
         rested = tuple(self._pending_rest_minions)
         self._pending_rest_minions.clear()
@@ -145,25 +147,136 @@ class Engine:
         if self._effect_resolution_depth == 0:
             self.triggers.resolve_all()
 
-    def _run_effect_callback(self, fn: Callable, *args, effect: EffectSpec | None = None) -> None:
+    def _run_effect_callback(self, fn: Callable, *args, effect: Any = None) -> None:
         previous_contract = getattr(self, "_effect_target_contract", None)
-        self._effect_target_contract = (args[0], effect) if effect is not None else None
+        self._effect_target_contract = (args[0], effect) if isinstance(effect, EffectSpec) else None
+        source = args[0]
+        frame = self._magic_cast_frames.get(getattr(source, "iid", None))
+        source_clause = frame is not None and any(clause is effect for clause in frame.pending_clauses)
+        if source_clause:
+            frame.running_callbacks += 1
         self._enter_effect_resolution()
+        callback_completed = False
         try:
             fn(*args)
+            callback_completed = True
+        except GameOver:
+            self.finish_magic_casts_on_game_over()
+            raise
+        else:
+            if source_clause:
+                self.complete_magic_source_effect(source, effect, args[2])
         finally:
             self._effect_target_contract = previous_contract
-            self._leave_effect_resolution()
+            try:
+                self._leave_effect_resolution(flush=callback_completed)
+            finally:
+                if source_clause and self._magic_cast_frames.get(source.iid) is frame:
+                    frame.running_callbacks -= 1
+                    self._finish_magic_cast_if_ready(frame)
+
+    def _begin_magic_cast(self, source: CardInstance, ctx: Context) -> MagicCastFrame:
+        if source.iid in self._magic_cast_frames or source in source.owner.resolving:
+            raise RuntimeError(f"Magic {source.iid} already resolving")
+        clauses = [effect for effect in source.card.effects if effect.timing is EffectTiming.ON_CAST_MAGIC]
+        clauses.extend(trigger for trigger in source.card.triggers if trigger.when is TriggerTiming.ON_PLAY)
+        frame = MagicCastFrame(source, ctx, clauses)
+        self._magic_cast_frames[source.iid] = frame
+        source.area = AreaType.RESOLVING
+        source.owner.resolving.append(source)
+        self._record_zone_move(source, AreaType.HAND, AreaType.RESOLVING, cause="cast_start")
+        return frame
+
+    def _finish_magic_cast_if_ready(self, frame: MagicCastFrame) -> None:
+        if frame.dispatching or frame.running_callbacks or frame.pending_clauses:
+            return
+        source = frame.source
+        if self._magic_cast_frames.get(source.iid) is not frame:
+            return
+        if source.area is not AreaType.RESOLVING or source not in source.owner.resolving:
+            raise RuntimeError(f"Magic {source.iid} left resolving before source completion")
+        if not frame.listeners_collected and not self._terminal_game_over:
+            # Conditions observe the completed source effects for synchronous,
+            # interactive and manually split casts at the same logical instant.
+            frame.listeners_collected = True
+            self.triggers.emit(EffectTiming.ON_CAST_MAGIC, frame.context, exclude_instance=source)
+            self.triggers.emit(TriggerTiming.ON_PLAY, frame.context, exclude_instance=source)
+            self.triggers.emit(EffectTiming.ON_CARD_USED, frame.context)
+        source.owner.resolving.remove(source)
+        source.area = AreaType.TRASH
+        source.owner.trash.append(source)
+        del self._magic_cast_frames[source.iid]
+        self._record_zone_move(source, AreaType.RESOLVING, AreaType.TRASH, cause="cast_complete")
+
+    def complete_magic_source_effect(self, source: CardInstance, effect: Any, ctx: Context | None = None) -> None:
+        """Complete a callback, skipped clause, or Session-owned split clause."""
+        frame = self._magic_cast_frames.get(source.iid)
+        if frame is None:
+            return
+        for index, clause in enumerate(frame.pending_clauses):
+            if clause is effect:
+                del frame.pending_clauses[index]
+                break
+        self._finish_magic_cast_if_ready(frame)
+
+    def prepare_manual_magic_effect(self, source: CardInstance, effect: Any, ctx: Context) -> None:
+        """Hold the current split clause and enqueue all later source clauses."""
+        frame = self._magic_cast_frames.get(source.iid)
+        if frame is None or frame.continuation_queued:
+            raise RuntimeError(f"Magic {source.iid} has no unclaimed manual continuation")
+        if not frame.pending_clauses or frame.pending_clauses[0] is not effect:
+            raise RuntimeError(f"manual Magic clause is not the first pending clause: {source.iid}")
+        frame.context = ctx
+        self.triggers.enqueue_magic_source_clauses(source, ctx, frame.pending_clauses[1:])
+        frame.continuation_queued = True
+
+    def _resolve_magic_source(self, frame: MagicCastFrame) -> None:
+        source, ctx = frame.source, frame.context
+        for clause in list(frame.pending_clauses):
+            if (isinstance(clause, EffectSpec) and effect_once_per_turn_used(clause, source)
+                    or clause.condition and not clause.condition(source, self.state, ctx)):
+                self.complete_magic_source_effect(source, clause, ctx)
+                continue
+            if isinstance(clause, EffectSpec) and self.defer_source_effect_choice is not None:
+                choice_result = self.defer_source_effect_choice(source, clause, ctx)
+                if choice_result is None or choice_result:
+                    # None means another source currently owns the prompt;
+                    # this clause has not been offered or executed yet.
+                    continuation = frame.pending_clauses if choice_result is None else frame.pending_clauses[1:]
+                    self.triggers.enqueue_magic_source_clauses(source, ctx, continuation,
+                                                              after_pending=choice_result is None)
+                    frame.continuation_queued = True
+                    return
+            self._record_effect_event(source, clause, ctx)
+            if isinstance(clause, EffectSpec):
+                self._run_pre_target_effect(clause, source, ctx)
+            self._run_effect_callback(clause.fn, source, self.state, ctx, effect=clause)
+
+    def finish_magic_casts_on_game_over(self) -> None:
+        """No more choices resolve after a terminal game result."""
+        self._terminal_game_over = True
+        for frame in list(self._magic_cast_frames.values()):
+            self.triggers.discard_pending(instance=frame.source)
+            frame.pending_clauses.clear()
+            frame.dispatching = False
+            frame.running_callbacks = 0
+            self._finish_magic_cast_if_ready(frame)
 
     def _run_pre_target_effect(self, effect: Any, source: CardInstance, ctx: Context) -> None:
         pre_target_fn = getattr(effect, "pre_target_fn", None)
-        if pre_target_fn is None or getattr(ctx, "_pre_target_effect_applied", False):
+        applied = getattr(ctx, "_pre_target_effects_applied", [])
+        if pre_target_fn is None or any(previous is effect for previous in applied):
             return
-        pre_target_fn(source, self.state, ctx)
-        setattr(ctx, "_pre_target_effect_applied", True)
+        try:
+            pre_target_fn(source, self.state, ctx)
+        except GameOver:
+            self.finish_magic_casts_on_game_over()
+            raise
+        applied.append(effect)
+        setattr(ctx, "_pre_target_effects_applied", applied)
 
     def _flush_pending_destroy_events(self) -> None:
-        if self._flushing_destroy_events:
+        if self._terminal_game_over or self._flushing_destroy_events:
             return
         self._flushing_destroy_events = True
         try:
@@ -186,6 +299,16 @@ class Engine:
     def _record_visual_event(self, event: dict[str, Any]) -> None:
         self.visual_events.append(event)
 
+    def _visual_source_card(self, source) -> dict[str, Any] | None:
+        """Freeze public attribution before zone cleanup changes the source."""
+        if not isinstance(source, CardInstance):
+            return None
+        identity = {"ownerSide": source.owner.side.name, "area": source.area.value}
+        if source.area in {AreaType.HAND, AreaType.DECK}:
+            return {**identity, "faceDown": True}
+        return {**identity, "iid": source.iid, "cardId": source.card.id,
+                "manaColor": self._mana_color_of(source).name, "faceDown": False}
+
     def _record_phase_visual_event(self, phase: str, player: Player) -> None:
         self._record_visual_event({
             "type": "phase",
@@ -193,7 +316,8 @@ class Engine:
             "side": player.side.name,
         })
 
-    def _record_zone_move(self, ci: CardInstance, from_area: AreaType, to_area: AreaType) -> None:
+    def _record_zone_move(self, ci: CardInstance, from_area: AreaType, to_area: AreaType,
+                          *, cause: str | None = None) -> None:
         if from_area is to_area:
             return
         event = {
@@ -201,6 +325,8 @@ class Engine:
             "from": from_area,
             "to": to_area,
         }
+        if cause is not None:
+            event["cause"] = cause
         self.zone_move_events.append(event)
         self._record_visual_event({"type": "zone_move", **event})
 
@@ -544,6 +670,11 @@ class Engine:
             self.reveal_card(player, card, reason)
 
     def _record_effect_event(self, ci: CardInstance, effect: Any, ctx: Context | None = None) -> None:
+        announced = getattr(ctx, "_announced_effect_events", set())
+        key = (ci.iid, id(effect))
+        if key in announced:
+            announced.remove(key)
+            return
         timing = getattr(effect, "timing", getattr(effect, "when", None))
         if timing is EffectTiming.CONTINUOUS:
             return
@@ -555,6 +686,20 @@ class Engine:
             "effect": effect,
             "ctx": ctx,
         })
+
+    def _announce_effect_event(self, ci: CardInstance, effect: Any, ctx: Context) -> None:
+        """Disclose one pending clause before its pre-target work or private look."""
+        announced = getattr(ctx, "_announced_effect_events", None)
+        if announced is None:
+            announced = set()
+            setattr(ctx, "_announced_effect_events", announced)
+        key = (ci.iid, id(effect))
+        if key not in announced:
+            self._record_effect_event(ci, effect, ctx)
+            announced.add(key)
+
+    def _cancel_effect_announcement(self, ci: CardInstance, effect: Any, ctx: Context) -> None:
+        getattr(ctx, "_announced_effect_events", set()).discard((ci.iid, id(effect)))
 
     def prevent_player_damage(self, player: Player, amount: int) -> None:
         key = id(player)
@@ -1038,6 +1183,8 @@ class Engine:
         self._record_visual_event({
             "type": "destroy",
             "card": ci,
+            "cause": "replacement",
+            "sourceCard": None,
         })
         if ci.card.is_token:
             self._remove_token_from_game(ci)
@@ -1478,20 +1625,15 @@ class Engine:
             self._eject_field_card(active, field_replacement)
         active.hand.remove(ci)
         if ci.card.type is CardType.MAGIC:
-            ci.area = AreaType.TRASH
-            active.trash.append(ci)
-            self._record_zone_move(ci, AreaType.HAND, AreaType.TRASH)
             ctx = Context(controller=active, source=ci)
+            frame = self._begin_magic_cast(ci, ctx)
             active.flags.add("cast_magic_this_turn")
             if ci.card.mana_color is Color.BLUE or Color.BLUE in ci.card.cost:
                 active.flags.add("cast_blue_magic_this_turn")
             if resolve_source_effects:
-                self._resolve_source_effects(ci, EffectTiming.ON_CAST_MAGIC, ctx)
-                self._resolve_source_triggers(ci, TriggerTiming.ON_PLAY, ctx)
-            already_resolved = ci if resolve_source_effects else None
-            self.triggers.emit(EffectTiming.ON_CAST_MAGIC, ctx, exclude_instance=already_resolved)
-            self.triggers.emit(TriggerTiming.ON_PLAY, ctx, exclude_instance=already_resolved)
-            self.triggers.emit(EffectTiming.ON_CARD_USED, ctx)
+                self._resolve_magic_source(frame)
+            frame.dispatching = False
+            self._finish_magic_cast_if_ready(frame)
             if resolve_triggers:
                 self.triggers.resolve_all()
             if sum(original_cost.values()) >= 4:
@@ -2485,16 +2627,21 @@ class Engine:
             elif blk_dest and not atk_dest:
                 self._emit_battle_win(blocker, attacker)
             self._enter_effect_resolution()
+            # Both sources still have their battle identity here, even when
+            # the first destruction below resets a temporary color or owner.
+            visual_sources = (self._visual_source_card(attacker), self._visual_source_card(blocker))
             try:
                 if atk_dest:
                     self._destroy(
                         blocker, source=attacker, operation="battle",
                         battle_participants=(attacker, blocker),
+                        visual_source=visual_sources[0],
                     )
                 if blk_dest:
                     self._destroy(
                         attacker, source=blocker, operation="battle",
                         battle_participants=(attacker, blocker),
+                        visual_source=visual_sources[1],
                     )
             finally:
                 self._leave_effect_resolution()
@@ -2504,6 +2651,7 @@ class Engine:
                 blocker,
                 first_active=attacker_death_blow,
                 second_active=blocker_death_blow,
+                visual_sources=visual_sources,
             )
             self._destroy_maddoll_after_battle(attacker, blocker)
         else:
@@ -2512,17 +2660,20 @@ class Engine:
                 # TBD: rulebook may forbid direct minion targeting; keep path using BP
                 # since unblocked-to-minion is modeled as a direct combat exchange.
                 ref = target.ref
+                visual_sources = (self._visual_source_card(attacker), self._visual_source_card(ref))
                 if self.effective_bp(attacker) >= self.effective_dp(ref):
                     self._destroy(
                         ref, source=attacker, operation="battle",
                         battle_participants=(attacker, ref),
+                        visual_source=visual_sources[0],
                     )
                 if self.effective_bp(ref) >= self.effective_dp(attacker):
                     self._destroy(
                         attacker, source=ref, operation="battle",
                         battle_participants=(attacker, ref),
+                        visual_source=visual_sources[1],
                     )
-                self._apply_death_blow(attacker, ref)
+                self._apply_death_blow(attacker, ref, visual_sources=visual_sources)
                 self._destroy_maddoll_after_battle(attacker, ref)
             elif target.kind is AttackTargetKind.FORCE:
                 self._damage_force(
@@ -2588,8 +2739,11 @@ class Engine:
             *,
             first_active: bool | None = None,
             second_active: bool | None = None,
+            visual_sources: tuple[dict[str, Any], dict[str, Any]] | None = None,
     ) -> None:
         active = self.state.active
+        if visual_sources is None:
+            visual_sources = (self._visual_source_card(first), self._visual_source_card(second))
         if first_active is None:
             first_active = self._should_death_blow_destroy(first, second, active)
         if second_active is None:
@@ -2598,11 +2752,13 @@ class Engine:
             self._destroy(
                 second, source=first, operation="battle",
                 battle_participants=(first, second),
+                visual_source=visual_sources[0],
             )
         if second_active:
             self._destroy(
                 first, source=second, operation="battle",
                 battle_participants=(first, second),
+                visual_source=visual_sources[1],
             )
 
     def _destroy_maddoll_after_battle(self, *participants: CardInstance) -> None:
@@ -2632,6 +2788,7 @@ class Engine:
             *,
             operation: str = "destroy",
             battle_participants: tuple[CardInstance, CardInstance] | None = None,
+            visual_source: dict[str, Any] | None = None,
     ) -> None:
         if ci.area is not AreaType.FIELD:
             return
@@ -2646,6 +2803,9 @@ class Engine:
         self._record_visual_event({
             "type": "destroy",
             "card": ci,
+            "cause": ("battle" if operation == "battle" else "self" if source is ci
+                      else "rule" if source is None else "effect"),
+            "sourceCard": visual_source if visual_source is not None else self._visual_source_card(source),
         })
         if ci.card.is_token:
             self._remove_token_from_game(ci)
@@ -2977,18 +3137,14 @@ class Engine:
                 self._eject_field_card(player, field_replacement)
             player.hand.remove(ci)
             if ci.card.type is CardType.MAGIC:
-                ci.area = AreaType.TRASH
-                player.trash.append(ci)
-                self._record_zone_move(ci, AreaType.HAND, AreaType.TRASH)
                 ctx = Context(controller=player, source=ci)
+                frame = self._begin_magic_cast(ci, ctx)
                 player.flags.add("cast_magic_this_turn")
                 if ci.card.mana_color is Color.BLUE or Color.BLUE in ci.card.cost:
                     player.flags.add("cast_blue_magic_this_turn")
-                self._resolve_source_effects(ci, EffectTiming.ON_CAST_MAGIC, ctx)
-                self._resolve_source_triggers(ci, TriggerTiming.ON_PLAY, ctx)
-                self.triggers.emit(EffectTiming.ON_CAST_MAGIC, ctx, exclude_instance=ci)
-                self.triggers.emit(TriggerTiming.ON_PLAY, ctx, exclude_instance=ci)
-                self.triggers.emit(EffectTiming.ON_CARD_USED, ctx)
+                self._resolve_magic_source(frame)
+                frame.dispatching = False
+                self._finish_magic_cast_if_ready(frame)
                 if resolve_triggers:
                     self.triggers.resolve_all()
                 if sum(original_cost.values()) >= 4:
@@ -3576,16 +3732,21 @@ class Engine:
             self._run_effect_callback(trig.fn, ci, self.state, ctx)
 
     def _resolve_source_effects(self, ci: CardInstance, timing: EffectTiming, ctx: Context) -> None:
-        for effect in ci.card.effects:
+        for index, effect in enumerate(ci.card.effects):
             if effect.timing is not timing:
                 continue
             if isinstance(effect, EffectSpec) and effect_once_per_turn_used(effect, ci):
                 continue
             if effect.condition and not effect.condition(ci, self.state, ctx):
                 continue
-            if self.defer_source_effect_choice is not None and self.defer_source_effect_choice(ci, effect, ctx):
-                continue
-            self._record_effect_event(ci, effect)
+            if self.defer_source_effect_choice is not None:
+                choice_result = self.defer_source_effect_choice(ci, effect, ctx)
+                if choice_result is None or choice_result:
+                    next_index = index if choice_result is None else index + 1
+                    self.triggers.enqueue_source_effects(ci, timing, ctx, ci.card.effects[next_index:],
+                                                        after_pending=choice_result is None)
+                    break
+            self._record_effect_event(ci, effect, ctx)
             self._run_pre_target_effect(effect, ci, ctx)
             self._run_effect_callback(effect.fn, ci, self.state, ctx, effect=effect)
 

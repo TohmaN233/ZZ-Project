@@ -222,10 +222,10 @@ def catalog_dto(asset_index: AssetIndex) -> dict[str, Any]:
             card, official, bilingual, series_value=_series_filter_value(pack_jp, filters),
         )
         ability_jp = card_japanese_ability(card)
-        ability_en = _first(bilingual.get("ability_en"), card.ability_en)
         name_jp = _first(official.get("official_name_jp"), bilingual.get("name_jp"), card.name_jp)
         name_en = _first(bilingual.get("name_en"), card.name_en)
         translation = card_translation(card.id)
+        ability_en = _first(translation.get("ability_en"), bilingual.get("ability_en"), card.ability_en)
         name_zh = _first(translation.get("name_zh"))
         ability_zh = _first(translation.get("ability_zh"))
         pack_order = _int_or_none(official.get("pack_order"))
