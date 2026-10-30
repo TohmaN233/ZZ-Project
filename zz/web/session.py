@@ -2423,16 +2423,20 @@ class GameSession:
         before = self._visual_state_snapshot()
         if blocker is not None:
             self._queue_block_animation_event(flow.attacker, blocker)
-        self.engine.resolve_attack_after_flash(flow.attacker, flow.target, blocker)
+        battle = self.engine.resolve_attack_after_flash(flow.attacker, flow.target, blocker)
         self._record_visual_changes(before)
         self.engine._flash_ctx = None
         self._attack = None
         label = "no block" if blocker is None else blocker.card.name_jp
-        self._log_event(f"Block: {label}", {
+        event = {
             "type": "block",
             "blocker": self._card_log_payload(blocker),
             "blocked": blocker is not None,
-        })
+        }
+        if battle is not None:
+            event["attacker"] = self._card_log_payload(flow.attacker)
+            event["battle"] = battle
+        self._log_event(f"Block: {label}", event)
 
     def _drain_or_prompt_force_base_choices(self) -> bool:
         while self.engine.pending_force_base_choices and self.prompt is None:

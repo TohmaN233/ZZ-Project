@@ -6325,6 +6325,11 @@ function battleLogEventText(event) {
   }
   if (event.type === "block") {
     const blocker = localizedLogCardName(event.blocker);
+    const battle = event.battle;
+    const attacker = localizedLogCardName(event.attacker);
+    if (blocker && attacker && battle) {
+      return `${logLabel(LOG_EVENT_LABELS, "block")}: ${blocker} (${attacker} BP ${battle.attackerBp} vs ${blocker} BP ${battle.blockerBp})`;
+    }
     return blocker
       ? `${logLabel(LOG_EVENT_LABELS, "block")}: ${blocker}`
       : logLabel(LOG_EVENT_LABELS, "noBlock");
