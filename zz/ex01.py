@@ -113,7 +113,7 @@ def _riza_trigger(source: CardInstance, state: Any, ctx: Context) -> bool:
 
 
 def _refresh_self(source: CardInstance, state: Any, ctx: Context) -> None:
-    source.rested = False
+    state.engine.refresh_target(source)
 
 
 def _heal_owner(source: CardInstance, state: Any, ctx: Context) -> None:

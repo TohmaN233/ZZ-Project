@@ -173,7 +173,7 @@ def _passive_phoenix(fi: "ForceInstance", engine: "Engine") -> None:
         if not _force_can_exert(fi) or engine.state.active is not fi.owner:
             return
         for ci in fi.owner.base:
-            ci.rested = False
+            engine.refresh_target(ci)
     at_turn_end._force_iid = id(fi)
     engine._passive_modifiers.append(("turn_end_hook", at_turn_end))
 
@@ -185,7 +185,7 @@ def _passive_ouroboros(fi: "ForceInstance", engine: "Engine") -> None:
             return
         for ci in fi.owner.field:
             if not ci.card.is_token:
-                ci.rested = False
+                engine.refresh_target(ci)
     at_turn_end._force_iid = id(fi)
     engine._passive_modifiers.append(("turn_end_hook", at_turn_end))
 

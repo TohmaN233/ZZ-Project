@@ -31,7 +31,7 @@ def _this_minion_blocked(source: CardInstance, _state: Any, ctx: Context) -> boo
 def _become_active_after_block(source: CardInstance, _state: Any, _ctx: Context) -> None:
     if source.area is not AreaType.FIELD:
         raise RuntimeError(f"{CARD_ID} ON_BLOCK resolved while this minion was outside the Field")
-    source.rested = False
+    _state.engine.refresh_target(source)
 
 
 def build_card(row: dict[str, Any]):

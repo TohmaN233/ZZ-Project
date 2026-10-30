@@ -285,7 +285,7 @@ def _refresh_yellow_cost_six(source: CardInstance, state: Any, ctx: Context) -> 
         source=source,
     )
     for target in targets:
-        target.rested = False
+        state.engine.refresh_target(target)
 
 
 def _other_ally_entered(source: CardInstance, state: Any, ctx: Context) -> bool:
@@ -325,7 +325,7 @@ def _refresh_own_color_minion(color: Color) -> Callable[[CardInstance, Any, Cont
             source=source,
         )
         for target in targets:
-            target.rested = False
+            state.engine.refresh_target(target)
 
     return fn
 
@@ -407,7 +407,7 @@ def _refresh_green_mana(amount: int) -> Callable[[CardInstance, Any, Context], N
             source=source,
         )
         for target in targets:
-            target.rested = False
+            state.engine.refresh_target(target)
 
     return fn
 
@@ -516,10 +516,10 @@ def _refresh_all_on_opponent_turn(source: CardInstance, state: Any, ctx: Context
     if state.active is source.owner:
         return
     for target in source.owner.field:
-        target.rested = False
+        state.engine.refresh_target(target)
     for force in source.owner.forces:
         if not force.destroyed:
-            force.rested = False
+            state.engine.refresh_target(force)
 
 
 def _grant_soldier_auto_win(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -552,7 +552,7 @@ def _rest_force_refresh_self(source: CardInstance, state: Any, ctx: Context) -> 
     )
     if targets:
         targets[0].rested = True
-        source.rested = False
+        state.engine.refresh_target(source)
 
 
 def _protect_all_from_magic(source: CardInstance, state: Any, ctx: Context) -> None:

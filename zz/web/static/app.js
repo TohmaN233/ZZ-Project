@@ -1065,6 +1065,7 @@ const ACTIVE_EFFECT_COPY = {
     unblockable_by_cost_at_most_3: "不能被费用 3 以下的 Minion 阻挡",
     forced_blocker: "必须由指定 Minion 阻挡",
     skip_next_refresh: "下次 Refresh 时不能激活",
+    cannot_activate: "直到下个准备阶段结束都不能激活",
     force_passive: "Force 持续效果",
     turn_stat_aura: "本回合持续修正",
     card_aura: "卡牌持续效果",
@@ -1104,6 +1105,7 @@ const ACTIVE_EFFECT_COPY = {
     unblockable_by_cost_at_most_3: "コスト3以下のミニオンにブロックされない",
     forced_blocker: "指定されたミニオンが必ずブロックする",
     skip_next_refresh: "次のリフレッシュでアクティブにならない",
+    cannot_activate: "次のスタンバイ終了時までアクティブにならない",
     force_passive: "フォース常時効果",
     turn_stat_aura: "このターンの継続修正",
     card_aura: "カードの常時効果",
@@ -1143,6 +1145,7 @@ const ACTIVE_EFFECT_COPY = {
     unblockable_by_cost_at_most_3: "Cannot be blocked by Minions costing 3 or less",
     forced_blocker: "Must be blocked by the selected Minion",
     skip_next_refresh: "Does not become Active during the next Refresh",
+    cannot_activate: "Cannot become Active until the end of your next Standby Phase",
     force_passive: "Force passive effect",
     turn_stat_aura: "Turn-long stat effect",
     card_aura: "Card passive effect",
@@ -5531,13 +5534,14 @@ function renderCard(card, size = "") {
   const art = cardImage(card);
   const label = esc(cardTitle(card));
   const type = card.faceDown ? "hidden" : esc(card.type || "");
+  const hasCombatStats = !card.faceDown && card.type !== "magic";
   const bp = card.effectiveBp ?? card.bp ?? "-";
   const dp = card.effectiveDp ?? card.dp ?? "-";
-  const stats = card.faceDown ? "" : `<div class="card-stats"><span>${esc(bp)}</span><span>${esc(dp)}</span></div>`;
+  const stats = hasCombatStats ? `<div class="card-stats"><span>${esc(bp)}</span><span>${esc(dp)}</span></div>` : "";
   const overlay = art && !card.faceDown
-    ? `<div class="card-overlay"><span>${label}</span>${size ? `<b>${esc(bp)}/${esc(dp)}</b>` : ""}</div>`
+    ? `<div class="card-overlay"><span>${label}</span>${size && hasCombatStats ? `<b>${esc(bp)}/${esc(dp)}</b>` : ""}</div>`
     : "";
-  const fieldStats = art && !card.faceDown && !size
+  const fieldStats = art && hasCombatStats && !size
     ? `<div class="card-field-stats"><span>BP ${esc(bp)}</span><span>DP ${esc(dp)}</span></div>`
     : "";
   const actionBadge = actions.length ? `<div class="card-action-dot"></div>` : "";
@@ -6745,6 +6749,7 @@ function renderCardDetailPanel(card, {
   const title = esc(cardTitle(card));
   const bp = card.effectiveBp ?? card.bp ?? "-";
   const dp = card.effectiveDp ?? card.dp ?? "-";
+  const stats = card.type === "magic" ? "" : `<span>${esc(bp)}/${esc(dp)}</span>`;
   const effect = cardEffectText(card);
   const art = cardImage(card) || `<div class="card-detail-fallback">${title}</div>`;
   const actions = actionsHtml !== null
@@ -6759,7 +6764,7 @@ function renderCardDetailPanel(card, {
         <div class="card-detail-title">${title}</div>
         <div class="card-detail-meta">
           <span>${esc(card.type || "card")}</span>
-          <span>${esc(bp)}/${esc(dp)}</span>
+          ${stats}
           <span>${esc(card.area || "")}</span>
         </div>
         ${effect ? `<div class="card-detail-effect">${multiline(effect)}</div>` : ""}

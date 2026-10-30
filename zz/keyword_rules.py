@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import TYPE_CHECKING, Callable
 
-from zz.enums import AreaType, CardType, Keyword
+from zz.enums import AreaType, CardType, Color, Keyword
 
 if TYPE_CHECKING:
     from zz.model import CardInstance, Player
@@ -60,9 +61,8 @@ OFFICIAL_KEYWORDS: dict[Keyword, KeywordDefinition] = {
         Keyword.COOPERATION,
         "連携",
         "Cooperation",
-        "If a specified color of your mana was placed this turn when used from hand, draw 1 card.",
-        implemented=False,
-        parameter="color",
+        "If mana of the specified color or race was placed this turn when used from hand, draw 1 card.",
+        parameter="color_or_race",
     ),
     Keyword.KAGO: KeywordDefinition(
         Keyword.KAGO,
@@ -72,6 +72,30 @@ OFFICIAL_KEYWORDS: dict[Keyword, KeywordDefinition] = {
         parameter="condition",
     ),
 }
+
+
+_COOPERATION_COLORS = {
+    "赤": Color.RED, "黄": Color.YELLOW, "白": Color.WHITE,
+    "緑": Color.GREEN, "青": Color.BLUE, "紫": Color.PURPLE,
+    "無": Color.COLORLESS, "無色": Color.COLORLESS,
+}
+
+
+def cooperation_requirement(ability_jp: str) -> tuple[str, Color | str] | None:
+    """Read the standalone printed Chain keyword, ignoring mentions in prose."""
+    for line in ability_jp.splitlines():
+        line = line.strip()
+        match = re.fullmatch(r"(?:[［\[]\s*)?連携\s*[：:・]\s*(.*?)(?:\s*[］\]])?", line)
+        if not match:
+            continue
+        value = match.group(1).strip()
+        if value in _COOPERATION_COLORS:
+            return "color", _COOPERATION_COLORS[value]
+        race = re.fullmatch(r"「([^」]+)」", value)
+        if race:
+            return "race", race.group(1)
+        raise ValueError(f"Unsupported cooperation requirement: {line!r}")
+    return None
 
 
 def has_keyword(ci: "CardInstance", keyword: Keyword) -> bool:

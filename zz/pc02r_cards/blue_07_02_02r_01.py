@@ -33,7 +33,7 @@ def _activate_own_blue_mana(source: CardInstance, state: Any, _ctx: Context) -> 
     engine = state.engine
     for mana in source.owner.base:
         if engine._mana_color_of(mana) is Color.BLUE:
-            mana.rested = False
+            engine.refresh_target(mana)
 
 
 def build_card(row: dict[str, Any]):

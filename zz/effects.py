@@ -1070,8 +1070,8 @@ def _place_base_from_hand(
         replace_iid = None
         if eng is not None:
             replace_iid = eng.select_base_replacement_iid(owner, ci)
-            if replace_iid is not None:
-                eng._make_base_space(owner, replace_iid)
+            eng.put_base_minion_from_hand(owner, candidate, rested=rested, replace_base_iid=replace_iid)
+            return
         elif len(owner.base) >= 10:
             return
         owner.hand.remove(candidate)
@@ -1242,7 +1242,7 @@ def _force_block(
             if not targets:
                 return
             target = targets[0]
-            target.rested = False
+            eng.refresh_target(target)
             ci.flags.add(f"force_block_iid:{target.iid}")
             return
         ci.flags.add("must_be_blocked")
@@ -1251,11 +1251,7 @@ def _force_block(
 
 def _refresh_self(**_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
-        eng = getattr(state, "engine", None)
-        if eng is not None:
-            eng.refresh_target(ci)
-            return
-        ci.rested = False
+        state.engine.refresh_target(ci)
     return fn
 
 

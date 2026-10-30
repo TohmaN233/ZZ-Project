@@ -36,7 +36,7 @@ def _refresh_on_life_damage(source: CardInstance, state: Any, ctx: Context) -> b
 
 
 def _refresh_blessed_minion(source: CardInstance, state: Any, _ctx: Context) -> None:
-    _blessed_host(source, state).rested = False
+    state.engine.refresh_target(_blessed_host(source, state))
 
 
 def build_card(row: dict[str, Any]):

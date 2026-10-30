@@ -8,6 +8,7 @@ from zz.cards import CARD_REGISTRY, register
 from zz.effects import EffectSpec, EffectTiming, build_effect
 from zz.enums import AreaType, AttackTargetKind, CardType, Color, Keyword
 from zz.model import Card, CardInstance, Context, ForceInstance, Player
+from zz.keyword_rules import cooperation_requirement
 
 
 PC01_PACK_JP = "PC:01 AWAKEN"
@@ -184,12 +185,6 @@ def _own_color_mana_count(ci: CardInstance, color: Color) -> int:
 def _self_source_and_own_color_mana_at_least(color: Color, amount: int):
     def condition(ci: CardInstance, state, ctx: Context) -> bool:
         return _self_source(ci, state, ctx) and _own_color_mana_count(ci, color) >= amount
-    return condition
-
-
-def _self_source_and_mana_color_placed_this_turn(color: Color):
-    def condition(ci: CardInstance, state, ctx: Context) -> bool:
-        return _self_source(ci, state, ctx) and f"turn:placed_mana:{color.name}" in ci.owner.flags
     return condition
 
 
@@ -387,11 +382,22 @@ def _keywords(ability_jp: str) -> list[Keyword]:
     return keywords
 
 
-def _cooperation_color(ability_jp: str) -> Color | None:
-    match = re.search(r"[［\[]\s*連携\s*[：:]\s*([^］\]\s]+)\s*[］\]]", ability_jp)
-    if not match:
-        return None
-    return _COLOR_BY_SEESAA_LABEL.get(match.group(1).strip())
+def _cooperation_effect(ability_jp: str) -> list[EffectSpec]:
+    requirement = cooperation_requirement(ability_jp)
+    if requirement is None:
+        return []
+    kind, value = requirement
+    flag = (f"turn:placed_mana:{value.name}" if kind == "color"
+            else f"turn:placed_mana_race:{value}")
+
+    def condition(ci: CardInstance, state, ctx: Context) -> bool:
+        return _self_source(ci, state, ctx) and flag in ci.owner.flags
+
+    return [build_effect(
+        "draw_cards", EffectTiming.ON_SUMMON, condition=condition, amount=1,
+        official_timing="召喚時", official_effect="カードを1枚引く",
+        official_condition=next(line.strip() for line in ability_jp.splitlines() if "連携" in line),
+    )]
 
 
 def _effects(card_id: str, ability_jp: str) -> list:
@@ -409,17 +415,6 @@ def _effects(card_id: str, ability_jp: str) -> list:
         )
     if "【配置時】" in ability_jp and "自分はカードを1枚引く" in ability_jp:
         effects.append(build_effect("draw_cards", EffectTiming.ON_PLACE_BASE, condition=_self_source, amount=1))
-    cooperation_color = _cooperation_color(ability_jp)
-    if cooperation_color is not None:
-        effects.append(
-            build_effect(
-                "draw_cards",
-                EffectTiming.ON_SUMMON,
-                condition=_self_source_and_mana_color_placed_this_turn(cooperation_color),
-                amount=1,
-                official_condition="連携",
-            )
-        )
     effects.extend(_extra_effects(card_id))
     return effects
 
@@ -464,7 +459,7 @@ def _card_from_row(row: dict[str, str], *, infer_effects: bool = True) -> Card:
         race_jp=_clean_text(row.get("race_jp")),
         ability_jp=ability_jp,
         ability_en=_clean_text(row.get("ability_en")),
-        effects=_effects(card_id, ability_jp) if infer_effects else [],
+        effects=_cooperation_effect(ability_jp) + (_effects(card_id, ability_jp) if infer_effects else []),
         aura=_extra_aura(card_id),
         keyword_aura=_extra_keyword_aura(card_id),
         main_timing_ok=main_timing_ok,
@@ -744,7 +739,7 @@ def _barichalguo_refresh(ci: CardInstance, state, ctx: Context) -> None:
         and source.owner is not ci.owner
         and sum(source.card.cost.values()) <= 5
     ):
-        ci.rested = False
+        state.engine.refresh_target(ci)
 
 
 def _ashbringer_buff_force_attacker(ci: CardInstance, state, ctx: Context) -> None:
@@ -764,7 +759,7 @@ def _zintine_destroy_and_refresh(ci: CardInstance, state, ctx: Context) -> None:
     if not targets:
         return
     eng.destroy_target(targets[0], source=ci)
-    ci.rested = False
+    eng.refresh_target(ci)
 
 
 def _aleshand_move_minion_mana_to_field(ci: CardInstance, state, ctx: Context) -> None:
@@ -950,7 +945,7 @@ def _basic_reactive_shield(ci: CardInstance, state, ctx: Context) -> None:
     target = targets[0]
     eng.modify_stat(target, bp_delta=300)
     if state.active is not ci.owner:
-        target.rested = False
+        eng.refresh_target(target)
 
 
 def _basic_tuba_magic_gain_bp(ci: CardInstance, state, ctx: Context) -> None:
@@ -1111,7 +1106,7 @@ def _basic_gert_force_blocker(ci: CardInstance, state, ctx: Context) -> None:
     if not targets:
         return
     target = targets[0]
-    target.rested = False
+    eng.refresh_target(target)
     target.flags.add("turn:must_block")
 
 

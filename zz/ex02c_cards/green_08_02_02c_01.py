@@ -30,7 +30,7 @@ def _prevent_opponent_minion_refresh(source: CardInstance, state: Any, _ctx: Con
     engine = state.engine
     opponent = state.players[1 - state.players.index(source.owner)]
     for minion in list(opponent.field):
-        engine.prevent_next_refresh(minion)
+        engine.prevent_activation_until_next_standby_end(minion)
 
 
 def build_card(row: dict[str, Any]):

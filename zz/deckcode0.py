@@ -47,12 +47,12 @@ def _draw_one(ci: CardInstance, state, ctx: Context) -> None:
 
 
 def _refresh_self(ci: CardInstance, state, ctx: Context) -> None:
-    ci.rested = False
+    state.engine.refresh_target(ci)
 
 
 def _turn_end_refresh_base(ci: CardInstance, state, ctx: Context) -> None:
     if ctx.controller is ci.owner and ci.area is AreaType.BASE:
-        ci.rested = False
+        state.engine.refresh_target(ci)
 
 
 def _own_base_turn_end(ci: CardInstance, state, ctx: Context) -> bool:

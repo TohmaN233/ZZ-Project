@@ -268,6 +268,7 @@ class GameSession:
         self.engine.defer_blessing_base_choice = self._is_user_controlled
         self.engine.defer_trigger_choice = self._defer_trigger_choice
         self.engine.defer_source_effect_choice = self._defer_source_effect_choice
+        self.engine.standby_resolution_pending = self._phase_resolution_pending
         self._configure_mode_controls()
         player_specs = (
             (
@@ -1996,6 +1997,16 @@ class GameSession:
                 return
             if self._drain_or_prompt_force_base_choices():
                 return
+            if self.engine.has_pending_standby:
+                before = self._visual_state_snapshot()
+                self.engine.triggers.resolve_all()
+                if self.prompt is None:
+                    self.engine.continue_standby()
+                self._record_visual_changes(before)
+                if self.prompt is not None:
+                    return
+                if self.engine.has_pending_standby:
+                    continue
             if self._attack is not None:
                 self._continue_attack_flow(single_step=visual_step)
                 continue
@@ -2003,16 +2014,27 @@ class GameSession:
             if self._is_user_controlled(active):
                 self._prompt_main_action()
                 return
+
             action = self.engine.policy_for(active).choose(self.engine)
             self._perform_action(action, actor=active, continue_uncontrolled_attack=not visual_step)
             if (
                 self.prompt is None
                 and self._game_over is None
                 and self._attack is None
+                and not self.engine.has_pending_standby
                 and self._is_user_controlled(self.engine.state.active)
             ):
                 self._prompt_main_action()
                 return
+
+    def _phase_resolution_pending(self) -> bool:
+        """Choices removed from the trigger queue still belong to their phase."""
+        return bool(
+            self.prompt is not None
+            or self._pending_effect is not None
+            or self.engine.pending_blessing_returns
+            or self.engine.pending_force_base_choices
+        )
 
     def _prompt_main_action(self) -> None:
         options = []

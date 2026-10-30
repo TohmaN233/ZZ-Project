@@ -12,7 +12,7 @@ CARD_ID = "green_05_02_02c_00"
 _ITEM_BLESS_EFFECT = "ex02c_berkuli_item_bless_until_opponent_turn_end"
 
 
-def _item_blessed_this_minion(source: CardInstance, _state: Any, ctx: Context) -> bool:
+def _blessed_this_minion(source: CardInstance, _state: Any, ctx: Context) -> bool:
     mana = ctx.target
     return (
         ctx.source is source
@@ -20,7 +20,6 @@ def _item_blessed_this_minion(source: CardInstance, _state: Any, ctx: Context) -
         and isinstance(mana, CardInstance)
         and mana.area is AreaType.BLESSING
         and mana in source.blessings
-        and "アイテム" in mana.card.race_jp.split("|")
     )
 
 
@@ -70,14 +69,13 @@ def build_card(row: dict[str, Any]):
         EffectSpec(
             timing=EffectTiming.ON_BLESS,
             fn=_grant_item_bless_effect,
-            condition=_item_blessed_this_minion,
+            condition=_blessed_this_minion,
             official_effect=(
                 "次の相手のターン終了時まで、このミニオンに"
                 "「相手のミニオンがレストするたび、このターン中、そのミニオンをBP-300する。」"
                 "を与える。"
             ),
             official_timing="加護時",
-            official_condition="連携：「アイテム」",
             active_areas=(AreaType.FIELD,),
         ),
         EffectSpec(
