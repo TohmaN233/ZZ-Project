@@ -61,7 +61,8 @@ def test_every_equivalent_face_is_registered_and_searchable_in_its_own_pack(cata
         assert original["copyIdentity"] == variant["copyIdentity"]
         assert original["deckBuildable"] == variant["deckBuildable"]
         assert original["nameEn"]
-        assert variant["nameEn"] == variant["abilityEn"] == ""
+        assert variant["nameEn"] == ""
+        assert variant["abilityEn"] or not original["abilityJp"]
 
 
 def test_series_filter_resolves_declared_labels_and_rejects_unknown_packs() -> None:
@@ -80,7 +81,7 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const catalog = JSON.parse(fs.readFileSync(0, 'utf8'));
 const source = fs.readFileSync(process.argv[1], 'utf8');
-const names = ['filterGroups', 'localizedCatalogLabel', 'localizedFilterValue',
+const names = ['filterGroups', 'localizedAbility', 'localizedCatalogLabel', 'localizedFilterValue',
   'localizedCardSeries', 'activeOfficialFilters', 'cardMatchesOfficialFilters',
   'cardMatchesSearch', 'setDeckFilter', 'filteredDeckCatalogCards',
   'cardMatchesBattleDebugFilters', 'battleDebugCards', 'canAddBattleDebugCard',
@@ -110,6 +111,11 @@ for (const language of ['zh', 'ja', 'en']) {
   currentLanguage = () => language;
   const key = { zh: 'labelZh', ja: 'labelJp', en: 'labelEn' }[language];
   assert.equal(localizedCardSeries(found[0]), sao[key]);
+  if (language === 'en') {
+    assert.ok(found.every(card => !card.abilityJp || localizedAbility(card)));
+    assert.ok(localizedAbility(catalog.cards.find(card => card.id === 'yellow_03_03_02c_00'))
+      .includes('"スピードホリック"'));
+  }
 }
 setDeckFilter('series', 'CAMPAIGN');
 assert.equal(filteredDeckCatalogCards().length, 2);

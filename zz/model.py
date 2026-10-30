@@ -83,6 +83,17 @@ class Action:
 
 
 @dataclass
+class MagicCastFrame:
+    source: "CardInstance"
+    context: Context
+    pending_clauses: list[Any]
+    dispatching: bool = True
+    running_callbacks: int = 0
+    continuation_queued: bool = False
+    listeners_collected: bool = False
+
+
+@dataclass
 class AttackTarget:
     """An attack's chosen target."""
     kind: AttackTargetKind
@@ -180,6 +191,7 @@ class Player:
     hand: list[CardInstance] = field(default_factory=list)
     base: list[CardInstance] = field(default_factory=list)
     trash: list[CardInstance] = field(default_factory=list)
+    resolving: list[CardInstance] = field(default_factory=list)
     removed: list[CardInstance] = field(default_factory=list)
     forces: list[ForceInstance] = field(default_factory=list)
     movement_right_count: int = 0

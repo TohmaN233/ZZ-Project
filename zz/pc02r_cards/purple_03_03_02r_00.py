@@ -13,9 +13,12 @@ CARD_ID = "purple_03_03_02r_00"
 def _drain_ritual(source, state, ctx: Context) -> None:
     engine = state.engine
     targets = engine.select_target(source.owner, "enemy_force", 1, 1, source=source)
-    if not targets:
+    if not targets and engine._eligible_targets(source.owner, "enemy_force", source=source):
         raise RuntimeError("Ritual of Draining requires one opposing Force target")
-    engine._damage_force(targets[0], 1, source=source)
+    if len(targets) > 1:
+        raise RuntimeError("Ritual of Draining received multiple Force targets")
+    if targets:
+        engine._damage_force(targets[0], 1, source=source)
     engine.heal(source.owner, 1)
 
 

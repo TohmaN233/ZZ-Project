@@ -1,8 +1,11 @@
 from __future__ import annotations
 
 import csv
+import re
 from functools import lru_cache
 from pathlib import Path
+
+from zz.card_identity import explicit_card_equivalence_pairs
 
 
 TRANSLATION_ROOT = Path(__file__).resolve().parent / "translations"
@@ -40,7 +43,30 @@ def force_translations() -> dict[str, dict[str, str]]:
 
 
 def card_translation(card_id: str) -> dict[str, str]:
-    return card_translations().get(card_id, {})
+    translation = card_translations().get(card_id, {})
+    english = _equivalent_english_abilities()
+    if card_id in english:
+        return {**translation, "ability_en": english[card_id]}
+    return translation
+
+
+@lru_cache(maxsize=1)
+def _equivalent_english_abilities() -> dict[str, str]:
+    """Display EX02 English rules on paired SAO faces without inventing a print."""
+    with CARD_SOURCE_TSV.open(encoding="utf-8-sig", newline="") as handle:
+        rows = {row["image_id"]: row for row in csv.DictReader(handle, delimiter="\t")}
+    pairs = explicit_card_equivalence_pairs()
+    names = {_clean(rows[a]["name_en"]): _clean(rows[b]["name_jp"]) for a, b in pairs}
+    if not all(names) or not all(names.values()):
+        raise ValueError("Equivalent English effects require both printed card names")
+    pattern = re.compile("|".join(re.escape(name) for name in sorted(names, key=len, reverse=True)))
+    abilities = {}
+    for original, variant in pairs:
+        text = _clean(rows[original]["ability_en"])
+        if not text and _clean(rows[original]["ability_jp"]):
+            raise ValueError(f"Missing EX02 English effect for SAO counterpart: {original} / {variant}")
+        abilities[variant] = pattern.sub(lambda match: names[match.group()], text)
+    return abilities
 
 
 @lru_cache(maxsize=1)

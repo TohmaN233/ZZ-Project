@@ -20,8 +20,8 @@ def _draw_three_then_discard_destroyed_force_count(
     _ctx: Context,
 ) -> None:
     engine = state.engine
-    discard_count = sum(1 for force in source.owner.forces if force.destroyed)
     engine.draw(source.owner, 3)
+    discard_count = min(sum(1 for force in source.owner.forces if force.destroyed), len(source.owner.hand))
     if discard_count == 0:
         return
     targets = engine.select_target(

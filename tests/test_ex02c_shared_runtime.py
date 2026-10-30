@@ -346,6 +346,40 @@ def test_ex02c_bless_conditions_use_their_race_and_cost_limits(mana_id, cost, ra
     assert session.engine.can_bless(mana, target) is allowed
 
 
+@pytest.mark.parametrize("mana_id", ["red_00_01_02c_01", "red_00_01_EX02_01"])
+@pytest.mark.parametrize("cost,race,allowed", [(2, "ソード", False), (3, "ドラゴン", True), (4, "", True)])
+def test_dark_repulser_blesses_any_race_at_printed_total_cost_three(mana_id, cost, race, allowed):
+    session, owner = _interactive_lab(mana_id, zone="base", base_count=4)
+    mana = next(card for card in owner.base if card.card.id == mana_id)
+    host = _instance(Card("repulser-host", "host", "host", CardType.F_MINION,
+                          cost={Color.GREEN: 1, Color.COLORLESS: cost - 1}, bp=400, dp=1, race_jp=race),
+                     owner, area=AreaType.FIELD)
+    session.engine.state.step = Step.MAIN
+    owner.movement_right_count = 1
+    session._prompt_main_action()
+    choices = [(key, action) for key, action in session._options.items()
+               if action.kind == "bless" and action.payload.get("mana_iid") == mana.iid
+               and action.payload.get("target_iid") == host.iid]
+    assert session.engine.can_bless(mana, host) is allowed
+    assert bool(choices) is allowed
+    if allowed:
+        response = session.choose(session.prompt["id"], choices[0][0])
+        assert response["error"] is None
+        assert mana in host.blessings and mana not in owner.base
+        assert session.engine.effective_bp(host) == 700
+        assert owner.movement_right_count == 0
+    assert mana.card.ability_jp.startswith("加護：コスト3以上")
+
+
+def test_all_printed_ex02c_bless_cards_declare_their_target_condition():
+    from zz.ex02c import EX02C_CARD_IDS
+
+    for card_id in EX02C_CARD_IDS:
+        card = CARD_REGISTRY[card_id]
+        if Keyword.KAGO in card.keywords or Keyword.BLESS in card.keywords:
+            assert callable(card.bless_condition), card_id
+
+
 def test_battle_destruction_carries_participants_and_honors_battle_protection():
     session, owner = _lab("green_08_02_02c_00", zone="field", base_count=4)
     engine = session.engine

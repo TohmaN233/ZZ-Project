@@ -131,15 +131,23 @@ def test_bad_talk_shows_milled_cards_before_trash_target_prompt() -> None:
         "red_02_02_02_00",
         "red_02_02_02_00",
     ]
+    assert source.area is AreaType.RESOLVING and source not in player.trash
     assert [
         (event["type"], event.get("fromArea"), event.get("toArea"))
         for event in result["animationEvents"]
     ] == [
-        ("zone_move", "hand", "trash"),
+        ("zone_move", "hand", "resolving"),
+        ("effect", None, None),
         ("zone_move", "deck", "trash"),
         ("zone_move", "deck", "trash"),
         ("zone_move", "deck", "trash"),
     ]
+    chosen = result["prompt"]["options"][0]
+    result = session.choose(result["prompt"]["id"], chosen["id"])
+    assert result["error"] is None and source.area is AreaType.TRASH
+    moves = [(event.get("fromArea"), event.get("toArea"))
+             for event in result["animationEvents"] if event["type"] == "zone_move"]
+    assert moves == [("trash", "hand"), ("resolving", "trash")]
 
 
 def test_vanjan_payment_metadata_and_default_selection_use_three_mana_value() -> None:

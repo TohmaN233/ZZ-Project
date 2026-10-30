@@ -49,18 +49,24 @@ def test_magic_source_explicit_trash_effect_is_resolved_once():
     assert calls == [magic.iid]
 
 
-def test_flash_magic_is_in_trash_while_its_effect_resolves():
+@pytest.mark.parametrize('flash', [False, True])
+def test_magic_is_in_resolving_area_until_its_effect_completes(flash):
     session, owner = lab('blue_01_03_02r_00')
     observed = []
     magic = CardInstance(Card('flash-magic', 'flash', 'flash', CardType.MAGIC, flash_timing_ok=True,
         effects=[EffectSpec(EffectTiming.ON_CAST_MAGIC,
-                            lambda c,s,x: observed.append(c in c.owner.trash))]),
+                            lambda c,s,x: observed.append((c.area, c in c.owner.resolving,
+                                                           c in c.owner.hand, c in c.owner.trash)))]),
         owner, iid=session.engine.state.allocate_iid(), area=AreaType.HAND)
     owner.hand.append(magic)
     session._clear_prompt()
-    session.engine.apply_flash_action(owner, Action('play_card', {'iid': magic.iid}))
-    assert observed == [True]
-    assert magic in owner.trash
+    if flash:
+        session.engine.apply_flash_action(owner, Action('play_card', {'iid': magic.iid}))
+    else:
+        session.engine.play_card(magic)
+    assert observed == [(AreaType.RESOLVING, True, False, False)]
+    assert magic.area is AreaType.TRASH and owner.trash.count(magic) == 1
+    assert magic not in owner.resolving
 
 
 def test_generated_mana_disappears_without_entering_trash_or_banished_card_count():

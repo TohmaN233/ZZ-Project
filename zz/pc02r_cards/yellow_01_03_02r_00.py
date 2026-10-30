@@ -19,6 +19,8 @@ def _self_cast(source: CardInstance, _state: Any, ctx: Context) -> bool:
 def _select_and_boost_minion(source: CardInstance, state: Any, _ctx: Context) -> None:
     engine = state.engine
     targets = engine.select_target(source.owner, "ally_minion", 1, 1, source=source)
+    if not targets and not engine._eligible_targets(source.owner, "ally_minion", source=source):
+        return
     if len(targets) != 1:
         raise RuntimeError(f"{CARD_ID} expected one allied Minion, received {len(targets)}")
     target = targets[0]

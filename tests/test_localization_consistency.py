@@ -5,16 +5,88 @@ import json
 import re
 from pathlib import Path
 
+from tools.run_semantic_scenario import ScenarioRunner
+from zz.card_identity import explicit_card_equivalence_pairs
 from zz.cards import CARD_REGISTRY
 from zz.decks import is_user_deck_card_id
+from zz.enums import AreaType
 from zz.forces import F_CYCLOPS
-from zz.web.localization import card_translations, force_translations
+from zz.model import CardInstance
+from zz.web.assets import AssetIndex
+from zz.web.catalog import catalog_dto
+from zz.web.localization import card_translation, card_translations, force_translations
+from zz.web.serialize import serialize_card
 from zz.web.server import RULEBOOK_FILES
+from zz.web.session import GameSession
 
 
 ROOT = Path(__file__).resolve().parents[1]
 APP_JS = ROOT / "zz" / "web" / "static" / "app.js"
 RULES_ROOT = ROOT / "docs" / "rules"
+
+
+def test_sao_reuses_equivalent_english_effects_in_catalog_details_and_prompts() -> None:
+    catalog = {row["id"]: row for row in catalog_dto(AssetIndex(None))["cards"]}
+    session = GameSession(seed=702, mode="god")
+    owner = session.engine.state.players[0]
+    pairs = explicit_card_equivalence_pairs()
+    names = {CARD_REGISTRY[a].name_en: CARD_REGISTRY[b].name_jp for a, b in pairs}
+    for original, variant in pairs:
+        source, card = CARD_REGISTRY[original], CARD_REGISTRY[variant]
+        expected = source.ability_en
+        for english, japanese in sorted(names.items(), key=lambda item: len(item[0]), reverse=True):
+            expected = expected.replace(english, japanese)
+        assert expected or not source.ability_jp, original
+        translation = card_translation(variant)
+        assert translation["ability_en"] == expected, variant
+        assert catalog[variant]["abilityEn"] == expected, variant
+        ci = CardInstance(card, owner, iid=session.engine.state.allocate_iid(), area=AreaType.HAND)
+        detail = serialize_card(session.engine, ci, session.asset_index)
+        assert detail["abilityEn"] == expected, variant
+        assert detail["abilityJp"] == catalog[variant]["abilityJp"]
+        assert detail["abilityZh"] == catalog[variant]["abilityZh"] == card_translations()[variant]["ability_zh"]
+        assert detail["nameJp"] == catalog[variant]["nameJp"] == card.name_jp
+        assert detail["nameEn"] == catalog[variant]["nameEn"] == ""
+        assert detail["assetId"] == variant
+        assert "ability_en" not in card_translations()[variant]
+        for effect in card.effects:
+            fields = session._effect_text_fields(ci, effect)
+            if fields:
+                assert fields["effectTextEn"], (variant, effect.timing)
+                assert fields["effectTextEn"] in expected
+        hidden = serialize_card(session.engine, ci, session.asset_index, face_down=True)
+        assert "abilityEn" not in hidden
+
+
+def test_sao_english_named_effects_use_sao_targets_and_originals_stay_original() -> None:
+    assert card_translation("red_00_01_02c_01")["ability_en"].startswith("Boost: Cost 3 or Higher\n")
+    targets = {
+        "red_07_02_02c_02": '"「双剣」キリト"',
+        "yellow_07_02_02c_00": '"「絶剣」ユウキ"',
+        "green_08_02_02c_00": '"「整合騎士」ユージオ"',
+        "yellow_03_03_02c_00": '"スピードホリック"',
+        "colorless_08_02_02c_00": "ソードゴーレム",
+    }
+    for card_id, target in targets.items():
+        assert target in card_translation(card_id)["ability_en"]
+    catalog = {row["id"]: row for row in catalog_dto(AssetIndex(None))["cards"]}
+    for original, _variant in explicit_card_equivalence_pairs():
+        assert catalog[original]["abilityEn"].replace("\\n", "\n") == CARD_REGISTRY[original].ability_en
+    assert '"Lightning Speed"' in CARD_REGISTRY["yellow_03_03_EX02_00"].ability_en
+    assert "ability_en" not in card_translation("red_02_03_02r_01")
+
+
+def test_sao_english_effect_reaches_a_real_magic_target_prompt() -> None:
+    runner = ScenarioRunner(ROOT / "tests/semantic_scenarios/ex02c/yellow_03_03_02c_00-positive.json", ROOT)
+    for call in runner.spec["setup"]:
+        response = runner._apply_setup(call)
+        runner._apply_captures(response, call)
+    runner._run_action(runner.spec["actions"][0])
+    prompt = runner.session.prompt
+    assert prompt["kind"] == "effect_target"
+    assert "[Main]" in prompt["effectTextEn"]
+    assert '"スピードホリック"' in prompt["effectTextEn"]
+    assert prompt["card"]["abilityEn"] == card_translation("yellow_03_03_02c_00")["ability_en"]
 
 
 def _ui_keys_by_language() -> dict[str, set[str]]:

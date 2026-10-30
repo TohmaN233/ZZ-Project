@@ -22,6 +22,8 @@ def _destroy_one_ally_and_matching_opponents(
 ) -> None:
     engine = state.engine
     targets = engine.select_target(source.owner, "ally_minion", 1, 1, source=source)
+    if not targets and not engine._eligible_targets(source.owner, "ally_minion", source=source):
+        return
     if len(targets) != 1:
         raise RuntimeError(f"{CARD_ID} requires one allied minion to destroy")
     sacrificed = targets[0]

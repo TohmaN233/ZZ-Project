@@ -24,6 +24,7 @@ class _Pending:
     instance: "CardInstance"
     trigger: Any
     context: "Context"
+    evaluate_condition_on_resolution: bool = False
 
 
 class TriggerRegistry:
@@ -50,6 +51,26 @@ class TriggerRegistry:
             for pending in self._queue
         )
 
+    def enqueue_source_effects(self, ci: "CardInstance", timing: EffectTiming,
+                               ctx: "Context", effects: list[Any], *, after_pending: bool = False) -> None:
+        """Resume later source clauses in order after an interactive choice."""
+        pending = [_Pending(timing, ci, effect, ctx, True) for effect in effects if effect.timing is timing]
+        if after_pending:
+            self._queue.extend(pending)
+        else:
+            self._queue.extendleft(reversed(pending))
+
+    def enqueue_magic_source_clauses(self, ci: "CardInstance", ctx: "Context", clauses: list[Any], *,
+                                    after_pending: bool = False) -> None:
+        pending = []
+        for clause in clauses:
+            timing = clause.timing if isinstance(clause, EffectSpec) else clause.when
+            pending.append(_Pending(timing, ci, clause, ctx, True))
+        if after_pending:
+            self._queue.extend(pending)
+        else:
+            self._queue.extendleft(reversed(pending))
+
     def _effect_active_in_area(self, effect: Any, ci: "CardInstance") -> bool:
         active_areas = getattr(effect, "active_areas", None)
         if active_areas is None:
@@ -61,6 +82,8 @@ class TriggerRegistry:
 
     def emit(self, timing: TriggerTiming | EffectTiming, ctx: "Context", *,
              exclude_instance: "CardInstance" | None = None) -> None:
+        if self._engine._terminal_game_over:
+            return
         state = self._engine.state
         switch_contexts: dict[int, Any] = {}
         switch_races: set[str] = set()
@@ -165,14 +188,36 @@ class TriggerRegistry:
                             self._queue.append(_Pending(timing, ci, effect, ctx))
 
     def resolve_all(self) -> None:
-        while self._queue:
+        if self._engine._terminal_game_over:
+            return
+        while self._queue and not self._engine._terminal_game_over:
+            # An interactive source clause has left this queue for the Session.
+            # Its frame remains authoritative until that choice/callback finishes.
+            if any(
+                frame.running_callbacks or frame.pending_clauses and (
+                    frame.dispatching
+                    or frame.continuation_queued and not any(
+                        pending.instance is frame.source
+                        and pending.trigger is frame.pending_clauses[0]
+                        for pending in self._queue
+                    )
+                )
+                for frame in self._engine._magic_cast_frames.values()
+            ):
+                self._depth = 0
+                return
             self._depth += 1
             if self._depth > MAX_TRIGGER_DEPTH:
                 raise TriggerLoopError(
                     f"trigger depth exceeded {MAX_TRIGGER_DEPTH}"
                 )
             p = self._queue.popleft()
+            if (p.evaluate_condition_on_resolution and p.trigger.condition
+                    and not p.trigger.condition(p.instance, self._engine.state, p.context)):
+                self._engine.complete_magic_source_effect(p.instance, p.trigger, p.context)
+                continue
             if isinstance(p.trigger, EffectSpec) and effect_once_per_turn_used(p.trigger, p.instance):
+                self._engine.complete_magic_source_effect(p.instance, p.trigger, p.context)
                 continue
             defer_choice = getattr(self._engine, "defer_trigger_choice", None)
             if defer_choice is not None:
@@ -200,5 +245,5 @@ class TriggerRegistry:
                         run_pre_target(p.trigger, p.instance, p.context)
                     run_callback(p.trigger.fn, p.instance, self._engine.state, p.context, effect=p.trigger)
                 else:
-                    run_callback(p.trigger.fn, p.instance, self._engine.state, p.context)
+                    run_callback(p.trigger.fn, p.instance, self._engine.state, p.context, effect=p.trigger)
         self._depth = 0

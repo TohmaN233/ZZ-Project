@@ -266,6 +266,7 @@ const UI_TEXT = {
     promptMainAction: "选择行动",
     promptMulligan: "起手调度",
     promptForceBaseChoice: "选择 Base Minion",
+    forceBaseChoiceNote: "选择 1 张 Base Minion 放入费用区。",
     aiTraining: "AI 训练",
     replayTraining: "Replay & Training",
     replayTrainingShort: "对局回放 / AI 训练",
@@ -484,6 +485,7 @@ const UI_TEXT = {
     zoneBase: "费用区",
     zoneField: "战场",
     zoneTrash: "废弃区",
+    zoneResolving: "结算中",
     zoneDeck: "卡组",
   },
   ja: {
@@ -541,6 +543,7 @@ const UI_TEXT = {
     promptMainAction: "行動を選択",
     promptMulligan: "マリガン",
     promptForceBaseChoice: "ベース・ミニオンを選択",
+    forceBaseChoiceNote: "ベース・ミニオン1枚を選んでベースに置きます。",
     codemanMemory: "対戦メモリー",
     codemanReplay: "リプレイ",
     codemanReplayOriginal: "プレイヤーの対局",
@@ -759,6 +762,7 @@ const UI_TEXT = {
     zoneBase: "ベース",
     zoneField: "フィールド",
     zoneTrash: "トラッシュ",
+    zoneResolving: "解決中",
     zoneDeck: "デッキ",
   },
   en: {
@@ -816,6 +820,7 @@ const UI_TEXT = {
     promptMainAction: "Choose Action",
     promptMulligan: "Mulligan",
     promptForceBaseChoice: "Choose Base Minion",
+    forceBaseChoiceNote: "Choose 1 Base Minion to place in your mana area.",
     aiTraining: "AI Training",
     replayTraining: "Replay & Training",
     replayTrainingShort: "Battle replay / AI training",
@@ -1034,6 +1039,7 @@ const UI_TEXT = {
     zoneBase: "Base",
     zoneField: "Field",
     zoneTrash: "Trash",
+    zoneResolving: "Resolving",
     zoneDeck: "Deck",
   },
 };
@@ -1340,7 +1346,7 @@ function rememberZoneMoveSource(event) {
 
 function promptWaitsForVisualSetup(prompt) {
   if (!prompt) return false;
-  return ["effect_target", "optional_effect"].includes(prompt.kind);
+  return ["effect_target", "force_base_choice", "optional_effect"].includes(prompt.kind);
 }
 
 function animationEventBlocksPrompt(event, prompt = rawActivePrompt()) {
@@ -1380,6 +1386,7 @@ function playerAreaCards(player, area) {
   if (area === "field") return player.field || (player.field = []);
   if (area === "base") return player.base || (player.base = []);
   if (area === "trash") return player.trash || (player.trash = []);
+  if (area === "resolving") return player.resolving || (player.resolving = []);
   return null;
 }
 
@@ -4058,7 +4065,7 @@ function isVisibleManaPromptOption(option) {
 function visiblePromptOptions(prompt) {
   if (replayReadonlyMode) return [];
   if (!prompt) return [];
-  if (prompt.kind === "effect_target") return [];
+  if (["effect_target", "force_base_choice"].includes(prompt.kind)) return [];
   if (prompt.kind === "main_action" && state && state.step === "mana") {
     return prompt.options
       .filter((option) => isVisibleManaPromptOption(option))
@@ -4134,7 +4141,7 @@ function players() {
 }
 
 function cardsFor(player) {
-  return [...player.hand, ...player.field, ...player.base, ...(player.trash || [])];
+  return [...player.hand, ...player.field, ...player.base, ...(player.resolving || []), ...(player.trash || [])];
 }
 
 function findPlayerBySide(side) {
@@ -4586,6 +4593,7 @@ function showNextAnimationEvent(rerender = true) {
     animationOverlayTimer = null;
   }
   const finishedEvent = activeAnimationEvent;
+  if (globalThis.ZZFx) globalThis.ZZFx.onEventEnd(finishedEvent);
   settleFinishedAnimationEvent(finishedEvent);
   activeAnimationEvent = animationEventQueue.shift() || null;
   activeAnimationSourceAnchor = null;
@@ -4606,6 +4614,7 @@ function showNextAnimationEvent(rerender = true) {
     }
     playBattleSfx(activeAnimationEvent);
     const duration = animationEventDuration(activeAnimationEvent);
+    if (globalThis.ZZFx) globalThis.ZZFx.onEventStart(activeAnimationEvent, duration);
     if (duration > 0) {
       animationOverlayTimer = setTimeout(() => showNextAnimationEvent(true), duration);
     }
@@ -4710,6 +4719,7 @@ function boardAnchorForZone(side, zone) {
       base: [26, 31],
       field: [48, 36],
       trash: [10, 46],
+      resolving: [6, 36],
       removed: [18, 48],
       force: [88, 25],
       player: [86, 20],
@@ -4720,6 +4730,7 @@ function boardAnchorForZone(side, zone) {
       base: [26, 69],
       field: [48, 64],
       trash: [10, 54],
+      resolving: [6, 64],
       removed: [18, 52],
       force: [88, 75],
       player: [86, 80],
@@ -4864,12 +4875,30 @@ function queueBoardAnimationAnchorRefresh() {
 }
 
 function setAppHtml(html) {
-  if (duelLayoutObserver) duelLayoutObserver.disconnect();
-  app.innerHTML = `${html}${renderRulebookModal()}`;
-  duelLayoutObserver = DuelLayout.observe(app, settings.duelScale, queueBoardAnimationAnchorRefresh);
+  if (globalThis.ZZFx) globalThis.ZZFx.beforeRender();
+  const liveDuel = appView === "duel" && html.includes('class="duel-board"');
+  const fxKey = liveDuel && globalThis.ZZFx ? globalThis.ZZFx.eventKey(activeAnimationEvent) : "";
+  const content = `${html}${renderRulebookModal()}`.replace(/class="visual-overlay([^\"]*)"/g,
+    `class="visual-overlay$1" data-fx-event="${fxKey}"`);
+  if (liveDuel && globalThis.ZZDuelDom) {
+    const { mounted } = globalThis.ZZDuelDom.patch(app, content);
+    if (mounted || !duelLayoutObserver) {
+      if (duelLayoutObserver) duelLayoutObserver.disconnect();
+      duelLayoutObserver = DuelLayout.observe(app, settings.duelScale, queueBoardAnimationAnchorRefresh);
+    }
+    duelLayoutObserver.setScale(settings.duelScale);
+    duelLayoutObserver.refresh();
+  } else {
+    if (duelLayoutObserver) duelLayoutObserver.disconnect();
+    app.innerHTML = content;
+    duelLayoutObserver = DuelLayout.observe(app, settings.duelScale, queueBoardAnimationAnchorRefresh);
+  }
   hydrateHomeThemeVideo();
   syncHomeThemeIdle();
   queueBoardAnimationAnchorRefresh();
+  if (globalThis.ZZFx) globalThis.ZZFx.afterRender(app, {
+    live: liveDuel, reducedMotion: settings.reducedMotion, humanSide: state?.humanSide,
+  });
 }
 
 function clearHomeThemeTimer() {
@@ -5001,7 +5030,6 @@ function renderBoardAnchoredGraveyardSummon(event) {
   const to = boardAnchorForZone(event.side, "field");
   return `
     <div class="board-zone-move graveyard" style="${boardAnchorStyle(from, "from")} ${boardAnchorStyle(to, "to")}">
-      <span class="board-graveyard-summon"></span>
       ${renderBoardEventCard(event.card, "board-zone-move-card")}
     </div>
   `;
@@ -5070,8 +5098,7 @@ function renderBoardAnchoredAttack(event, { persistent = false } = {}) {
       <span class="board-attack-diamonds"></span>
       <span class="board-attack-arrow"></span>
       ${persistent ? "" : renderBoardEventCard(event.attacker, "board-attack-projectile")}
-      <span class="board-attack-target-ring"></span>
-      ${persistent ? "" : `<span class="board-attack-impact"></span>`}
+      ${persistent ? '<span class="board-attack-target-ring"></span>' : ""}
     </div>
   `;
 }
@@ -5135,13 +5162,14 @@ function renderBoardAnchoredEffectTarget(event) {
 function renderBoardAnchoredDestroy(event) {
   const card = event.card || {};
   const anchor = activeAnimationSourceAnchor || boardAnchorForCard(card.iid, event.side || card.ownerSide, event.fromArea || "field");
+  const removal = !["battle", "effect", "self"].includes(event.cause);
   return `
-    <div class="board-destroy ${esc(anchor.side)}" style="${boardAnchorStyle(anchor)}">
+    <div class="board-destroy ${esc(anchor.side)} ${removal ? "fx-removal" : ""}" style="${boardAnchorStyle(anchor)}">
       ${renderBoardEventCard(card, "board-destroy-card")}
       <span class="board-destroy-flash"></span>
       <span class="board-destroy-crack"></span>
       <span class="board-destroy-smoke"></span>
-      <span class="board-destroy-label">${esc(t("destroyed"))}</span>
+      ${event.cause === "replacement" ? "" : `<span class="board-destroy-label">${esc(t("destroyed"))}</span>`}
     </div>
   `;
 }
@@ -5165,7 +5193,7 @@ function renderBoardAnimationLayer({ replay = false } = {}) {
     if (event.type === "destroy") body = renderBoardAnchoredDestroy(event);
   }
   if (!body && !persistentAttack) return "";
-  return `<div class="board-animation-layer ${replay ? "replay" : "live"}" aria-hidden="true">${persistentAttack}${body}</div>`;
+  return `<div class="board-animation-layer ${replay ? "replay" : "live"}" data-fx-event="${globalThis.ZZFx ? globalThis.ZZFx.eventKey(event) : ""}" aria-hidden="true">${persistentAttack}${body}</div>`;
 }
 
 function zoneLabel(area) {
@@ -5175,6 +5203,7 @@ function zoneLabel(area) {
     base: "BASE",
     field: "FIELD",
     trash: "TRASH",
+    resolving: t("zoneResolving"),
     removed: "REMOVED",
   };
   return labels[area] || String(area || "").toUpperCase();
@@ -5411,7 +5440,9 @@ function renderAnimationOverlay() {
   if (event.type === "game_result") return renderGameResultOverlay(event);
   const assetId = animationEventAssetId(event);
   const art = assetId ? uiAssetUrl(assetId) : null;
-  const tone = event.type === "heal" ? " heal" : event.type === "damage" ? " damage" : "";
+  const tone = event.type === "heal" ? " heal" : event.type === "damage" ? " damage"
+    : event.type === "turn_begin" ? ` fx-turn ${event.side === state?.humanSide ? "mine" : "theirs"}`
+    : event.type === "phase" ? " fx-phase" : "";
   return `
     <div class="visual-overlay${tone}" aria-live="polite">
       <div class="visual-overlay-card">
@@ -5525,8 +5556,10 @@ function renderCard(card, size = "") {
     : `aria-hidden="true"`;
   return `
     <div class="card${classes}${legal}${playable}${blessSource}${blessTarget}${rested}${selected}${mulliganClass}${movingSource}" ${cardAnchor}
+         data-fx-face="${card.faceDown ? "down" : "up"}" data-rarity="${esc(card.faceDown ? "" : (cardById(card.cardId)?.rarity || ""))}"
          ${interactionAttrs} ${blessDragAttrs} ${blessTargetAttr}>
       ${art}
+      ${card.faceDown ? "" : '<span class="card-fx" aria-hidden="true"></span>'}
       ${actionBadge}
       ${mulliganToggle}
       ${overlay}
@@ -5625,8 +5658,20 @@ function renderBaseLane(player) {
 
 function renderBattlefield(player, side) {
   const legal = player.field.some((card) => optionForCard(card));
-  const meta = `<span>${esc(player.field.length)}/5</span>`;
+  const meta = `<span>${esc(player.field.length)}/5</span>${renderResolvingZone(player)}`;
   return renderZone(t("battleField"), meta, renderRow(player.field, "", t("noMinions"), 5), `field-zone battlefield ${side}`, legal, player.side, "field");
+}
+
+function renderResolvingZone(player) {
+  const cards = player.resolving || [];
+  return `
+    <div class="resolving-zone${cards.length ? " occupied" : ""}" ${boardAnchorAttr(player.side, "resolving")}>
+      <span class="resolving-label">${esc(t("zoneResolving"))}</span>
+      <div class="resolving-cards">
+        ${cards.length ? cards.map((card) => renderCard(card, "mini")).join("") : '<i class="resolving-slot" aria-hidden="true"></i>'}
+      </div>
+    </div>
+  `;
 }
 
 function renderHandFan(player, side) {
@@ -5922,9 +5967,7 @@ function renderPrompt(error) {
   const colorlessReplaceHtml = prompt.kind === "main_action" && state && state.step === "mana" && colorlessBaseReplacementOptions().length
     ? `<button data-colorless-base-replace>${esc(t("placeColorlessMana"))}</button>`
     : "";
-  const optionsHtml = prompt.kind === "force_base_choice"
-    ? renderForceBaseChoiceOptions(promptOptions)
-    : prompt.kind === "effect_target"
+  const optionsHtml = ["effect_target", "force_base_choice"].includes(prompt.kind)
       ? ""
       : `${colorlessReplaceHtml}${promptOptions.map((option, index) => `
         ${renderPromptButton(option, index)}
@@ -5936,7 +5979,7 @@ function renderPrompt(error) {
     ? state.step === "mana"
       ? `<div class="prompt-note">${esc(t("manaPhase"))}</div>`
       : ""
-    : prompt.kind === "effect_target"
+    : ["effect_target", "force_base_choice"].includes(prompt.kind)
       ? `<div class="prompt-note">${esc(t("effectTargetHint"))}</div>`
     : "";
   return `
@@ -5975,26 +6018,6 @@ function promptTitle(prompt) {
   return t("promptMainAction");
 }
 
-function renderForceBaseChoiceOptions(options) {
-  return options.map((option, index) => {
-    const title = localizedName(option, option.label || "?");
-    const artUrl = localizedCardAssetUrl(option);
-    const art = artUrl
-      ? `<img src="${esc(artUrl)}" alt="${esc(title)}">`
-      : `<span class="force-choice-fallback">${esc(title.slice(0, 1) || "?")}</span>`;
-    const stats = option.type === "b_minion"
-      ? `<span>${esc(option.bp ?? "-")}/${esc(option.dp ?? "-")}</span>`
-      : "";
-    return `
-      <button class="force-choice-card ${index === 0 ? "primary" : ""}" data-option="${esc(option.id)}">
-        ${art}
-        <span class="force-choice-name">${esc(title)}</span>
-        ${stats}
-      </button>
-    `;
-  }).join("");
-}
-
 function renderEffectChoiceOptions(options) {
   return options.map((option, index) => {
     const title = localizedName(option, option.label || "?");
@@ -6017,7 +6040,7 @@ function renderEffectChoiceOptions(options) {
 
 function renderEffectPromptModal() {
   const prompt = activePrompt();
-  if (!prompt || prompt.kind !== "effect_target") return "";
+  if (!prompt || !["effect_target", "force_base_choice"].includes(prompt.kind)) return "";
   if (prompt.choiceKind === "deck_top_or_bottom") {
     const topOption = (prompt.options || []).find((option) => option.reorderPosition === "top");
     const bottomOption = (prompt.options || []).find((option) => option.reorderPosition === "bottom");
@@ -6068,7 +6091,8 @@ function renderEffectPromptModal() {
   );
   const sourceCards = (prompt.revealedCards && prompt.revealedCards.length)
     ? prompt.revealedCards
-    : prompt.options.filter(isRenderableEffectPromptTarget);
+    : prompt.options.filter(isRenderableEffectPromptTarget).map((card) =>
+      prompt.kind === "force_base_choice" ? { ...cardById(card.cardId), ...card } : card);
   const skipOption = prompt.options.find((option) => option.kind === "effect_target_skip");
   return `
     <div class="effect-prompt-modal">
@@ -6120,6 +6144,7 @@ function effectTargetKey(option) {
 }
 
 function effectPromptNote(prompt) {
+  if (prompt.kind === "force_base_choice") return t("forceBaseChoiceNote");
   if (prompt.choiceKind === "top3_magic") return t("lookTop3MagicNote");
   if (prompt.allowVariableTargetCount) {
     return t("variableTargetNote", { min: effectPromptMinimumCount(prompt), max: effectPromptMaximumCount(prompt) });
@@ -8396,8 +8421,8 @@ function renderCatalogCard(card) {
     ? `<img src="${esc(artUrl)}" alt="${esc(title)}">`
     : `<span class="force-choice-fallback">${esc((title || card.id).slice(0, 1))}</span>`;
   return `
-    <article class="catalog-card ${count ? "in-deck" : ""}">
-      <button class="catalog-art" data-deck-add="${esc(card.id)}" ${canAddDeckCard(card.id) ? "" : "disabled"}>${art}</button>
+    <article class="catalog-card ${count ? "in-deck" : ""}" data-rarity="${esc(card.rarity || "")}">
+      <button class="catalog-art" data-deck-add="${esc(card.id)}" ${canAddDeckCard(card.id) ? "" : "disabled"}>${art}<span class="card-fx" aria-hidden="true"></span></button>
       <div class="catalog-copy">
         <strong>${esc(title)}</strong>
         <span>${esc(localizedCardType(card))} / ${esc(card.officialCost || card.totalCost)}</span>
@@ -8649,6 +8674,7 @@ function playBattleSfx(event) {
 }
 
 function clearDuelUiState() {
+  if (globalThis.ZZFx) globalThis.ZZFx.onEventEnd(null);
   appView = "duel";
   selectedCardIid = null;
   selectedForceKey = null;
@@ -10060,7 +10086,10 @@ function bootApp(initialView = "home") {
     loadCatalog(),
     initMultiplayerBridge(),
     loadApplicationUpdate(),
-  ]).then((result) => {
+  ]).then(async (result) => {
+    // Duel boot calls loadState only after this promise: prepare the native
+    // renderer while the existing loading view is still on screen.
+    if (initialView === "duel" && globalThis.ZZFx) await globalThis.ZZFx.prepare();
     if (!parseCodemanReplayHash()) render();
     return result;
   });

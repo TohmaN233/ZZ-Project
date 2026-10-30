@@ -11,7 +11,7 @@ multiplayer = ["websockets>=16,<17"]
 [tool.setuptools.package-data]
 "zz" = ["pc02r_data.tsv", "ex02c_data.tsv"]
 "zz.multiplayer" = ["compatibility.json"]
-"zz.web" = ["translations/*.tsv", "translations/*.json", "static/*"]
+"zz.web" = ["translations/*.tsv", "translations/*.json", "static/*", "static/fx/*"]
 
 [tool.setuptools.packages.find]
 include = ["zz*"]
