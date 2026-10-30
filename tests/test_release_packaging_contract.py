@@ -11,6 +11,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ReleasePackagingContractTests(unittest.TestCase):
+    def test_online_guide_points_to_current_server_and_extracts_package_root(self) -> None:
+        package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
+        version = package["version"]
+        guide = (PROJECT_ROOT / "docs/ONLINE.md").read_text(encoding="utf-8")
+        archive = f"ZZ-Multiplayer-v{version}.tar.gz"
+        self.assertIn(f"releases/download/v{version}/{archive}", guide)
+        self.assertIn(f"tar -xzf {archive} --strip-components=1 -C zz-multiplayer", guide)
+        self.assertIn("RECONNECT_GRACE_MS=600000", guide)
+
     def test_public_asset_manifest_matches_desktop_download_source(self) -> None:
         package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
         source = json.loads((PROJECT_ROOT / "electron/asset-source.json").read_text(encoding="utf-8"))

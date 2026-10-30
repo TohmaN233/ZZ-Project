@@ -55,8 +55,8 @@
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Linux.tar.gz",
-    "bytes": 23395647,
-    "sha256": "8EE3C13A36AB00B600D28689BCBF6C083FE0ADB810D603D972467F88ACEBF0D0"
+    "bytes": 23395880,
+    "sha256": "7A8D25AF67B8B72181386D4E54E79F1215EA2910446106225498A5D6DDEBC7D6"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -101,8 +101,8 @@
       "public runtime models and public Windows rebuild checkpoint"
     ],
     "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-source.zip",
-    "bytes": 39924521,
-    "sha256": "A223D9CF2DEF9C75773A186F2865FF8EBC80FA55125A216CFF154A13CF7F7A6D"
+    "bytes": 39924874,
+    "sha256": "6511A5522B8E11F84ED460795C0BBFF1744A97C87CCC712C42B49FB5A9D92F7D"
   },
   "multiplayerServer": {
     "filename": "ZZ-Multiplayer-v0.5.3.tar.gz",
@@ -112,8 +112,8 @@
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
     "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Multiplayer-v0.5.3.tar.gz",
-    "bytes": 698581,
-    "sha256": "C6BB40D376ECC6C5CB2007E73101A7F89E0CFEF8BE0CFE121E0814E4DDC7B6BA"
+    "bytes": 698714,
+    "sha256": "C5B9DBC51A6379CE3167E8369EBF4078B16107B4B1D63202420A38CC97AC46F0"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
   "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.3",

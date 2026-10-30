@@ -14,20 +14,22 @@ LAN 不需要单独的服务器包。
 
 客户端默认连接项目维护者的个人服务器（加拿大）。这是个人维护的服务，不承诺持续在线。中国大陆通常需要代理。
 
-**0.4.2** 调整了结束回合操作栏，保留 0.4.1 的联机换牌回归修复。默认入口为 `wss://zz.tgy233.top/multiplayer`。请双方更新客户端后再连接。
+**0.5.3** 的默认入口为 `wss://zz.tgy233.top/multiplayer`。请双方更新客户端后再连接。
 
 双方必须使用同一应用版本、同一协议版本和同一规则 checksum。版本不兼容时先更新客户端。
 
+对局断线后客户端会自动重连最多 5 次；失败后回到房间页面，保留原房间码并提供重新连接按钮。服务器默认保留断线席位 10 分钟，服务器重启或房间关闭后无法恢复原对局。对局和结果页面的战斗日志可分页查看之前的事件。
+
 ## 自建服务器
 
-下载 [ZZ-Multiplayer-v0.4.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz)，并使用
-[SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt) 校验文件。文件大小与校验值也记录在项目根目录的 `PUBLIC_RELEASE_MANIFEST.json`。
+下载 [ZZ-Multiplayer-v0.5.3.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Multiplayer-v0.5.3.tar.gz)，并使用
+[SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/SHA256SUMS-PC02.txt) 校验文件。文件大小与校验值也记录在项目根目录的 `PUBLIC_RELEASE_MANIFEST.json`。
 
 需要 Linux、Python 3.10+，以及一个带 TLS 的 HTTPS 域名。游戏客户端按 `PUBLIC_ORIGIN` 校验来源，所以公网入口必须是 `https://你的域名`，不能带路径。
 
 ```bash
 mkdir zz-multiplayer
-tar -xzf ZZ-Multiplayer-v0.4.2.tar.gz -C zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.5.3.tar.gz --strip-components=1 -C zz-multiplayer
 cd zz-multiplayer
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip
@@ -42,7 +44,7 @@ PUBLIC_ORIGIN=https://your.example.com
 PROTOCOL_VERSION=2
 ```
 
-其余可先保持示例值。`MAX_MESSAGE_BYTES` 需要是 `262144`。不要把填好的 env 提交到 git。
+其余可先保持示例值。默认断线保留时间 `RECONNECT_GRACE_MS=600000`；`ROOM_IDLE_TIMEOUT_MS` 不能小于该值。不要把填好的 env 提交到 git。
 
 ```bash
 set -a
