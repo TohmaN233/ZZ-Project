@@ -37,7 +37,7 @@ from zz.web.debug_tools import (
 )
 from zz.web.catalog import catalog_dto
 from zz.web.deck_store import DeckStore
-from zz.web.assets import resolve_asset_root
+from zz.web.assets import AssetIndex, resolve_asset_root
 from zz.web.settings_store import SettingsStore, normalize_ai_difficulty
 from zz.web.session import GameSession
 
@@ -66,6 +66,7 @@ class ServerState:
     dev_mode: bool | None = None
     session: GameSession | None = None
     session_lock: object = field(default_factory=RLock, repr=False)
+    _asset_index: AssetIndex | None = field(default=None, init=False, repr=False)
 
     def _random_seed(self) -> int:
         return secrets.randbelow(2_147_483_647)
@@ -95,6 +96,14 @@ class ServerState:
         payload = catalog_dto(session.asset_index)
         payload["devMode"] = self.is_dev_mode()
         return payload
+
+    def asset_index(self) -> AssetIndex:
+        with self.session_lock:
+            if self.session is not None:
+                return self.session.asset_index
+            if self._asset_index is None:
+                self._asset_index = AssetIndex(self.asset_root)
+            return self._asset_index
 
     def is_dev_mode(self) -> bool:
         if self.dev_mode is True:
@@ -832,16 +841,14 @@ class ZenonzardHandler(BaseHTTPRequestHandler):
         self._send_file(path)
 
     def _send_asset(self, asset_id: str) -> None:
-        session = self.app.ensure_session()
-        path = session.asset_index.resolve_asset_id(unquote(asset_id))
+        path = self.app.asset_index().resolve_asset_id(unquote(asset_id))
         if path is None:
             _write_json(self, 404, {"ok": False, "error": {"code": "asset_not_found", "message": asset_id}})
             return
         self._send_file(path)
 
     def _send_audio(self, audio_id: str) -> None:
-        session = self.app.ensure_session()
-        path = session.asset_index.resolve_audio_id(unquote(audio_id))
+        path = self.app.asset_index().resolve_audio_id(unquote(audio_id))
         if path is None:
             _write_json(self, 404, {"ok": False, "error": {"code": "audio_not_found", "message": audio_id}})
             return
