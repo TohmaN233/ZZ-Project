@@ -15,6 +15,7 @@
 *.service text eol=lf
 *.sh text eol=lf
 *.cmd text eol=crlf
+zz/web/static/fx/effekseer-LICENSE.txt text eol=lf
 
 *.png binary
 *.jpg binary
