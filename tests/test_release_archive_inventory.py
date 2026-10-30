@@ -46,6 +46,7 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
             "tests/test_oct29_switch_mana.py", "tests/test_oct29_phase_continuation.py",
             "tests/test_effect_resolution_order_oct29.py", "tests/test_frontend_magic_prompt.py",
             "tests/test_frontend_oct29_feedback.py", "tests/test_eugeo_reactive_shield_combat.py",
+            "tests/test_web_session_initialization.py",
         } <= files
     else:
         assert release.DEEP_SOURCE_RELATIVE.as_posix() not in files

@@ -76,18 +76,19 @@ class ServerState:
         return self.seed
 
     def ensure_session(self) -> GameSession:
-        if self.session is None:
-            settings = self.settings_store().load()
-            self.session = GameSession(
-                seed=self._session_seed(),
-                mode=self.mode,
-                asset_root=self.asset_root,
-                player_profile=settings.get("playerProfile"),
-                opponent_profile=settings.get("opponentProfile"),
-                opponent_ai_difficulty=settings.get("opponentAiDifficulty", "deep"),
-                ai_data_root=self.ai_data_root_path(),
-            )
-        return self.session
+        with self.session_lock:
+            if self.session is None:
+                settings = self.settings_store().load()
+                self.session = GameSession(
+                    seed=self._session_seed(),
+                    mode=self.mode,
+                    asset_root=self.asset_root,
+                    player_profile=settings.get("playerProfile"),
+                    opponent_profile=settings.get("opponentProfile"),
+                    opponent_ai_difficulty=settings.get("opponentAiDifficulty", "deep"),
+                    ai_data_root=self.ai_data_root_path(),
+                )
+            return self.session
 
     def catalog(self) -> dict:
         session = self.ensure_session()

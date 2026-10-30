@@ -127,6 +127,7 @@ def release_files(root: Path, kind: str) -> list[Path]:
             "test_frontend_magic_prompt.py", "test_frontend_oct29_feedback.py",
             "test_oct29_magic_engine.py", "test_oct29_phase_continuation.py",
             "test_oct29_shared_rules.py", "test_oct29_switch_mana.py",
+            "test_web_session_initialization.py",
         ))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
         paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))
