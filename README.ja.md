@@ -14,9 +14,9 @@
 
 ## インストール
 
-v0.4.2 ではターン終了ボタンの比率を調整し、操作ガイドとボタンをコンパクトな操作バーにまとめました。手札の自動縮小も維持しています。v0.4.1 では、相手が開局時の手札交換を確定した後に対局が停止するオンライン問題を修正しました。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.4.2 を使用してください。
+v0.5.0 では EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）と、対応する EX02 オリジナルカード面を追加しました。カード検索、ルール処理、Force 検索、対戦中の視覚的フィードバックも改善しました。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.5.0 を使用してください。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Multiplayer-v0.5.0.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 
@@ -53,7 +53,7 @@ Windows インストーラー版はスタートメニューまたはデスクト
 - **Codeman とローカル学習**：最近の対戦記憶をローカルに保存します。ソース版では GPU / CUDA 環境で実験的な学習を行えます。
 - **Replay と AI アドバイス**：最近の対戦を振り返り、対戦中に Codeman から現在の行動への提案を確認できます。
 - **オンライン対戦**：LAN と公開ルームに対応します。クライアントの接続先は既定で `wss://zz.tgy233.top/multiplayer` です。自分でサーバーを立てる場合は[オンライン対戦ガイド](docs/ONLINE.md)を参照してください。
-- **カードプールと画面**：基本カード、EX01、PC01、PC01R、PC02、および PC02R DIVINE の 106 枚を収録しています。画面は簡体字中国語、日本語、英語に対応します。
+- **カードプールと画面**：基本カード、EX01、PC01、PC01R、PC02、PC02R DIVINE の 106 枚に加え、EX02C/SAO の 70 枚と対応する EX02 オリジナルカード面を収録しています。画面は簡体字中国語、日本語、英語に対応します。
 - **カード表示**：カード詳細で変身後の形態を確認できます。同名カードの再録分は合算され、デッキには最大 3 枚まで入れられます。
 
 Story Mode は未実装です。長期的には、Agent がプレイヤーと自動で対話するゲームを設計し、GAL 形式のフロントエンドを実装することを目指しています。SillyTavern コミュニティのキャラクター、World Info、長期的な交流に関する経験も取り入れ、プレイヤーが自分の Codeman と共有できる ZZ 体験を作る計画です。
@@ -62,7 +62,7 @@ Story Mode は未実装です。長期的には、Agent がプレイヤーと自
 
 本プロジェクトは実験モデルを強力な AI として宣伝しません。作者は統計学の学位を持っていますが、強化学習の授業を履修しておらず、研究分野も強化学習とは異なります。個人プロジェクトのため学習規模も限られており、現在の AI は ZENONZARD 正式運営時に使用された AI より明確に弱いものです。AI アドバイスも主に娯楽機能です。
 
-コンピューター AI の学習カードプールは現在 PC01 のみです。PC01R、EX01、PC02、PC02R DIVINE は現在の学習プロセスに含まれていないため、追加カードパックを AI が正しく理解するとは限りません。ルール上プレイできることと、AI がカードを学習していることは別です。
+コンピューター AI の学習カードプールは現在 PC01 のみです。PC01R、EX01、PC02、PC02R DIVINE、EX02、EX02C/SAO は現在の学習プロセスに含まれていないため、追加カードパックを AI が正しく理解するとは限りません。ルール上プレイできることと、AI がカードを学習していることは別です。
 
 AI 関連コードは Codex の支援を受けています。また、[sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent) の公開手法と開発構成を参考にしています。詳しくは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
 

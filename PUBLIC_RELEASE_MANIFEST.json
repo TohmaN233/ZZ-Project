@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.4.2",
+  "releaseVersion": "0.5.0",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -8,7 +8,9 @@
     "PC01",
     "PC01R",
     "PC02",
-    "PC02R"
+    "PC02R",
+    "EX02",
+    "EX02C"
   ],
   "includedSurfaces": [
     "Python rules engine and card content",
@@ -28,10 +30,10 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.4.2-Windows-Setup.exe",
+    "filename": "ZZ-Project-v0.5.0-Windows-Setup.exe",
     "contains": [
       "Electron desktop client",
-      "frozen Python web server with all 106 PC02R card modules",
+      "frozen Python web server with PC02R, EX02 and EX02C card content",
       "first-launch asset downloader and bundled 7-Zip",
       "current PC01-trained runtime AI models"
     ],
@@ -39,12 +41,10 @@
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Windows-Setup.exe",
-    "bytes": 148323293,
-    "sha256": "24B10B06F85FF810ADF76CE94604CDD65B2156033541A90F420FDA4536F5173A"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.4.2-Linux.tar.gz",
+    "filename": "ZZ-Project-v0.5.0-Linux.tar.gz",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
@@ -52,9 +52,7 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Linux.tar.gz",
-    "bytes": 21706374,
-    "sha256": "82A65B5AF7D4C9CF7BBE54A529565C24CF047BF54C8BE11F2A974C796E22F72B"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -92,29 +90,25 @@
   ],
   "releaseStatus": "published",
   "sourcePackage": {
-    "filename": "ZZ-Project-v0.4.2-source.zip",
+    "filename": "ZZ-Project-v0.5.0-source.zip",
     "contains": [
       "current product source, build tools and deployment examples",
-      "focused tests and all 212 PC02R semantic scenarios",
+      "focused tests and PC02R and EX02C semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-source.zip",
-    "bytes": 37860006,
-    "sha256": "C4E8074780EB9C554125F052F57E377E276D30891B744300F23B89FFD1AC22ED"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip"
   },
   "multiplayerServer": {
-    "filename": "ZZ-Multiplayer-v0.4.2.tar.gz",
+    "filename": "ZZ-Multiplayer-v0.5.0.tar.gz",
     "contains": [
-      "authoritative multiplayer server and all 106 PC02R card modules",
+      "authoritative multiplayer server with PC02R, EX02 and EX02C card content",
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz",
-    "bytes": 644344,
-    "sha256": "89B518B62E9DD5A61CE10DF8F1B7DAE838F0BB4F1848CFAB2B83A25D41AE5A68"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Multiplayer-v0.5.0.tar.gz"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
-  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.2",
-  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt",
-  "releaseSummary": "Refine the end-turn control and compact command bar while preserving adaptive hand sizing and the 0.4.1 multiplayer mulligan fix."
+  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.0",
+  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/SHA256SUMS-PC02.txt",
+  "releaseSummary": "Add EX02 and Sword Art Online EX02C cards with shared card identity, and improve the duel frontend and card effect resolution."
 }

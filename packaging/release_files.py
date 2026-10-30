@@ -121,6 +121,13 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.add(Path("tests/test_ex02c_cards.py"))
         paths.add(Path("tests/test_ex02_cards.py"))
         paths.update(Path("tests") / name for name in ("test_frontend_duel_dom.py", "test_frontend_fx.py", "test_frontend_fx_arrival.py"))
+        paths.update(Path("tests") / name for name in (
+            "test_effect_resolution_order_oct29.py", "test_eugeo_reactive_shield_combat.py",
+            "test_ex02c_link_activation_combat.py", "test_ex02c_standby_deadline.py",
+            "test_frontend_magic_prompt.py", "test_frontend_oct29_feedback.py",
+            "test_oct29_magic_engine.py", "test_oct29_phase_continuation.py",
+            "test_oct29_shared_rules.py", "test_oct29_switch_mana.py",
+        ))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
         paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))
         paths.add(Path("tests/semantic_scenarios/ex02c/green_08_02_02c_01-trash-boundary.json"))

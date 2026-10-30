@@ -41,6 +41,12 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
         assert len([path for path in files if path.startswith("tests/semantic_scenarios/pc02r/")]) == 212
         assert len([path for path in files if path.startswith("tests/semantic_scenarios/ex02c/")]) == 141
         assert {"tests/test_ex02c_cards.py", "tools/build_ex02c_correspondence.py"} <= files
+        assert {
+            "tests/test_ex02c_link_activation_combat.py", "tests/test_ex02c_standby_deadline.py",
+            "tests/test_oct29_switch_mana.py", "tests/test_oct29_phase_continuation.py",
+            "tests/test_effect_resolution_order_oct29.py", "tests/test_frontend_magic_prompt.py",
+            "tests/test_frontend_oct29_feedback.py", "tests/test_eugeo_reactive_shield_combat.py",
+        } <= files
     else:
         assert release.DEEP_SOURCE_RELATIVE.as_posix() not in files
 

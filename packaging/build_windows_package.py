@@ -65,6 +65,8 @@ def main() -> None:
         "--add-data",
         add_data("zz/pc02r_data.tsv", "zz"),
         "--add-data",
+        add_data("zz/ex02c_data.tsv", "zz"),
+        "--add-data",
         add_data("zz/web/static", "zz/web/static"),
         "--add-data",
         add_data("zz/web/translations", "zz/web/translations"),

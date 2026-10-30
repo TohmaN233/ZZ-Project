@@ -37,6 +37,7 @@ class ReleasePackagingContractTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn('add_data("image.png", ".")', windows_builder)
+        self.assertIn('add_data("zz/ex02c_data.tsv", "zz")', windows_builder)
         self.assertNotIn('add_data("data", "data")', windows_builder)
         self.assertIn("data/ai_training/deep_p2_specialist_v1_latest/best_greedy.pt", windows_builder)
         self.assertIn("best_greedy.runtime.npz", windows_builder)
