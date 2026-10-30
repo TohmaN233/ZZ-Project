@@ -2625,9 +2625,9 @@ class Engine:
             self.triggers.resolve_all()
 
     def resolve_attack_after_flash(self, attacker: CardInstance, target: AttackTarget,
-                                   blocker: Optional[CardInstance] = None) -> None:
+                                   blocker: Optional[CardInstance] = None) -> dict[str, Any] | None:
         try:
-            self._resolve_attack_after_flash(attacker, target, blocker)
+            return self._resolve_attack_after_flash(attacker, target, blocker)
         finally:
             for player in self.state.players:
                 for zone in (player.field, player.base, player.hand, player.trash, player.deck, player.removed):
@@ -2637,7 +2637,7 @@ class Engine:
                         ci.flags = {flag for flag in ci.flags if not flag.startswith("battle:")}
 
     def _resolve_attack_after_flash(self, attacker: CardInstance, target: AttackTarget,
-                                    blocker: Optional[CardInstance] = None) -> None:
+                                    blocker: Optional[CardInstance] = None) -> dict[str, Any] | None:
         """Block and Battle Resolution steps after Flash has finished."""
         from zz.enums import AttackTargetKind
         target = getattr(self, "_pc02_attack_target_override", target)
@@ -2668,9 +2668,11 @@ class Engine:
             override = pc02_battle_outcome_override(attacker, blocker, self.state)
             if override is None:
                 override = battle_outcome_override(attacker, blocker)
+            attacker_bp = self.effective_bp(attacker)
+            blocker_bp = self.effective_bp(blocker)
             if override is None:
-                atk_dest = self.effective_bp(attacker) >= self.effective_bp(blocker)
-                blk_dest = self.effective_bp(blocker) >= self.effective_bp(attacker)
+                atk_dest = attacker_bp >= blocker_bp
+                blk_dest = blocker_bp >= attacker_bp
             else:
                 atk_dest, blk_dest = override
             attacker_death_blow = self._should_death_blow_destroy(attacker, blocker, self.state.active)
@@ -2711,6 +2713,15 @@ class Engine:
                 visual_sources=visual_sources,
             )
             self._destroy_maddoll_after_battle(attacker, blocker)
+            return {
+                "attackerBp": attacker_bp,
+                "blockerBp": blocker_bp,
+                "outcomeOverride": override is not None,
+                "wouldDestroyAttacker": blk_dest,
+                "wouldDestroyBlocker": atk_dest,
+                "attackerAreaAfterBattle": attacker.area.value,
+                "blockerAreaAfterBattle": blocker.area.value,
+            }
         else:
             # 4. Unblocked: damage to player/force = attacker.DP per rulebook p20
             if target.kind is AttackTargetKind.MINION:
