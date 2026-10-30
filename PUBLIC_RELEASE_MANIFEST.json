@@ -42,8 +42,8 @@
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
     "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe",
-    "bytes": 151697252,
-    "sha256": "F1ADC91B4EE8715E557D3DA2CA8E0353C2A6A8D783DA02D9E9D88B4517F1BC48"
+    "bytes": 151696778,
+    "sha256": "CA5CD53D424C4B491253524F48140536F56A550B365236EF8B55366DFCFADA26"
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.5.0-Linux.tar.gz",
@@ -55,8 +55,8 @@
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz",
-    "bytes": 23371350,
-    "sha256": "1BDB7014025801C35FBCE0CA66A65AA2105E3D803F179FBA8E8B56A8CAF7823F"
+    "bytes": 23371463,
+    "sha256": "B740935171A9C108A77E0A6E7E4F2CCD86FC1C74B65D0A71619A55A639AF0AEC"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -101,8 +101,8 @@
       "public runtime models and public Windows rebuild checkpoint"
     ],
     "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip",
-    "bytes": 39869064,
-    "sha256": "7C51E462937CC2B5870DDB6839BD1AAC6443DBAF90240F4617FBDD940D560F8D"
+    "bytes": 39869370,
+    "sha256": "84AF71B160558FFABCE5F7EEF0AC2A0729FED3279B67C38F1EA68A1201589D3D"
   },
   "multiplayerServer": {
     "filename": "ZZ-Multiplayer-v0.5.0.tar.gz",
