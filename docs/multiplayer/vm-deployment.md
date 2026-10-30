@@ -55,9 +55,10 @@ sudo ln -s /etc/nginx/sites-available/zz-multiplayer.conf /etc/nginx/sites-enabl
 
 `PUBLIC_ORIGIN` must exactly match the browser Origin, such as
 `https://multiplayer.example.com`. `ROOM_IDLE_TIMEOUT_MS` must not be shorter
-than `RECONNECT_GRACE_MS`. The example token bucket allows 20 messages per
-second per connection with a burst of 40; keep both limits enabled for public
-deployment.
+than `RECONNECT_GRACE_MS`. The example reserves a disconnected player's seat
+for 10 minutes; existing installations must update their own environment file
+to change that period. The example token bucket allows 20 messages per second
+per connection with a burst of 40; keep both limits enabled for public deployment.
 
 Provision TLS through the VM's existing certificate workflow. For a new
 Certbot-managed Nginx host, the operator may use:

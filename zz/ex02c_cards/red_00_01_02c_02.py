@@ -61,7 +61,7 @@ def build_card(row: dict[str, Any]):
             target_kind="enemy_minion",
             min_targets=1,
             max_targets=1,
-            params={"max_bp": 400},
+            params={"max_bp": 400, "granted_by_blessing": True},
             active_areas=(AreaType.BLESSING,),
             official_effect="相手のBP400以下のミニオン1体を破壊する",
             official_timing="アタック時",

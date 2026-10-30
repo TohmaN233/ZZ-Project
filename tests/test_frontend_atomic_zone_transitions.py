@@ -385,6 +385,74 @@ assert.equal(state.players.human.hand.length, 9);
 """)
 
 
+@pytest.mark.parametrize("viewer", [None, "player_1", "player_2"])
+@pytest.mark.parametrize("counts", [(0, 0), (0, 3), (3, 0), (9, 10)])
+def test_real_enrico_both_hands_land_in_trash_before_any_draw(viewer, counts):
+    from tests.test_enrico_hand_reset import enrico_session
+    from tests.test_public_base_rules import choose_kind
+    from zz.multiplayer.views import build_player_view
+
+    session, source, originals = enrico_session(*counts)
+    before = session.state_dto()
+    if viewer:
+        before = build_player_view(session, player_id=viewer, revision=0, state_hash="before")
+    after = choose_kind(session, "play_card", iid=source.iid)
+    assert after["error"] is None
+    if viewer:
+        after = build_player_view(session, player_id=viewer, revision=1, state_hash="after",
+                                  animation_events=after["animationEvents"])
+    _run("const packet = " + json.dumps([before, after, originals], ensure_ascii=True) + r""";
+state = packet[0]; stageDuelState(packet[1]); check();
+while (activeAnimationEvent || animationEventQueue.length) {
+  if (activeAnimationEvent?.type === 'draw') {
+    for (const player of players()) {
+      const originalIds = packet[2][player.side];
+      assert.ok(player.hand.every(card => !originalIds.includes(card.iid)), 'old hand still present at draw');
+      assert.deepEqual(player.trash.map(card => card.iid), originalIds, 'all old hands must land in Trash before any draw');
+    }
+  }
+  tick();
+}
+check();
+assert.deepEqual(state, packet[1]);
+assert.equal(state.players.human.handCount, 5);
+assert.equal(state.players.opponent.handCount, 5);
+for (const snapshot of snapshots) {
+  for (const player of [snapshot.players.human, snapshot.players.opponent]) {
+    const finalPlayer = [packet[1].players.human, packet[1].players.opponent].find(owner => owner.side === player.side);
+    const newIds = finalPlayer.hand.filter(card => card.iid != null).map(card => card.iid);
+    const hasNewCards = player.hand.some(card => newIds.includes(card.iid));
+    if (hasNewCards) {
+      for (const owner of [snapshot.players.human, snapshot.players.opponent]) {
+        assert.deepEqual(owner.trash.map(card => card.iid), packet[2][owner.side]);
+      }
+    }
+  }
+  if (packet[1].mode === 'multiplayer') {
+    for (const card of snapshot.players.opponent.hand) {
+      assert.equal(card.faceDown, true);
+      assert.equal(card.iid, undefined);
+      assert.equal(card.cardId, undefined);
+    }
+  }
+}
+""")
+
+
+def test_real_enrico_full_hands_never_render_over_capacity():
+    from tests.test_enrico_hand_reset import enrico_session
+    from tests.test_public_base_rules import choose_kind
+
+    session, source, _ = enrico_session(9, 10)
+    before = session.state_dto()
+    after = choose_kind(session, "play_card", iid=source.iid)
+    assert after["error"] is None
+    _run("const packet = " + json.dumps([before, after], ensure_ascii=True) + r""";
+state = packet[0]; stageDuelState(packet[1]); check(); drain(); check();
+assert.deepEqual(state, packet[1]);
+""")
+
+
 def test_departure_animation_keeps_measured_source_position_after_zone_removal():
     _run(r"""
 const old = card(1), next = card(1, 'base');

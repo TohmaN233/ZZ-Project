@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import secrets
 from collections.abc import Callable, Mapping
+from copy import deepcopy
 from dataclasses import dataclass
 from threading import Lock
 from typing import Any
@@ -23,6 +25,7 @@ from zz.multiplayer.protocol import (
     serialize_server_message,
 )
 from zz.multiplayer.service import MultiplayerServer
+from zz.multiplayer.views import fit_player_log_page, fit_player_view_log_history
 
 
 @dataclass(frozen=True)
@@ -34,7 +37,7 @@ class WebSocketServerConfig:
     heartbeat_interval_seconds: float = 20.0
     heartbeat_timeout_seconds: float = 20.0
     close_timeout_seconds: float = 10.0
-    reconnect_grace_seconds: float = 90.0
+    reconnect_grace_seconds: float = 600.0
     allowed_origins: tuple[str | None, ...] | None = None
 
     def __post_init__(self) -> None:
@@ -108,11 +111,26 @@ class WebSocketMultiplayerGateway:
         registered = False
 
         def emit(message: Mapping[str, Any]) -> None:
-            outgoing = dict(message)
+            outgoing = deepcopy(dict(message))
             if outgoing.get("type") == "WELCOME":
                 payload = dict(outgoing.get("payload") or {})
                 payload["compatibility"] = compatibility_payload()
                 outgoing["payload"] = payload
+            payload = outgoing.get("payload")
+            view = payload.get("view") if isinstance(payload, dict) else None
+            if (isinstance(view, dict) and "logEvents" in view) or outgoing.get("type") == "LOG_HISTORY":
+                def wire_bytes(value: Any) -> int:
+                    return len(json.dumps(value, ensure_ascii=False, separators=(",", ":"),
+                                          allow_nan=False).encode("utf-8"))
+
+                if outgoing.get("type") == "LOG_HISTORY":
+                    fit_player_log_page(payload, max_message_bytes=self.config.max_message_bytes,
+                                        envelope_bytes=wire_bytes(outgoing) - wire_bytes(payload))
+                else:
+                    fit_player_view_log_history(
+                        view, max_message_bytes=self.config.max_message_bytes,
+                        envelope_bytes=wire_bytes(outgoing) - wire_bytes(view),
+                    )
             encoded = serialize_server_message(
                 outgoing,
                 max_bytes=self.config.max_message_bytes,
@@ -205,7 +223,7 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=32145)
     parser.add_argument("--max-message-bytes", type=int, default=MAX_MESSAGE_BYTES)
-    parser.add_argument("--reconnect-grace-seconds", type=float, default=90.0)
+    parser.add_argument("--reconnect-grace-seconds", type=float, default=600.0)
     args = parser.parse_args()
     gateway = WebSocketMultiplayerGateway(config=WebSocketServerConfig(
         host=args.host,

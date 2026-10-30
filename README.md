@@ -14,9 +14,9 @@
 
 ## 安装
 
-v0.5.2 的 Windows 版将卡组保存在安装目录的 `data/decks/`。首次启动时会从旧的 `%APPDATA%\zenonzard-clone\game-data\decks\` 迁移卡组，保留原文件作为备份，且不会覆盖冲突卡组。换手时选牌不再遮挡邻牌，启动失败时会显示诊断信息；为保护玩家数据，卸载时可能保留部分程序资源。联机握手要求双方客户端与所连接服务器的 `applicationVersion` 完全相同；连接前请确认三方版本一致。v0.5.1 的一键将当前卡组编辑器重置为空白新卡组的操作仍会保留已保存卡组，并保留卡牌检索、规则结算、Force 搜索和对战视觉反馈改进；本版本也继续包含 v0.5.0 加入的 EX02C/SAO 70 张卡（含 2 张 CAMPAIGN 卡）及其对应的 EX02 原版卡面。
+v0.5.3 的 Windows 版继续将卡组保存在安装目录的 `data/decks/`。首次启动时会从旧的 `%APPDATA%\zenonzard-clone\game-data\decks\` 迁移卡组，保留原文件作为备份，且不会覆盖冲突卡组。圣之 Force 会保护符合条件的己方怪物，使其不会被通过加护赋予对手怪物的选择效果选中；恩里科效果为双方先弃牌、再抽牌。联机断线后最多自动重连 5 次，并保留房间码；对局中的战斗日志和结果页日志均支持分页查看。联机双方客户端与服务器版本必须一致；v0.5.3 客户端需要连接 v0.5.3 服务器。此前版本的换手选牌显示和启动诊断、卡牌与 Force 搜索及 EX02C/SAO 卡池也继续包含在内。
 
-[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/SHA256SUMS-PC02.txt)
+[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Multiplayer-v0.5.3.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/SHA256SUMS-PC02.txt)
 
 Windows 玩家使用安装包，Linux 玩家使用便携包；macOS 玩家和开发者使用源码包。完整步骤见[安装说明](INSTALL.md)。
 

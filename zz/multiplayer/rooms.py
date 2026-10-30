@@ -38,6 +38,7 @@ class RoomPlayer:
     is_host: bool
     joined_at: float
     reconnect_token: str | None = field(default=None, repr=False)
+    previous_reconnect_token: str | None = field(default=None, repr=False)
     connected: bool = True
     disconnected_at: float | None = None
     deck_recipe: dict[str, int] | None = field(default=None, repr=False)
@@ -293,10 +294,13 @@ class Room:
             self._raise_invalid_status("reconnect")
         player = self.player_for_id(player_id)
         current_token = player.reconnect_token
+        valid_tokens = (current_token, player.previous_reconnect_token)
         if (
             not isinstance(reconnect_token, str)
-            or current_token is None
-            or not secrets.compare_digest(current_token, reconnect_token)
+            or not any(
+                token is not None and secrets.compare_digest(token, reconnect_token)
+                for token in valid_tokens
+            )
         ):
             raise RoomError(
                 "INVALID_RECONNECT_TOKEN",
@@ -316,17 +320,37 @@ class Room:
                 "CONNECTION_ALREADY_OWNED",
                 "connection already owns a room seat",
             )
+        # Keep a single unconfirmed candidate across retries. Discarding the old
+        # credential before the new one reaches durable client storage strands a
+        # seat when the recovery response or client process is lost.
+        if player.previous_reconnect_token is None:
+            candidate = self._new_reconnect_token(exclude=current_token)
+            player.previous_reconnect_token = current_token
+            player.reconnect_token = candidate
         player.connection_id = connection_id
-        player.reconnect_token = self._new_reconnect_token(exclude=current_token)
         player.connected = True
         player.disconnected_at = None
         self._touch()
         return player
 
+    def confirm_reconnect(self, connection_id: str, reconnect_token: str) -> None:
+        player = self.player_for_connection(connection_id)
+        if (
+            not player.connected
+            or player.reconnect_token is None
+            or not secrets.compare_digest(player.reconnect_token, reconnect_token)
+        ):
+            raise RoomError("INVALID_RECONNECT_TOKEN", "persisted reconnect credential is not current")
+        # Idempotent if the ACK is repeated after its response or socket is lost.
+        if player.previous_reconnect_token is not None:
+            player.previous_reconnect_token = None
+            self._touch()
+
     def expire_reconnect(self, player_id: str) -> RoomPlayer:
         player = self.player_for_id(player_id)
-        if player.reconnect_token is not None:
+        if player.reconnect_token is not None or player.previous_reconnect_token is not None:
             player.reconnect_token = None
+            player.previous_reconnect_token = None
             self._touch()
         return player
 
@@ -337,6 +361,7 @@ class Room:
             self._raise_invalid_status("close an active room")
         for player in self._players:
             player.reconnect_token = None
+            player.previous_reconnect_token = None
         self.status = RoomStatus.CLOSED
         self._touch()
         self.closed_at = self.updated_at
@@ -411,9 +436,10 @@ class Room:
 
     def _new_reconnect_token(self, *, exclude: str | None = None) -> str:
         existing = {
-            player.reconnect_token
+            token
             for player in self._players
-            if player.reconnect_token is not None
+            for token in (player.reconnect_token, player.previous_reconnect_token)
+            if token is not None
         }
         if exclude is not None:
             existing.add(exclude)

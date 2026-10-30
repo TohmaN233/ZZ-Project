@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import time
 from contextlib import contextmanager
 from threading import Thread
+from pathlib import Path
 
 import pytest
 from websockets.sync.client import connect as websocket_connect
@@ -48,6 +50,59 @@ def test_gateway_applies_configured_reconnect_grace_to_default_core() -> None:
     ))
 
     assert gateway.core.reconnect_grace_seconds == 37.5
+
+
+def test_gateway_default_reserves_disconnected_seats_for_ten_minutes() -> None:
+    gateway = WebSocketMultiplayerGateway()
+    assert gateway.config.reconnect_grace_seconds == 600
+    assert gateway.core.reconnect_grace_seconds == 600
+
+
+def test_electron_client_recovers_lost_rotation_frames_and_confirms_only_after_disk_write() -> None:
+    core = MultiplayerServer(room_code_factory=lambda: "RC1234", seed_factory=lambda: 911)
+    messages: dict[str, list[dict]] = {"a": [], "b": []}
+    for connection in messages:
+        core.connect(connection, messages[connection].append)
+    message_id = 0
+
+    def send(connection: str, kind: str, payload: dict) -> None:
+        nonlocal message_id
+        message_id += 1
+        core.receive(connection, {
+            "protocolVersion": PROTOCOL_VERSION, "messageId": f"setup-{message_id}",
+            "type": kind, "payload": payload,
+        })
+
+    send("a", "CREATE_ROOM", {})
+    send("b", "JOIN_ROOM", {"roomCode": "RC1234"})
+    for connection, deck, forces in [
+        ("a", KANATANA_YELLOW_RECIPE, DECKCODE0_YELLOW_FORCES),
+        ("b", DEMETE_GREEN_RECIPE, DECKCODE0_GREEN_FORCES),
+    ]:
+        send(connection, "SELECT_DECK", {"deck": deck, "forces": forces})
+        send(connection, "SET_READY", {"ready": True})
+    send("a", "SELECT_OPENING_CHOICE", {"choice": "rock"})
+    send("b", "SELECT_OPENING_CHOICE", {"choice": "scissors"})
+    room = core.room_for_code("RC1234")
+    match = core.match_for_room("RC1234")
+    token = room.host.reconnect_token
+    core.disconnect("a")
+    root = Path(__file__).resolve().parents[1]
+    with _running_gateway(core) as url:
+        result = subprocess.run(
+            ["node", str(root / "tests" / "electron_reconnect_gateway_harness.js")],
+            input=json.dumps({
+                "url": url, "roomCode": "RC1234", "playerId": "player_1",
+                "matchId": match.match_id, "reconnectToken": token, "pendingAction": None,
+            }),
+            text=True, capture_output=True, cwd=root, timeout=15,
+        )
+        assert token not in result.stdout + result.stderr
+        assert result.returncode == 0, result.stderr
+        assert json.loads(result.stdout) == {
+            "recovered": True, "droppedResponses": 3, "durableConfirmation": True,
+        }
+        assert core.match_for_room("RC1234") is match
 
 
 @contextmanager

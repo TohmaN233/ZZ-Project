@@ -279,6 +279,27 @@ def test_invalid_welcome_compatibility_is_rejected_without_recording_connection_
     assert private_connection_id not in json.dumps(report)
 
 
+@pytest.mark.parametrize("capability", [True, False, "true", None, 1])
+def test_welcome_reconnect_confirmation_capability_is_a_strict_optional_boolean(capability: Any) -> None:
+    class WelcomeSocket:
+        def send(self, _message: str) -> None:
+            pass
+
+        def recv(self, *, timeout: float) -> str:
+            return json.dumps({
+                "protocolVersion": MANIFEST["protocolVersion"], "messageId": "welcome-1", "type": "WELCOME",
+                "payload": {"connectionId": "test-connection", "compatibility": MANIFEST,
+                            "recoveryPersistenceAck": capability},
+            })
+
+    if type(capability) is bool:
+        assert diagnostic._hello(WelcomeSocket(), MANIFEST, 1, progress=None) == {"compatibilityMatches": True}
+    else:
+        with pytest.raises(diagnostic.ProbeFailure) as error:
+            diagnostic._hello(WelcomeSocket(), MANIFEST, 1, progress=None)
+        assert error.value.code == "INVALID_WELCOME"
+
+
 def test_heartbeat_timeout_records_partial_rtt_and_close_evidence() -> None:
     class PendingPong:
         def wait(self, _timeout: float) -> bool:

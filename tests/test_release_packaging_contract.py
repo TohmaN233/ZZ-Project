@@ -11,6 +11,17 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ReleasePackagingContractTests(unittest.TestCase):
+    def test_public_asset_manifest_matches_desktop_download_source(self) -> None:
+        package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
+        source = json.loads((PROJECT_ROOT / "electron/asset-source.json").read_text(encoding="utf-8"))
+        manifest = json.loads((PROJECT_ROOT / "ASSET_PACK_MANIFEST.json").read_text(encoding="utf-8"))
+        self.assertEqual(manifest["release"], f"v{package['version']}")
+        self.assertEqual(manifest["archive"], source["fileName"])
+        self.assertEqual(manifest["archiveBytes"], source["sizeBytes"])
+        self.assertEqual(manifest["expandedBytes"], source["expandedBytes"])
+        self.assertEqual(manifest["fileId"], source["fileId"])
+        self.assertEqual(manifest["distribution"]["url"], source["folderUrl"])
+
     def test_home_background_is_present_and_packaged(self) -> None:
         home_image = PROJECT_ROOT / "image.png"
         self.assertTrue(home_image.is_file())

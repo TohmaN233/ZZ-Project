@@ -42,6 +42,7 @@ def build_card(row: dict[str, Any]):
             max_targets=1,
             exclude_color=Color.COLORLESS,
             active_areas=(AreaType.BLESSING,),
+            granted_by_blessing=True,
             official_effect="相手の有色のミニオン1体をレストする。",
             official_timing="アタック時",
         )

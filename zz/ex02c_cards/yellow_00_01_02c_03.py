@@ -47,6 +47,7 @@ def build_card(row: dict[str, Any]):
             official_effect="相手のBP400以下のミニオン1体を手札に戻す。",
             official_timing="アタック時",
             active_areas=(AreaType.BLESSING,),
+            granted_by_blessing=True,
         ),
         build_effect(
             "return_to_hand",
@@ -59,6 +60,7 @@ def build_card(row: dict[str, Any]):
             official_effect="相手のBP400以下のミニオン1体を手札に戻す。",
             official_timing="ブロック時",
             active_areas=(AreaType.BLESSING,),
+            granted_by_blessing=True,
         ),
     ])
     return card

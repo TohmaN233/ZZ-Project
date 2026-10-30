@@ -39,6 +39,7 @@ def build_card(row: dict[str, Any]):
             fn=_heal_one_force,
             condition=_this_boosted_minion_damaged_on_own_turn,
             active_areas=(AreaType.BLESSING,),
+            params={"granted_by_blessing": True},
             target_kind="ally_force",
             official_effect="自分のターン中、付与先のミニオンがダメージを与えるたび、自分のフォース1つを1回復する",
             official_timing="自分のターン中のダメージ時",

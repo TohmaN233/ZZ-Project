@@ -5,6 +5,9 @@ const Module = require("node:module");
 const path = require("node:path");
 const { test } = require("node:test");
 const { buildSync } = require("esbuild");
+const { readFileSync } = require("node:fs");
+const { once } = require("node:events");
+const { WebSocket, WebSocketServer } = require("ws");
 
 const {
   LOCAL_COMPATIBILITY,
@@ -247,6 +250,64 @@ test("opening choice is allowed only while the match is starting", () => {
     payload: { choice: "rock" },
   });
   assert.throws(() => client.selectOpeningChoice({ choice: "fire" }), /rock, paper, or scissors/);
+});
+
+test("history pages use capability-gated cursors and cannot replace board or pending actions", () => {
+  const { client, socket } = makeClient();
+  connectClient(client, socket);
+  enterRoom(client, socket);
+  startMatch(client, socket, 4);
+  assert.throws(() => client.requestLogHistory({ matchId: "match-1", beforeEventIndex: 4 }), /does not support/);
+  socket().receive(serverMessage("STATE_SNAPSHOT", {
+    matchId: "match-1", view: { revision: 4, logHistory: { canPage: true, latestEventIndex: 9 } },
+  }));
+  client.submitAction({ action: { kind: "CHOOSE_PROMPT_OPTION", promptId: "p", optionId: "keep", payload: {} } });
+  const board = client.view;
+  const pending = client.pendingAction;
+  client.requestLogHistory({ matchId: "match-1", beforeEventIndex: 4 });
+  assert.deepEqual(JSON.parse(socket().sent.at(-1)).payload, { matchId: "match-1", beforeEventIndex: 4 });
+  assert.equal(JSON.parse(socket().sent.at(-1)).type, "REQUEST_LOG_HISTORY");
+  const page = { matchId: "match-1", beforeEventIndex: 4, events: [{ eventIndex: 2 }, { eventIndex: 3 }],
+    hasEarlierEvents: true, firstEventIndex: 2, lastEventIndex: 3 };
+  socket().receive(serverMessage("LOG_HISTORY", page));
+  assert.deepEqual(client.getSnapshot().logHistoryPage, page);
+  assert.deepEqual(client.view, board);
+  assert.deepEqual(client.pendingAction, pending);
+  client.getSnapshot().logHistoryPage.events[0].eventIndex = 99;
+  assert.equal(client.getSnapshot().logHistoryPage.events[0].eventIndex, 2);
+  assert.throws(() => client.requestLogHistory({ matchId: "other-match", beforeEventIndex: 4 }), /current match/);
+  assert.throws(() => client.requestLogHistory({ matchId: "match-1", beforeEventIndex: -1 }), /non-negative/);
+  socket().receive(serverMessage("MATCH_STARTED", {
+    matchId: "match-2", view: { revision: 0, logHistory: { canPage: true } },
+  }));
+  socket().receive(serverMessage("LOG_HISTORY", page));
+  assert.equal(client.getSnapshot().logHistoryPage, null);
+  assert.equal(client.matchId, "match-2");
+  assert.equal(client.view.revision, 0);
+});
+
+test("leaving, suspension, room closure and invalid recovery discard cached history pages", () => {
+  for (const mode of ["leave", "suspend", "closed", "invalid-reconnect"]) {
+    const { client, socket, sockets } = makeClient();
+    connectClient(client, socket);
+    enterRecoverableRoom(client, socket);
+    startMatch(client, socket);
+    socket().receive(serverMessage("LOG_HISTORY", { matchId: "match-1", beforeEventIndex: 1,
+      events: [{ eventIndex: 0 }], firstEventIndex: 0, lastEventIndex: 0, hasEarlierEvents: false }));
+    assert.ok(client.getSnapshot().logHistoryPage);
+    if (mode === "leave") client.leaveRoom();
+    if (mode === "suspend") client.suspend();
+    if (mode === "closed") socket().receive(serverMessage("ROOM_CLOSED", { roomCode: "ABC123" }));
+    if (mode === "invalid-reconnect") {
+      socket().emit("close");
+      client.reconnect();
+      sockets()[1].emit("open");
+      sockets()[1].receive(serverMessage("WELCOME", { connectionId: "new" }));
+      sockets()[1].receive(serverMessage("ERROR", { code: "INVALID_RECONNECT_TOKEN", message: "expired" }));
+    }
+    assert.equal(client.getSnapshot().logHistoryPage, null, mode);
+    client.disconnect();
+  }
 });
 
 test("ready-check after a finished match keeps the result until the player returns", () => {
@@ -605,7 +666,7 @@ test("duplicate seat is retryable while an invalid reconnect token clears recove
   assert.equal(invalid.client.state, MultiplayerClientState.OFFLINE);
   assert.equal(invalid.client.getSnapshot().canReconnect, false);
   assert.equal(invalid.client.getRecoverySession(), null);
-  assert.equal(invalid.client.error, null);
+  assert.equal(invalid.client.error.code, "INVALID_RECONNECT_TOKEN");
 });
 
 test("socket error during a recoverable match starts reconnect instead of dropping the room", () => {
@@ -639,4 +700,270 @@ test("five failed reconnect attempts give up after a recoverable drop", () => {
   assert.equal(client.state, MultiplayerClientState.ERROR);
   assert.equal(client.error.code, "RECONNECT_EXHAUSTED");
   assert.equal(client.getSnapshot().reconnectFailures, 5);
+});
+
+test("each retry has a deadline through the canonical match snapshot and manual retry starts a fresh budget", (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const { client, socket, sockets } = makeClient();
+  connectClient(client, socket);
+  enterRecoverableRoom(client, socket);
+  startMatch(client, socket, 5);
+  socket().emit("close", { code: 1006 });
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    client.reconnect();
+    const retry = sockets().at(-1);
+    retry.emit("open");
+    retry.receive(serverMessage("WELCOME", { connectionId: `retry-${attempt}` }));
+    retry.receive(serverMessage("ROOM_STATE", {
+      roomId: "room-1", roomCode: "ABC123", status: "RUNNING",
+      playerId: "player-1", matchId: "match-1", reconnectToken: `rotated-${attempt}`,
+    }));
+    assert.equal(client.state, MultiplayerClientState.RECONNECTING);
+    assert.equal(client.getSnapshot().canSubmitAction, false);
+    t.mock.timers.tick(10000);
+    assert.equal(client.getSnapshot().reconnectFailures, attempt + 1);
+    assert.equal(retry.closeCalls, 1);
+    assert.equal(client.view.revision, 5);
+  }
+  assert.equal(client.state, MultiplayerClientState.ERROR);
+  assert.equal(client.getSnapshot().recoveryRoomCode, "ABC123");
+  assert.equal(client.getSnapshot().canRetryReconnect, true);
+  assert.equal(client.getSnapshot().reconnectMaxAttempts, 5);
+  client.reconnect();
+  assert.equal(client.getSnapshot().reconnectFailures, 0);
+  sockets().at(-1).emit("close", { code: 1006 });
+  assert.equal(client.state, MultiplayerClientState.RECONNECTING);
+  assert.equal(client.getSnapshot().reconnectFailures, 1);
+  client.disconnect();
+});
+
+test("socket constructor failures consume the five-attempt recovery budget", () => {
+  const client = new MultiplayerDesktopClient({
+    WebSocketImpl: class { constructor() { throw new Error("network unavailable"); } },
+  });
+  client.restoreRecoverySession({
+    url: "ws://example.test", roomCode: "ABC123", playerId: "player-1",
+    matchId: "match-1", reconnectToken: "private-token", pendingAction: null,
+  });
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    assert.throws(() => client.reconnect(), /network unavailable/);
+    assert.equal(client.getSnapshot().reconnectFailures, attempt);
+  }
+  assert.equal(client.state, MultiplayerClientState.ERROR);
+  assert.equal(client.getSnapshot().canRetryReconnect, true);
+});
+
+test("explicit disconnect clears an offline restored credential and leave invalidates recovery immediately", () => {
+  const first = makeClient();
+  connectClient(first.client, first.socket);
+  enterRecoverableRoom(first.client, first.socket);
+  const recovery = first.client.getRecoverySession();
+  first.client.leaveRoom();
+  assert.equal(first.client.getSnapshot().canReconnect, false);
+  const second = makeClient();
+  second.client.restoreRecoverySession(recovery);
+  assert.equal(second.client.getSnapshot().recoveryRoomCode, "ABC123");
+  second.client.disconnect();
+  assert.equal(second.client.getRecoverySession(), null);
+  assert.equal(second.client.getSnapshot().recoveryRoomCode, null);
+});
+
+test("a retry with no WELCOME times out and an incompatible server invalidates recovery", (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  const { client, socket, sockets } = makeClient();
+  connectClient(client, socket);
+  enterRecoverableRoom(client, socket);
+  startMatch(client, socket, 5);
+  socket().emit("close", { code: 1006 });
+  client.reconnect();
+  sockets().at(-1).emit("open");
+  t.mock.timers.tick(10000);
+  assert.equal(client.getSnapshot().reconnectFailures, 1);
+  assert.equal(client.error.causeCode, "RECONNECT_TIMEOUT");
+  client.reconnect();
+  const retry = sockets().at(-1);
+  retry.emit("open");
+  const welcome = serverMessage("WELCOME", {});
+  welcome.payload.compatibility = { ...LOCAL_COMPATIBILITY, applicationVersion: "incompatible" };
+  retry.receive(welcome);
+  assert.equal(client.getSnapshot().canReconnect, false);
+  assert.equal(client.error.code, "INCOMPATIBLE_GAME_VERSION");
+  assert.equal(client.state, MultiplayerClientState.ERROR);
+  assert.equal(retry.closeCalls, 1);
+});
+
+test("real socket close drives main's five automatic retries and preserves the seat for manual recovery", { timeout: 5000 }, async (t) => {
+  const server = new WebSocketServer({ host: "127.0.0.1", port: 0 });
+  await once(server, "listening");
+  const client = new MultiplayerDesktopClient({ WebSocketImpl: WebSocket });
+  t.after(async () => {
+    client.disconnect();
+    for (const socket of server.clients) socket.terminate();
+    await new Promise((resolve) => server.close(resolve));
+  });
+  let mode = "initial";
+  let acceptedSocket;
+  let connectionCount = 0;
+  const commands = [];
+  server.on("connection", (socket) => {
+    connectionCount += 1;
+    if (mode === "offline") { socket.terminate(); return; }
+    acceptedSocket = socket;
+    socket.on("message", (raw) => {
+      const message = JSON.parse(raw.toString());
+      commands.push(message);
+      if (message.type === "HELLO") {
+        socket.send(JSON.stringify(serverMessage("WELCOME", { connectionId: `connection-${connectionCount}` })));
+        if (mode === "initial") {
+          socket.send(JSON.stringify(serverMessage("ROOM_STATE", {
+            roomId: "room-real", roomCode: "ABC123", status: "RUNNING",
+            playerId: "player-1", matchId: "match-real", reconnectToken: "private-real-token",
+          })));
+          socket.send(JSON.stringify(serverMessage("MATCH_STARTED", {
+            playerId: "player-1", matchId: "match-real", view: { revision: 6, gameOver: false },
+          })));
+        }
+      } else if (message.type === "RECONNECT") {
+        assert.deepEqual(message.payload, {
+          roomCode: "ABC123", playerId: "player-1", reconnectToken: "private-real-token",
+        });
+        socket.send(JSON.stringify(serverMessage("ROOM_STATE", {
+          roomId: "room-real", roomCode: "ABC123", status: "RUNNING",
+          playerId: "player-1", matchId: "match-real", reconnectToken: "private-rotated-token",
+        })));
+        socket.send(JSON.stringify(serverMessage("STATE_SNAPSHOT", {
+          playerId: "player-1", matchId: "match-real", view: { revision: 6, gameOver: false },
+        })));
+      }
+    });
+  });
+  const nextEvent = (predicate) => new Promise((resolve) => {
+    const unsubscribe = client.onEvent((event) => {
+      if (predicate(event)) { unsubscribe(); resolve(event); }
+    });
+  });
+  let ready = nextEvent((event) => event.snapshot.state === "IN_MATCH");
+  client.connect({ url: `ws://127.0.0.1:${server.address().port}` });
+  await ready;
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  // Run the actual Electron main scheduler, with only its unrelated app globals removed.
+  const source = readFileSync(path.join(__dirname, "../electron/main.js"), "utf8");
+  const schedulerSource = source.slice(source.indexOf("function scheduleMultiplayerReconnect()"), source.indexOf("function syncLanAdvertisement()"));
+  assert.match(schedulerSource, /function scheduleMultiplayerReconnect/);
+  const schedule = new Function("multiplayerClient", "appendLog", `
+    let multiplayerReconnectTimer = null;
+    const multiplayerReconnectDelayMs = 1000;
+    ${schedulerSource}
+    return scheduleMultiplayerReconnect;
+  `)(client, () => {});
+  const publicEvents = [];
+  const lifecycleLogs = [];
+  const broadcastSource = source.slice(source.indexOf("function broadcastMultiplayerEvent(event)"), source.indexOf("multiplayerClient.onEvent(broadcastMultiplayerEvent)"));
+  const broadcast = new Function("multiplayerClient", "scheduleMultiplayerReconnect", "appendLog", `
+    const syncLanAdvertisement = () => {};
+    const queueMultiplayerRecoveryWrite = () => {};
+    const multiplayerSnapshot = () => multiplayerClient.getSnapshot();
+    const mainWindow = null;
+    ${broadcastSource}
+    return broadcastMultiplayerEvent;
+  `)(client, schedule, (line) => lifecycleLogs.push(line));
+  client.onEvent((event) => { publicEvents.push(event); broadcast(event); });
+  mode = "offline";
+  ready = nextEvent((event) => event.snapshot.state === "RECONNECTING");
+  acceptedSocket.terminate();
+  await ready;
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    ready = nextEvent((event) => event.type === "RECONNECT_FAILED" && event.snapshot.reconnectFailures === attempt);
+    t.mock.timers.tick(1000);
+    await ready;
+    assert.equal(client.view.revision, 6);
+    assert.equal(client.room.roomCode, "ABC123");
+  }
+  assert.equal(client.state, "ERROR");
+  assert.equal(client.error.code, "RECONNECT_EXHAUSTED");
+  assert.equal(connectionCount, 6);
+  t.mock.timers.tick(100000);
+  assert.equal(connectionCount, 6);
+  assert.equal(client.getSnapshot().canRetryReconnect, true);
+  mode = "recovered";
+  ready = nextEvent((event) => event.snapshot.state === "IN_MATCH");
+  client.reconnect();
+  await ready;
+  assert.equal(client.matchId, "match-real");
+  assert.equal(client.playerId, "player-1");
+  assert.equal(client.view.revision, 6);
+  assert.equal(client.getSnapshot().reconnectFailures, 0);
+  assert.equal(client.getRecoverySession().reconnectToken, "private-rotated-token");
+  assert.equal(commands.filter((command) => command.type === "RECONNECT").length, 1);
+  assert.doesNotMatch(JSON.stringify(publicEvents), /private-real-token|private-rotated-token/);
+  assert.doesNotMatch(lifecycleLogs.join("\n"), /private-real-token|private-rotated-token/);
+  assert.ok(lifecycleLogs.some((line) => line.includes("reconnectFailures=5/5")));
+});
+
+test("private durable confirmation is capability-gated, current-session-only and idempotent", () => {
+  const { client, socket } = makeClient();
+  const events = [];
+  client.onEvent((event) => events.push(event));
+  connectClient(client, socket);
+  enterRecoverableRoom(client, socket);
+  const persisted = client.getRecoverySession();
+  // Existing deployments don't advertise this command and must never receive it.
+  assert.equal(client.acknowledgeRecoveryPersisted(persisted), false);
+  socket().receive(serverMessage("WELCOME", { connectionId: "connection-1", recoveryPersistenceAck: true }));
+  assert.equal(client.acknowledgeRecoveryPersisted({ ...persisted, reconnectToken: "stale-token" }), false);
+  assert.equal(client.acknowledgeRecoveryPersisted(persisted), true);
+  assert.deepEqual(JSON.parse(socket().sent.at(-1)).payload, { reconnectToken: "token-1" });
+  assert.equal(JSON.parse(socket().sent.at(-1)).type, "CONFIRM_RECONNECT");
+  assert.equal(client.acknowledgeRecoveryPersisted(persisted), false);
+  assert.equal(socket().sent.filter((raw) => JSON.parse(raw).type === "CONFIRM_RECONNECT").length, 1);
+  assert.equal(JSON.stringify(events).includes("token-1"), false);
+  client.disconnect();
+  assert.equal(client.acknowledgeRecoveryPersisted(persisted), false);
+});
+
+test("main confirms recovery only after flushed write and rename; failed writes keep old credentials usable", async () => {
+  const source = readFileSync(path.join(__dirname, "../electron/main.js"), "utf8");
+  const writeSource = source.slice(source.indexOf("function queueMultiplayerRecoveryWrite()"), source.indexOf("async function restoreMultiplayerRecovery()"));
+  const recovery = { reconnectToken: "private-persisted-token" };
+  const operations = [];
+  const logs = [];
+  let releaseWrite;
+  let failRename = false;
+  const filesystem = {
+    mkdir: async () => {},
+    writeFile: async (_filename, contents, options) => {
+      assert.equal(options.flush, true);
+      assert.equal(JSON.parse(contents).reconnectToken, recovery.reconnectToken);
+      operations.push("write");
+      await new Promise((resolve) => { releaseWrite = resolve; });
+    },
+    rename: async () => {
+      if (failRename) throw new Error("disk write failed");
+      operations.push("rename");
+    },
+  };
+  const client = {
+    getRecoverySession: () => recovery,
+    acknowledgeRecoveryPersisted: (session) => { assert.deepEqual(session, recovery); operations.push("ack"); },
+  };
+  const queueWrite = new Function("multiplayerClient", "fs", "path", "multiplayerRecoveryPath", "appendLog", `
+    let multiplayerRecoveryWrite = Promise.resolve();
+    ${writeSource}
+    return queueMultiplayerRecoveryWrite;
+  `)(client, filesystem, path, "/private/recovery.json", (line) => logs.push(line));
+  let pending = queueWrite();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(operations, ["write"]);
+  releaseWrite();
+  await pending;
+  assert.deepEqual(operations, ["write", "rename", "ack"]);
+  operations.length = 0;
+  failRename = true;
+  pending = queueWrite();
+  await new Promise((resolve) => setImmediate(resolve));
+  releaseWrite();
+  await pending;
+  assert.deepEqual(operations, ["write"]);
+  assert.ok(logs.some((line) => line.includes("recovery write failed")));
+  assert.doesNotMatch(logs.join("\n"), /private-persisted-token/);
 });

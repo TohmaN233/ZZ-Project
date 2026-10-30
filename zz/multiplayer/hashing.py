@@ -86,6 +86,10 @@ def _runtime_value(value: Any) -> Any:
             "attackTarget": _runtime_value(value.attack_target),
             "switchSource": _runtime_value(value.switch_source),
             "battleParticipants": _runtime_value(value.battle_participants),
+            "effectCarrier": _runtime_value(value.effect_carrier),
+            "effectSource": _runtime_value(value.effect_source),
+            "effectSourceArea": _runtime_value(value.effect_source_area),
+            "blessingDestroyEffects": _runtime_value(value.blessing_destroy_effects),
             "preTargetEffectsApplied": _runtime_value(getattr(value, "_pre_target_effects_applied", [])),
         }
     if isinstance(value, Mapping):

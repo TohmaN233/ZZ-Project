@@ -38,12 +38,14 @@ const ROOM_COMMAND_STATES = new Set([
 ]);
 
 const MAX_RECONNECT_FAILURES = 5;
+const RECONNECT_TIMEOUT_MS = 10000;
 
 const SERVER_MESSAGE_TYPES = new Set([
   "WELCOME",
   "ROOM_STATE",
   "MATCH_STARTED",
   "STATE_SNAPSHOT",
+  "LOG_HISTORY",
   "ACTION_RESULT",
   "ERROR",
   "ROOM_CLOSED",
@@ -58,11 +60,15 @@ class MultiplayerDesktopClient {
   #listeners = new Set();
   #room = null;
   #view = null;
+  #logHistoryPage = null;
   #error = null;
   #pendingAction = null;
   #recovery = null;
   #pendingActionNeedsReplay = false;
   #reconnectFailures = 0;
+  #reconnectTimer = null;
+  #recoveryPersistenceAckSupported = false;
+  #confirmedRecoveryToken = null;
 
   constructor({ WebSocketImpl = globalThis.WebSocket, uuidFactory = randomUUID } = {}) {
     if (typeof WebSocketImpl !== "function") {
@@ -115,17 +121,37 @@ class MultiplayerDesktopClient {
       matchId: this.matchId,
       room: cloneJson(this.#room),
       view: cloneJson(this.#view),
+      logHistoryPage: this.#logHistoryPage?.matchId === this.matchId ? cloneJson(this.#logHistoryPage) : null,
       error: cloneJson(this.#error),
       pendingAction: cloneJson(this.#pendingAction),
       canSubmitAction: this.canSubmitAction,
       canReconnect: this.#recovery !== null,
+      recoveryRoomCode: this.#recovery?.roomCode || null,
+      canRetryReconnect: this.#recovery !== null && this.#socket === null
+        && [MultiplayerClientState.OFFLINE, MultiplayerClientState.ERROR].includes(this.state),
       reconnectAttemptActive: this.state === MultiplayerClientState.RECONNECTING && this.#socket !== null,
       reconnectFailures: this.#reconnectFailures,
+      reconnectMaxAttempts: MAX_RECONNECT_FAILURES,
     };
   }
 
   getRecoverySession() {
     return cloneJson(this.#recovery);
+  }
+
+  acknowledgeRecoveryPersisted(session) {
+    if (!this.#recoveryPersistenceAckSupported || this.#socket === null || this.#recovery === null) return false;
+    if (!session || ["url", "roomCode", "playerId", "reconnectToken"].some((key) => session[key] !== this.#recovery[key])) return false;
+    if (this.#confirmedRecoveryToken === session.reconnectToken) return false;
+    const socket = this.#socket;
+    try {
+      this.#sendCommand("CONFIRM_RECONNECT", { reconnectToken: session.reconnectToken });
+      this.#confirmedRecoveryToken = session.reconnectToken;
+    } catch (error) {
+      this.#failConnection(socket, "RECOVERY_CONFIRM_FAILED", error);
+      throw error;
+    }
+    return true;
   }
 
   restoreRecoverySession(session) {
@@ -184,9 +210,12 @@ class MultiplayerDesktopClient {
     if (![MultiplayerClientState.OFFLINE, MultiplayerClientState.RECONNECTING, MultiplayerClientState.ERROR].includes(this.state)) {
       throw new Error(`client cannot reconnect from ${this.state}`);
     }
+    if (this.state !== MultiplayerClientState.RECONNECTING) this.#reconnectFailures = 0;
     this.url = this.#recovery.url;
     this.#error = null;
     this.#helloSent = false;
+    this.#recoveryPersistenceAckSupported = false;
+    this.#confirmedRecoveryToken = null;
     this.#pendingActionNeedsReplay = this.#pendingAction !== null;
     this.#setState(MultiplayerClientState.RECONNECTING);
     let socket;
@@ -195,24 +224,33 @@ class MultiplayerDesktopClient {
       this.#assertSocket(socket);
       this.#socket = socket;
       this.#attachSocketListeners(socket);
+      this.#reconnectTimer = setTimeout(() => {
+        if (socket === this.#socket) {
+          this.#failConnection(socket, "RECONNECT_TIMEOUT", new Error("Reconnect handshake timed out"));
+        }
+      }, RECONNECT_TIMEOUT_MS);
+      this.#reconnectTimer.unref?.();
     } catch (error) {
       this.#socket = null;
       this.#socketListeners = null;
       this.#recordError("RECONNECT_FAILED", error);
-      this.#emitEvent("RECONNECT_FAILED");
+      this.#registerReconnectFailure();
       throw error;
     }
     return this.getSnapshot();
   }
 
   disconnect({ preserveRecovery = false } = {}) {
-    if (this.state === MultiplayerClientState.OFFLINE && this.#socket === null) {
+    if (this.state === MultiplayerClientState.OFFLINE && this.#socket === null && this.#recovery === null) {
       return this.getSnapshot();
     }
+    this.#clearReconnectTimer();
     const socket = this.#socket;
     this.#detachSocketListeners(socket);
     this.#socket = null;
     this.#helloSent = false;
+    this.#recoveryPersistenceAckSupported = false;
+    this.#confirmedRecoveryToken = null;
     if (socket !== null) {
       socket.close();
     }
@@ -222,6 +260,7 @@ class MultiplayerDesktopClient {
     this.matchId = preserveRecovery && this.#recovery ? this.#recovery.matchId : null;
     this.#room = null;
     this.#view = null;
+    this.#logHistoryPage = null;
     this.#error = null;
     this.#pendingAction = preserveRecovery && this.#recovery
       ? cloneJson(this.#recovery.pendingAction)
@@ -230,6 +269,7 @@ class MultiplayerDesktopClient {
     this.#reconnectFailures = 0;
     if (!preserveRecovery) this.#clearRecovery();
     this.#setState(MultiplayerClientState.OFFLINE);
+    this.#emitEvent("DISCONNECTED");
     return this.getSnapshot();
   }
 
@@ -329,9 +369,18 @@ class MultiplayerDesktopClient {
     this.#sendCommand("REQUEST_SYNC", payload);
   }
 
+  requestLogHistory({ matchId, beforeEventIndex } = {}) {
+    this.#requireState("REQUEST_LOG_HISTORY", ROOM_COMMAND_STATES);
+    if (!this.#view || this.#view.logHistory?.canPage !== true) throw new Error("server does not support log history paging");
+    if (matchId !== this.matchId) throw new Error("log history matchId must match the current match");
+    if (!Number.isSafeInteger(beforeEventIndex) || beforeEventIndex < 0) throw new TypeError("beforeEventIndex must be a non-negative integer");
+    this.#sendCommand("REQUEST_LOG_HISTORY", { matchId, beforeEventIndex });
+  }
+
   dismissMatchResult() {
     if (this.#view && this.#view.gameOver) {
       this.#view = null;
+      this.#logHistoryPage = null;
       this.#pendingAction = null;
       this.#pendingActionNeedsReplay = false;
     }
@@ -344,6 +393,8 @@ class MultiplayerDesktopClient {
   leaveRoom() {
     this.#requireState("LEAVE_ROOM", ROOM_COMMAND_STATES);
     this.#sendCommand("LEAVE_ROOM", {});
+    this.#clearRecovery();
+    this.#emitEvent("LEAVE_REQUESTED");
   }
 
   #assertSocket(socket) {
@@ -428,6 +479,7 @@ class MultiplayerDesktopClient {
     if (socket !== this.#socket) return;
     const code = event && Number.isInteger(event.code) ? event.code : null;
     const reason = event && typeof event.reason === "string" ? event.reason : "";
+    this.#clearReconnectTimer();
     this.#detachSocketListeners(socket);
     this.#socket = null;
     this.#helloSent = false;
@@ -446,13 +498,18 @@ class MultiplayerDesktopClient {
   }
 
   #failConnection(socket, code, error) {
+    this.#clearReconnectTimer();
     this.#detachSocketListeners(socket);
     if (this.#socket === socket) this.#socket = null;
     this.#helloSent = false;
     try {
       socket.close();
     } finally {
-      if (this.#recovery !== null) {
+      if (code === "INCOMPATIBLE_GAME_VERSION") {
+        this.#clearRoomSession();
+        this.#recordError(code, error);
+        this.#setState(MultiplayerClientState.ERROR);
+      } else if (this.#recovery !== null) {
         this.#recordError("RECONNECT_REQUIRED", error, { causeCode: code });
         if (this.state !== MultiplayerClientState.RECONNECTING) {
           this.#setState(MultiplayerClientState.RECONNECTING);
@@ -477,6 +534,10 @@ class MultiplayerDesktopClient {
     switch (message.type) {
       case "WELCOME":
         requireCompatibleServer(payload.compatibility);
+        if (payload.recoveryPersistenceAck !== undefined && typeof payload.recoveryPersistenceAck !== "boolean") {
+          throw new TypeError("recoveryPersistenceAck must be a boolean");
+        }
+        this.#recoveryPersistenceAckSupported = payload.recoveryPersistenceAck === true;
         this.connectionId = optionalString(payload.connectionId);
         this.playerId = optionalString(payload.playerId) || this.playerId;
         if (this.state === MultiplayerClientState.RECONNECTING && this.#recovery !== null) {
@@ -489,7 +550,6 @@ class MultiplayerDesktopClient {
         break;
       case "ROOM_STATE":
         {
-          this.#reconnectFailures = 0;
           const reconnectToken = optionalString(payload.reconnectToken);
           delete payload.reconnectToken;
           this.#room = payload;
@@ -501,29 +561,35 @@ class MultiplayerDesktopClient {
           } else {
             this.matchId = null;
             this.#view = null;
+            this.#logHistoryPage = null;
             this.#pendingAction = null;
             this.#pendingActionNeedsReplay = false;
           }
           if (reconnectToken) this.#setRecoveryToken(reconnectToken);
-          this.#applyRoomStatus(payload.status);
+          // A running match isn't restored until its private canonical view arrives.
+          if (this.state !== MultiplayerClientState.RECONNECTING || payload.status !== "RUNNING") {
+            this.#completeReconnect();
+            this.#applyRoomStatus(payload.status);
+          }
           this.#syncRecoverySession();
         }
         break;
       case "MATCH_STARTED":
-        this.#reconnectFailures = 0;
         this.matchId = optionalString(payload.matchId) || optionalString(message.matchId);
         this.playerId = optionalString(payload.playerId) || this.playerId;
         this.#view = requirePlainObjectClone(payload.view, "MATCH_STARTED view");
+        this.#logHistoryPage = null;
+        this.#completeReconnect();
         this.#pendingAction = null;
         this.#pendingActionNeedsReplay = false;
         this.#syncRecoverySession();
         this.#setState(MultiplayerClientState.IN_MATCH);
         break;
       case "STATE_SNAPSHOT":
-        this.#reconnectFailures = 0;
         this.matchId = optionalString(payload.matchId) || optionalString(message.matchId) || this.matchId;
         this.playerId = optionalString(payload.playerId) || this.playerId;
         this.#view = requirePlainObjectClone(payload.view, "STATE_SNAPSHOT view");
+        this.#completeReconnect();
         this.#setState(this.#view.gameOver ? MultiplayerClientState.MATCH_FINISHED : MultiplayerClientState.IN_MATCH);
         this.#syncRecoverySession();
         if (this.#pendingActionNeedsReplay && this.#pendingAction !== null && !this.#view.gameOver) {
@@ -534,6 +600,30 @@ class MultiplayerDesktopClient {
       case "ACTION_RESULT":
         this.#applyActionResult(payload);
         break;
+      case "LOG_HISTORY": {
+        if (payload.matchId !== this.matchId) break;
+        if (!Number.isSafeInteger(payload.beforeEventIndex) || payload.beforeEventIndex < 0
+            || !Array.isArray(payload.events) || payload.events.length > 80) {
+          throw new TypeError("invalid log history page");
+        }
+        let previous = -1;
+        for (const event of payload.events) {
+          if (!isPlainObject(event) || !Number.isSafeInteger(event.eventIndex)
+              || event.eventIndex <= previous || event.eventIndex >= payload.beforeEventIndex) {
+            throw new TypeError("invalid log history eventIndex order");
+          }
+          previous = event.eventIndex;
+        }
+        const first = payload.events[0]?.eventIndex ?? null;
+        const last = payload.events.at(-1)?.eventIndex ?? null;
+        if ((payload.events.length > 0 ? last !== payload.beforeEventIndex - 1 : payload.beforeEventIndex !== 0)
+            || payload.firstEventIndex !== first || payload.lastEventIndex !== last
+            || payload.hasEarlierEvents !== (first !== null && first > 0)) {
+          throw new TypeError("invalid log history window");
+        }
+        this.#logHistoryPage = payload;
+        break;
+      }
       case "ERROR":
         this.#error = payload;
         if (optionalString(payload.clientActionId) === this.#pendingAction?.clientActionId) {
@@ -541,7 +631,8 @@ class MultiplayerDesktopClient {
           this.#syncRecoverySession();
         }
         if (this.state === MultiplayerClientState.RECONNECTING) {
-          const retryable = ["DUPLICATE_CONNECTION", "SEAT_ALREADY_CONNECTED"].includes(payload.code);
+          this.#clearReconnectTimer();
+          const retryable = ["DUPLICATE_CONNECTION", "SEAT_ALREADY_CONNECTED", "RATE_LIMITED"].includes(payload.code);
           const socket = this.#socket;
           this.#detachSocketListeners(socket);
           this.#socket = null;
@@ -552,9 +643,9 @@ class MultiplayerDesktopClient {
             this.#registerReconnectFailure();
           } else {
             this.#clearRecovery();
-            this.#error = null;
             this.#room = null;
             this.#view = null;
+            this.#logHistoryPage = null;
             this.connectionId = null;
             this.playerId = null;
             this.matchId = null;
@@ -619,6 +710,7 @@ class MultiplayerDesktopClient {
   #clearRoomSession() {
     this.#room = null;
     this.#view = null;
+    this.#logHistoryPage = null;
     this.#pendingAction = null;
     this.#pendingActionNeedsReplay = false;
     this.matchId = null;
@@ -652,7 +744,9 @@ class MultiplayerDesktopClient {
   }
 
   #clearRecovery() {
+    this.#clearReconnectTimer();
     this.#recovery = null;
+    this.#logHistoryPage = null;
     this.#pendingActionNeedsReplay = false;
   }
 
@@ -687,6 +781,17 @@ class MultiplayerDesktopClient {
       this.#recordError("RECONNECT_EXHAUSTED", new Error("reconnect failed repeatedly"));
       this.#setState(MultiplayerClientState.ERROR);
     }
+  }
+
+  #clearReconnectTimer() {
+    if (this.#reconnectTimer !== null) clearTimeout(this.#reconnectTimer);
+    this.#reconnectTimer = null;
+  }
+
+  #completeReconnect() {
+    this.#clearReconnectTimer();
+    this.#reconnectFailures = 0;
+    this.#error = null;
   }
 
   #setState(nextState) {

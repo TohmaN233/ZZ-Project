@@ -27,6 +27,7 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
     assert "新建 文本文档.txt" not in files
     assert "data/settings/settings.json" not in files
     assert "seiso.toml" not in files
+    assert {"docs/DUEL_FX.md", "docs/EX02C_RULES.md", "docs/ZZ_EXPERIENCE.md"}.isdisjoint(files)
     if kind != "multiplayer":
         assert {"electron/asset-bootstrap.js", "electron/asset-setup.html", "electron/asset-source.json",
                 "zz/web/static/duel-layout.js", "image.png", "package-lock.json"} <= files
@@ -47,6 +48,9 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
             "tests/test_effect_resolution_order_oct29.py", "tests/test_frontend_magic_prompt.py",
             "tests/test_frontend_oct29_feedback.py", "tests/test_eugeo_reactive_shield_combat.py",
             "tests/test_web_session_initialization.py",
+            "tests/test_enrico_hand_reset.py", "tests/test_frontend_online_recovery.py",
+            "tests/test_multiplayer_battle_log.py", "tests/test_sphinx_effect_source.py",
+            "tests/electron_reconnect_gateway_harness.js",
         } <= files
     else:
         assert release.DEEP_SOURCE_RELATIVE.as_posix() not in files

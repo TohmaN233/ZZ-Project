@@ -368,8 +368,16 @@ function queueMultiplayerRecoveryWrite() {
       await fs.writeFile(temporaryPath, `${JSON.stringify(recovery)}\n`, {
         encoding: "utf8",
         mode: 0o600,
+        flush: true,
       });
       await fs.rename(temporaryPath, targetPath);
+      // Only retire the server's previous credential after the replacement has
+      // reached durable storage. A crash before this point must remain retryable.
+      try {
+        multiplayerClient.acknowledgeRecoveryPersisted(recovery);
+      } catch (_error) {
+        appendLog("Multiplayer recovery confirmation failed: code=SEND_FAILED");
+      }
     })
     .catch((error) => {
       appendLog(`Multiplayer recovery write failed: ${error.message || error}`);
@@ -434,6 +442,12 @@ function broadcastMultiplayerEvent(event) {
   syncLanAdvertisement();
   queueMultiplayerRecoveryWrite();
   scheduleMultiplayerReconnect();
+  if (["STATE_CHANGED", "RECONNECT_FAILED", "DISCONNECTED", "LEAVE_REQUESTED"].includes(event.type)) {
+    const snapshot = multiplayerClient.getSnapshot();
+    const roomCode = snapshot.recoveryRoomCode || snapshot.room?.roomCode || "-";
+    const errorCode = snapshot.error?.causeCode || snapshot.error?.code || "NONE";
+    appendLog(`Multiplayer lifecycle: state=${snapshot.state} room=${roomCode} reconnectFailures=${snapshot.reconnectFailures}/${snapshot.reconnectMaxAttempts} active=${snapshot.reconnectAttemptActive} code=${errorCode}`);
+  }
   const payload = {
     ...event,
     snapshot: multiplayerSnapshot(),
@@ -831,6 +845,11 @@ function registerIpc() {
   ipcMain.handle("multiplayer:requestSync", async (_event) => {
     assertTrustedSender(_event);
     multiplayerClient.requestSync();
+    return multiplayerSnapshot();
+  });
+  ipcMain.handle("multiplayer:requestLogHistory", async (_event, payload) => {
+    assertTrustedSender(_event);
+    multiplayerClient.requestLogHistory(payload);
     return multiplayerSnapshot();
   });
   ipcMain.handle("multiplayer:leaveRoom", async (_event) => {

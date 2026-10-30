@@ -36,6 +36,7 @@ def build_card(row: dict[str, Any]):
             fn=_gain_start_of_turn_stats,
             condition=_own_turn_started,
             active_areas=(AreaType.BLESSING,),
+            params={"granted_by_blessing": True},
             official_effect="このミニオンをBP+100/DP+1する",
             official_timing="自分のターン開始時",
         )

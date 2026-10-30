@@ -80,6 +80,34 @@ class TriggerRegistry:
     def _trigger_active_in_area(self, ci: "CardInstance") -> bool:
         return ci.area is AreaType.FIELD
 
+    def capture_blessing_source_effects(self, host: "CardInstance", timing: EffectTiming,
+                                       ctx: "Context") -> list[_Pending]:
+        """Capture granted destruction clauses while the host is still attached."""
+        captured = []
+        for mana in host.blessings:
+            for effect in mana.card.effects:
+                if (effect.timing is not timing or not effect.params.get("granted_by_blessing")
+                        or not self._effect_active_in_area(effect, mana)
+                        or effect_once_per_turn_used(effect, mana)):
+                    continue
+                if effect.condition and not effect.condition(mana, self._engine.state, ctx):
+                    continue
+                context = self._engine.capture_effect_context(mana, effect, ctx)
+                captured.append(_Pending(timing, mana, effect, context))
+        from zz.pc02 import blessing_effects
+
+        for effect in blessing_effects(host, timing, ctx):
+            if effect_once_per_turn_used(effect, host):
+                continue
+            if effect.condition and not effect.condition(host, self._engine.state, ctx):
+                continue
+            context = self._engine.capture_effect_context(host, effect, ctx)
+            captured.append(_Pending(timing, host, effect, context))
+        return captured
+
+    def enqueue_captured_effects(self, captured: list[_Pending]) -> None:
+        self._queue.extend(captured)
+
     def emit(self, timing: TriggerTiming | EffectTiming, ctx: "Context", *,
              exclude_instance: "CardInstance" | None = None) -> None:
         if self._engine._terminal_game_over:
@@ -172,10 +200,11 @@ class TriggerRegistry:
                             continue
                         if effect.condition and not effect.condition(ci, state, effect_context):
                             continue
+                        effect_context = self._engine.capture_effect_context(ci, effect, effect_context)
                         self._queue.append(_Pending(pending_timing, ci, effect, effect_context))
                         should_duplicate = getattr(self._engine, "should_duplicate_summon_effect", lambda source: False)
                         if timing is EffectTiming.ON_SUMMON and ci is ctx.source and should_duplicate(ci):
-                            self._queue.append(_Pending(timing, ci, effect, ctx))
+                            self._queue.append(_Pending(timing, ci, effect, effect_context))
                     for trig in ci.card.triggers:
                         if trig.when is not timing:
                             continue
@@ -192,7 +221,8 @@ class TriggerRegistry:
                                 continue
                             if effect.condition and not effect.condition(ci, state, ctx):
                                 continue
-                            self._queue.append(_Pending(timing, ci, effect, ctx))
+                            context = self._engine.capture_effect_context(ci, effect, ctx)
+                            self._queue.append(_Pending(timing, ci, effect, context))
 
     def resolve_all(self) -> None:
         if self._engine._terminal_game_over:
@@ -228,7 +258,8 @@ class TriggerRegistry:
                 continue
             defer_choice = getattr(self._engine, "defer_trigger_choice", None)
             if defer_choice is not None:
-                choice_result = defer_choice(p)
+                with self._engine.effect_target_context(p.instance, p.trigger, p.context):
+                    choice_result = defer_choice(p)
                 if choice_result is None:
                     self._queue.appendleft(p)
                     self._depth = 0

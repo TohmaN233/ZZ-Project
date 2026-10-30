@@ -4575,6 +4575,7 @@ class GameSession:
                 [force for force in opponent.forces if not force.destroyed],
                 action,
                 source_ci=source_ci,
+                effect=effect,
             )
             return (
                 self._filter_card_targets_for_effect(player, list(opponent.field), action, effect, source_ci)
@@ -4591,6 +4592,7 @@ class GameSession:
                 ],
                 action,
                 source_ci=source_ci,
+                effect=effect,
             )
             return (
                 self._filter_card_targets_for_effect(player, list(player.field) + list(opponent.field), action, effect, source_ci)
@@ -4640,6 +4642,7 @@ class GameSession:
                 [force for force in opponent.forces if not force.destroyed],
                 action,
                 source_ci=source_ci,
+                effect=effect,
             ), effect)
         if kind == "ally_force":
             return self._filter_targets_for_effect(self._filter_effect_targets(
@@ -4647,6 +4650,7 @@ class GameSession:
                 [force for force in player.forces if not force.destroyed],
                 action,
                 source_ci=source_ci,
+                effect=effect,
             ), effect)
         if kind == "owner_player_or_force":
             return [player] + [force for force in player.forces if not force.destroyed]
@@ -4785,7 +4789,7 @@ class GameSession:
             source_ci: CardInstance | None = None,
     ) -> list[CardInstance]:
         source_ci, _ = self._effect_selection_source(player, action, source_ci)
-        targets = self._filter_effect_targets(player, targets, action, source_ci=source_ci)
+        targets = self._filter_effect_targets(player, targets, action, source_ci=source_ci, effect=effect)
         if effect is not None:
             operation = effect.params.get("protection_operation")
             if operation is None:
@@ -4838,12 +4842,17 @@ class GameSession:
             targets: list[Any],
             action: Action | None,
             source_ci: CardInstance | None = None,
+            effect: EffectSpec | None = None,
     ) -> list[Any]:
         source, source_area = self._effect_selection_source(player, action, source_ci)
         if source is not None:
+            pending = self._pending_effect
+            context = pending.get("context") if (
+                pending and pending.get("source") is source and pending.get("effect") is effect
+            ) else None
             targets = [
                 target for target in targets
-                if self.engine._can_effect_select(source, target, source_area=source_area)
+                if self.engine._can_effect_select(source, target, source_area=source_area, effect=effect, context=context)
             ]
         if action is None or action.kind != "play_card":
             return targets

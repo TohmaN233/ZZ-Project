@@ -22,6 +22,7 @@ from zz.multiplayer.protocol import (
     validate_server_envelope,
 )
 from zz.multiplayer.rooms import Room, RoomError, RoomStatus
+from zz.multiplayer.views import build_player_log_archive, build_player_log_page, build_projected_log_page
 
 
 @dataclass
@@ -49,7 +50,7 @@ class MultiplayerServer:
         match_id_factory: Callable[[], str] | None = None,
         seed_factory: Callable[[], int] | None = None,
         reconnect_token_factory: Callable[[], str] | None = None,
-        reconnect_grace_seconds: float = 90.0,
+        reconnect_grace_seconds: float = 600.0,
         reconnect_timer_factory: Callable[[float, Callable[[], None]], Any] | None = None,
         max_rooms: int | None = None,
         room_idle_timeout_seconds: float | None = None,
@@ -143,6 +144,7 @@ class MultiplayerServer:
         self._rooms: dict[str, Room] = {}
         self._room_ids_by_code: dict[str, str] = {}
         self._matches: dict[str, AuthoritativeMatch] = {}
+        self._finished_match_logs: dict[str, tuple[str, dict[str, list[dict[str, Any]]]]] = {}
         self._registry_lock = RLock()
         self._room_locks: dict[str, RLock] = {}
         self._disconnect_timers: dict[tuple[str, str], Any] = {}
@@ -166,7 +168,7 @@ class MultiplayerServer:
                 rate_tokens=float(self.rate_limit_burst or 0),
                 rate_updated_at=now,
             )
-        self._emit(connection_id, "WELCOME", {"connectionId": connection_id})
+        self._emit(connection_id, "WELCOME", {"connectionId": connection_id, "recoveryPersistenceAck": True})
         self._observe("connection_opened", connectionId=connection_id)
 
     def disconnect(self, connection_id: str) -> None:
@@ -291,11 +293,13 @@ class MultiplayerServer:
             "CREATE_ROOM": self._create_room,
             "JOIN_ROOM": self._join_room,
             "RECONNECT": self._reconnect,
+            "CONFIRM_RECONNECT": self._confirm_reconnect,
             "SELECT_DECK": self._select_deck,
             "SET_READY": self._set_ready,
             "SELECT_OPENING_CHOICE": self._select_opening_choice,
             "SUBMIT_ACTION": self._submit_action,
             "REQUEST_SYNC": self._request_sync,
+            "REQUEST_LOG_HISTORY": self._request_log_history,
             "LEAVE_ROOM": self._leave_room,
         }
         handlers[message_type](connection, payload)
@@ -337,6 +341,9 @@ class MultiplayerServer:
             connection.connection_id,
             display_name=self._display_name(payload, "Guest"),
         )
+        # Archived private projections belong to the exact participants of the
+        # finished duel. A newly joined occupant must never inherit a seat's log.
+        self._finished_match_logs.pop(room.room_id, None)
         self._cancel_room_idle_timer(room.room_id)
         connection.room_id = room.room_id
         self._broadcast_room(room)
@@ -376,6 +383,16 @@ class MultiplayerServer:
             roomId=room.room_id,
             matchId=match.match_id if match is not None else None,
             revision=match.revision if match is not None else None,
+        )
+
+    def _confirm_reconnect(self, connection: _Connection, payload: dict[str, Any]) -> None:
+        room = self._room_for_connection(connection)
+        room.confirm_reconnect(connection.connection_id, str(payload["reconnectToken"]))
+        self._observe(
+            "reconnect_credential_confirmed",
+            connectionId=connection.connection_id,
+            playerId=room.player_for_connection(connection.connection_id).player_id,
+            roomId=room.room_id,
         )
 
     def _select_deck(self, connection: _Connection, payload: dict[str, Any]) -> None:
@@ -447,6 +464,7 @@ class MultiplayerServer:
             },
         ), asset_root=self._asset_root)
         self._matches[room.room_id] = match
+        self._finished_match_logs.pop(room.room_id, None)
         room.mark_running()
         self._broadcast_room(room)
         for player in room.players:
@@ -529,6 +547,10 @@ class MultiplayerServer:
                 matchId=match.match_id,
                 revision=match.revision,
             )
+            self._finished_match_logs[room.room_id] = (match.match_id, {
+                player.player_id: build_player_log_archive(match.session, player_id=player.player_id)
+                for player in room.players
+            })
             self._matches.pop(room.room_id, None)
             room.prepare_rematch()
             self._broadcast_room(room)
@@ -545,6 +567,25 @@ class MultiplayerServer:
         self._emit(connection.connection_id, "STATE_SNAPSHOT", {
             **self._snapshot_payload(room, match, player.player_id),
         }, match_id=match.match_id)
+
+    def _request_log_history(self, connection: _Connection, payload: dict[str, Any]) -> None:
+        room = self._room_for_connection(connection)
+        player = room.player_for_connection(connection.connection_id)
+        match_id = payload["matchId"]
+        match = self._matches.get(room.room_id)
+        if match is not None and match.match_id == match_id:
+            page = build_player_log_page(match.session, match_id=match_id, player_id=player.player_id,
+                                         before_event_index=payload["beforeEventIndex"])
+        else:
+            archived = self._finished_match_logs.get(room.room_id)
+            if archived is None or archived[0] != match_id:
+                raise RoomError("MATCH_NOT_FOUND", "log history is not available for this match")
+            page = build_projected_log_page(archived[1][player.player_id], match_id=match_id,
+                                            before_event_index=payload["beforeEventIndex"])
+        self._emit(connection.connection_id, "LOG_HISTORY", page, match_id=match_id)
+        self._observe("log_history_served", connectionId=connection.connection_id,
+                      playerId=player.player_id, roomId=room.room_id, matchId=match_id,
+                      messageType="REQUEST_LOG_HISTORY")
 
     def _leave_room(self, connection: _Connection, _payload: dict[str, Any]) -> None:
         room = self._room_for_connection(connection)
@@ -928,6 +969,7 @@ class MultiplayerServer:
         self._close_room_locked(room)
 
     def _close_room_locked(self, room: Room) -> None:
+        self._finished_match_logs.pop(room.room_id, None)
         room.close()
         self._cancel_room_timers(room.room_id)
         for player in room.players:

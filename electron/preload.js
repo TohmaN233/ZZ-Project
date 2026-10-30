@@ -35,6 +35,7 @@ contextBridge.exposeInMainWorld("zzMultiplayer", {
   submitAction: (action) => ipcRenderer.invoke("multiplayer:submitAction", action),
   surrender: () => ipcRenderer.invoke("multiplayer:surrender"),
   requestSync: () => ipcRenderer.invoke("multiplayer:requestSync"),
+  requestLogHistory: (payload) => ipcRenderer.invoke("multiplayer:requestLogHistory", payload),
   leaveRoom: () => ipcRenderer.invoke("multiplayer:leaveRoom"),
   dismissMatchResult: () => ipcRenderer.invoke("multiplayer:dismissMatchResult"),
   lanStatus: () => ipcRenderer.invoke("multiplayer:lanStatus"),

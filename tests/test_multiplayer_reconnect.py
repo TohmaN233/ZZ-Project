@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from zz.deckcode0 import (
@@ -167,6 +169,104 @@ def test_reconnect_protocol_round_trips_room_scoped_credentials() -> None:
     assert parse_client_message(serialize_client_message(message)) == message
 
 
+def test_lost_rotation_responses_and_persistence_confirmation_are_retryable() -> None:
+    timer_factory = TimerFactory()
+    server, messages = _connected_server(timer_factory)
+    tokens = _start_match(server, messages)
+    match = server.match_for_room("ABC123")
+    server.disconnect("a")
+    old_token = tokens["player_1"]
+    candidate = None
+    for attempt in range(3):
+        connection_id = f"lost-{attempt}"
+        messages[connection_id] = []
+        # Model a real disconnect after RECONNECT is accepted but before the
+        # ROOM_STATE frame reaches the client; its disk still holds old_token.
+        server.connect(connection_id, lambda message: None)
+        _send(server, connection_id, "RECONNECT", {
+            "roomCode": "ABC123", "playerId": "player_1", "reconnectToken": old_token,
+        })
+        host = server.room_for_code("ABC123").host
+        assert host.connected
+        assert host.connection_id == connection_id
+        if candidate is None:
+            candidate = host.reconnect_token
+            assert candidate != old_token
+        assert host.reconnect_token == candidate
+        server.disconnect(connection_id)
+
+    messages["persisted"] = []
+    server.connect("persisted", messages["persisted"].append)
+    _send(server, "persisted", "RECONNECT", {
+        "roomCode": "ABC123", "playerId": "player_1", "reconnectToken": candidate,
+    })
+    assert _latest(messages["persisted"], "ROOM_STATE")["reconnectToken"] == candidate
+    assert server.match_for_room("ABC123") is match
+    for token in (old_token, candidate):
+        messages["intruder"] = []
+        server.connect("intruder", messages["intruder"].append)
+        _send(server, "intruder", "RECONNECT", {
+            "roomCode": "ABC123", "playerId": "player_1", "reconnectToken": token,
+        })
+        assert _latest(messages["intruder"], "ERROR")["code"] == "DUPLICATE_CONNECTION"
+        server.disconnect("intruder")
+    for _ in range(2):
+        _send(server, "persisted", "CONFIRM_RECONNECT", {"reconnectToken": candidate})
+    assert not any(message["type"] == "ERROR" for message in messages["persisted"])
+    assert old_token not in repr(messages["b"])
+    assert candidate not in repr(messages["b"])
+    server.disconnect("persisted")
+    messages["stale-confirmed"] = []
+    server.connect("stale-confirmed", messages["stale-confirmed"].append)
+    _send(server, "stale-confirmed", "RECONNECT", {
+        "roomCode": "ABC123", "playerId": "player_1", "reconnectToken": old_token,
+    })
+    assert _latest(messages["stale-confirmed"], "ERROR")["code"] == "INVALID_RECONNECT_TOKEN"
+
+
+def test_welcome_confirmation_capability_has_strict_boolean_validation() -> None:
+    from zz.multiplayer.protocol import ProtocolError, validate_server_envelope
+
+    for flag in (True, False):
+        message = _message("welcome", "WELCOME", {"connectionId": "new", "recoveryPersistenceAck": flag})
+        assert validate_server_envelope(message) == message
+    for flag in (None, 1, "yes"):
+        with pytest.raises(ProtocolError):
+            validate_server_envelope(_message("welcome", "WELCOME", {
+                "connectionId": "new", "recoveryPersistenceAck": flag,
+            }))
+
+
+def test_confirm_reconnect_protocol_rejects_malformed_private_ack() -> None:
+    valid = _message("confirm-1", "CONFIRM_RECONNECT", {"reconnectToken": "persisted-token"})
+    assert parse_client_message(serialize_client_message(valid)) == valid
+    from zz.multiplayer.protocol import ProtocolError
+
+    for payload in ({}, {"reconnectToken": ""}, {"reconnectToken": "value", "roomCode": "ABC123"}):
+        with pytest.raises(ProtocolError):
+            parse_client_message(json.dumps(_message("invalid", "CONFIRM_RECONNECT", payload)))
+
+
+@pytest.mark.parametrize("invalidate", ["expire", "close"])
+def test_unconfirmed_old_and_candidate_tokens_expire_together(invalidate: str) -> None:
+    room = Room(room_id="room-1", room_code="ABC123", host_connection_id="old")
+    old_token = room.host.reconnect_token
+    room.mark_disconnected("old")
+    room.reconnect(player_id="player_1", reconnect_token=old_token, connection_id="new")
+    candidate = room.host.reconnect_token
+    assert room.host.previous_reconnect_token == old_token
+    assert old_token not in repr(room.host)
+    assert candidate not in repr(room.host)
+    assert old_token not in repr(room.to_public_dict())
+    assert candidate not in repr(room.to_public_dict())
+    if invalidate == "expire":
+        room.expire_reconnect("player_1")
+    else:
+        room.close()
+    assert room.host.reconnect_token is None
+    assert room.host.previous_reconnect_token is None
+
+
 def test_room_reconnect_rebinds_the_seat_and_rotates_private_credentials() -> None:
     tokens = iter(("host-token", "guest-token", "rotated-host-token"))
     room = Room(
@@ -198,6 +298,7 @@ def test_room_reconnect_rebinds_the_seat_and_rotates_private_credentials() -> No
     assert host.connected is True
     assert host.disconnected_at is None
     assert host.reconnect_token == "rotated-host-token"
+    room.confirm_reconnect("connection-new", "rotated-host-token")
 
     with pytest.raises(RoomError) as stale:
         room.reconnect(
@@ -251,6 +352,7 @@ def test_service_disconnect_reconnect_is_private_rotating_and_timer_backed() -> 
     assert all(player["connected"] for player in restored_room["players"])
     rotated_token = restored_room["reconnectToken"]
     assert rotated_token not in repr(messages["b"])
+    _send(server, "new-a", "CONFIRM_RECONNECT", {"reconnectToken": rotated_token})
 
     messages["stale"] = []
     server.connect("stale", messages["stale"].append)
@@ -398,6 +500,46 @@ def test_disconnect_timeout_forfeits_and_expires_that_seat() -> None:
         "reconnectToken": tokens["player_1"],
     })
     assert _latest(messages["late"], "ERROR")["code"] == "ROOM_NOT_FOUND"
+
+
+def test_default_retention_allows_both_seats_to_resume_after_five_auto_attempts() -> None:
+    timer_factory = TimerFactory()
+    server = MultiplayerServer(
+        room_code_factory=lambda: "ABC123",
+        reconnect_timer_factory=timer_factory,
+    )
+    messages: dict[str, list[dict]] = {"a": [], "b": []}
+    server.connect("a", messages["a"].append)
+    server.connect("b", messages["b"].append)
+    tokens = _start_match(server, messages)
+    match = server.match_for_room("ABC123")
+    original_revision = match.revision
+    server.disconnect("a")
+    server.disconnect("b")
+
+    # Five bounded 10-second handshakes plus 1-second delays leave over 9 minutes
+    # for a player to return to the room and retry the same seat manually.
+    assert [timer.delay for timer in timer_factory.timers] == [600.0, 600.0]
+    assert server.reconnect_grace_seconds - 5 * (10 + 1) == 545
+    for old, player_id in [("a", "player_1"), ("b", "player_2")]:
+        new = f"new-{old}"
+        messages[new] = []
+        server.connect(new, messages[new].append)
+        _send(server, new, "RECONNECT", {
+            "roomCode": "ABC123", "playerId": player_id,
+            "reconnectToken": tokens[player_id],
+        })
+        restored = _latest(messages[new], "STATE_SNAPSHOT")
+        assert restored["matchId"] == match.match_id
+        assert restored["playerId"] == player_id
+        assert restored["view"]["revision"] == original_revision
+        assert _latest(messages[new], "ROOM_STATE")["reconnectToken"] != tokens[player_id]
+    assert server.match_for_room("ABC123") is match
+    assert all(timer.cancelled for timer in timer_factory.timers)
+    # Old timeout callbacks cannot destroy the recovered match.
+    for timer in timer_factory.timers:
+        timer.callback()
+    assert server.match_for_room("ABC123") is match
 
 
 def test_both_disconnect_use_one_timer_per_seat_and_close_after_both_expire() -> None:

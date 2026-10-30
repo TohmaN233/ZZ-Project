@@ -9,3 +9,8 @@ local_ai_training/*/
 
 # Local CodeGraph index.
 .codegraph/
+
+# Local development notes are kept on the developer's machine only.
+/docs/DUEL_FX.md
+/docs/EX02C_RULES.md
+/docs/ZZ_EXPERIENCE.md

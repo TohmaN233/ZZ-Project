@@ -1,5 +1,7 @@
 from __future__ import annotations
 import random
+from contextlib import contextmanager
+from copy import copy
 from typing import Optional, Callable, Iterable, Any
 
 from zz.enums import AreaType, CardType, Color, Keyword, Phase, Side, Step, TriggerTiming
@@ -153,7 +155,7 @@ class Engine:
 
     def _run_effect_callback(self, fn: Callable, *args, effect: Any = None) -> None:
         previous_contract = getattr(self, "_effect_target_contract", None)
-        self._effect_target_contract = (args[0], effect) if isinstance(effect, EffectSpec) else None
+        self._effect_target_contract = (args[0], effect, args[2]) if isinstance(effect, EffectSpec) else None
         source = args[0]
         frame = self._magic_cast_frames.get(getattr(source, "iid", None))
         source_clause = frame is not None and any(clause is effect for clause in frame.pending_clauses)
@@ -242,7 +244,8 @@ class Engine:
                 self.complete_magic_source_effect(source, clause, ctx)
                 continue
             if isinstance(clause, EffectSpec) and self.defer_source_effect_choice is not None:
-                choice_result = self.defer_source_effect_choice(source, clause, ctx)
+                with self.effect_target_context(source, clause, ctx):
+                    choice_result = self.defer_source_effect_choice(source, clause, ctx)
                 if choice_result is None or choice_result:
                     # None means another source currently owns the prompt;
                     # this clause has not been offered or executed yet.
@@ -2878,6 +2881,17 @@ class Engine:
         if ci.card.is_token:
             self._remove_token_from_game(ci)
             return
+        ctx = Context(
+            controller=owner,
+            source=source,
+            target=ci,
+            battle_participants=battle_participants,
+            effect_carrier=ci,
+            effect_source=ci,
+            effect_source_area=AreaType.FIELD,
+        )
+        # Destruction grants belong to the host before cleanup detaches its Mana.
+        ctx.blessing_destroy_effects = self.triggers.capture_blessing_source_effects(ci, EffectTiming.ON_DESTROY, ctx)
         if ci in owner.field:
             owner.field.remove(ci)
         had_blessed_return = ci.card.id == "yellow_05_02_02_00" and bool(ci.blessings)
@@ -2885,12 +2899,6 @@ class Engine:
         self._reset_card_zone_state(ci)
         ci.area = AreaType.TRASH
         owner.trash.append(ci)
-        ctx = Context(
-            controller=owner,
-            source=source,
-            target=ci,
-            battle_participants=battle_participants,
-        )
         setattr(ctx, "blessed_return_to_hand", had_blessed_return)
         self._pending_destroy_events.append((ci, ctx))
         if self._effect_resolution_depth == 0 and not self.pending_blessing_returns:
@@ -2901,6 +2909,7 @@ class Engine:
     def _resolve_destroy_event(self, ci: CardInstance, ctx: Context) -> None:
         self._resolve_source_effects(ci, EffectTiming.ON_DESTROY, ctx)
         self._resolve_source_triggers(ci, TriggerTiming.ON_DESTROY, ctx)
+        self.triggers.enqueue_captured_effects(ctx.blessing_destroy_effects)
         self.triggers.emit(EffectTiming.ON_DESTROY, ctx, exclude_instance=ci)
         self.triggers.emit(TriggerTiming.ON_DESTROY, ctx, exclude_instance=ci)
         from zz.pc02 import on_minion_destroyed
@@ -3459,6 +3468,13 @@ class Engine:
         self._target_selection_context = {"source": source}
         try:
             selected = policy.choose_target(self, kind, min_n, max_n, eligible)
+            illegal_targets = [target for target in selected if target not in eligible]
+            if illegal_targets:
+                raise IllegalActionError(
+                    f"policy selected an illegal effect target for {kind}: "
+                    f"source iid={getattr(source, 'iid', None)}, "
+                    f"target iids={[getattr(target, 'iid', None) for target in illegal_targets]}"
+                )
             from zz.pc02 import on_targets_selected
 
             on_targets_selected(self, player, source, selected)
@@ -3490,7 +3506,15 @@ class Engine:
             *,
             source_area: AreaType | None = None,
             protection_operation: str | None = None,
+            effect: EffectSpec | None = None,
+            context: Context | None = None,
     ) -> bool:
+        selection_source, captured_area = self._effect_selection_origin(source, effect=effect, context=context)
+        if selection_source is None:
+            return False
+        if captured_area is not None or selection_source is not source:
+            source_area = captured_area
+        source = selection_source
         if not isinstance(target, CardInstance):
             from zz.pc02 import can_effect_select_non_card
 
@@ -3542,6 +3566,57 @@ class Engine:
             if kind == "sphinx_selection_ward" and not fn(target, selector_kind, source):
                 return False
         return True
+
+    def effect_selection_source(
+            self,
+            source: CardInstance,
+            *,
+            effect: EffectSpec | None = None,
+            context: Context | None = None,
+    ) -> CardInstance | None:
+        """A granted callback keeps its Mana carrier, but selects as its host."""
+        return self._effect_selection_origin(source, effect=effect, context=context)[0]
+
+    def _effect_selection_origin(
+            self, source: CardInstance, *, effect: EffectSpec | None = None,
+            context: Context | None = None,
+    ) -> tuple[CardInstance | None, AreaType | None]:
+        contract = getattr(self, "_effect_target_contract", None)
+        if contract is not None and source is contract[0] and (effect is None or effect is contract[1]):
+            effect = contract[1] if effect is None else effect
+            context = contract[2] if context is None else context
+        if context is not None and context.effect_carrier is source:
+            return context.effect_source, context.effect_source_area
+        if effect is None or not effect.params.get("granted_by_blessing"):
+            return source, None
+        if source.area is not AreaType.BLESSING:
+            return None, None
+        hosts = [
+            host for player in self.state.players for host in player.field
+            if host.area is AreaType.FIELD and source in host.blessings
+        ]
+        if len(hosts) > 1:
+            raise RuntimeError(f"Blessing {source.iid} has multiple effect hosts")
+        return (hosts[0], AreaType.FIELD) if hosts else (None, None)
+
+    def capture_effect_context(self, source: CardInstance, effect: EffectSpec, ctx: Context) -> Context:
+        origin, area = self._effect_selection_origin(source, effect=effect, context=ctx)
+        if origin is None:
+            raise RuntimeError(f"cannot capture detached granted effect from {source.iid}")
+        captured = copy(ctx)
+        captured.effect_carrier = source
+        captured.effect_source = origin
+        captured.effect_source_area = area or origin.area
+        return captured
+
+    @contextmanager
+    def effect_target_context(self, source: CardInstance, effect: Any, ctx: Context):
+        previous = getattr(self, "_effect_target_contract", None)
+        self._effect_target_contract = (source, effect, ctx) if isinstance(effect, EffectSpec) else None
+        try:
+            yield
+        finally:
+            self._effect_target_contract = previous
 
     def is_protected_from_card_effect(
             self,
@@ -3847,7 +3922,8 @@ class Engine:
             if effect.condition and not effect.condition(ci, self.state, ctx):
                 continue
             if self.defer_source_effect_choice is not None:
-                choice_result = self.defer_source_effect_choice(ci, effect, ctx)
+                with self.effect_target_context(ci, effect, ctx):
+                    choice_result = self.defer_source_effect_choice(ci, effect, ctx)
                 if choice_result is None or choice_result:
                     next_index = index if choice_result is None else index + 1
                     self.triggers.enqueue_source_effects(ci, timing, ctx, ci.card.effects[next_index:],

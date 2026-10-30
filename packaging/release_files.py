@@ -113,7 +113,6 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.update(Path("data/decks") / name for name in DEFAULT_DECKS)
         paths.add(NORMAL_MODEL_RELATIVE)
     if kind == "source":
-        paths.add(Path("docs/DUEL_FX.md"))
         paths.update(Path(name) for name in ("CONTRIBUTING.md", "smoke_clean_release.py", "ai_training/__init__.py", "ai_training/codeman_training.py", "build/installer.nsh"))
         paths.update(Path("packaging") / name for name in PACKAGING_FILES)
         paths.update(Path("tools") / name for name in SOURCE_TOOLS)
@@ -130,6 +129,9 @@ def release_files(root: Path, kind: str) -> list[Path]:
             "test_oct29_magic_engine.py", "test_oct29_phase_continuation.py",
             "test_oct29_shared_rules.py", "test_oct29_switch_mana.py",
             "test_web_session_initialization.py",
+            "test_enrico_hand_reset.py", "test_frontend_online_recovery.py",
+            "test_multiplayer_battle_log.py", "test_sphinx_effect_source.py",
+            "electron_reconnect_gateway_harness.js",
         ))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
         paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))

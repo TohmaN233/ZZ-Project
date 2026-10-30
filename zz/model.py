@@ -73,6 +73,12 @@ class Context:
     switch_source: Optional["CardInstance"] = None
     # The two Minions involved in a battle destruction; None otherwise.
     battle_participants: Optional[tuple["CardInstance", "CardInstance"]] = None
+    # One captured effect's rules source; the callback may still use its Mana carrier.
+    effect_carrier: Optional["CardInstance"] = None
+    effect_source: Optional["CardInstance"] = None
+    effect_source_area: Optional["AreaType"] = None
+    # Captured before destruction returns Blessing Mana to Base.
+    blessing_destroy_effects: list[Any] = field(default_factory=list)
 
 
 @dataclass

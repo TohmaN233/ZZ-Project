@@ -1,9 +1,47 @@
 import random
 
 from zz.ai import RandomLegalPolicy
+from zz.effects import EffectSpec, EffectTiming
+from zz.enums import AreaType
+from zz.model import Context
 from zz.multiplayer.actions import CHOOSE_PROMPT_OPTION
 from zz.multiplayer.match import AuthoritativeMatch, InitialMatchSpec
+from zz.triggers import _Pending
 from zz.web.session import GameSession
+
+
+def _captured_effect(_source, _state, _context):
+    pass
+
+
+def test_authoritative_hash_tracks_captured_effect_source_and_destroy_queue() -> None:
+    spec = InitialMatchSpec.standard(match_id="effect-source-hash", seed=304)
+    match = AuthoritativeMatch(spec)
+    owner = match.session.engine.state.players[0]
+    card = (owner.hand or owner.deck)[0]
+    context = Context(controller=owner, source=card, target=card)
+    match.session.engine._pending_destroy_events.append((card, context))
+    previous = match.state_hash()
+    for key, value in (("effect_carrier", card), ("effect_source", card), ("effect_source_area", AreaType.FIELD)):
+        setattr(context, key, value)
+        current = match.state_hash()
+        assert current != previous, f"authoritative hash ignored {key}"
+        previous = current
+    effect = EffectSpec(timing=EffectTiming.ON_DESTROY, fn=_captured_effect)
+    captured = Context(controller=owner, effect_carrier=card, effect_source=card, effect_source_area=AreaType.FIELD)
+    context.blessing_destroy_effects = [_Pending(EffectTiming.ON_DESTROY, card, effect, captured)]
+    captured_hash = match.state_hash()
+    assert captured_hash != previous, "authoritative hash ignored captured destruction effects"
+    replay = AuthoritativeMatch(spec)
+    replay_owner = replay.session.engine.state.players[0]
+    replay_card = (replay_owner.hand or replay_owner.deck)[0]
+    replay_context = Context(controller=replay_owner, source=replay_card, target=replay_card,
+                             effect_carrier=replay_card, effect_source=replay_card, effect_source_area=AreaType.FIELD)
+    replay_captured = Context(controller=replay_owner, effect_carrier=replay_card, effect_source=replay_card,
+                              effect_source_area=AreaType.FIELD)
+    replay_context.blessing_destroy_effects = [_Pending(EffectTiming.ON_DESTROY, replay_card, effect, replay_captured)]
+    replay.session.engine._pending_destroy_events.append((replay_card, replay_context))
+    assert replay.state_hash() == captured_hash
 
 
 def _safe_progress_choice(prompt: dict) -> dict:

@@ -108,6 +108,7 @@ def effect_target_filter(eng: Any, effect: EffectSpec, *, source: Any = None):
             source,
             target,
             protection_operation=protection_operation,
+            effect=effect,
         ):
             return False
         if max_dp is not None and eng.effective_dp(target) > max_dp:
@@ -431,16 +432,14 @@ def _draw_until_hand_size(*, hand_size: int, **_: Any) -> EffectFn:
 
 def _discard_hand_draw(*, amount: int, scope: str = "owner", **_: Any) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
-        eng = getattr(state, "engine", None)
-        if eng is None:
-            return
+        eng = state.engine
         players = list(state.players) if scope == "both" else [ci.owner]
+        # Complete the discard sentence for every player before any draw.
+        # The shared verb also records departures in the ordered visual stream.
         for player in players:
-            discarded = list(player.hand)
-            player.hand.clear()
-            for card in discarded:
-                card.area = AreaType.TRASH
-                player.trash.append(card)
+            for card in list(player.hand):
+                eng.discard_from_hand(player, card)
+        for player in players:
             eng.draw(player, amount)
     return fn
 

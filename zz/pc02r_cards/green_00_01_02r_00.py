@@ -51,6 +51,7 @@ def build_card(row: dict[str, Any]):
             fn=_refresh_blessed_minion,
             condition=_refresh_on_life_damage,
             active_areas=(AreaType.BLESSING,),
+            params={"granted_by_blessing": True},
             official_effect="相手のターン中、自分のプレイヤーがダメージを受けたとき加護先をアクティブにする",
             official_timing="相手のターン中のプレイヤー被ダメージ時",
         )

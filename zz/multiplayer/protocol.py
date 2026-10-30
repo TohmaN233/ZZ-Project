@@ -28,11 +28,13 @@ _CLIENT_MESSAGE_TYPES = {
     "CREATE_ROOM",
     "JOIN_ROOM",
     "RECONNECT",
+    "CONFIRM_RECONNECT",
     "SELECT_DECK",
     "SET_READY",
     "SELECT_OPENING_CHOICE",
     "SUBMIT_ACTION",
     "REQUEST_SYNC",
+    "REQUEST_LOG_HISTORY",
     "LEAVE_ROOM",
 }
 _SERVER_MESSAGE_TYPES = {
@@ -40,6 +42,7 @@ _SERVER_MESSAGE_TYPES = {
     "ROOM_STATE",
     "MATCH_STARTED",
     "STATE_SNAPSHOT",
+    "LOG_HISTORY",
     "ACTION_RESULT",
     "ERROR",
     "ROOM_CLOSED",
@@ -308,6 +311,11 @@ def _validate_select_deck(payload: Mapping[str, Any]) -> None:
                 _identifier(profile[field], field)
 
 
+def _validate_confirm_reconnect(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(payload, required={"reconnectToken"}, label="CONFIRM_RECONNECT payload")
+    _identifier(value["reconnectToken"], "reconnectToken")
+
+
 def _validate_set_ready(payload: Mapping[str, Any]) -> None:
     value = _strict_object(
         payload,
@@ -383,11 +391,47 @@ def _validate_leave_room(payload: Mapping[str, Any]) -> None:
     _strict_object(payload, label="LEAVE_ROOM payload")
 
 
+def _validate_request_log_history(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(payload, required={"matchId", "beforeEventIndex"}, label="REQUEST_LOG_HISTORY payload")
+    _identifier(value["matchId"], "matchId")
+    _non_negative_int(value["beforeEventIndex"], "beforeEventIndex")
+
+
+def _validate_log_history(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(payload, required={"matchId", "beforeEventIndex", "events", "hasEarlierEvents",
+                                            "firstEventIndex", "lastEventIndex"}, label="LOG_HISTORY payload")
+    _identifier(value["matchId"], "matchId")
+    before = _non_negative_int(value["beforeEventIndex"], "beforeEventIndex")
+    events = value["events"]
+    if not isinstance(events, list) or len(events) > 80:
+        _invalid("LOG_HISTORY events must be an array with at most 80 entries")
+    _validate_json_value(events, "events")
+    previous = -1
+    for event in events:
+        if not isinstance(event, Mapping):
+            _invalid("LOG_HISTORY event must be an object")
+        index = _non_negative_int(event.get("eventIndex"), "eventIndex")
+        if not previous < index < before:
+            _invalid("LOG_HISTORY eventIndex values must increase below beforeEventIndex")
+        previous = index
+    first = events[0]["eventIndex"] if events else None
+    last = events[-1]["eventIndex"] if events else None
+    if (events and last != before - 1) or (not events and before != 0):
+        _invalid("LOG_HISTORY must end immediately before its requested cursor")
+    for key in ("firstEventIndex", "lastEventIndex"):
+        if value[key] is not None:
+            _non_negative_int(value[key], key)
+    if value["firstEventIndex"] != first or value["lastEventIndex"] != last:
+        _invalid("LOG_HISTORY window indices do not match events")
+    if not isinstance(value["hasEarlierEvents"], bool) or value["hasEarlierEvents"] != bool(events and first > 0):
+        _invalid("LOG_HISTORY hasEarlierEvents does not match its window")
+
+
 def _validate_welcome(payload: Mapping[str, Any]) -> None:
     value = _strict_object(
         payload,
         required={"connectionId"},
-        optional={"playerId", "compatibility"},
+        optional={"playerId", "compatibility", "recoveryPersistenceAck"},
         label="WELCOME payload",
     )
     _identifier(value["connectionId"], "connectionId")
@@ -395,6 +439,8 @@ def _validate_welcome(payload: Mapping[str, Any]) -> None:
         _identifier(value["playerId"], "playerId")
     if "compatibility" in value:
         _validate_compatibility(value["compatibility"])
+    if "recoveryPersistenceAck" in value and not isinstance(value["recoveryPersistenceAck"], bool):
+        _invalid("recoveryPersistenceAck must be a boolean")
 
 
 def _validate_compatibility(value: Mapping[str, Any]) -> None:
@@ -600,11 +646,13 @@ _CLIENT_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
     "CREATE_ROOM": _validate_create_room,
     "JOIN_ROOM": _validate_join_room,
     "RECONNECT": _validate_reconnect,
+    "CONFIRM_RECONNECT": _validate_confirm_reconnect,
     "SELECT_DECK": _validate_select_deck,
     "SET_READY": _validate_set_ready,
     "SELECT_OPENING_CHOICE": _validate_select_opening_choice,
     "SUBMIT_ACTION": _validate_submit_action,
     "REQUEST_SYNC": _validate_request_sync,
+    "REQUEST_LOG_HISTORY": _validate_request_log_history,
     "LEAVE_ROOM": _validate_leave_room,
 }
 _SERVER_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
@@ -612,6 +660,7 @@ _SERVER_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
     "ROOM_STATE": _validate_room_state,
     "MATCH_STARTED": _validate_match_started,
     "STATE_SNAPSHOT": _validate_state_snapshot,
+    "LOG_HISTORY": _validate_log_history,
     "ACTION_RESULT": _validate_action_result,
     "ERROR": _validate_error,
     "ROOM_CLOSED": _validate_room_closed,

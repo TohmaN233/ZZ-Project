@@ -129,11 +129,17 @@ let multiplayerUi = {
   view: null,
   pendingAction: null,
   lastError: null,
+  canReconnect: false,
+  canRetryReconnect: false,
+  recoveryRoomCode: null,
+  reconnectFailures: 0,
+  reconnectMaxAttempts: 5,
   networkRoute: "UNSELECTED",
   lan: { state: "STOPPED", discovered: [] },
 };
 let lanPendingCreateRoom = false;
 let lanPendingJoin = null;
+let onlineBattleLogHistory = { matchId: null, rows: [], missingEarlier: false };
 const PENDING_DUEL_LAUNCH_KEY = "zz_pending_duel_launch";
 const BATTLE_SFX_SELECTION_KEY = "zz_battle_sfx_map";
 const BATTLE_SFX_MAP = {
@@ -240,6 +246,11 @@ const UI_TEXT = {
     onlinePlayers: "玩家",
     onlineUnavailable: "联网对战需要桌面版运行环境。",
     onlineReconnecting: "连接中断，正在恢复对战…",
+    onlineReconnectProgress: "自动重连（{current}/{total}）",
+    onlineReconnectExhausted: "自动重连失败，原房间暂时保留，请尽快重试。",
+    onlineResumeMatch: "重新连接原对局",
+    onlineRecoveryRoom: "原房间码",
+    onlineAbandonRecovery: "放弃恢复",
     onlineDisconnected: "已断线",
     lanGame: "LAN Game",
     lanHost: "主机开房",
@@ -394,6 +405,8 @@ const UI_TEXT = {
     latestLog: "最近记录",
     noBattleLog: "暂无战斗日志",
     legacyLogUnavailable: "旧版记录没有结构化的本地化日志。",
+    onlineEarlierLogUnavailable: "更早的战斗日志不在本次已接收记录中。",
+    onlineLoadEarlierLog: "加载缺失的战斗日志",
     aiAdvicePrefix: "建议",
     aiAdviceThinking: "Codeman 正在思考...",
     aiAdviceUnavailable: "AI 建议不可用。",
@@ -518,6 +531,11 @@ const UI_TEXT = {
     onlinePlayers: "プレイヤー",
     onlineUnavailable: "オンライン対戦にはデスクトップ版が必要です。",
     onlineReconnecting: "接続が切れました。対戦を復旧しています…",
+    onlineReconnectProgress: "自動再接続（{current}/{total}）",
+    onlineReconnectExhausted: "自動再接続に失敗しました。元のルームが保持されている間に再試行してください。",
+    onlineResumeMatch: "元の対戦に再接続",
+    onlineRecoveryRoom: "元のルームコード",
+    onlineAbandonRecovery: "復旧をやめる",
     onlineDisconnected: "切断中",
     lanGame: "LAN Game",
     lanHost: "LAN ホスト",
@@ -684,6 +702,8 @@ const UI_TEXT = {
     latestLog: "最新ログ",
     noBattleLog: "ログはありません",
     legacyLogUnavailable: "旧形式の記録にはローカライズ可能な構造化ログがありません。",
+    onlineEarlierLogUnavailable: "これ以前の戦闘ログは今回の受信記録に含まれていません。",
+    onlineLoadEarlierLog: "未取得の対戦ログを読み込む",
     aiAdvicePrefix: "提案",
     aiAdviceThinking: "Codeman が考えています...",
     aiAdviceUnavailable: "AI提案を利用できません。",
@@ -796,6 +816,11 @@ const UI_TEXT = {
     onlinePlayers: "Players",
     onlineUnavailable: "Online play requires the desktop runtime.",
     onlineReconnecting: "Connection lost. Restoring the match…",
+    onlineReconnectProgress: "Automatic reconnect ({current}/{total})",
+    onlineReconnectExhausted: "Automatic reconnect failed. Retry while the original room is still reserved.",
+    onlineResumeMatch: "Reconnect to match",
+    onlineRecoveryRoom: "Original room code",
+    onlineAbandonRecovery: "Abandon recovery",
     onlineDisconnected: "Disconnected",
     lanGame: "LAN Game",
     lanHost: "Host LAN Room",
@@ -950,6 +975,8 @@ const UI_TEXT = {
     latestLog: "Latest log",
     noBattleLog: "No battle log yet",
     legacyLogUnavailable: "This legacy record has no structured localizable log.",
+    onlineEarlierLogUnavailable: "Earlier battle log entries were not received in this session.",
+    onlineLoadEarlierLog: "Load missing battle log entries",
     aiAdvicePrefix: "Advice",
     aiAdviceThinking: "Codeman is thinking...",
     aiAdviceUnavailable: "AI advice unavailable.",
@@ -3070,6 +3097,7 @@ function isOnlineDuel() {
 function multiplayerErrorText(error = multiplayerUi.lastError) {
   if (!error) return "";
   if (typeof error === "string") return error;
+  if (error.code === "RECONNECT_EXHAUSTED") return t("onlineReconnectExhausted");
   return String(error.message || error.code || error);
 }
 
@@ -3137,6 +3165,10 @@ function applyMultiplayerSnapshot(snapshot, { rerender = true } = {}) {
     pendingChoicePromptId = null;
     lastAppliedMultiplayerViewKey = null;
     appView = ONLINE_VIEW;
+  }
+  if (snapshot.logHistoryPage && isOnlineDuel() && state) {
+    battleLogRows();
+    mergeOnlineBattleLogPage(snapshot.logHistoryPage);
   }
   if (multiplayerUi.status === "CONNECTED" && !multiplayerUi.room) {
     if (lanPendingCreateRoom) {
@@ -3251,6 +3283,7 @@ function persistOnlineDisplayName(name = onlineInputValue("[data-online-name]", 
 }
 
 async function connectOnlineServer() {
+  if (multiplayerUi.canRetryReconnect) return runMultiplayerCommand("reconnect");
   persistOnlineDisplayName();
   const rawUrl = onlineInputValue("[data-online-url]", multiplayerUi.url);
   const url = multiplayerUi.mode === "lan" ? normalizeLanUrl(rawUrl) : rawUrl;
@@ -6222,10 +6255,65 @@ function renderEffectPromptCard(card, option, index, isMulti = false) {
 
 function battleLogRows() {
   if (!state) return [];
-  if (Array.isArray(state.logEvents) && state.logEvents.length) {
-    return state.logEvents.filter((row) => row != null);
+  const rows = Array.isArray(state.logEvents) ? state.logEvents : [];
+  if (!isOnlineDuel() || !multiplayerUi.matchId) return rows.filter((row) => row != null);
+  if (onlineBattleLogHistory.matchId !== multiplayerUi.matchId) {
+    onlineBattleLogHistory = { matchId: multiplayerUi.matchId, rows: [], missingEarlier: false };
   }
-  return [];
+  const history = onlineBattleLogHistory;
+  const metadata = state.logHistory || {};
+  const byIndex = new Map(history.rows.map((row) => [row.eventIndex, row]));
+  for (const row of rows) {
+    if (!row || typeof row !== "object" || !Number.isInteger(row.eventIndex) || row.eventIndex < 0) {
+      throw new Error("Online battle log entry is missing a valid event index.");
+    }
+    byIndex.set(row.eventIndex, row);
+  }
+  history.rows = [...byIndex.values()].sort((left, right) => left.eventIndex - right.eventIndex);
+  history.missingEarlier = onlineBattleLogGapCursor() !== null
+    || Boolean(metadata.hasEarlierEvents && !history.rows.length);
+  return history.rows;
+}
+
+function onlineBattleLogGapCursor() {
+  if (!state || !isOnlineDuel() || onlineBattleLogHistory.matchId !== multiplayerUi.matchId) return null;
+  const rows = onlineBattleLogHistory.rows;
+  const latest = (state.logHistory || {}).latestEventIndex;
+  if (!rows.length) return Number.isInteger(latest) && latest >= 0 ? latest + 1 : null;
+  if (Number.isInteger(latest) && latest > rows[rows.length - 1].eventIndex) return latest + 1;
+  for (let index = rows.length - 1; index > 0; index -= 1) {
+    if (rows[index].eventIndex > rows[index - 1].eventIndex + 1) return rows[index].eventIndex;
+  }
+  return rows[0].eventIndex > 0 ? rows[0].eventIndex : null;
+}
+
+function mergeOnlineBattleLogPage(page) {
+  if (!page || page.matchId !== multiplayerUi.matchId || onlineBattleLogHistory.matchId !== page.matchId) return;
+  if (!Array.isArray(page.events) || !page.events.length || !Number.isInteger(page.beforeEventIndex)
+      || page.beforeEventIndex <= 0) {
+    throw new Error("Online battle log page cannot fill its requested gap.");
+  }
+  let previous = -1;
+  const byIndex = new Map(onlineBattleLogHistory.rows.map((row) => [row.eventIndex, row]));
+  for (const row of page.events) {
+    if (!row || typeof row !== "object" || !Number.isInteger(row.eventIndex)
+        || row.eventIndex <= previous || row.eventIndex >= page.beforeEventIndex) {
+      throw new Error("Online battle log page has an invalid event index.");
+    }
+    byIndex.set(row.eventIndex, row);
+    previous = row.eventIndex;
+  }
+  if (previous !== page.beforeEventIndex - 1) {
+    throw new Error("Online battle log page did not reach its requested cursor.");
+  }
+  onlineBattleLogHistory.rows = [...byIndex.values()].sort((left, right) => left.eventIndex - right.eventIndex);
+  onlineBattleLogHistory.missingEarlier = onlineBattleLogGapCursor() !== null;
+}
+
+async function requestOnlineLogHistory() {
+  const cursor = onlineBattleLogGapCursor();
+  if (!state || !(state.logHistory || {}).canPage || cursor === null || !multiplayerUi.matchId) return null;
+  return runMultiplayerCommand("requestLogHistory", { matchId: multiplayerUi.matchId, beforeEventIndex: cursor });
 }
 
 function logLabel(table, key) {
@@ -6415,6 +6503,10 @@ function renderBattleLogModal() {
                 </div>
               `).join("")
             : `<div class="empty">${esc(t("noBattleLog"))}</div>`}
+          ${isOnlineDuel() && onlineBattleLogHistory.matchId === multiplayerUi.matchId && onlineBattleLogHistory.missingEarlier
+            ? `<div class="empty">${esc(t("onlineEarlierLogUnavailable"))}</div>` : ""}
+          ${isOnlineDuel() && state && (state.logHistory || {}).canPage && onlineBattleLogGapCursor() !== null
+            ? `<button type="button" data-online-log-earlier ${["IN_MATCH", "MATCH_FINISHED"].includes(multiplayerUi.status) ? "" : "disabled"}>${esc(t("onlineLoadEarlierLog"))}</button>` : ""}
         </div>
       </article>
     </div>
@@ -6514,7 +6606,10 @@ function renderDuelView(error = null) {
       </div>
     </header>
     ${online && multiplayerUi.status === "RECONNECTING"
-      ? `<div class="online-reconnect-banner" role="status">${esc(t("onlineReconnecting"))}</div>`
+      ? `<div class="online-reconnect-banner" role="status">${esc(t("onlineReconnecting"))} ${esc(t("onlineReconnectProgress", {
+          current: Math.min((multiplayerUi.reconnectFailures || 0) + 1, multiplayerUi.reconnectMaxAttempts || 5),
+          total: multiplayerUi.reconnectMaxAttempts || 5,
+        }))}</div>`
       : ""}
     ${renderDuelBoardShell(error)}
   `;
@@ -7557,7 +7652,8 @@ function renderOnlineRoom() {
   const room = multiplayerUi.room;
   if (!room) return "";
   const player = currentOnlineRoomPlayer();
-  const canEditLoadout = ["WAITING_FOR_PLAYERS", "READY_CHECK"].includes(room.status);
+  const canEditLoadout = ["WAITING_FOR_PLAYERS", "READY_CHECK"].includes(room.status)
+    && !["OFFLINE", "ERROR", "RECONNECTING"].includes(multiplayerUi.status);
   return `
     <section class="home-panel online-room-panel">
       <div class="home-panel-head">
@@ -7630,7 +7726,9 @@ function renderLanControls() {
 function renderOnlineGamePage(error = null) {
   const bridgeAvailable = Boolean(multiplayerBridge());
   const connected = !["OFFLINE", "ERROR"].includes(multiplayerUi.status);
-  const modeLocked = connected || ["STARTING", "RUNNING"].includes(multiplayerUi.lan && multiplayerUi.lan.state);
+  const canRetryRecovery = Boolean(multiplayerUi.canRetryReconnect);
+  const recoveryRoomCode = multiplayerUi.recoveryRoomCode || (multiplayerUi.room && multiplayerUi.room.roomCode) || "";
+  const modeLocked = connected || canRetryRecovery || ["STARTING", "RUNNING"].includes(multiplayerUi.lan && multiplayerUi.lan.state);
   const visibleError = multiplayerErrorText(error || multiplayerUi.lastError);
   return `
     ${renderShellHeader("ZENONZARD / ONLINE")}
@@ -7650,7 +7748,7 @@ function renderOnlineGamePage(error = null) {
           <div class="online-connect-grid">
             <label class="online-field">
               <span>${esc(multiplayerUi.mode === "lan" ? t("lanManualAddress") : t("onlineServerUrl"))}</span>
-              <input data-online-url value="${esc(multiplayerUi.url || (multiplayerUi.mode === "lan" ? LAN_SERVER_URL : ONLINE_SERVER_URL))}" ${connected ? "disabled" : ""}>
+              <input data-online-url value="${esc(multiplayerUi.url || (multiplayerUi.mode === "lan" ? LAN_SERVER_URL : ONLINE_SERVER_URL))}" ${connected || canRetryRecovery ? "disabled" : ""}>
             </label>
             <label class="online-field">
               <span>${esc(t("onlinePlayerName"))}</span>
@@ -7663,8 +7761,12 @@ function renderOnlineGamePage(error = null) {
             </div>
             ${connected
               ? `<button data-online-disconnect>${esc(t("onlineDisconnect"))}</button>`
-              : `<button class="primary" data-online-connect>${esc(t("onlineConnect"))}</button>`}
+              : canRetryRecovery
+                ? `<button class="primary" data-online-reconnect>${esc(t("onlineResumeMatch"))}</button>
+                   <button data-online-disconnect>${esc(t("onlineAbandonRecovery"))}</button>`
+                : `<button class="primary" data-online-connect>${esc(t("onlineConnect"))}</button>`}
           </div>
+          ${canRetryRecovery ? `<div class="online-status-line"><span>${esc(t("onlineRecoveryRoom"))}</span><strong>${esc(recoveryRoomCode)}</strong></div>` : ""}
           ${connected && !multiplayerUi.room ? `
             <div class="online-room-entry">
               <button class="primary" data-online-create>${esc(t("onlineCreateRoom"))}</button>
@@ -9377,6 +9479,16 @@ app.addEventListener("click", async (event) => {
   if (event.target.closest("[data-online-connect]")) {
     event.preventDefault();
     connectOnlineServer();
+    return;
+  }
+  if (event.target.closest("[data-online-reconnect]")) {
+    event.preventDefault();
+    runMultiplayerCommand("reconnect");
+    return;
+  }
+  if (event.target.closest("[data-online-log-earlier]")) {
+    event.preventDefault();
+    requestOnlineLogHistory();
     return;
   }
   const multiplayerTab = event.target.closest("[data-multiplayer-tab]");

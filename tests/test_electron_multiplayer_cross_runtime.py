@@ -21,8 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 @contextmanager
-def _gateway():
-    core = MultiplayerServer(
+def _gateway(core=None, *, max_message_bytes=262_144):
+    core = core or MultiplayerServer(
         room_id_factory=lambda: "electron-room",
         room_code_factory=lambda: "EL1234",
         match_id_factory=lambda: "electron-match",
@@ -30,7 +30,7 @@ def _gateway():
     )
     gateway = WebSocketMultiplayerGateway(
         core,
-        config=WebSocketServerConfig(host="127.0.0.1", port=0),
+        config=WebSocketServerConfig(host="127.0.0.1", port=0, max_message_bytes=max_message_bytes),
     )
     with gateway.create_server() as server:
         thread = Thread(target=server.serve_forever, name="electron-cross-runtime-server")
@@ -131,3 +131,93 @@ const waitFor = async (predicate, label) => {
     assert result["roomCode"] == "EL1234"
     assert result["roomStatus"] == "READY_CHECK"
     assert result["winner"] == "Bob"
+
+
+def test_real_64k_gateway_restores_complete_desktop_history_and_isolates_the_next_match() -> None:
+    from test_multiplayer_reconnect import TimerFactory, _connected_server, _start_match
+
+    core, messages = _connected_server(TimerFactory())
+    match_ids = iter(("match-1", "match-2"))
+    core._match_id_factory = lambda: next(match_ids)
+    tokens = _start_match(core, messages)
+    match = core.match_for_room("ABC123")
+    owner = match.session.engine.state.players[0]
+    match.session._log_event("private-log-text", {"type": "effect_target", "actorSide": "P1",
+                                                "targets": [match.session._effect_target_log_payload(owner.hand[0])]})
+    for index in range(104):
+        match.session._log_event("diagnostics", {"type": "reveal", "actorSide": "P1", "reason": "公開" * 2000})
+    core.disconnect("a")
+    core.disconnect("b")
+    script = r"""
+const assert = require("node:assert/strict");
+const { MultiplayerDesktopClient } = require(process.env.ZZ_CLIENT_MODULE);
+const tokens = JSON.parse(process.env.ZZ_TEST_TOKENS);
+const waitFor = async (predicate, label) => {
+  const deadline = Date.now() + 5000;
+  while (Date.now() < deadline) {
+    if (predicate()) return;
+    await new Promise(resolve => setTimeout(resolve, 5));
+  }
+  throw new Error(`timeout: ${label}`);
+};
+(async () => {
+  const clients = [new MultiplayerDesktopClient(), new MultiplayerDesktopClient()];
+  const [first, second] = clients;
+  try {
+    for (const [index, client] of clients.entries()) {
+      const playerId = `player_${index + 1}`;
+      client.restoreRecoverySession({ url: process.env.ZZ_TEST_URL, roomCode: "ABC123", playerId,
+        reconnectToken: tokens[playerId], matchId: "match-1", pendingAction: null });
+      client.reconnect();
+    }
+    await waitFor(() => clients.every(client => client.state === "IN_MATCH"), "both reconnect snapshots");
+    const board = first.view;
+    const all = new Map();
+    let before = first.view.logHistory.latestEventIndex + 1;
+    while (before > 0) {
+      first.requestLogHistory({ matchId: "match-1", beforeEventIndex: before });
+      await waitFor(() => first.getSnapshot().logHistoryPage?.beforeEventIndex === before, `page ${before}`);
+      const page = first.getSnapshot().logHistoryPage;
+      assert.ok(page.events.length > 0);
+      for (const event of page.events) all.set(event.eventIndex, event);
+      assert.ok(page.firstEventIndex < before);
+      before = page.firstEventIndex;
+    }
+    assert.deepEqual([...all.keys()].sort((a, b) => a - b), Array.from({ length: 105 }, (_, i) => i));
+    assert.deepEqual(first.view, board);
+    assert.ok(all.get(0).targets[0].cardId);
+    second.requestLogHistory({ matchId: "match-1", beforeEventIndex: 1 });
+    await waitFor(() => second.getSnapshot().logHistoryPage?.beforeEventIndex === 1, "private opponent history");
+    assert.equal(second.getSnapshot().logHistoryPage.events[0].targets[0].faceDown, true);
+    assert.equal(second.getSnapshot().logHistoryPage.events[0].targets[0].cardId, undefined);
+    assert.equal(JSON.stringify(first.getSnapshot().logHistoryPage).includes("private-log-text"), false);
+    first.surrender({ clientActionId: "history-finish" });
+    await waitFor(() => clients.every(client => client.state === "MATCH_FINISHED" && client.room?.status === "READY_CHECK"), "finish");
+    first.requestLogHistory({ matchId: "match-1", beforeEventIndex: 1 });
+    await waitFor(() => first.getSnapshot().logHistoryPage?.beforeEventIndex === 1, "finished history");
+    assert.ok(first.getSnapshot().logHistoryPage.events[0].targets[0].cardId);
+    for (const client of clients) client.dismissMatchResult();
+    first.setReady({ ready: true });
+    second.setReady({ ready: true });
+    await waitFor(() => clients.every(client => client.state === "MATCH_STARTING"), "ready rematch");
+    first.selectOpeningChoice({ choice: "rock" });
+    second.selectOpeningChoice({ choice: "scissors" });
+    await waitFor(() => clients.every(client => client.matchId === "match-2" && client.state === "IN_MATCH"), "next match");
+    assert.equal(first.getSnapshot().logHistoryPage, null);
+    assert.equal(second.getSnapshot().logHistoryPage, null);
+    assert.throws(() => first.requestLogHistory({ matchId: "match-1", beforeEventIndex: 1 }), /current match/);
+    process.stdout.write(JSON.stringify({ recovered: all.size, matchId: first.matchId, private: true }));
+  } finally {
+    for (const client of clients) client.disconnect();
+  }
+})().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
+"""
+    env = {**os.environ, "ZZ_CLIENT_MODULE": str(ROOT / "electron" / "multiplayer-client.js"),
+           "ZZ_TEST_TOKENS": json.dumps(tokens)}
+    with _gateway(core, max_message_bytes=65_536) as url:
+        env["ZZ_TEST_URL"] = url
+        completed = subprocess.run(["node", "-e", script], cwd=ROOT, env=env, capture_output=True,
+                                   text=True, timeout=25, check=True)
+    result = json.loads(completed.stdout)
+    assert result == {"recovered": 105, "matchId": "match-2", "private": True}
+    assert core._finished_match_logs == {}

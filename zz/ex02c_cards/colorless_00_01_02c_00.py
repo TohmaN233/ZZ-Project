@@ -44,6 +44,7 @@ def build_card(row: dict[str, Any]):
             target_kind="enemy_minion",
             max_targets=1,
             active_areas=(AreaType.BLESSING,),
+            granted_by_blessing=True,
             official_effect=(
                 "自分のマナが10以上ある場合、相手のミニオン1体を破壊する。"
             ),

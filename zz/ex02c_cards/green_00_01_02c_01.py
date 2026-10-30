@@ -41,6 +41,7 @@ def build_card(row: dict[str, Any]):
             duration="turn",
             only_rested=True,
             active_areas=(AreaType.BLESSING,),
+            granted_by_blessing=True,
             official_effect="このターン中、相手のレスト状態であるミニオン1体をBP-400する。",
             official_timing="アタック時",
         )

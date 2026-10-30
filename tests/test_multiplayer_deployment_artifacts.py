@@ -34,6 +34,17 @@ def test_deployment_environment_example_has_required_non_secret_configuration() 
     assert "token" not in text.lower()
     assert "127.0.0.1" in text
 
+    from zz.multiplayer.deployment import DeploymentConfig
+
+    values = dict(
+        line.split("=", 1)
+        for line in text.splitlines()
+        if line and not line.startswith("#")
+    )
+    config = DeploymentConfig.from_environ(values)
+    assert config.reconnect_grace_ms == 600_000
+    assert config.room_idle_timeout_ms >= config.reconnect_grace_ms
+
 
 def test_python_package_discovery_excludes_non_package_release_directories() -> None:
     pyproject = (ROOT / "pyproject.toml").read_text(encoding="utf-8")

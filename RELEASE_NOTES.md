@@ -1,3 +1,39 @@
+# v0.5.3 - Rules and Online Reliability
+
+[简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
+
+## 简体中文
+
+- **圣之 Force**：保护符合条件的己方怪物，使其不会被通过加护赋予对手怪物的选择效果选中。
+- **恩里科**：效果顺序调整为双方先弃牌，再抽牌。
+- **断线重连**：联机断线后最多自动重连 5 次，并保留房间码。
+- **对局日志**：当前对局中的战斗日志和结果页日志均支持分页查看。
+- **联机版本**：新客户端和新服务器版本需要同步，双方客户端与服务器应使用相同版本。
+
+## 日本語
+
+- **聖の Force**：条件を満たす自分のミニオンを保護し、加護によって相手のミニオンに付与された選択効果の対象にならないようにします。
+- **エンリコ**：効果の順序を変更し、両プレイヤーが先に捨ててからカードを引きます。
+- **切断後の再接続**：最大 5 回まで自動再接続し、ルームコードを保持します。
+- **対局ログ**：対戦中と結果画面のバトルログをページ分けして表示します。
+- **オンライン対戦のバージョン**：新しいクライアントとサーバーは同じバージョンに揃えてください。
+
+## English
+
+- **Holy Force**: Protects eligible friendly minions from targeting effects granted to opposing minions by a Blessing.
+- **Enrico**: Both players now discard first, then draw.
+- **Reconnects**: Online play retries a disconnected session up to five times and preserves the room code.
+- **Battle logs**: Logs are paginated during the current match and on the results page.
+- **Online versions**: New client and server releases must be kept in sync; both clients and the server should use the same version.
+
+## Downloads
+
+- [Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Windows-Setup.exe)
+- [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Linux.tar.gz)
+- [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-source.zip)
+- [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Multiplayer-v0.5.3.tar.gz)
+- [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/SHA256SUMS-PC02.txt)
+
 # v0.5.2 - Deck Storage and Diagnostics
 
 [简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
