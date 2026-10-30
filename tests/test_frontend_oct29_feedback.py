@@ -210,7 +210,7 @@ def test_rosario_real_dtos_animate_through_public_resolving_area(duel_fx_fixture
   }
   assert(exits===1&&count("resolving")===0&&count("trash")===1&&count("hand")===0,"source arrives once without loss or duplication");
   assert(source().hand.length===expectedHand,"leaving resolving never removes another hidden hand card");
-  assert(!ZZFx.inspect().errors.length,"resolving playback stays error-free");
+  assert(!ZZFx.inspect().errors.length,"resolving playback stays error-free: "+JSON.stringify(ZZFx.inspect().errors));
   return {ok:true,exits};'''
     _run_fx_test_page(fixture, tmp_path, PAGE.replace("BODY", body))
 
@@ -434,7 +434,7 @@ def test_summon_and_base_placement_fly_without_landing_particles(duel_fx_fixture
     assert(!app.querySelector(".board-graveyard-summon"),"no legacy resurrection landing glow");
     end(event);
   }
-  assert(!ZZFx.inspect().errors.length,"arrival paths must remain error-free");
+  assert(!ZZFx.inspect().errors.length,"arrival paths must remain error-free: "+JSON.stringify(ZZFx.inspect().errors));
   return {ok:true};'''
     _run_fx_test_page(duel_fx_fixture, tmp_path, PAGE.replace("BODY", body))
 
