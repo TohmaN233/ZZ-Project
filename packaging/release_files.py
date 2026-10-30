@@ -120,6 +120,8 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.update(Path("tests") / name for name in (*FOCUSED_TESTS, "test_release_archive_inventory.py"))
         paths.add(Path("tests/test_ex02c_cards.py"))
         paths.add(Path("tests/test_ex02_cards.py"))
+        paths.add(Path("tests/test_deck_root_migration.py"))
+        paths.add(Path("tests/electron_deck_storage.test.js"))
         paths.update(Path("tests") / name for name in ("test_frontend_duel_dom.py", "test_frontend_fx.py", "test_frontend_fx_arrival.py"))
         paths.update(Path("tests") / name for name in (
             "test_effect_resolution_order_oct29.py", "test_eugeo_reactive_shield_combat.py",

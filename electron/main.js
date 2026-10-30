@@ -95,6 +95,10 @@ function packagedDeckRoot() {
   return path.join(path.dirname(process.execPath), "data", "decks");
 }
 
+function packagedBundledDeckRoot() {
+  return path.join(process.resourcesPath, "default-decks");
+}
+
 function packagedUserDataRoot() {
   return path.join(app.getPath("userData"), "game-data");
 }
@@ -500,7 +504,8 @@ function pythonArgs(port) {
   }
   const args = app.isPackaged
     ? ["--host", "127.0.0.1", "--port", String(port), "--asset-root", assetRoot,
-      "--user-data-root", packagedUserDataRoot(), "--bundled-deck-root", packagedDeckRoot()]
+      "--user-data-root", packagedUserDataRoot(), "--deck-root", packagedDeckRoot(),
+      "--bundled-deck-root", packagedBundledDeckRoot()]
     : ["-m", "zz.web.server", "--host", "127.0.0.1", "--port", String(port)];
   if (!app.isPackaged && assetRoot) args.push("--asset-root", assetRoot);
   else if (!app.isPackaged && process.env.ZZ_ASSET_ROOT) args.push("--asset-root", process.env.ZZ_ASSET_ROOT);
@@ -516,9 +521,13 @@ async function startServer(options = {}) {
   const serverCommand = packagedServerPath() || process.env.ZZ_PYTHON || "python";
   serverProcess = spawn(serverCommand, pythonArgs(port), {
     cwd: projectRoot(),
+    env: { ...process.env, PYTHONIOENCODING: "utf-8" },
     windowsHide: true,
     stdio: ["ignore", "pipe", "pipe"],
   });
+  const startedProcess = serverProcess;
+  let startupFailure = null;
+  let startupDiagnostics = "";
 
   serverProcess.stdout.on("data", (chunk) => {
     const text = chunk.toString("utf8");
@@ -528,12 +537,27 @@ async function startServer(options = {}) {
       serverUrl = match[0];
     }
   });
-  serverProcess.stderr.on("data", appendLog);
+  serverProcess.stderr.on("data", (chunk) => {
+    appendLog(chunk);
+    startupDiagnostics = (startupDiagnostics + chunk.toString("utf8")).slice(-4000);
+  });
+  serverProcess.once("error", (error) => {
+    startupFailure = new Error(`Unable to start Python server: ${error.message || error}`);
+    appendLog(startupFailure.message);
+    if (serverProcess === startedProcess) serverProcess = null;
+    serverState = "stopped";
+  });
   serverProcess.on("exit", (code, signal) => {
     appendLog(`Python server exited: ${code ?? signal}`);
     serverProcess = null;
     if (serverState !== "stopping") {
       serverState = "stopped";
+    }
+  });
+  startedProcess.once("close", (code, signal) => {
+    if (!serverUrl && !startupFailure) {
+      const details = startupDiagnostics.trim();
+      startupFailure = new Error(`Python server exited: ${code ?? signal}${details ? `\n${details}` : ""}\nLog: ${path.join(app.getPath("userData"), "server.log")}`);
     }
   });
 
@@ -542,6 +566,10 @@ async function startServer(options = {}) {
     const readUrl = () => {
       if (serverUrl) {
         resolve(serverUrl);
+        return;
+      }
+      if (startupFailure) {
+        reject(startupFailure);
         return;
       }
       if (Date.now() - startedAt > 15000) {

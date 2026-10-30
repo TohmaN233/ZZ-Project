@@ -14,9 +14,9 @@
 
 ## インストール
 
-v0.5.1 では、編集中のデッキをワンクリックで空の新規デッキにリセットする機能を追加しました。カードと Force はクリアされ、名前と検索フィルターは初期状態に戻りますが、保存済みデッキは削除されません。また、v0.5.0 で追加した EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）と対応する EX02 オリジナルカード面、カード検索・ルール処理・Force 検索・対戦中の視覚的フィードバックの改善も引き続き含まれます。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.5.1 を使用してください。
+v0.5.2 の Windows 版では、インストール先の `data/decks/` にデッキを保存します。初回起動時に従来の `%APPDATA%\zenonzard-clone\game-data\decks\` からデッキを移行し、元ファイルをバックアップとして残し、競合するデッキを上書きしません。初手交換時にカードを選択しても隣のカードが隠れなくなり、起動に失敗した場合は診断情報が表示されます。データ保護のため、アンインストール後に一部のプログラム関連ファイルが残る場合があります。オンライン対戦では両プレイヤーのクライアントと接続先サーバーの `applicationVersion` が完全に一致している必要があります。接続前に三者のバージョンを確認してください。v0.5.1 の空のデッキへのワンクリックリセット機能も引き続き利用でき、保存済みデッキは削除されません。また、カード検索、ルール処理、Force 検索、対戦中の視覚的フィードバックの改善も含まれます。v0.5.0 で追加した EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）と対応する EX02 オリジナルカード面も引き続き収録しています。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 

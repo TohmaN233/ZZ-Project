@@ -1542,14 +1542,21 @@ button:disabled {
   margin-left: 0;
 }
 
-.hand-fan.bottom .hand-slot:hover,
-.hand-fan.bottom .hand-slot:focus-within {
+.hand-fan.bottom .hand-slot:has(:focus-visible) {
   z-index: 100;
   transform: translateY(-10px) rotate(0deg);
 }
 
-.hand-fan.bottom .hand-slot:hover .card.hand-card,
-.hand-fan.bottom .hand-slot:focus-within .card.hand-card {
+.hand-fan.bottom .hand-slot:hover {
+  z-index: 101;
+  transform: translateY(-10px) rotate(0deg);
+}
+
+.hand-fan.bottom .hand-slot:has(:focus-visible) .card.hand-card {
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.48), 0 0 0 2px rgba(50, 213, 200, 0.58);
+}
+
+.hand-fan.bottom .hand-slot:hover .card.hand-card {
   box-shadow: 0 16px 30px rgba(0, 0, 0, 0.48), 0 0 0 2px rgba(50, 213, 200, 0.58);
 }
 

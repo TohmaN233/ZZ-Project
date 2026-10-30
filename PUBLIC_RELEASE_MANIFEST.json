@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.5.1",
+  "releaseVersion": "0.5.2",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -30,23 +30,23 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.5.1-Windows-Setup.exe",
+    "filename": "ZZ-Project-v0.5.2-Windows-Setup.exe",
     "contains": [
       "Electron desktop client",
       "frozen Python web server with PC02R, EX02 and EX02C card content",
       "first-launch asset downloader and bundled 7-Zip",
       "current PC01-trained runtime AI models"
     ],
-    "sampleDecks": "separate data/decks directory next to ZZ-Project.exe; saved decks use the per-user game-data/decks directory",
+    "sampleDecks": "read-only default samples under resources/default-decks; saved decks under installation-root data/decks; previous per-user decks are migrated without overwriting",
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe",
-    "bytes": 151696795,
-    "sha256": "F64BBDC1D4AF8667D45675D628ED2C280640A7754076FD755341DE0CDB0185A7"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Windows-Setup.exe",
+    "bytes": 151709981,
+    "sha256": "9E0E310CFEF98D4688E4A154C8505A98BBA6EFCE911A96C1FC75A603198C60E4"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.5.1-Linux.tar.gz",
+    "filename": "ZZ-Project-v0.5.2-Linux.tar.gz",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
@@ -54,9 +54,9 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz",
-    "bytes": 23371577,
-    "sha256": "38D5BF77B1B21BBF861E4F1A58970770550DBA731300B867D7A4129B4958932F"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Linux.tar.gz",
+    "bytes": 23386381,
+    "sha256": "C8A221AFD7AF583FC33E2800AC5F434BDEC0F340EA06E8255D8626B655762BA5"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -94,29 +94,29 @@
   ],
   "releaseStatus": "published",
   "sourcePackage": {
-    "filename": "ZZ-Project-v0.5.1-source.zip",
+    "filename": "ZZ-Project-v0.5.2-source.zip",
     "contains": [
       "current product source, build tools and deployment examples",
       "focused tests and PC02R and EX02C semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip",
-    "bytes": 39872659,
-    "sha256": "DDF0F9773316EE612222935BBC79F1EBF636271244E79F3DA91F0E45977F5E4F"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-source.zip",
+    "bytes": 39894161,
+    "sha256": "309EA7092E4B890B04652B361F81B1C301219BA30771615266C88CBB63A592C7"
   },
   "multiplayerServer": {
-    "filename": "ZZ-Multiplayer-v0.5.1.tar.gz",
+    "filename": "ZZ-Multiplayer-v0.5.2.tar.gz",
     "contains": [
       "authoritative multiplayer server with PC02R, EX02 and EX02C card content",
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz",
-    "bytes": 687098,
-    "sha256": "7B0A706B6079C4A269AB3B3CA1D535E984D8CA260EB45B9F6783117E7A08198A"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz",
+    "bytes": 692183,
+    "sha256": "A5141405DC523AE7B23C50511A9598BB5308032F101731FD75DEE071B4E7F1F2"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
-  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.1",
-  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt",
-  "releaseSummary": "Add a one-click deck editor reset that starts a new deck without deleting saved decks."
+  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.2",
+  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/SHA256SUMS-PC02.txt",
+  "releaseSummary": "Save decks in the game directory with safe migration from per-user storage, and fix overlapping hand cards during mulligan."
 }

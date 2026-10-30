@@ -1,37 +1,46 @@
-# v0.5.1 - Deck Builder Clear Action
+# v0.5.2 - Deck Storage and Diagnostics
 
 [简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
 
 ## 简体中文
 
-- **卡组编辑器**：新增一键将当前编辑器重置为空白新卡组的操作，会清空卡牌和 Force，并重置名称及搜索筛选；已保存的卡组不会被删除。
-- **联机兼容性**：联机握手要求客户端与服务器的 `applicationVersion` 完全一致；双方客户端和服务器（包括自建服务器）均须使用 v0.5.1。
-- **卡池**：继续包含 v0.5.0 加入的 EX02C/SAO 70 张卡（含 2 张 CAMPAIGN 卡）及其对应的 EX02 原版卡面。
+- **Windows 卡组保存**：卡组保存在安装目录的 `data/decks/`。首次启动时从旧的 `%APPDATA%\zenonzard-clone\game-data\decks\` 迁移卡组，保留原文件作为备份；冲突卡组不会被覆盖。
+- **换手选牌**：选择卡牌时不再遮挡相邻卡牌。
+- **启动诊断**：启动失败时显示诊断信息。
+- **卸载保护**：为保护玩家数据，卸载时可能保留部分程序资源。
+- **联机兼容性**：联机握手要求双方客户端和所连接服务器的 `applicationVersion` 完全相同；连接前请确认三方版本一致。此规则也适用于自建服务器。
+- **此前功能**：继续包含 v0.5.1 的一键将当前编辑器重置为空白新卡组功能（不会删除已保存卡组），以及 v0.5.0 加入的 EX02C/SAO 70 张卡（含 2 张 CAMPAIGN 卡）和对应的 EX02 原版卡面。
 
 ## 日本語
 
-- **デッキ編集**：編集中のデッキをワンクリックで空の新規デッキにリセットできます。カードと Force はクリアされ、名前と検索フィルターは初期状態に戻りますが、保存済みデッキは削除されません。
-- **オンライン互換性**：クライアントとサーバーの `applicationVersion` が完全に一致する必要があります。双方とサーバー（自設サーバーを含む）に v0.5.1 を使用してください。
-- **カードプール**：v0.5.0 で追加した EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）と、対応する EX02 オリジナルカード面も引き続き含まれます。
+- **Windows のデッキ保存**：インストール先の `data/decks/` に保存します。初回起動時に従来の `%APPDATA%\zenonzard-clone\game-data\decks\` から移行し、元ファイルをバックアップとして残します。競合するデッキは上書きしません。
+- **初手交換時のカード選択**：カードを選択しても隣のカードが隠れなくなりました。
+- **起動時の診断**：起動に失敗した場合、診断情報を表示します。
+- **アンインストール時の保護**：データを保護するため、一部のプログラム関連ファイルが残る場合があります。
+- **オンライン互換性**：双方のクライアントと接続先サーバーの `applicationVersion` が完全に一致する必要があります。接続前に三者のバージョンを確認してください。自設サーバーにも同じルールが適用されます。
+- **既存機能**：v0.5.1 の空の新規デッキへのワンクリックリセット（保存済みデッキは削除されません）と、v0.5.0 で追加した EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）および対応する EX02 オリジナルカード面も引き続き含まれます。
 
 ## English
 
-- **Deck builder**: Reset the current editor to a blank new deck with one click, clearing cards and Forces and resetting the name and search filters without deleting saved decks.
-- **Online compatibility**: The client and server `applicationVersion` values must match exactly. Both players and the server, including self-hosted servers, must use v0.5.1.
-- **Card pool**: The 70 EX02C/SAO cards added in v0.5.0, including two CAMPAIGN cards and their corresponding EX02 original faces, remain included.
+- **Windows deck storage**: Decks are stored in `data/decks/` inside the installation directory. On first launch, decks are migrated from the legacy `%APPDATA%\zenonzard-clone\game-data\decks\` folder, with the original files kept as backups; conflicting decks are not overwritten.
+- **Opening mulligan selection**: Selecting a card no longer obscures neighboring cards.
+- **Startup diagnostics**: Diagnostic information is displayed when startup fails.
+- **Uninstall protection**: Some program resources may remain after uninstall to protect player data.
+- **Online compatibility**: Both clients and the connected server must report exactly the same `applicationVersion`. Check all three before connecting. The same rule applies to self-hosted servers.
+- **Existing features**: The v0.5.1 one-click reset to a blank deck (without deleting saved decks) and the 70 EX02C/SAO cards added in v0.5.0, including two CAMPAIGN cards and their corresponding EX02 original faces, remain included.
 
 ## Downloads
 
-- [Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe)
-- [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz)
-- [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip)
-- [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz)
-- [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt)
+- [Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Windows-Setup.exe)
+- [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Linux.tar.gz)
+- [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-source.zip)
+- [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz)
+- [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/SHA256SUMS-PC02.txt)
 
 Package sizes and SHA-256 values are recorded in [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json).
 See [INSTALL.md](INSTALL.md) for setup and [docs/ONLINE.md](docs/ONLINE.md) for online play and self-hosting.
 
-## Previous release: v0.5.0 - EX02C/SAO and Duel Improvements
+## Earlier release: v0.5.0 - EX02C/SAO and Duel Improvements
 
 ### 简体中文
 

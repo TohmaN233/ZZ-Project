@@ -146,3 +146,123 @@ addEventListener('message', ({data}) => {
     assert main["commandBottom"] <= main["cockpitBottom"] + 1, json.dumps(measured)
     assert main["buttonBottom"] <= main["cockpitBottom"] + 1, json.dumps(measured)
     assert main["buttonOverlapsHand"] is False, json.dumps(measured)
+
+
+@pytest.mark.parametrize("online,width,height", [
+    (False, 1366, 768),
+    (True, 1920, 1080),
+])
+def test_mulligan_pointer_does_not_leave_a_focused_card_over_its_neighbors(
+    duel_fixture, tmp_path, online, width, height,
+):
+    origin, fixture = duel_fixture
+    opening = GameSession(seed=123, mode="human-vs-ai", opponent_ai_difficulty="easy").state_dto()
+    assert opening["prompt"]["kind"] == "mulligan"
+    data = json.dumps({"catalog": fixture["catalog"], "opening": opening}, ensure_ascii=False).replace("<", "\\u003c")
+    html = '''<!doctype html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><base href="ORIGIN/">
+<link rel="stylesheet" href="static/styles.css"><link rel="stylesheet" href="static/fx.css"></head>
+<body><main id="app" class="app duel-app"></main><script>window.ZZ_DEFER_BOOT=true;</script>
+<script src="static/api-client.js"></script><script src="static/multiplayer-card-policy.js"></script>
+<script src="static/duel-layout.js"></script><script src="static/duel-dom.js"></script>
+<script src="static/fx-core.js"></script><script src="static/app.js"></script><script>
+const fixture=FIXTURE;catalog=fixture.catalog;state=fixture.opening;appView="duel";
+activeMatchPayload={multiplayer:ONLINE};settings.duelScale=100;
+window.ZZDuelRuntime={render:window.ZZApp.renderDuelView};render();window.__mulliganReady=true;
+</script></body></html>'''.replace("ORIGIN", origin).replace("FIXTURE", data).replace("ONLINE", "true" if online else "false")
+    page = tmp_path / "mulligan.html"
+    page.write_text(html, encoding="utf-8")
+    driver = r'''
+const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
+const {spawn,spawnSync}=require("node:child_process");
+const WebSocket=globalThis.WebSocket||require("ws");
+const [browser,profile,url,width,height]=process.argv.slice(1),delay=ms=>new Promise(r=>setTimeout(r,ms));
+const chrome=spawn(browser,["--headless=new","--no-sandbox","--no-first-run","--disable-extensions",
+  "--disable-breakpad","--disable-crash-reporter","--remote-debugging-port=0","--remote-allow-origins=*",
+  "--window-size="+width+","+height,"--user-data-dir="+profile,"about:blank"],{stdio:"ignore",windowsHide:true});
+(async()=>{let ws;try{
+  const portFile=path.join(profile,"DevToolsActivePort");
+  for(let i=0;!fs.existsSync(portFile);i++){if(i>100)throw Error("Chrome debug port did not open");await delay(100);}
+  const port=fs.readFileSync(portFile,"utf8").split("\n")[0];
+  const targets=await(await fetch("http://127.0.0.1:"+port+"/json/list")).json();
+  ws=new WebSocket(targets.find(t=>t.type==="page").webSocketDebuggerUrl);
+  await new Promise((resolve,reject)=>{ws.onopen=resolve;ws.onerror=reject;});
+  let serial=0;const pending=new Map();
+  ws.onmessage=e=>{const msg=JSON.parse(e.data);if(!msg.id)return;const p=pending.get(msg.id);
+    pending.delete(msg.id);msg.error?p.reject(Error(JSON.stringify(msg.error))):p.resolve(msg.result);};
+  const send=(method,params={})=>new Promise((resolve,reject)=>{const id=++serial;
+    pending.set(id,{resolve,reject});ws.send(JSON.stringify({id,method,params}));});
+  const evaluate=async expression=>{const r=await send("Runtime.evaluate",{expression,returnByValue:true,awaitPromise:true});
+    if(r.exceptionDetails)throw Error(JSON.stringify(r.exceptionDetails));return r.result.value;};
+  await send("Runtime.enable");await send("Page.enable");
+  await send("Emulation.setDeviceMetricsOverride",{width:Number(width),height:Number(height),deviceScaleFactor:1,mobile:false});
+  await send("Page.navigate",{url});
+  for(let i=0;i<150;i++){if(await evaluate("Boolean(window.__mulliganReady)"))break;
+    if(i===149)throw Error("mulligan page did not load");await delay(100);}
+  await delay(300);
+  const snapshot=()=>evaluate(`(()=>{
+    const slots=[...document.querySelectorAll('.hand-fan.bottom .hand-slot')];
+    return {selected:[...mulliganSelectedIids],active:document.activeElement?.dataset?.mulliganIid||null,
+      slots:slots.map(slot=>{const card=slot.querySelector('.card'),button=slot.querySelector('.mulligan-toggle');
+        const r=card.getBoundingClientRect(),b=button?.getBoundingClientRect();
+        return {iid:card.dataset.cardIid,selected:card.classList.contains('mulligan-selected'),
+          hover:slot.matches(':hover'),focus:slot.matches(':focus-within'),
+          focusVisible:slot.matches(':has(:focus-visible)'),z:Number(getComputedStyle(slot).zIndex),
+          rect:{left:r.left,right:r.right,top:r.top,bottom:r.bottom},
+          button:b&&{x:b.left+b.width/2,y:b.top+b.height/2}};})};})()`);
+  const move=async (x,y)=>{await send("Input.dispatchMouseEvent",{type:"mouseMoved",x,y});await delay(220);};
+  const click=async (x,y)=>{await send("Input.dispatchMouseEvent",{type:"mousePressed",x,y,button:"left",clickCount:1});
+    await send("Input.dispatchMouseEvent",{type:"mouseReleased",x,y,button:"left",clickCount:1});await delay(220);};
+  const key=async (name,code,number)=>{await send("Input.dispatchKeyEvent",{type:"keyDown",key:name,code,windowsVirtualKeyCode:number});
+    await send("Input.dispatchKeyEvent",{type:"keyUp",key:name,code,windowsVirtualKeyCode:number});await delay(100);};
+  let state=await snapshot();assert.ok(state.slots.length>=5,"opening hand must have selectable cards");
+  const right=4,left=3,rightId=state.slots[right].iid,leftId=state.slots[left].iid;
+  assert.ok(state.slots[right].button,"mulligan button is present");
+  await move(state.slots[right].button.x,state.slots[right].button.y);
+  state=await snapshot();await click(state.slots[right].button.x,state.slots[right].button.y);
+  state=await snapshot();assert.ok(state.selected.includes(Number(rightId)),"pointer selects the intended card");
+  await move(4,4);state=await snapshot();
+  assert.ok(state.slots[right].selected&&state.slots[right].focus&&!state.slots[right].hover,
+    "selected card keeps its selection and pointer focus after leaving");
+  assert.equal(state.slots[right].focusVisible,false,"mouse focus must not appear as keyboard focus");
+  assert.ok(state.slots[right].z<100,"mouse-focused card must stop covering its neighbors after pointer leaves: "+JSON.stringify(state));
+  let r=state.slots[left].rect;await move(r.left+8,(r.top+r.bottom)/2);state=await snapshot();
+  assert.ok(state.slots[left].hover,"neighbor can be hovered");
+  const hit=await evaluate(`(()=>{const slots=[...document.querySelectorAll('.hand-fan.bottom .hand-slot')];
+    const a=slots[${left}].querySelector('.card').getBoundingClientRect(),b=slots[${right}].querySelector('.card').getBoundingClientRect();
+    const x=(Math.max(a.left,b.left)+Math.min(a.right,b.right))/2,y=(Math.max(a.top,b.top)+Math.min(a.bottom,b.bottom))/2;
+    return {overlap:Math.min(a.right,b.right)>Math.max(a.left,b.left),owner:document.elementFromPoint(x,y)?.closest('.hand-slot')===slots[${left}]};})()`);
+  assert.ok(hit.overlap&&hit.owner,"hovered neighbor must be on top in the overlap: "+JSON.stringify(hit));
+  await move(state.slots[left].button.x,state.slots[left].button.y);state=await snapshot();
+  await click(state.slots[left].button.x,state.slots[left].button.y);state=await snapshot();
+  assert.ok(state.selected.includes(Number(leftId))&&state.selected.includes(Number(rightId)),"adjacent cards can both be selected");
+  await move(4,4);
+  for(let i=0;i<4;i++){await key("Tab","Tab",9);state=await snapshot();if(state.active)break;}
+  assert.ok(state.active,"keyboard can focus a mulligan button");
+  const focused=state.slots.find(slot=>slot.iid===state.active);
+  assert.ok(focused?.focusVisible&&focused.z>=100,"keyboard focus remains visibly raised");
+  const previous=state.selected.includes(Number(state.active));const activeId=Number(state.active);
+  await key(" ","Space",32);state=await snapshot();
+  assert.notEqual(state.selected.includes(activeId),previous,"keyboard can toggle the focused card");
+  const keyboardSlot=state.slots.find(slot=>slot.iid===String(activeId));
+  assert.ok(keyboardSlot?.focusVisible&&keyboardSlot.z>=100,"keyboard focus survives the selection redraw");
+  const other=keyboardSlot.iid===leftId?right:left;r=state.slots[other].rect;
+  await move(r.left+8,(r.top+r.bottom)/2);state=await snapshot();
+  assert.ok(state.slots[other].hover&&state.slots[other].z>state.slots.find(slot=>slot.iid===String(activeId)).z,
+    "hovered card must appear above a different keyboard-focused card");
+  const focusedIndex=state.slots.findIndex(slot=>slot.iid===String(activeId));
+  await move(state.slots[focusedIndex].button.x,state.slots[focusedIndex].button.y);state=await snapshot();
+  await click(state.slots[focusedIndex].button.x,state.slots[focusedIndex].button.y);await move(4,4);state=await snapshot();
+  assert.ok(!state.slots[focusedIndex].focusVisible&&state.slots[focusedIndex].z<100,
+    "a mouse click after keyboard focus must not leave the card raised");
+  console.log("MULLIGAN_POINTER_AND_KEYBOARD_OK");
+}finally{ws?.close();if(process.platform==="win32")spawnSync("taskkill",["/PID",String(chrome.pid),"/T","/F"],{stdio:"ignore",windowsHide:true});else chrome.kill();}})()
+ .catch(error=>{console.error(error.stack);process.exitCode=1;});
+'''
+    result = subprocess.run(
+        ["node", "-e", driver, BROWSER, str(tmp_path / "chrome"), page.as_uri(), str(width), str(height)],
+        capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=55,
+        creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "MULLIGAN_POINTER_AND_KEYBOARD_OK" in result.stdout

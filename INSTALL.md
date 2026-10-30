@@ -2,17 +2,31 @@
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
-The v0.4.2 packages are available on [GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.2).
+## Current release: v0.5.2
+
+The v0.5.2 package links below target its [GitHub Releases page](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.2).
 See [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json) for package
-sizes and SHA-256 values.
-v0.4.2 adjusts the proportions of the end-turn button and combines prompts
-with controls in a compact action bar, while retaining automatic hand scaling.
-The earlier v0.4.1 release fixed an online issue that could freeze a match
-after the opponent confirmed the opening mulligan. The online handshake
-requires the client and server `applicationVersion` values to match exactly,
-so both players and the server, including self-hosted servers, must use v0.4.2.
-The large media pack remains separate from the program packages, but the
-current desktop client can download and install it on first launch.
+sizes and SHA-256 values. The Windows build stores decks in
+`<installation directory>/data/decks/` and migrates decks from the legacy
+per-user directory on first launch. Card selection during the opening mulligan no longer
+obscures neighboring cards, startup failures display diagnostic information,
+and uninstall may leave some program resources behind to protect player data.
+
+Online play requires both players' clients and the connected server to report
+exactly the same `applicationVersion`. Check all three before connecting; the
+same requirement applies to self-hosted servers.
+
+## Historical release notes: v0.4.2 and earlier
+
+The historical v0.4.2 release adjusted the proportions of the end-turn button
+and combined prompts with controls in a compact action bar, while retaining
+automatic hand scaling. The earlier v0.4.1 release fixed an online issue that
+could freeze a match after the opponent confirmed the opening mulligan. At
+v0.4.2, the online handshake required the client and server
+`applicationVersion` values to match exactly, so both players and the server,
+including self-hosted servers, had to use v0.4.2. The large media pack remained
+separate from program packages; desktop clients can download and install it on
+first launch.
 
 ### Automatic asset setup introduced in v0.4.0
 
@@ -40,11 +54,11 @@ location. Changing the published archive requires updating
 
 Download the package for your platform:
 
-- [ZZ-Project-v0.4.2-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Windows-Setup.exe)
-- [ZZ-Project-v0.4.2-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-Linux.tar.gz)
-- [ZZ-Project-v0.4.2-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Project-v0.4.2-source.zip)
-- [ZZ-Multiplayer-v0.4.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz)
-- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/SHA256SUMS-PC02.txt)
+- [ZZ-Project-v0.5.2-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Windows-Setup.exe)
+- [ZZ-Project-v0.5.2-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Linux.tar.gz)
+- [ZZ-Project-v0.5.2-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-source.zip)
+- [ZZ-Multiplayer-v0.5.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz)
+- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/SHA256SUMS-PC02.txt)
 
 - **Windows players:** use the installable desktop package. It includes
   Electron, the frozen Python server, the PC02R DIVINE rules runtime, the current
@@ -69,7 +83,7 @@ Download the package for your platform:
 
 ## 3. Windows installer
 
-Run the v0.4.2 Windows installer. Python,
+Run the v0.5.2 Windows installer. Python,
 Node.js, and `npm install` are not required. Start the installed game from the
 Start menu or the desktop shortcut.
 
@@ -89,20 +103,33 @@ The installer keeps `image.png` inside the application resources and the
 frozen server bundle; it is already included and does not need to be copied by
 the player. The installer package excludes the large `asserts/` directory.
 
-The installer may include the default sample decks as a separate
-`resources/data/decks/` folder, never inside `ZZ-Project.exe`. Saved and edited
-decks are stored in the per-user `game-data/decks/` directory, outside the
-application files, so application updates do not replace them. Private
-`data/codeman_ai/`, `ai_challenges/`, training traces, and local Codeman
-training actors are not packaged.
+Windows builds from the current source store saved and edited decks beside the
+executable in `<installation directory>/data/decks/`. Copy the JSON files in
+that folder to another installation's `data/decks/` to transfer decks. Default
+samples are shipped separately in `resources/default-decks/` and are copied
+only when initializing an empty deck store; later updates do not replace saved
+decks or restore decks the player deleted. The installer makes the deck folder
+writable to ordinary users and preserves it during updates and uninstallation.
+
+At first launch, those builds also import decks from the older per-user
+`%APPDATA%\zenonzard-clone\game-data\decks\` directory. Original files stay
+there as backups; identical decks are not duplicated and conflicting IDs are
+imported as separate decks. Settings and Codeman data remain per-user.
+Published v0.5.1 and earlier still read the per-user deck directory and do not
+gain the new location until a build containing this change is installed.
+Private `data/codeman_ai/`, `ai_challenges/`, training traces, and local
+Codeman training actors are not packaged.
+
+To protect player data, uninstall may retain some program resources in the
+installation directory.
 
 ## 4. Linux portable bundle
 
-Extract the v0.4.2 Linux bundle and run:
+Extract the v0.5.2 Linux bundle and run:
 
 ```bash
-tar -xzf ZZ-Project-v0.4.2-Linux.tar.gz
-cd ZZ-Project-v0.4.2
+tar -xzf ZZ-Project-v0.5.2-Linux.tar.gz
+cd ZZ-Project-v0.5.2
 ./launch-electron.sh --check
 ./launch-electron.sh
 ```
@@ -118,7 +145,7 @@ needed for the first bootstrap unless those runtime files are already cached.
 
 ## 5. Source launch and macOS
 
-Use the v0.4.2 source ZIP or clone the repository. The source
+Use the v0.5.2 source ZIP or clone the repository. The source
 package contains the release snapshot, runtime models, tests, documentation,
 and `image.png`.
 
@@ -199,11 +226,11 @@ log.
 - **Internet:** the default personal server is in Canada. Cross-region
   stability has not been fully verified; users in mainland China may need a
   proxy.
-- **Self-hosted:** download [ZZ-Multiplayer-v0.4.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.4.2/ZZ-Multiplayer-v0.4.2.tar.gz)
+- **Self-hosted:** download [ZZ-Multiplayer-v0.5.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz)
   and follow [docs/ONLINE.md](docs/ONLINE.md).
 - **Client compatibility:** the online handshake requires the client and server
-  `applicationVersion` values to match exactly. Both players and the server
-  must use v0.4.2 to play together.
+  `applicationVersion` values to match exactly. Both players' clients and the
+  connected server must report the same value before they can play together.
 
 
 See [docs/ONLINE.md](docs/ONLINE.md) for the full online-play notes.
@@ -224,8 +251,8 @@ GPU memory, time, and disk space.
 
 ### Resource installation reports `Redirect was cancelled`
 
-If resource installation reports this error, reinstall the v0.4.2 package from
-[GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.4.2)
+If resource installation reports this error, reinstall the v0.5.2 package from
+[GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.2)
 and retry resource setup. The in-game version checker does not offer replacement
 packages when the application version remains unchanged.
 

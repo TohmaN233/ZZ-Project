@@ -1,6 +1,6 @@
 {
   "name": "zenonzard-clone",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": true,
   "description": "Local Zenonzard clone and debugging client.",
   "main": "electron/main.js",
@@ -58,12 +58,20 @@
       {
         "from": "packaging/server-dist/zz-server.exe",
         "to": "server/zz-server.exe"
-      }
-    ],
-    "extraFiles": [
+      },
       {
         "from": "data/decks",
-        "to": "data/decks"
+        "to": "default-decks",
+        "filter": [
+          "aice.json",
+          "deck-060837.json",
+          "deck-b70677.json",
+          "deck-c80751.json",
+          "deck-e83cf0.json",
+          "deck-f9b075.json",
+          "deck.json",
+          "h.json"
+        ]
       }
     ],
     "win": {
@@ -78,6 +86,7 @@
       "icon": "electron/icon-256.png"
     },
     "nsis": {
+      "include": "build/installer.nsh",
       "artifactName": "ZZ-Project-v${version}-Windows-Setup.${ext}",
       "oneClick": false,
       "perMachine": true,

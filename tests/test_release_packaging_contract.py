@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import re
 import unittest
 from pathlib import Path
 
@@ -20,7 +21,6 @@ class ReleasePackagingContractTests(unittest.TestCase):
         self.assertIn("!asserts{,/**/*}", package["build"]["files"])
         self.assertTrue(package["build"]["nsis"]["perMachine"])
         self.assertNotIn("data/**/*", package["build"]["files"])
-        self.assertIn({"from": "data/decks", "to": "data/decks"}, package["build"]["extraFiles"])
         self.assertNotIn("local_ai_training/retained_mainline_20260630/**/*", package["build"]["files"])
         self.assertTrue(all("codeman_ai" not in pattern and "ai_challenges" not in pattern
                             for pattern in package["build"]["files"]))
@@ -96,6 +96,86 @@ class ReleasePackagingContractTests(unittest.TestCase):
             (PROJECT_ROOT / "PUBLIC_RELEASE_MANIFEST.json").read_text(encoding="utf-8")
         )
         self.assertEqual(manifest["runtimeRootFiles"][0]["path"], "image.png")
+
+    def test_windows_default_decks_use_exact_immutable_resource_allowlist(self) -> None:
+        package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
+        spec = importlib.util.spec_from_file_location(
+            "release_files_deck_contract", PROJECT_ROOT / "packaging" / "release_files.py"
+        )
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        selector = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(selector)
+
+        deck_resources = [
+            resource for resource in package["build"]["extraResources"]
+            if resource.get("from") == "data/decks"
+        ]
+        self.assertEqual(deck_resources, [{
+            "from": "data/decks", "to": "default-decks",
+            "filter": list(selector.DEFAULT_DECKS),
+        }])
+        # Exact filenames prevent personal/untracked or nested decks from being
+        # swept into a Windows release, regardless of the local checkout's files.
+        for name in deck_resources[0]["filter"]:
+            self.assertEqual(Path(name).name, name)
+            self.assertNotRegex(name, r"[!*?\[\]{}]")
+            self.assertTrue((PROJECT_ROOT / "data" / "decks" / name).is_file())
+        self.assertFalse(any(
+            "decks" in json.dumps(entry)
+            for entry in package["build"].get("extraFiles", [])
+        ))
+        self.assertFalse(any("decks" in pattern for pattern in package["build"]["files"]))
+
+    def test_windows_deck_permissions_are_scoped_and_fail_closed(self) -> None:
+        package = json.loads((PROJECT_ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(package["build"]["nsis"]["include"], "build/installer.nsh")
+        self.assertTrue(package["build"]["nsis"]["perMachine"])
+        installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
+        hook = installer.split("!macro customInstall\n", 1)[1].split("!macroend", 1)[0]
+        create_at = hook.index('CreateDirectory "$INSTDIR\\data\\decks"')
+        for directory in ("$INSTDIR", "$INSTDIR\\data", "$INSTDIR\\data\\decks"):
+            self.assertLess(
+                hook.index(f'!insertmacro requireDeckDirectoryNotReparsePoint "{directory}"'),
+                create_at,
+            )
+        self.assertIn("GetFileAttributesW", installer)
+        self.assertIn("IntOp $0 $0 & 0x400", installer)  # FILE_ATTRIBUTE_REPARSE_POINT
+        self.assertIn('Abort "Unsafe deck storage path:', installer)
+        self.assertIn('Abort "Cannot create deck storage."', hook)
+        commands = re.findall(r"nsExec::ExecToStack '([^']+)'", hook)
+        self.assertEqual(commands, [
+            '"$SYSDIR\\icacls.exe" "$INSTDIR\\data\\decks" '
+            '/grant "*S-1-5-32-545:(OI)(CI)M" /L'
+        ])
+        self.assertIn('${If} $installMode == "all"', hook)
+        self.assertIn("Pop $R0\n    Pop $R1", hook)
+        self.assertIn("${If} $R0 != 0", hook)
+        self.assertIn('DetailPrint "Deck storage permissions (exit $R0): $R1"', hook)
+        self.assertIn("MessageBox MB_OK|MB_ICONSTOP", hook)
+        self.assertIn("SetErrorLevel 1", hook)
+        self.assertIn('Abort "Deck storage permissions failed."', hook)
+
+    def test_windows_update_and_uninstall_preserve_user_owned_trees(self) -> None:
+        installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
+        removal = installer.split("!macro customRemoveFiles\n", 1)[1].split("!macroend", 1)[0]
+        update_branch, uninstall_branch = removal.split("${Else}", 1)
+        self.assertIn("${If} ${isUpdated}", update_branch)
+        self.assertNotRegex(update_branch, r"(?m)^\s*(Delete|RMDir)\b")
+        # No recursive removals or wildcard deletes can traverse player decks,
+        # downloaded asserts or unknown content in old application directories.
+        self.assertNotRegex(removal, r"(?im)^\s*RMDir\s+/r\b")
+        deletes = re.findall(r'(?m)^\s*Delete "([^"]+)"', uninstall_branch)
+        self.assertIn("$INSTDIR\\${APP_EXECUTABLE_FILENAME}", deletes)
+        self.assertIn("$INSTDIR\\${UNINSTALL_FILENAME}", deletes)
+        self.assertTrue(deletes)
+        for target in deletes:
+            self.assertTrue(target.startswith("$INSTDIR\\"), target)
+            self.assertNotIn("\\", target.removeprefix("$INSTDIR\\"), target)
+            self.assertNotRegex(target, r"[*?]")
+            self.assertNotIn("asserts", target.casefold())
+            self.assertNotIn("decks", target.casefold())
+        self.assertEqual(re.findall(r'(?m)^\s*RMDir (.+)', uninstall_branch), ['"$INSTDIR"'])
 
 
 if __name__ == "__main__":

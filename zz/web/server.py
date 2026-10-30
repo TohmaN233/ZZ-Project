@@ -5,7 +5,6 @@ import json
 import mimetypes
 import os
 import secrets
-import shutil
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -36,7 +35,7 @@ from zz.web.debug_tools import (
     setup_debug_lab,
 )
 from zz.web.catalog import catalog_dto
-from zz.web.deck_store import DeckStore
+from zz.web.deck_store import DeckStore, initialize_deck_storage
 from zz.web.assets import AssetIndex, resolve_asset_root
 from zz.web.settings_store import SettingsStore, normalize_ai_difficulty
 from zz.web.session import GameSession
@@ -908,26 +907,36 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("--mode", choices=["human-vs-ai", "ai-vs-ai", "god"], default="human-vs-ai")
     parser.add_argument("--asset-root", default=None)
     parser.add_argument("--user-data-root", default=None)
+    parser.add_argument("--deck-root", default=None)
     parser.add_argument("--bundled-deck-root", default=None)
     parser.add_argument("--dev-mode", action="store_true")
     args = parser.parse_args(argv)
     user_data_root = Path(args.user_data_root).expanduser().resolve() if args.user_data_root else None
+    deck_root = Path(args.deck_root).expanduser().resolve() if args.deck_root else None
     if user_data_root is not None:
-        for name in ("decks", "settings", "codeman_ai", "ai_challenges"):
+        for name in ("settings", "codeman_ai", "ai_challenges"):
             (user_data_root / name).mkdir(parents=True, exist_ok=True)
+        if deck_root is None:
+            deck_root = user_data_root / "decks"
         bundled_decks = (
             Path(args.bundled_deck_root).expanduser().resolve()
             if args.bundled_deck_root
             else PROJECT_ROOT / "data" / "decks"
         )
-        user_decks = user_data_root / "decks"
-        if bundled_decks.is_dir() and not any(user_decks.glob("*.json")):
-            for source in bundled_decks.glob("*.json"):
-                shutil.copy2(source, user_decks / source.name)
+        report = initialize_deck_storage(
+            deck_root,
+            legacy_root=user_data_root / "decks" if args.deck_root else None,
+            state_root=user_data_root / "settings" if args.deck_root else None,
+            bundled_root=bundled_decks,
+        )
+        print(f"Deck storage: {deck_root}; initialization: {report}", flush=True)
+    elif deck_root is not None:
+        report = initialize_deck_storage(deck_root, bundled_root=args.bundled_deck_root)
+        print(f"Deck storage: {deck_root}; initialization: {report}", flush=True)
     app = ServerState(
         seed=args.seed,
         asset_root=args.asset_root,
-        deck_root=user_data_root / "decks" if user_data_root is not None else None,
+        deck_root=deck_root,
         settings_root=user_data_root / "settings" if user_data_root is not None else None,
         ai_data_root=user_data_root if user_data_root is not None else None,
         mode=args.mode,
