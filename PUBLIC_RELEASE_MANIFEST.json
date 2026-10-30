@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.5.0",
+  "releaseVersion": "0.5.1",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -30,7 +30,7 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.5.0-Windows-Setup.exe",
+    "filename": "ZZ-Project-v0.5.1-Windows-Setup.exe",
     "contains": [
       "Electron desktop client",
       "frozen Python web server with PC02R, EX02 and EX02C card content",
@@ -41,12 +41,10 @@
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe",
-    "bytes": 151696778,
-    "sha256": "CA5CD53D424C4B491253524F48140536F56A550B365236EF8B55366DFCFADA26"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.5.0-Linux.tar.gz",
+    "filename": "ZZ-Project-v0.5.1-Linux.tar.gz",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
@@ -54,9 +52,7 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz",
-    "bytes": 23371463,
-    "sha256": "B740935171A9C108A77E0A6E7E4F2CCD86FC1C74B65D0A71619A55A639AF0AEC"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -94,29 +90,25 @@
   ],
   "releaseStatus": "published",
   "sourcePackage": {
-    "filename": "ZZ-Project-v0.5.0-source.zip",
+    "filename": "ZZ-Project-v0.5.1-source.zip",
     "contains": [
       "current product source, build tools and deployment examples",
       "focused tests and PC02R and EX02C semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip",
-    "bytes": 39869370,
-    "sha256": "84AF71B160558FFABCE5F7EEF0AC2A0729FED3279B67C38F1EA68A1201589D3D"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip"
   },
   "multiplayerServer": {
-    "filename": "ZZ-Multiplayer-v0.5.0.tar.gz",
+    "filename": "ZZ-Multiplayer-v0.5.1.tar.gz",
     "contains": [
       "authoritative multiplayer server with PC02R, EX02 and EX02C card content",
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Multiplayer-v0.5.0.tar.gz",
-    "bytes": 686714,
-    "sha256": "F689E7A52EAC8701755EE14DCC08C0C30DE58F20B09A4EA2ACC8EA4EDDA77CBE"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
-  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.0",
-  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/SHA256SUMS-PC02.txt",
-  "releaseSummary": "Add EX02 and Sword Art Online EX02C cards with shared card identity, and improve the duel frontend and card effect resolution."
+  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.1",
+  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt",
+  "releaseSummary": "Add a one-click deck editor reset that starts a new deck without deleting saved decks."
 }

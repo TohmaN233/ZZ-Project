@@ -14,9 +14,9 @@
 
 ## インストール
 
-v0.5.0 では EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）と、対応する EX02 オリジナルカード面を追加しました。カード検索、ルール処理、Force 検索、対戦中の視覚的フィードバックも改善しました。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.5.0 を使用してください。
+v0.5.1 では、編集中のデッキをワンクリックで空の新規デッキにリセットする機能を追加しました。カードと Force はクリアされ、名前と検索フィルターは初期状態に戻りますが、保存済みデッキは削除されません。また、v0.5.0 で追加した EX02C/SAO の 70 枚（CAMPAIGN 2 枚を含む）と対応する EX02 オリジナルカード面、カード検索・ルール処理・Force 検索・対戦中の視覚的フィードバックの改善も引き続き含まれます。オンライン接続ではクライアントとサーバーの `applicationVersion` が完全に一致する必要があります。対戦する双方とサーバー（自設サーバーを含む）に v0.5.1 を使用してください。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Multiplayer-v0.5.0.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip) · [自設対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 
@@ -49,7 +49,7 @@ Windows インストーラー版はスタートメニューまたはデスクト
 
 ## 現在の内容
 
-- **対戦とデッキ**：人間 VS AI、神視点、AI VS AI に対応します。カードプールを検索し、デッキを編集・保存できます。
+- **対戦とデッキ**：人間 VS AI、神視点、AI VS AI に対応します。カードプールを検索し、デッキを編集・保存できます。編集中のデッキはワンクリックで空の新規デッキにリセットでき、カードと Force がクリアされ、名前と検索フィルターは初期状態に戻りますが、保存済みデッキは削除されません。
 - **Codeman とローカル学習**：最近の対戦記憶をローカルに保存します。ソース版では GPU / CUDA 環境で実験的な学習を行えます。
 - **Replay と AI アドバイス**：最近の対戦を振り返り、対戦中に Codeman から現在の行動への提案を確認できます。
 - **オンライン対戦**：LAN と公開ルームに対応します。クライアントの接続先は既定で `wss://zz.tgy233.top/multiplayer` です。自分でサーバーを立てる場合は[オンライン対戦ガイド](docs/ONLINE.md)を参照してください。

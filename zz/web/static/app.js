@@ -330,6 +330,7 @@ const UI_TEXT = {
     rulebookLoadFailed: "规则书读取失败",
     savedDecks: "保存的卡组",
     newDeck: "新建",
+    clearDeck: "清空卡组",
     startBattle: "进入对战",
     startWithDeck: "这个卡组开战",
     aiPilot: "AI 代打",
@@ -619,6 +620,7 @@ const UI_TEXT = {
     rulebookLoadFailed: "ルールブックを読み込めません",
     savedDecks: "保存したデッキ",
     newDeck: "新規",
+    clearDeck: "デッキをクリア",
     startBattle: "対戦開始",
     startWithDeck: "このデッキで対戦",
     aiPilot: "AI操作",
@@ -884,6 +886,7 @@ const UI_TEXT = {
     rulebookLoadFailed: "Could not load the rulebook",
     savedDecks: "Saved Decks",
     newDeck: "New",
+    clearDeck: "Clear deck",
     startBattle: "Start Duel",
     startWithDeck: "Start with this deck",
     aiPilot: "AI Pilot",
@@ -3715,6 +3718,7 @@ function toggleDeckForce(forceId) {
 
 async function saveCurrentDeck() {
   if (!deckIsValid()) return;
+  const savingEditor = deckEditor;
   const payload = await ZZApi.request("/api/decks", {
     id: deckEditor.id,
     name: deckEditor.name.trim() || "Unnamed Deck",
@@ -3725,12 +3729,13 @@ async function saveCurrentDeck() {
     render(payload.error);
     return;
   }
-  loadDeckIntoEditor(payload.deck);
+  if (deckEditor === savingEditor) loadDeckIntoEditor(payload.deck);
   await loadSavedDecks();
 }
 
 async function requestDeckAiCompletion() {
   if (!deckCanAiComplete() || deckCompletionLoading) return;
+  const completionEditor = deckEditor;
   deckCompletionLoading = true;
   renderPreservingDeckBuilderScroll();
   let payload;
@@ -3751,6 +3756,10 @@ async function requestDeckAiCompletion() {
   }
   if (deckRecipeContainsUnbuildableCard(payload.completion.recipe || {})) {
     renderPreservingDeckBuilderScroll(new Error(t("unbuildableCardInDeck")));
+    return;
+  }
+  if (deckEditor !== completionEditor) {
+    renderPreservingDeckBuilderScroll();
     return;
   }
   deckEditor.recipe = { ...(payload.completion.recipe || {}) };
@@ -8363,6 +8372,7 @@ function renderDeckBuilder(error = null) {
           <div class="deck-panel-head">
             <h2>${esc(t("deck"))}</h2>
             <span>${esc(total)} / 40</span>
+            <button data-new-deck>${esc(t("clearDeck"))}</button>
           </div>
           <div class="deck-list">
             ${deckRows.length ? deckRows.map(([cardId, count]) => {

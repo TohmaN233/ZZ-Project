@@ -14,9 +14,9 @@
 
 ## 安装
 
-v0.5.0 加入 EX02C/SAO 的 70 张卡（含 2 张 CAMPAIGN 卡）及其对应的 EX02 原版卡面，并改进卡牌检索、规则结算、Force 搜索和对战视觉反馈。联机握手要求客户端与服务器的 `applicationVersion` 完全一致；双方客户端和服务器（包括自建服务器）都须使用 v0.5.0。
+v0.5.1 新增一键将当前卡组编辑器重置为空白新卡组的操作，会清空卡牌和 Force，并重置名称及搜索筛选，但不会删除已保存的卡组。此版本继续包含 v0.5.0 加入的 EX02C/SAO 70 张卡（含 2 张 CAMPAIGN 卡）及其对应的 EX02 原版卡面，并保留卡牌检索、规则结算、Force 搜索和对战视觉反馈改进。联机握手要求客户端与服务器的 `applicationVersion` 完全一致；双方客户端和服务器（包括自建服务器）都须使用 v0.5.1。
 
-[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Multiplayer-v0.5.0.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/SHA256SUMS-PC02.txt)
+[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt)
 
 Windows 玩家使用安装包，Linux 玩家使用便携包；macOS 玩家和开发者使用源码包。完整步骤见[安装说明](INSTALL.md)。
 
@@ -49,7 +49,7 @@ Windows 安装版从开始菜单或桌面快捷方式启动。Linux 便携包首
 
 ## 当前内容
 
-- **对战与卡组**：支持人类对 AI、神视点和 AI 对 AI；可搜索卡池、编辑并保存卡组。
+- **对战与卡组**：支持人类对 AI、神视点和 AI 对 AI；可搜索卡池、编辑并保存卡组，也可一键将当前编辑器重置为空白新卡组（清空卡牌和 Force，并重置名称及筛选），且不删除已保存卡组。
 - **Codeman 与本地训练**：本机保存近期对局记忆；源码版可在 GPU / CUDA 环境中进行实验训练。
 - **Replay 与 AI 建议**：回看最近对局；对战中可查看 Codeman 对当前行动的建议。
 - **联机**：支持局域网与公网房间。公网客户端默认连接 `wss://zz.tgy233.top/multiplayer`；自建服务器说明见[联机说明](docs/ONLINE.md)。

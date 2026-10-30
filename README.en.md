@@ -14,9 +14,9 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an AI experime
 
 ## Installation
 
-v0.5.0 adds all 70 EX02C/SAO cards, including two CAMPAIGN cards, and their corresponding EX02 original faces. It also improves card search, rule resolution, Force search, and visual feedback during battles. The online handshake requires the client and server `applicationVersion` values to match exactly; both players and the server, including self-hosted servers, must use v0.5.0.
+v0.5.1 adds a one-click action that resets the current deck editor to a blank new deck, clearing its cards and Forces and resetting its name and search filters without deleting saved decks. It retains the 70 EX02C/SAO cards added in v0.5.0, including two CAMPAIGN cards and their corresponding EX02 original faces, along with the card search, rule resolution, Force search, and duel feedback improvements. The online handshake requires the client and server `applicationVersion` values to match exactly; both players and the server, including self-hosted servers, must use v0.5.1.
 
-[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Project-v0.5.0-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/ZZ-Multiplayer-v0.5.0.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.0/SHA256SUMS-PC02.txt)
+[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Project-v0.5.1-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/ZZ-Multiplayer-v0.5.1.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.1/SHA256SUMS-PC02.txt)
 
 Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
 
@@ -49,7 +49,7 @@ Launch the Windows installer build from the Start menu or its desktop shortcut. 
 
 ## Current Features
 
-- **Matches and decks**: play Human vs AI, in omniscient view, or AI vs AI; search the card pool, edit decks, and save them.
+- **Matches and decks**: play Human vs AI, in omniscient view, or AI vs AI; search the card pool, edit and save decks, or reset the current editor to a blank new deck with one click, clearing cards and Forces and resetting the name and filters while keeping saved decks.
 - **Codeman and local training**: recent match memories are stored locally; the source build supports experimental training with a GPU / CUDA environment.
 - **Replay and AI suggestions**: review recent matches and see Codeman's suggestion for the current action during a match.
 - **Online play**: supports LAN and public rooms. The client connects by default to `wss://zz.tgy233.top/multiplayer`; see the [online play guide](docs/ONLINE.md) to host your own server.
