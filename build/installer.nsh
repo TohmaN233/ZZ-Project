@@ -43,6 +43,7 @@
   !insertmacro requireDeckDirectoryNotReparsePoint "$INSTDIR"
   !insertmacro requireDeckDirectoryNotReparsePoint "$INSTDIR\data"
   !insertmacro requireDeckDirectoryNotReparsePoint "$INSTDIR\data\decks"
+  !insertmacro requireDeckDirectoryNotReparsePoint "$INSTDIR\data\replays"
   ClearErrors
   CreateDirectory "$INSTDIR\data\decks"
   ${If} ${Errors}
@@ -52,9 +53,17 @@
     Abort "Cannot create deck storage."
   ${EndIf}
 
+  ClearErrors
+  CreateDirectory "$INSTDIR\data\replays"
+  ${If} ${Errors}
+    MessageBox MB_OK|MB_ICONSTOP "Cannot create replay storage: $INSTDIR\data\replays. Check directory permissions." /SD IDOK
+    SetErrorLevel 1
+    Abort "Cannot create replay storage."
+  ${EndIf}
+
   ${If} $installMode == "all"
     ; Numeric SID works on localized Windows. Inheritable Modify is confined to
-    ; decks: the install root, program files, data parent and asserts stay intact.
+    ; decks and replays: the install root, program files, data parent and asserts stay intact.
     ; No /T: do not explicitly rewrite ACLs of arbitrary existing descendants.
     nsExec::ExecToStack '"$SYSDIR\icacls.exe" "$INSTDIR\data\decks" /grant "*S-1-5-32-545:(OI)(CI)M" /L'
     Pop $R0
@@ -64,6 +73,15 @@
       MessageBox MB_OK|MB_ICONSTOP "Cannot grant Users access to $INSTDIR\data\decks (exit $R0).$\r$\n$R1" /SD IDOK
       SetErrorLevel 1
       Abort "Deck storage permissions failed."
+    ${EndIf}
+    nsExec::ExecToStack '"$SYSDIR\icacls.exe" "$INSTDIR\data\replays" /grant "*S-1-5-32-545:(OI)(CI)M" /L'
+    Pop $R0
+    Pop $R1
+    DetailPrint "Replay storage permissions (exit $R0): $R1"
+    ${If} $R0 != 0
+      MessageBox MB_OK|MB_ICONSTOP "Cannot grant Users access to $INSTDIR\data\replays (exit $R0).$\r$\n$R1" /SD IDOK
+      SetErrorLevel 1
+      Abort "Replay storage permissions failed."
     ${EndIf}
   ${EndIf}
 !macroend

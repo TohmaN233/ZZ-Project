@@ -1,3 +1,33 @@
+# v0.5.4 - Online Reconnect and Replays
+
+[简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)
+
+## 简体中文
+
+- **断线重连**：较大的对战消息分段传输，避免重连时因消息超过单帧上限而失败。
+- **对战日志与回放**：对局传输近期日志，完整的本玩家可见记录自动保存在游戏目录的 `data/replays/`，可在“回放与训练”查看。断线期间缺失的数据会尝试补齐；未补齐时会标记为不完整。
+- **联机版本**：双方客户端和服务器需要同步更新到 v0.5.4。服务器重启会结束正在进行的对局。
+
+## 日本語
+
+- **再接続**：大きな対戦メッセージを分割して送信し、単一フレームのサイズ制限による再接続失敗を防ぎます。
+- **対戦ログとリプレイ**：通信には最近のログを使い、プレイヤーに見える記録をゲームディレクトリの `data/replays/` に保存します。「リプレイとトレーニング」で確認できます。切断中のデータは再取得を試み、揃わなければ未完了と表示します。
+- **オンラインのバージョン**：両プレイヤーのクライアントとサーバーを v0.5.4 に更新してください。サーバーの再起動時は進行中の対戦が終了します。
+
+## English
+
+- **Reconnects**: Large match messages are sent in bounded fragments to avoid failures at the single-frame size limit.
+- **Battle logs and replays**: Live messages carry recent logs. Player-visible recordings are saved in `data/replays/` inside the game directory and can be opened in Replay & Training. Missing data is recovered after reconnect when available; incomplete recordings are labeled.
+- **Online versions**: Both clients and the server must be updated to v0.5.4. Restarting the server ends matches in progress.
+
+## Downloads
+
+- [Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe)
+- [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz)
+- [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip)
+- [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz)
+- [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt)
+
 # v0.5.3 - Rules and Online Reliability
 
 [简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)

@@ -546,11 +546,13 @@ def _hello(
     if message["type"] != "WELCOME":
         raise ProbeFailure("game_hello", "protocol", "EXPECTED_WELCOME")
     if (
-        set(payload) - {"connectionId", "playerId", "compatibility", "recoveryPersistenceAck"}
+        set(payload) - {"connectionId", "playerId", "compatibility", "recoveryPersistenceAck", "messageFragments", "replayFrames"}
         or not isinstance(payload.get("connectionId"), str)
         or not payload["connectionId"]
         or ("playerId" in payload and not isinstance(payload["playerId"], str))
         or ("recoveryPersistenceAck" in payload and not isinstance(payload["recoveryPersistenceAck"], bool))
+        or ("messageFragments" in payload and not isinstance(payload["messageFragments"], bool))
+        or ("replayFrames" in payload and not isinstance(payload["replayFrames"], bool))
     ):
         raise ProbeFailure("game_hello", "protocol", "INVALID_WELCOME")
     compatible = _valid_compatibility(payload.get("compatibility"), manifest)

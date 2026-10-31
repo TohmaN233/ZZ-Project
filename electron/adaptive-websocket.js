@@ -48,8 +48,9 @@ function createAdaptiveWebSocketClass({
     #remaining = 0;
     #winner = null;
 
-    constructor(url) {
+    constructor(url, options = {}) {
       this.url = String(url || "");
+      this.headers = options.headers || undefined;
       queueMicrotask(() => this.#start());
     }
 
@@ -109,6 +110,7 @@ function createAdaptiveWebSocketClass({
       let socket;
       try {
         const options = { perMessageDeflate: false };
+        if (this.headers) options.headers = this.headers;
         if (route.proxy) options.agent = proxyAgentFactory(route.proxy);
         socket = new WebSocketImpl(url, options);
       } catch (error) {

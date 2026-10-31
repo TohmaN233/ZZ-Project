@@ -1,6 +1,8 @@
 "use strict";
 
 const { randomUUID } = require("node:crypto");
+const { TextDecoder } = require("node:util");
+const WebSocket = require("ws");
 const compatibility = require("../zz/multiplayer/compatibility.json");
 
 const LOCAL_COMPATIBILITY = Object.freeze({ ...compatibility });
@@ -39,6 +41,10 @@ const ROOM_COMMAND_STATES = new Set([
 
 const MAX_RECONNECT_FAILURES = 5;
 const RECONNECT_TIMEOUT_MS = 10000;
+const MAX_LOGICAL_MESSAGE_BYTES = 8 * 1024 * 1024;
+const MAX_MESSAGE_FRAGMENTS = 256;
+const MAX_FRAGMENT_DATA_LENGTH = 65536;
+const CLIENT_FEATURE_HEADERS = Object.freeze({ "X-ZZ-Client-Features": "replay-fragments-v1" });
 
 const SERVER_MESSAGE_TYPES = new Set([
   "WELCOME",
@@ -46,6 +52,7 @@ const SERVER_MESSAGE_TYPES = new Set([
   "MATCH_STARTED",
   "STATE_SNAPSHOT",
   "LOG_HISTORY",
+  "REPLAY_FRAME",
   "ACTION_RESULT",
   "ERROR",
   "ROOM_CLOSED",
@@ -69,8 +76,12 @@ class MultiplayerDesktopClient {
   #reconnectTimer = null;
   #recoveryPersistenceAckSupported = false;
   #confirmedRecoveryToken = null;
+  #messageFragmentsEnabled = false;
+  #incomingFragments = null;
+  #replayFramesSupported = false;
+  #requestedReplayRevision = null;
 
-  constructor({ WebSocketImpl = globalThis.WebSocket, uuidFactory = randomUUID } = {}) {
+  constructor({ WebSocketImpl = WebSocket, uuidFactory = randomUUID } = {}) {
     if (typeof WebSocketImpl !== "function") {
       throw new TypeError("WebSocketImpl must be a constructor");
     }
@@ -122,6 +133,7 @@ class MultiplayerDesktopClient {
       room: cloneJson(this.#room),
       view: cloneJson(this.#view),
       logHistoryPage: this.#logHistoryPage?.matchId === this.matchId ? cloneJson(this.#logHistoryPage) : null,
+      replayFramesSupported: this.#replayFramesSupported,
       error: cloneJson(this.#error),
       pendingAction: cloneJson(this.#pendingAction),
       canSubmitAction: this.canSubmitAction,
@@ -190,7 +202,7 @@ class MultiplayerDesktopClient {
 
     let socket;
     try {
-      socket = new this.#WebSocketImpl(normalizedUrl);
+      socket = new this.#WebSocketImpl(normalizedUrl, { headers: CLIENT_FEATURE_HEADERS });
       this.#assertSocket(socket);
       this.#socket = socket;
       this.#attachSocketListeners(socket);
@@ -220,7 +232,7 @@ class MultiplayerDesktopClient {
     this.#setState(MultiplayerClientState.RECONNECTING);
     let socket;
     try {
-      socket = new this.#WebSocketImpl(this.url);
+      socket = new this.#WebSocketImpl(this.url, { headers: CLIENT_FEATURE_HEADERS });
       this.#assertSocket(socket);
       this.#socket = socket;
       this.#attachSocketListeners(socket);
@@ -377,6 +389,21 @@ class MultiplayerDesktopClient {
     this.#sendCommand("REQUEST_LOG_HISTORY", { matchId, beforeEventIndex });
   }
 
+  requestReplayFrame({ matchId, revision } = {}) {
+    this.#requireState("REQUEST_REPLAY_FRAME", new Set([MultiplayerClientState.IN_MATCH, MultiplayerClientState.MATCH_FINISHED]));
+    if (!this.#replayFramesSupported) throw new Error("server does not support replay frame recovery");
+    if (matchId !== this.matchId) throw new Error("replay frame matchId must match the current match");
+    if (!Number.isSafeInteger(revision) || revision < 0) throw new TypeError("replay revision must be a non-negative integer");
+    if (this.#requestedReplayRevision !== null) throw new Error("replay frame request is already pending");
+    this.#requestedReplayRevision = revision;
+    try {
+      this.#sendCommand("REQUEST_REPLAY_FRAME", { matchId, revision });
+    } catch (error) {
+      this.#requestedReplayRevision = null;
+      throw error;
+    }
+  }
+
   dismissMatchResult() {
     if (this.#view && this.#view.gameOver) {
       this.#view = null;
@@ -429,6 +456,10 @@ class MultiplayerDesktopClient {
       socket.removeEventListener(type, listener);
     }
     this.#socketListeners = null;
+    this.#messageFragmentsEnabled = false;
+    this.#incomingFragments = null;
+    this.#replayFramesSupported = false;
+    this.#requestedReplayRevision = null;
   }
 
   #handleOpen(socket) {
@@ -455,7 +486,13 @@ class MultiplayerDesktopClient {
       const raw = event && typeof event === "object" && "data" in event ? event.data : event;
       const text = Buffer.isBuffer(raw) ? raw.toString("utf8") : raw;
       if (typeof text !== "string") throw new TypeError("server message must be UTF-8 text");
-      const message = JSON.parse(text);
+      let message = JSON.parse(text);
+      if (message && message.type === "MESSAGE_FRAGMENT") {
+        message = this.#receiveMessageFragment(message);
+        if (message === null) return;
+      } else if (this.#incomingFragments !== null) {
+        throw new Error("server interrupted a fragmented message");
+      }
       this.#applyServerMessage(message);
       const publicMessage = cloneJson(message);
       if (publicMessage.type === "ROOM_STATE" && isPlainObject(publicMessage.payload)) {
@@ -465,6 +502,45 @@ class MultiplayerDesktopClient {
     } catch (error) {
       this.#failConnection(socket, error?.code || "INVALID_SERVER_MESSAGE", error);
     }
+  }
+
+  #receiveMessageFragment(message) {
+    if (!this.#messageFragmentsEnabled || message.protocolVersion !== PROTOCOL_VERSION) {
+      throw new Error("unexpected message fragment");
+    }
+    requireNonBlankString(message.messageId, "messageId");
+    const part = message.payload;
+    if (!isPlainObject(part) || Object.keys(part).sort().join(",") !== "count,data,id,index") {
+      throw new TypeError("invalid message fragment payload");
+    }
+    const id = requireNonBlankString(part.id, "fragment id");
+    if (id.length > 128 || !Number.isSafeInteger(part.index) || !Number.isSafeInteger(part.count)
+        || part.count < 1 || part.count > MAX_MESSAGE_FRAGMENTS || part.index < 0 || part.index >= part.count
+        || typeof part.data !== "string" || !part.data.length || part.data.length > MAX_FRAGMENT_DATA_LENGTH
+        || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(part.data)) {
+      throw new TypeError("invalid message fragment");
+    }
+    if (this.#incomingFragments === null) {
+      if (part.index !== 0) throw new Error("message fragments are out of order");
+      this.#incomingFragments = { id, count: part.count, parts: [], bytes: 0 };
+    }
+    const pending = this.#incomingFragments;
+    if (pending.id !== id || pending.count !== part.count || pending.parts.length !== part.index) {
+      throw new Error("message fragments are out of order");
+    }
+    const bytes = Buffer.from(part.data, "base64");
+    if (bytes.toString("base64") !== part.data) throw new TypeError("invalid message fragment encoding");
+    pending.bytes += bytes.length;
+    if (pending.bytes > MAX_LOGICAL_MESSAGE_BYTES) throw new Error("fragmented message exceeds logical size limit");
+    pending.parts.push(bytes);
+    if (pending.parts.length !== pending.count) return null;
+    this.#incomingFragments = null;
+    const decoded = new TextDecoder("utf-8", { fatal: true }).decode(Buffer.concat(pending.parts, pending.bytes));
+    const restored = JSON.parse(decoded);
+    if (!isPlainObject(restored) || restored.messageId !== id || restored.type === "MESSAGE_FRAGMENT") {
+      throw new Error("fragmented message identity does not match");
+    }
+    return restored;
   }
 
   #handleSocketError(socket, event) {
@@ -538,6 +614,17 @@ class MultiplayerDesktopClient {
           throw new TypeError("recoveryPersistenceAck must be a boolean");
         }
         this.#recoveryPersistenceAckSupported = payload.recoveryPersistenceAck === true;
+        if (payload.messageFragments !== undefined && typeof payload.messageFragments !== "boolean") {
+          throw new TypeError("messageFragments must be a boolean");
+        }
+        if (payload.messageFragments === true) {
+          this.#sendCommand("ENABLE_MESSAGE_FRAGMENTS", {});
+          this.#messageFragmentsEnabled = true;
+        }
+        if (payload.replayFrames !== undefined && typeof payload.replayFrames !== "boolean") {
+          throw new TypeError("replayFrames must be a boolean");
+        }
+        this.#replayFramesSupported = payload.replayFrames === true;
         this.connectionId = optionalString(payload.connectionId);
         this.playerId = optionalString(payload.playerId) || this.playerId;
         if (this.state === MultiplayerClientState.RECONNECTING && this.#recovery !== null) {
@@ -579,6 +666,7 @@ class MultiplayerDesktopClient {
         this.playerId = optionalString(payload.playerId) || this.playerId;
         this.#view = requirePlainObjectClone(payload.view, "MATCH_STARTED view");
         this.#logHistoryPage = null;
+        this.#requestedReplayRevision = null;
         this.#completeReconnect();
         this.#pendingAction = null;
         this.#pendingActionNeedsReplay = false;
@@ -599,6 +687,13 @@ class MultiplayerDesktopClient {
         break;
       case "ACTION_RESULT":
         this.#applyActionResult(payload);
+        break;
+      case "REPLAY_FRAME":
+        if (payload.matchId !== this.matchId || !isPlainObject(payload.view)
+            || payload.view.revision !== this.#requestedReplayRevision || this.#requestedReplayRevision === null) {
+          throw new TypeError("unexpected replay frame");
+        }
+        this.#requestedReplayRevision = null;
         break;
       case "LOG_HISTORY": {
         if (payload.matchId !== this.matchId) break;
@@ -626,6 +721,7 @@ class MultiplayerDesktopClient {
       }
       case "ERROR":
         this.#error = payload;
+        if (["MATCH_NOT_FOUND", "REPLAY_FRAME_NOT_FOUND"].includes(payload.code)) this.#requestedReplayRevision = null;
         if (optionalString(payload.clientActionId) === this.#pendingAction?.clientActionId) {
           this.#pendingAction = null;
           this.#syncRecoverySession();

@@ -280,7 +280,8 @@ def test_invalid_welcome_compatibility_is_rejected_without_recording_connection_
 
 
 @pytest.mark.parametrize("capability", [True, False, "true", None, 1])
-def test_welcome_reconnect_confirmation_capability_is_a_strict_optional_boolean(capability: Any) -> None:
+@pytest.mark.parametrize("field", ["recoveryPersistenceAck", "messageFragments", "replayFrames"])
+def test_welcome_capabilities_are_strict_optional_booleans(capability: Any, field: str) -> None:
     class WelcomeSocket:
         def send(self, _message: str) -> None:
             pass
@@ -289,7 +290,7 @@ def test_welcome_reconnect_confirmation_capability_is_a_strict_optional_boolean(
             return json.dumps({
                 "protocolVersion": MANIFEST["protocolVersion"], "messageId": "welcome-1", "type": "WELCOME",
                 "payload": {"connectionId": "test-connection", "compatibility": MANIFEST,
-                            "recoveryPersistenceAck": capability},
+                            field: capability},
             })
 
     if type(capability) is bool:

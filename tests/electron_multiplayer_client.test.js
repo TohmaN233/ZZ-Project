@@ -117,6 +117,73 @@ function enterRecoverableRoom(client, socket, reconnectToken = "token-1", status
   }));
 }
 
+test("negotiated reconnect reassembles bounded fragments before applying a large snapshot", () => {
+  const { client, socket, sockets } = makeClient();
+  connectClient(client, socket);
+  enterRecoverableRoom(client, socket, "token-1", "RUNNING");
+  startMatch(client, socket);
+  socket().emit("close", { code: 1006 });
+  client.reconnect();
+  const reconnectSocket = sockets()[1];
+  reconnectSocket.emit("open");
+  reconnectSocket.receive(serverMessage("WELCOME", { connectionId: "connection-2", messageFragments: true }));
+  assert.deepEqual(reconnectSocket.sent.slice(-2).map((raw) => JSON.parse(raw).type),
+    ["ENABLE_MESSAGE_FRAGMENTS", "RECONNECT"]);
+
+  const view = { revision: 5, gameOver: false, animationEvents: Array.from({ length: 400 }, (_, i) => ({
+    type: "zone_move", label: `カード${i}`.repeat(120),
+  })) };
+  const original = serverMessage("STATE_SNAPSHOT", { matchId: "match-1", playerId: "player-1", view });
+  const bytes = Buffer.from(JSON.stringify(original), "utf8");
+  const parts = [];
+  for (let offset = 0; offset < bytes.length; offset += 32768) parts.push(bytes.subarray(offset, offset + 32768));
+  assert.ok(parts.length > 1);
+  for (let index = 0; index < parts.length; index += 1) {
+    reconnectSocket.receive(serverMessage("MESSAGE_FRAGMENT", {
+      id: original.messageId, index, count: parts.length, data: parts[index].toString("base64"),
+    }));
+    if (index < parts.length - 1) assert.equal(client.view.revision, 4);
+  }
+  assert.deepEqual(client.view, view);
+  assert.equal(client.state, MultiplayerClientState.IN_MATCH);
+});
+
+test("out-of-order snapshot fragments fail the connection rather than applying partial state", () => {
+  const { client, socket } = makeClient();
+  connectClient(client, socket);
+  socket().receive(serverMessage("WELCOME", { connectionId: "connection-1", messageFragments: true }));
+  enterRecoverableRoom(client, socket, "token-1", "RUNNING");
+  startMatch(client, socket);
+  socket().receive(serverMessage("MESSAGE_FRAGMENT", {
+    id: "fragmented-snapshot", index: 1, count: 2, data: Buffer.from("partial").toString("base64"),
+  }));
+  assert.equal(client.state, MultiplayerClientState.RECONNECTING);
+  assert.equal(client.view.revision, 4);
+  assert.equal(client.error.causeCode, "INVALID_SERVER_MESSAGE");
+});
+
+test("replay frame recovery keeps the current board and rejects a forged seat or revision", () => {
+  const { client, socket } = makeClient();
+  connectClient(client, socket);
+  socket().receive(serverMessage("WELCOME", { connectionId: "connection-1", replayFrames: true }));
+  enterRecoverableRoom(client, socket, "token-1", "RUNNING");
+  startMatch(client, socket, 4);
+  const events = [];
+  client.onEvent((event) => events.push(event));
+  client.requestReplayFrame({ matchId: "match-1", revision: 2 });
+  assert.equal(JSON.parse(socket().sent.at(-1)).type, "REQUEST_REPLAY_FRAME");
+  // A rate limit for another in-flight command must not invalidate this request.
+  socket().receive(serverMessage("ERROR", { code: "RATE_LIMITED", message: "rate limit", fatal: false }));
+  socket().receive(serverMessage("REPLAY_FRAME", { matchId: "match-1", view: { revision: 2, players: {} } }));
+  assert.equal(client.view.revision, 4);
+  assert.equal(events.at(-1).type, "REPLAY_FRAME");
+  assert.throws(() => client.requestReplayFrame({ matchId: "different-match", revision: 2 }), /current match/);
+  client.requestReplayFrame({ matchId: "match-1", revision: 1 });
+  socket().receive(serverMessage("REPLAY_FRAME", { matchId: "match-1", view: { revision: 3, players: {} } }));
+  assert.equal(client.state, MultiplayerClientState.RECONNECTING);
+  assert.equal(client.view.revision, 4);
+});
+
 test("connect has explicit states and sends HELLO exactly once after open", () => {
   const { client, socket } = makeClient();
   const states = [];
@@ -862,6 +929,7 @@ test("real socket close drives main's five automatic retries and preserves the s
   const broadcast = new Function("multiplayerClient", "scheduleMultiplayerReconnect", "appendLog", `
     const syncLanAdvertisement = () => {};
     const queueMultiplayerRecoveryWrite = () => {};
+    const multiplayerReplayRecorder = null;
     const multiplayerSnapshot = () => multiplayerClient.getSnapshot();
     const mainWindow = null;
     ${broadcastSource}

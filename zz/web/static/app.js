@@ -140,6 +140,8 @@ let multiplayerUi = {
 let lanPendingCreateRoom = false;
 let lanPendingJoin = null;
 let onlineBattleLogHistory = { matchId: null, rows: [], missingEarlier: false };
+let multiplayerReplays = [];
+let multiplayerReplayListError = null;
 const PENDING_DUEL_LAUNCH_KEY = "zz_pending_duel_launch";
 const BATTLE_SFX_SELECTION_KEY = "zz_battle_sfx_map";
 const BATTLE_SFX_MAP = {
@@ -157,6 +159,7 @@ const BATTLE_SFX_MAP = {
 };
 
 let codemanReplayState = {
+  source: "codeman",
   codemanId: null,
   memory: [],
   replay: null,
@@ -407,6 +410,11 @@ const UI_TEXT = {
     legacyLogUnavailable: "旧版记录没有结构化的本地化日志。",
     onlineEarlierLogUnavailable: "更早的战斗日志不在本次已接收记录中。",
     onlineLoadEarlierLog: "加载缺失的战斗日志",
+    multiplayerReplays: "联机回放",
+    multiplayerReplaysEmpty: "暂无联机回放",
+    multiplayerReplayIncomplete: "记录不完整：缺少 {frames} 个局面、{logs} 条日志",
+    multiplayerReplayInProgress: "对局尚未结束",
+    multiplayerReplayWriteError: "回放保存失败",
     aiAdvicePrefix: "建议",
     aiAdviceThinking: "Codeman 正在思考...",
     aiAdviceUnavailable: "AI 建议不可用。",
@@ -704,6 +712,11 @@ const UI_TEXT = {
     legacyLogUnavailable: "旧形式の記録にはローカライズ可能な構造化ログがありません。",
     onlineEarlierLogUnavailable: "これ以前の戦闘ログは今回の受信記録に含まれていません。",
     onlineLoadEarlierLog: "未取得の対戦ログを読み込む",
+    multiplayerReplays: "オンライン対戦リプレイ",
+    multiplayerReplaysEmpty: "オンライン対戦の記録はありません",
+    multiplayerReplayIncomplete: "記録が不完全です：盤面 {frames} 件、ログ {logs} 件がありません",
+    multiplayerReplayInProgress: "対戦はまだ終了していません",
+    multiplayerReplayWriteError: "リプレイの保存に失敗しました",
     aiAdvicePrefix: "提案",
     aiAdviceThinking: "Codeman が考えています...",
     aiAdviceUnavailable: "AI提案を利用できません。",
@@ -977,6 +990,11 @@ const UI_TEXT = {
     legacyLogUnavailable: "This legacy record has no structured localizable log.",
     onlineEarlierLogUnavailable: "Earlier battle log entries were not received in this session.",
     onlineLoadEarlierLog: "Load missing battle log entries",
+    multiplayerReplays: "Online replays",
+    multiplayerReplaysEmpty: "No online replays yet",
+    multiplayerReplayIncomplete: "Incomplete recording: {frames} board states and {logs} log entries missing",
+    multiplayerReplayInProgress: "Match has not finished",
+    multiplayerReplayWriteError: "Replay recording failed",
     aiAdvicePrefix: "Advice",
     aiAdviceThinking: "Codeman is thinking...",
     aiAdviceUnavailable: "AI advice unavailable.",
@@ -2539,6 +2557,7 @@ async function requestCodemanMemory(codemanId) {
   appView = CODEMAN_MEMORY_VIEW;
   codemanReplayState = {
     ...codemanReplayState,
+    source: "codeman",
     codemanId,
     memory: [],
     replay: null,
@@ -2577,6 +2596,7 @@ async function requestCodemanReplay(codemanId, matchId, mode = "original") {
   appView = CODEMAN_REPLAY_VIEW;
   codemanReplayState = {
     ...codemanReplayState,
+    source: "codeman",
     codemanId,
     matchId,
     replay: null,
@@ -2611,6 +2631,38 @@ async function requestCodemanReplay(codemanId, matchId, mode = "original") {
     };
   }
   render();
+}
+
+async function refreshMultiplayerReplays() {
+  try {
+    multiplayerReplays = await ZZApi.desktop.listMultiplayerReplays();
+    multiplayerReplayListError = null;
+  } catch (error) {
+    multiplayerReplayListError = error && error.message ? error.message : String(error);
+  }
+  if (appView === AI_TRAINING_VIEW) render();
+}
+
+async function openMultiplayerReplay(id) {
+  try {
+    const replay = await ZZApi.desktop.readMultiplayerReplay(id);
+    for (const frame of replay.trace.stateSnapshots) {
+      hydrateMultiplayerViewAssets(frame.state);
+      frame.animationEvents = frame.state.animationEvents || [];
+    }
+    stopCodemanReplayAutoplay();
+    clearCodemanReplayAnimationWindow();
+    codemanReplayState = {
+      ...codemanReplayState, source: "multiplayer", codemanId: null, memory: [],
+      matchId: replay.metadata.matchId, replay, mode: "original", index: 0,
+      animatingIndex: null, playing: false, loading: false, correcting: false, error: null,
+    };
+    appView = CODEMAN_REPLAY_VIEW;
+    render();
+  } catch (error) {
+    multiplayerReplayListError = error && error.message ? error.message : String(error);
+    render();
+  }
 }
 
 function codemanReplayCanCorrect(replay = codemanReplayState.replay) {
@@ -2741,6 +2793,8 @@ function codemanReplayFrameAnimationEvents(index = codemanReplayState.index) {
   const snapshot = codemanReplaySnapshotForIndex(index);
   if (!snapshot || !Array.isArray(snapshot.animationEvents)) return [];
   let events = snapshot.animationEvents.filter((event) => event && event.type);
+  // Multiplayer snapshots contain one independent animation batch per revision.
+  if (codemanReplayState.source === "multiplayer") return events;
   const previous = codemanReplaySnapshotForIndex(Number(index) - 1);
   const previousEvents = previous && Array.isArray(previous.animationEvents)
     ? previous.animationEvents.filter((event) => event && event.type)
@@ -2900,6 +2954,13 @@ function stopCodemanReplayAutoplay() {
 function closeCodemanReplayView() {
   stopCodemanReplayAutoplay();
   clearCodemanReplayAnimationWindow();
+  if (codemanReplayState.source === "multiplayer") {
+    codemanReplayState = { ...codemanReplayState, source: "codeman", replay: null, matchId: null };
+    appView = AI_TRAINING_VIEW;
+    render();
+    refreshMultiplayerReplays();
+    return;
+  }
   if (appView === CODEMAN_REPLAY_VIEW && codemanReplayState.codemanId) {
     navigateCodemanMemory(codemanReplayState.codemanId);
     return;
@@ -6611,6 +6672,7 @@ function renderDuelView(error = null) {
           total: multiplayerUi.reconnectMaxAttempts || 5,
         }))}</div>`
       : ""}
+    ${online && multiplayerUi.replayError ? `<div class="error" role="alert">${esc(t("multiplayerReplayWriteError"))}: ${esc(multiplayerUi.replayError)}</div>` : ""}
     ${renderDuelBoardShell(error)}
   `;
 }
@@ -7734,6 +7796,7 @@ function renderOnlineGamePage(error = null) {
     ${renderShellHeader("ZENONZARD / ONLINE")}
     <main class="home-screen online-game-screen">
       ${visibleError ? `<div class="error">${esc(visibleError)}</div>` : ""}
+      ${multiplayerUi.replayError ? `<div class="error" role="alert">${esc(t("multiplayerReplayWriteError"))}: ${esc(multiplayerUi.replayError)}</div>` : ""}
       <section class="home-panel online-connect-panel">
         <div class="home-panel-head">
           <h1>${esc(t("onlineGame"))}</h1>
@@ -7828,9 +7891,29 @@ function renderAiTrainingPage(error = null) {
         </div>
         ${renderProfileSetup()}
       </section>
+      ${renderMultiplayerReplayList()}
       ${renderReplayTrainingMemoryPanel()}
       ${renderAiTrainingPanel()}
     </main>
+  `;
+}
+
+function renderMultiplayerReplayList() {
+  return `
+    <section class="home-panel replay-training-panel">
+      <div class="home-panel-head">
+        <h2>${esc(t("multiplayerReplays"))}</h2>
+      </div>
+      ${multiplayerReplayListError ? `<div class="error">${esc(multiplayerReplayListError)}</div>` : ""}
+      ${multiplayerReplays.length ? multiplayerReplays.map((replay) => `
+        <button class="codeman-memory-row" data-multiplayer-replay="${esc(replay.id)}">
+          <span><strong>${esc(replay.createdAt)}</strong><small>${esc(replay.matchId)}</small></span>
+          ${replay.complete ? "" : `<small>${esc(replay.finished
+            ? t("multiplayerReplayIncomplete", { frames: replay.missingRevisions, logs: replay.missingLogEvents })
+            : t("multiplayerReplayInProgress"))}</small>`}
+        </button>
+      `).join("") : `<div class="empty">${esc(t("multiplayerReplaysEmpty"))}</div>`}
+    </section>
   `;
 }
 
@@ -8024,6 +8107,7 @@ function renderCodemanTrainingControl(codemanId) {
 }
 
 function codemanReplayTitle() {
+  if (codemanReplayState.source === "multiplayer") return t("multiplayerReplays");
   const selected = characterById(codemanReplayState.codemanId);
   return selected ? characterTitle(selected) : (codemanReplayState.codemanId || "Codeman");
 }
@@ -8037,7 +8121,7 @@ function renderCodemanReplayShell({ replayOnly = false } = {}) {
           <strong>${esc(codemanReplayTitle())}</strong>
         </div>
         <div class="codeman-replay-head-actions">
-          ${codemanReplayState.matchId ? `<button data-codeman-replay-popout>${esc(t("codemanReplayOpenWindow"))}</button>` : ""}
+          ${codemanReplayState.matchId && codemanReplayState.source !== "multiplayer" ? `<button data-codeman-replay-popout>${esc(t("codemanReplayOpenWindow"))}</button>` : ""}
           <button data-codeman-replay-close>${esc(t("close"))}</button>
         </div>
       </header>
@@ -8084,7 +8168,7 @@ function renderCodemanReplayPlayer() {
   const canCorrect = codemanReplayCanCorrect(replay);
   const events = codemanReplayEvents();
   const snapshots = codemanReplaySnapshots();
-  const count = Math.max(events.length, snapshots.length);
+  const count = codemanReplayFrameCount();
   const frameMax = Math.max(0, count - 1);
   const index = Math.min(codemanReplayState.index, frameMax);
   const displayIndex = codemanReplayDisplaySnapshotIndex(index);
@@ -8092,8 +8176,12 @@ function renderCodemanReplayPlayer() {
   return `
     <section class="codeman-replay-player">
       ${renderReplayDivergenceBanner(index)}
+      ${codemanReplayState.source === "multiplayer" && !replay.metadata.complete
+        ? `<div class="error">${esc(replay.metadata.finished
+          ? t("multiplayerReplayIncomplete", { frames: replay.metadata.missingRevisions, logs: replay.metadata.missingLogEvents })
+          : t("multiplayerReplayInProgress"))}</div>` : ""}
       <div class="codeman-replay-toolbar">
-        <div class="codeman-replay-modes">
+        ${codemanReplayState.source === "multiplayer" ? "" : `<div class="codeman-replay-modes">
           <button class="${codemanReplayState.mode === "original" ? "active" : ""}"
                   data-codeman-replay-mode="original">${esc(t("codemanReplayOriginal"))}</button>
           <button class="${codemanReplayState.mode === "corrected" ? "active" : ""}"
@@ -8105,7 +8193,7 @@ function renderCodemanReplayPlayer() {
               ${esc(codemanReplayState.correcting ? t("codemanReplayCorrecting") : t("codemanReplayTryCorrection"))}
             </button>
           ` : ""}
-        </div>
+        </div>`}
         <div class="codeman-replay-controls">
           <button data-codeman-replay-step="-1" ${index <= 0 ? "disabled" : ""}>${esc(t("back"))}</button>
           <button data-codeman-replay-play>${esc(codemanReplayState.playing ? t("codemanReplayPause") : t("codemanReplayPlay"))}</button>
@@ -9361,6 +9449,12 @@ app.addEventListener("click", async (event) => {
     navigateCodemanMemory(codemanMemory.dataset.codemanMemory);
     return;
   }
+  const multiplayerReplay = event.target.closest("[data-multiplayer-replay]");
+  if (multiplayerReplay) {
+    event.preventDefault();
+    openMultiplayerReplay(multiplayerReplay.dataset.multiplayerReplay);
+    return;
+  }
   const replayOpen = event.target.closest("[data-codeman-replay-open]");
   if (replayOpen) {
     event.preventDefault();
@@ -9577,6 +9671,7 @@ app.addEventListener("click", async (event) => {
     else if (view === AI_TRAINING_VIEW) {
       appView = AI_TRAINING_VIEW;
       render();
+      refreshMultiplayerReplays();
     }
     else if (view === "settings") {
       appView = "settings";

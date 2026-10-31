@@ -16,6 +16,7 @@ _CARD_AREAS = {area.value for area in AreaType}
 # Logs are a reconnectable window, not the diagnostic replay archive. Leave
 # room for the board, prompts, animation batch and the largest wire envelope.
 _LOG_BYTE_BUDGET = 65_536
+_LIVE_LOG_EVENT_LIMIT = 20
 _WIRE_ENVELOPE_RESERVE = 4_096
 _LOG_EVENT_FIELDS = {
     "type", "eventIndex", "turn", "phase", "step", "activeSide",
@@ -352,7 +353,7 @@ def build_player_view(
         "publicReveals": deepcopy(list(public_reveals)),
     })
     _strip_wire_asset_urls(state)
-    state["logEvents"] = _project_log_events(session._log_events, viewer_side=player.side.name)
+    state["logEvents"] = _project_log_events(session._log_events[-_LIVE_LOG_EVENT_LIMIT:], viewer_side=player.side.name)
     state["logHistory"] = {
         "canPage": True,
         "latestEventIndex": session._codeman_trace_events[-1]["eventIndex"] if session._codeman_trace_events else None,

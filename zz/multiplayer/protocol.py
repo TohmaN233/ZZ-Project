@@ -13,6 +13,10 @@ from zz.multiplayer.compatibility import (
 )
 
 MAX_MESSAGE_BYTES = 262_144
+# A logical server message may span multiple bounded WebSocket messages.
+MAX_LOGICAL_MESSAGE_BYTES = 8 * 1024 * 1024
+MAX_MESSAGE_FRAGMENTS = 256
+MAX_FRAGMENT_DATA_LENGTH = 65_536
 
 _MAX_IDENTIFIER_LENGTH = 128
 _MAX_DISPLAY_NAME_LENGTH = 40
@@ -35,7 +39,9 @@ _CLIENT_MESSAGE_TYPES = {
     "SUBMIT_ACTION",
     "REQUEST_SYNC",
     "REQUEST_LOG_HISTORY",
+    "REQUEST_REPLAY_FRAME",
     "LEAVE_ROOM",
+    "ENABLE_MESSAGE_FRAGMENTS",
 }
 _SERVER_MESSAGE_TYPES = {
     "WELCOME",
@@ -46,6 +52,8 @@ _SERVER_MESSAGE_TYPES = {
     "ACTION_RESULT",
     "ERROR",
     "ROOM_CLOSED",
+    "MESSAGE_FRAGMENT",
+    "REPLAY_FRAME",
 }
 _ROOM_STATUSES = {
     "CREATED",
@@ -391,10 +399,20 @@ def _validate_leave_room(payload: Mapping[str, Any]) -> None:
     _strict_object(payload, label="LEAVE_ROOM payload")
 
 
+def _validate_enable_message_fragments(payload: Mapping[str, Any]) -> None:
+    _strict_object(payload, label="ENABLE_MESSAGE_FRAGMENTS payload")
+
+
 def _validate_request_log_history(payload: Mapping[str, Any]) -> None:
     value = _strict_object(payload, required={"matchId", "beforeEventIndex"}, label="REQUEST_LOG_HISTORY payload")
     _identifier(value["matchId"], "matchId")
     _non_negative_int(value["beforeEventIndex"], "beforeEventIndex")
+
+
+def _validate_request_replay_frame(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(payload, required={"matchId", "revision"}, label="REQUEST_REPLAY_FRAME payload")
+    _identifier(value["matchId"], "matchId")
+    _non_negative_int(value["revision"], "revision")
 
 
 def _validate_log_history(payload: Mapping[str, Any]) -> None:
@@ -431,7 +449,7 @@ def _validate_welcome(payload: Mapping[str, Any]) -> None:
     value = _strict_object(
         payload,
         required={"connectionId"},
-        optional={"playerId", "compatibility", "recoveryPersistenceAck"},
+        optional={"playerId", "compatibility", "recoveryPersistenceAck", "messageFragments", "replayFrames"},
         label="WELCOME payload",
     )
     _identifier(value["connectionId"], "connectionId")
@@ -441,6 +459,23 @@ def _validate_welcome(payload: Mapping[str, Any]) -> None:
         _validate_compatibility(value["compatibility"])
     if "recoveryPersistenceAck" in value and not isinstance(value["recoveryPersistenceAck"], bool):
         _invalid("recoveryPersistenceAck must be a boolean")
+    if "messageFragments" in value and not isinstance(value["messageFragments"], bool):
+        _invalid("messageFragments must be a boolean")
+    if "replayFrames" in value and not isinstance(value["replayFrames"], bool):
+        _invalid("replayFrames must be a boolean")
+
+
+def _validate_message_fragment(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(payload, required={"id", "index", "count", "data"},
+                           label="MESSAGE_FRAGMENT payload")
+    _identifier(value["id"], "id")
+    index = _non_negative_int(value["index"], "index")
+    count = _non_negative_int(value["count"], "count")
+    if not 1 <= count <= MAX_MESSAGE_FRAGMENTS or index >= count:
+        _invalid("MESSAGE_FRAGMENT index/count is invalid")
+    data = _string(value["data"], "data", max_length=MAX_FRAGMENT_DATA_LENGTH)
+    if len(data) % 4 or not re.fullmatch(r"[A-Za-z0-9+/]*={0,2}", data):
+        _invalid("MESSAGE_FRAGMENT data must be base64")
 
 
 def _validate_compatibility(value: Mapping[str, Any]) -> None:
@@ -577,6 +612,13 @@ def _validate_state_snapshot(payload: Mapping[str, Any]) -> None:
         _validate_connection_status(value["connectionStatus"])
 
 
+def _validate_replay_frame(payload: Mapping[str, Any]) -> None:
+    value = _strict_object(payload, required={"matchId", "view"}, label="REPLAY_FRAME payload")
+    _identifier(value["matchId"], "matchId")
+    _json_object(value["view"], "view")
+    _non_negative_int(value["view"].get("revision"), "view.revision")
+
+
 def _validate_connection_status(value: Any) -> None:
     statuses = _strict_object(
         value,
@@ -643,6 +685,7 @@ def _validate_room_closed(payload: Mapping[str, Any]) -> None:
 
 _CLIENT_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
     "HELLO": _validate_hello,
+    "ENABLE_MESSAGE_FRAGMENTS": _validate_enable_message_fragments,
     "CREATE_ROOM": _validate_create_room,
     "JOIN_ROOM": _validate_join_room,
     "RECONNECT": _validate_reconnect,
@@ -653,10 +696,13 @@ _CLIENT_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
     "SUBMIT_ACTION": _validate_submit_action,
     "REQUEST_SYNC": _validate_request_sync,
     "REQUEST_LOG_HISTORY": _validate_request_log_history,
+    "REQUEST_REPLAY_FRAME": _validate_request_replay_frame,
     "LEAVE_ROOM": _validate_leave_room,
 }
 _SERVER_PAYLOAD_VALIDATORS: dict[str, Callable[[Mapping[str, Any]], None]] = {
     "WELCOME": _validate_welcome,
+    "MESSAGE_FRAGMENT": _validate_message_fragment,
+    "REPLAY_FRAME": _validate_replay_frame,
     "ROOM_STATE": _validate_room_state,
     "MATCH_STARTED": _validate_match_started,
     "STATE_SNAPSHOT": _validate_state_snapshot,

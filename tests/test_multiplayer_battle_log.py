@@ -119,9 +119,9 @@ def test_long_log_window_is_explicit_compact_and_valid_wire_data():
         match.session._log_event(f"event-{index}", {"type": "reveal", "actorSide": "P1", "card": card, "reason": "公開"})
     view = match.get_view_for("player_2")
     assert view["logEvents"]
-    assert len(view["logEvents"]) <= 80
+    assert len(view["logEvents"]) == 20
     assert view["logHistory"] == {"canPage": True, "latestEventIndex": 104,
-                                  "hasEarlierEvents": True, "firstEventIndex": 25, "lastEventIndex": 104}
+                                  "hasEarlierEvents": True, "firstEventIndex": 85, "lastEventIndex": 104}
     assert "abilityJp" not in view["logEvents"][0]["card"]
     assert len(_wire(view).encode("utf-8")) < MAX_MESSAGE_BYTES
 
@@ -456,9 +456,12 @@ def test_finished_history_is_unavailable_to_a_replacement_guest_after_original_g
     _send(core, "a", "SUBMIT_ACTION", {"matchId": "match-1", "playerId": "player_1", "clientActionId": "end-seat-test",
                                       "expectedRevision": match.revision, "action": {"kind": "SURRENDER"}})
     assert core._finished_match_logs
+    assert core._finished_match_frames
     # The original host can still page while both original seats remain reserved.
     _send(core, "a", "REQUEST_LOG_HISTORY", {"matchId": "match-1", "beforeEventIndex": 1})
     assert _latest(messages["a"], "LOG_HISTORY")["events"]
+    _send(core, "a", "REQUEST_REPLAY_FRAME", {"matchId": "match-1", "revision": 0})
+    assert _latest(messages["a"], "REPLAY_FRAME")["view"]["humanSide"] == "P1"
     messages["replacement"] = []
     core.connect("replacement", messages["replacement"].append)
     if leave_mode == "explicit":
@@ -467,10 +470,14 @@ def test_finished_history_is_unavailable_to_a_replacement_guest_after_original_g
         core.disconnect("b")
         timers.timers[-1].fire()
     assert core._finished_match_logs == {}
+    assert core._finished_match_frames == {}
     _send(core, "replacement", "JOIN_ROOM", {"roomCode": "ABC123", "displayName": "New guest"})
     assert _latest(messages["replacement"], "ERROR")
     _send(core, "replacement", "REQUEST_LOG_HISTORY", {"matchId": "match-1", "beforeEventIndex": 1})
     assert _latest(messages["replacement"], "ERROR")["code"] == "PLAYER_NOT_IN_ROOM"
     assert not any(message["type"] == "LOG_HISTORY" for message in messages["replacement"])
+    _send(core, "replacement", "REQUEST_REPLAY_FRAME", {"matchId": "match-1", "revision": 0})
+    assert _latest(messages["replacement"], "ERROR")["code"] == "PLAYER_NOT_IN_ROOM"
+    assert not any(message["type"] == "REPLAY_FRAME" for message in messages["replacement"])
     _send(core, "a", "REQUEST_LOG_HISTORY", {"matchId": "match-1", "beforeEventIndex": 1})
     assert _latest(messages["a"], "ERROR")["code"] == "PLAYER_NOT_IN_ROOM"

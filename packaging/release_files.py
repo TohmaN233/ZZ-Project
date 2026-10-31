@@ -131,6 +131,8 @@ def release_files(root: Path, kind: str) -> list[Path]:
             "test_web_session_initialization.py",
             "test_enrico_hand_reset.py", "test_frontend_online_recovery.py",
             "test_multiplayer_battle_log.py", "test_sphinx_effect_source.py",
+            "test_multiplayer_large_snapshots.py", "test_frontend_multiplayer_replay.py",
+            "electron_multiplayer_replay.test.js",
             "electron_reconnect_gateway_harness.js",
         ))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
@@ -232,7 +234,7 @@ WEB_MODULES = ('__init__', 'assets', 'catalog', 'debug_tools', 'deck_store', 'fi
 
 MULTIPLAYER_MODULES = ('__init__', 'actions', 'client', 'compatibility', 'controllers', 'deployment', 'deployment_server', 'hashing', 'match', 'observability', 'protocol', 'rooms', 'service', 'transport', 'views', 'websocket_server')
 
-ELECTRON_FILES = ('adaptive-websocket.js', 'asset-bootstrap.js', 'asset-setup-preload.js', 'asset-setup-renderer.js', 'asset-setup.css', 'asset-setup.html', 'asset-setup.js', 'asset-source.json', 'icon-256.png', 'icon.png', 'lan-manager.js', 'main.js', 'multiplayer-client.js', 'preload.js', 'README.md', 'update-checker.js')
+ELECTRON_FILES = ('adaptive-websocket.js', 'asset-bootstrap.js', 'asset-setup-preload.js', 'asset-setup-renderer.js', 'asset-setup.css', 'asset-setup.html', 'asset-setup.js', 'asset-source.json', 'icon-256.png', 'icon.png', 'lan-manager.js', 'main.js', 'multiplayer-client.js', 'multiplayer-replay.js', 'preload.js', 'README.md', 'update-checker.js')
 
 STATIC_FILES = ('api-client.js', 'app.js', 'duel-dom.js', 'duel-layout.js', 'duel.html', 'duel.js', 'fx-core.js', 'fx.css', 'index.html', 'multiplayer-card-policy.js', 'styles.css')
 

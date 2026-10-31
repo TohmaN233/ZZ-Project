@@ -8,7 +8,7 @@
   <title>ZENONZARD Offline Project</title>
   <link rel="icon" href="assets/zzicon.webp">
   <link rel="stylesheet" href="assets/site.css">
-  <script src="assets/site.js?v=0.5.3" defer></script>
+  <script src="assets/site.js?v=0.5.4" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">跳到正文</a>
@@ -56,7 +56,7 @@
       <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + EX01 + PC01 + PC01R + PC02 + PC02R DIVINE（106 张）+ EX02C/SAO 与 EX02 对应卡面（70 组）</span></div>
       <div><strong data-i18n="statusTwoTitle">对战方式</strong><span data-i18n="statusTwoBody">单机 / 局域网 / 在线</span></div>
       <div><strong data-i18n="statusThreeTitle">AI 档位</strong><span data-i18n="statusThreeBody">Greedy + 两档 RL</span></div>
-      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.5.3 · 当前版本</span></div>
+      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.5.4 · 当前版本</span></div>
     </section>
 
     <section class="section" id="features">
@@ -193,8 +193,8 @@
     <section class="section install" id="install">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="installEyebrow">INSTALLATION</p>
-        <h2 data-i18n="installTitle">下载 v0.5.3；首次启动可自动获取资源</h2>
-        <p data-i18n="installLead">v0.5.3 的 Windows 版将卡组保存在安装目录 data/decks/；首次启动从旧的 %APPDATA%\zenonzard-clone\game-data\decks\ 迁移卡组，保留原文件备份且不覆盖冲突卡组。圣之 Force 会保护符合条件的己方怪物，使其不会被通过加护赋予对手怪物的选择效果选中；恩里科效果先令双方弃牌、再抽牌。联机断线后最多自动重连 5 次并保留房间码；当前对局和结果页的战斗日志支持分页。联机双方客户端与服务器必须使用相同版本；v0.5.3 客户端需要连接 v0.5.3 服务器。Windows 安装包和 Linux 便携包包含可玩的游戏与默认模型。缺少完整 asserts/ 时，桌面客户端会询问是否下载并安装包含英文卡图的 asserts.7z。</p>
+        <h2 data-i18n="installTitle">下载 v0.5.4；首次启动可自动获取资源</h2>
+        <p data-i18n="installLead">v0.5.4 的 Windows 版将卡组保存在安装目录 data/decks/；首次启动从旧的 %APPDATA%\zenonzard-clone\game-data\decks\ 迁移卡组，保留原文件备份且不覆盖冲突卡组。圣之 Force 会保护符合条件的己方怪物，使其不会被通过加护赋予对手怪物的选择效果选中；恩里科效果先令双方弃牌、再抽牌。联机断线后最多自动重连 5 次并保留房间码；当前对局和结果页的战斗日志支持分页。重连时较大的消息会分段传输；联机回放保存在游戏目录 data/replays/，未补齐时标记为不完整。联机双方客户端与服务器必须使用相同版本；v0.5.4 客户端需要连接 v0.5.4 服务器。Windows 安装包和 Linux 便携包包含可玩的游戏与默认模型。缺少完整 asserts/ 时，桌面客户端会询问是否下载并安装包含英文卡图的 asserts.7z。</p>
       </div>
       <div class="install-grid">
         <ol class="steps">
@@ -212,11 +212,11 @@
             <div><dt data-i18n="reqGpu">显卡</dt><dd data-i18n="reqGpuBody">游玩不要求；本地训练需要 NVIDIA GPU / CUDA</dd></div>
           </dl>
           <div class="download-actions">
-            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Windows-Setup.exe" data-i18n="downloadCode">下载 Windows v0.5.3</a>
-            <a class="button secondary" data-linux-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Linux.tar.gz" data-i18n="downloadLinux">下载 Linux v0.5.3</a>
-            <a class="button secondary" data-source-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-source.zip" data-i18n="downloadSource">下载源码</a>
-            <a class="button secondary" data-server-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Multiplayer-v0.5.3.tar.gz" data-i18n="downloadServer">下载联机服务器</a>
-            <a class="button secondary" data-checksums-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/SHA256SUMS-PC02.txt" data-i18n="downloadChecksums">SHA256 校验清单</a>
+            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe" data-i18n="downloadCode">下载 Windows v0.5.4</a>
+            <a class="button secondary" data-linux-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz" data-i18n="downloadLinux">下载 Linux v0.5.4</a>
+            <a class="button secondary" data-source-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip" data-i18n="downloadSource">下载源码</a>
+            <a class="button secondary" data-server-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz" data-i18n="downloadServer">下载联机服务器</a>
+            <a class="button secondary" data-checksums-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt" data-i18n="downloadChecksums">SHA256 校验清单</a>
             <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">打开 asserts.7z 资源文件夹（含英文卡图）</a>
           </div>
           <p class="hash-note"><code>asserts.7z · 1,534,680,950 bytes</code><br><span data-i18n="hashNote">asserts.7z 为 1,534,680,950 bytes，展开后为 1,577,092,255 bytes，需预留至少 3.2 GB。客户端捆绑 7-Zip 并校验 CRC；程序发行包的 SHA256 见校验清单。</span></p>

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import secrets
 from collections.abc import Callable, Mapping
@@ -18,6 +19,8 @@ from zz.multiplayer.compatibility import (
 )
 from zz.multiplayer.protocol import (
     MAX_MESSAGE_BYTES,
+    MAX_LOGICAL_MESSAGE_BYTES,
+    MAX_MESSAGE_FRAGMENTS,
     PROTOCOL_VERSION,
     ProtocolError,
     parse_client_hello,
@@ -109,20 +112,26 @@ class WebSocketMultiplayerGateway:
         connection_id = self._connection_id_factory()
         send_lock = Lock()
         registered = False
+        fragments_enabled = False
+        headers = getattr(getattr(socket, "request", None), "headers", {})
+        supports_extensions = headers.get("X-ZZ-Client-Features") == "replay-fragments-v1"
 
         def emit(message: Mapping[str, Any]) -> None:
             outgoing = deepcopy(dict(message))
+            def wire_bytes(value: Any) -> int:
+                return len(json.dumps(value, ensure_ascii=False, separators=(",", ":"),
+                                      allow_nan=False).encode("utf-8"))
+
             if outgoing.get("type") == "WELCOME":
                 payload = dict(outgoing.get("payload") or {})
                 payload["compatibility"] = compatibility_payload()
+                if supports_extensions:
+                    payload["messageFragments"] = True
+                    payload["replayFrames"] = True
                 outgoing["payload"] = payload
             payload = outgoing.get("payload")
             view = payload.get("view") if isinstance(payload, dict) else None
             if (isinstance(view, dict) and "logEvents" in view) or outgoing.get("type") == "LOG_HISTORY":
-                def wire_bytes(value: Any) -> int:
-                    return len(json.dumps(value, ensure_ascii=False, separators=(",", ":"),
-                                          allow_nan=False).encode("utf-8"))
-
                 if outgoing.get("type") == "LOG_HISTORY":
                     fit_player_log_page(payload, max_message_bytes=self.config.max_message_bytes,
                                         envelope_bytes=wire_bytes(outgoing) - wire_bytes(payload))
@@ -133,11 +142,51 @@ class WebSocketMultiplayerGateway:
                     )
             encoded = serialize_server_message(
                 outgoing,
-                max_bytes=self.config.max_message_bytes,
+                max_bytes=MAX_LOGICAL_MESSAGE_BYTES,
             )
+            encoded_bytes = encoded.encode("utf-8")
+            size = len(encoded_bytes)
+            limit = self.config.max_message_bytes
+            frames = [encoded]
+            if size > limit:
+                sizes = ({
+                    "viewBytes": wire_bytes(view),
+                    "logBytes": wire_bytes(view.get("logEvents")),
+                    "animationBytes": wire_bytes(view.get("animationEvents")),
+                    "boardBytes": wire_bytes(view.get("players")),
+                    "promptBytes": wire_bytes(view.get("prompt")),
+                } if isinstance(view, dict) else {})
+                if not fragments_enabled:
+                    self.core._observe("outbound_message_too_large", level="WARNING",
+                                       connectionId=connection_id, messageType=outgoing["type"],
+                                       messageBytes=size, messageLimit=limit, **sizes)
+                    raise ProtocolError("MESSAGE_TOO_LARGE", f"message size {size} exceeds {limit} bytes", fatal=True)
+                # Keep the fragment and its envelope below the configured wire limit.
+                raw_part_size = min(32_768, max(0, (limit - 512) * 3 // 4))
+                if raw_part_size == 0:
+                    raise ProtocolError("MESSAGE_TOO_LARGE", "message limit is too small for fragmentation", fatal=True)
+                count = (size + raw_part_size - 1) // raw_part_size
+                if count > MAX_MESSAGE_FRAGMENTS:
+                    raise ProtocolError("MESSAGE_TOO_LARGE", "message requires too many fragments", fatal=True)
+                frames = []
+                for index in range(count):
+                    fragment = {
+                        "protocolVersion": PROTOCOL_VERSION,
+                        "messageId": self._new_message_id(),
+                        "type": "MESSAGE_FRAGMENT",
+                        "payload": {
+                            "id": outgoing["messageId"], "index": index, "count": count,
+                            "data": base64.b64encode(encoded_bytes[index * raw_part_size:(index + 1) * raw_part_size]).decode("ascii"),
+                        },
+                    }
+                    frames.append(serialize_server_message(fragment, max_bytes=limit))
+                self.core._observe("outbound_message_fragmented", connectionId=connection_id,
+                                   messageType=outgoing["type"], messageBytes=size,
+                                   messageLimit=limit, fragmentCount=count, **sizes)
             try:
                 with send_lock:
-                    socket.send(encoded)
+                    for frame in frames:
+                        socket.send(frame)
             except ConnectionClosed:
                 return
 
@@ -181,6 +230,14 @@ class WebSocketMultiplayerGateway:
                     if exc.fatal:
                         socket.close(code=1002, reason=exc.code)
                         break
+                    continue
+                if message["type"] == "ENABLE_MESSAGE_FRAGMENTS":
+                    if fragments_enabled:
+                        error = ProtocolError("INVALID_MESSAGE", "message fragmentation was already enabled", fatal=True)
+                        self._send_protocol_error(socket, send_lock, error)
+                        socket.close(code=1002, reason=error.code)
+                        break
+                    fragments_enabled = True
                     continue
                 self.core.receive(connection_id, message)
         except ConnectionClosed:

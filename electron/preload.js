@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld("zzDesktop", {
   openFolder: () => ipcRenderer.invoke("dialog:openFolder"),
   openPath: (targetPath) => ipcRenderer.invoke("shell:openPath", targetPath),
   openReplayWindow: (payload) => ipcRenderer.invoke("replay:openWindow", payload),
+  listMultiplayerReplays: () => ipcRenderer.invoke("replay:listMultiplayer"),
+  readMultiplayerReplay: (id) => ipcRenderer.invoke("replay:readMultiplayer", id),
   selectAssetRoot: () => ipcRenderer.invoke("assets:selectRoot"),
   selectDeckRoot: () => ipcRenderer.invoke("decks:selectRoot"),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),

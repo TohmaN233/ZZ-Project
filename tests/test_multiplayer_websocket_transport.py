@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import base64
 import json
 from queue import Queue
 import time
@@ -77,6 +78,32 @@ def wait_until(predicate: Any, *, timeout: float = 1.0) -> None:
     raise AssertionError("condition was not reached before timeout")
 
 
+def test_websocket_negotiates_and_reassembles_fragmented_snapshots(monkeypatch):
+    socket = FakeSocket()
+    monkeypatch.setattr(transport_module, "websocket_connect", FakeConnector(socket))
+    transport = WebSocketTransport("ws://server/multiplayer", close_timeout=0.1)
+    received = []
+    transport.on_message(received.append)
+    transport.connect()
+    socket.emit({"type": "WELCOME", "payload": {"messageFragments": True}})
+    wait_until(lambda: len(socket.sent) == 2)
+    assert json.loads(socket.sent[1])["type"] == "ENABLE_MESSAGE_FRAGMENTS"
+    snapshot = {"protocolVersion": PROTOCOL_VERSION, "messageId": "large-snapshot", "type": "STATE_SNAPSHOT",
+                "payload": {"matchId": "m", "view": {"revision": 3, "animationEvents": [
+                    {"type": "zone_move", "label": "対戦" * 400} for _ in range(120)
+                ]}}}
+    raw = json.dumps(snapshot, ensure_ascii=False).encode("utf-8")
+    parts = [raw[offset:offset + 32768] for offset in range(0, len(raw), 32768)]
+    for index, data in enumerate(parts):
+        socket.emit({"protocolVersion": PROTOCOL_VERSION, "messageId": f"part-{index}", "type": "MESSAGE_FRAGMENT",
+                     "payload": {"id": snapshot["messageId"], "index": index, "count": len(parts),
+                                 "data": base64.b64encode(data).decode("ascii")}})
+    wait_until(lambda: len(received) == 2)
+    assert received[1] == snapshot
+    assert transport.last_error is None
+    transport.close()
+
+
 def test_connect_sends_one_hello_and_serializes_messages(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -102,6 +129,7 @@ def test_connect_sends_one_hello_and_serializes_messages(
     assert hello["messageId"]
     assert hello["payload"] == hello_compatibility_payload()
     assert connector.calls == [("ws://127.0.0.1:32145/multiplayer", {
+        "additional_headers": {"X-ZZ-Client-Features": "replay-fragments-v1"},
         "max_size": 4096,
         "open_timeout": 3,
         "ping_interval": 7,

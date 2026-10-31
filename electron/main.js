@@ -8,6 +8,7 @@ const path = require("node:path");
 const { createAdaptiveWebSocketClass } = require("./adaptive-websocket");
 const { LanManager } = require("./lan-manager");
 const { MultiplayerDesktopClient } = require("./multiplayer-client");
+const { MultiplayerReplayArchive, MultiplayerReplayRecorder } = require("./multiplayer-replay");
 const { assetRootLooksValid, createElectronAssetFetch } = require("./asset-bootstrap");
 const { ensureStartupAssets } = require("./asset-setup");
 const assetSource = require("./asset-source.json");
@@ -37,6 +38,9 @@ const AdaptiveWebSocket = createAdaptiveWebSocketClass({
 const multiplayerClient = new MultiplayerDesktopClient({ WebSocketImpl: AdaptiveWebSocket });
 const lanManager = new LanManager();
 let multiplayerRecoveryPath = null;
+let multiplayerReplayArchive = null;
+let multiplayerReplayRecorder = null;
+let multiplayerReplayError = null;
 let multiplayerRecoveryWrite = Promise.resolve();
 let multiplayerReconnectTimer = null;
 const multiplayerReconnectDelayMs = 1000;
@@ -93,6 +97,10 @@ function packagedAssetRoot() {
 
 function packagedDeckRoot() {
   return path.join(path.dirname(process.execPath), "data", "decks");
+}
+
+function multiplayerReplayRoot() {
+  return path.join(app.isPackaged ? path.dirname(process.execPath) : projectRoot(), "data", "replays");
 }
 
 function packagedBundledDeckRoot() {
@@ -342,6 +350,7 @@ function multiplayerSnapshot() {
     ...snapshot,
     status: snapshot.state,
     lastError: snapshot.error,
+    replayError: multiplayerReplayError,
     networkRoute: multiplayerRoute,
     lan: {
       ...lan,
@@ -439,6 +448,7 @@ function syncLanAdvertisement() {
 }
 
 function broadcastMultiplayerEvent(event) {
+  if (multiplayerReplayRecorder) multiplayerReplayRecorder.handleEvent(event);
   syncLanAdvertisement();
   queueMultiplayerRecoveryWrite();
   scheduleMultiplayerReconnect();
@@ -752,6 +762,16 @@ function registerIpc() {
     createReplayWindow(url);
     return { ok: true };
   });
+  ipcMain.handle("replay:listMultiplayer", async (_event) => {
+    assertTrustedSender(_event);
+    if (!multiplayerReplayArchive) throw new Error("multiplayer replay storage is unavailable");
+    return multiplayerReplayArchive.list();
+  });
+  ipcMain.handle("replay:readMultiplayer", async (_event, id) => {
+    assertTrustedSender(_event);
+    if (!multiplayerReplayArchive) throw new Error("multiplayer replay storage is unavailable");
+    return multiplayerReplayArchive.read(id);
+  });
   ipcMain.handle("assets:selectRoot", async (_event) => {
     assertTrustedSender(_event);
     const result = await dialog.showOpenDialog({ properties: ["openDirectory"], title: "Select asset root" });
@@ -908,6 +928,18 @@ app.whenReady().then(async () => {
     return;
   }
   multiplayerRecoveryPath = path.join(app.getPath("userData"), "multiplayer-recovery.json");
+  multiplayerReplayArchive = new MultiplayerReplayArchive(multiplayerReplayRoot());
+  multiplayerReplayRecorder = new MultiplayerReplayRecorder({
+    archive: multiplayerReplayArchive,
+    client: multiplayerClient,
+    onError: (error) => {
+      multiplayerReplayError = String(error && error.message ? error.message : error);
+      appendLog(`Multiplayer replay recording failed: ${multiplayerReplayError}`);
+      if (mainWindow && !mainWindow.isDestroyed() && isTrustedUrl(mainWindow.webContents.getURL())) {
+        mainWindow.webContents.send("multiplayer:event", { type: "REPLAY_ERROR", snapshot: multiplayerSnapshot() });
+      }
+    },
+  });
   const shouldReconnect = await restoreMultiplayerRecovery();
   registerIpc();
   await createWindow();
@@ -944,6 +976,7 @@ app.on("before-quit", (event) => {
   shutdownPromise = Promise.allSettled([
     startupAssetsPromise,
     queueMultiplayerRecoveryWrite(),
+    multiplayerReplayRecorder ? multiplayerReplayRecorder.flush() : null,
     lanManager.stopHost(),
     stopServer(),
   ]).finally(() => {

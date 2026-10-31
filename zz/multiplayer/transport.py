@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from copy import deepcopy
 import json
 from threading import Event, RLock, Thread, current_thread
@@ -7,7 +8,12 @@ from typing import Any, Callable, Mapping, Protocol
 from uuid import uuid4
 
 from zz.multiplayer.compatibility import hello_compatibility_payload
-from zz.multiplayer.protocol import PROTOCOL_VERSION, serialize_client_hello
+from zz.multiplayer.protocol import (
+    MAX_LOGICAL_MESSAGE_BYTES,
+    PROTOCOL_VERSION,
+    serialize_client_hello,
+    validate_server_envelope,
+)
 
 Message = Mapping[str, Any]
 MessageListener = Callable[[dict[str, Any]], None]
@@ -163,6 +169,7 @@ class WebSocketTransport:
         try:
             socket = websocket_connect(
                 self.url,
+                additional_headers={"X-ZZ-Client-Features": "replay-fragments-v1"},
                 max_size=self.max_size,
                 open_timeout=self.open_timeout,
                 ping_interval=self.ping_interval,
@@ -257,6 +264,8 @@ class WebSocketTransport:
         return unsubscribe
 
     def _receive_messages(self, socket: Any) -> None:
+        fragments_enabled = False
+        fragments: dict[str, Any] | None = None
         try:
             while not self._stop_receiver.is_set():
                 raw_message = socket.recv()
@@ -267,6 +276,37 @@ class WebSocketTransport:
                 decoded = json.loads(raw_message)
                 if not isinstance(decoded, Mapping):
                     raise ValueError("websocket message must contain a JSON object")
+                if decoded.get("type") == "WELCOME" and decoded.get("payload", {}).get("messageFragments") is True:
+                    self.send({"protocolVersion": PROTOCOL_VERSION, "messageId": str(uuid4()),
+                               "type": "ENABLE_MESSAGE_FRAGMENTS", "payload": {}})
+                    fragments_enabled = True
+                elif decoded.get("type") == "MESSAGE_FRAGMENT":
+                    if not fragments_enabled:
+                        raise ValueError("unexpected message fragment")
+                    part = validate_server_envelope(decoded)["payload"]
+                    if fragments is None:
+                        if part["index"] != 0:
+                            raise ValueError("message fragments are out of order")
+                        fragments = {"id": part["id"], "count": part["count"], "parts": [], "bytes": 0}
+                    if (fragments["id"] != part["id"] or fragments["count"] != part["count"]
+                            or len(fragments["parts"]) != part["index"]):
+                        raise ValueError("message fragments are out of order")
+                    raw_part = base64.b64decode(part["data"], validate=True)
+                    if base64.b64encode(raw_part).decode("ascii") != part["data"]:
+                        raise ValueError("invalid message fragment encoding")
+                    fragments["bytes"] += len(raw_part)
+                    if fragments["bytes"] > MAX_LOGICAL_MESSAGE_BYTES:
+                        raise ValueError("fragmented message exceeds logical size limit")
+                    fragments["parts"].append(raw_part)
+                    if len(fragments["parts"]) < fragments["count"]:
+                        continue
+                    decoded = json.loads(b"".join(fragments["parts"]).decode("utf-8"))
+                    if not isinstance(decoded, Mapping) or decoded.get("messageId") != fragments["id"] or decoded.get("type") == "MESSAGE_FRAGMENT":
+                        raise ValueError("fragmented message identity does not match")
+                    decoded = validate_server_envelope(decoded)
+                    fragments = None
+                elif fragments is not None:
+                    raise ValueError("server interrupted a fragmented message")
                 self._emit(decoded)
         except Exception as exc:
             if not self._stop_receiver.is_set():

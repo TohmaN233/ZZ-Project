@@ -14,3 +14,6 @@ local_ai_training/*/
 /docs/DUEL_FX.md
 /docs/EX02C_RULES.md
 /docs/ZZ_EXPERIENCE.md
+
+# Player-owned local online recordings.
+/data/replays/

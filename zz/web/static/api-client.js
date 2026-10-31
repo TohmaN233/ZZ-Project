@@ -35,6 +35,12 @@
     openReplayWindow: (payload) => window.zzDesktop && window.zzDesktop.openReplayWindow
       ? window.zzDesktop.openReplayWindow(payload)
       : Promise.resolve({ ok: false, unavailable: true }),
+    listMultiplayerReplays: () => window.zzDesktop && window.zzDesktop.listMultiplayerReplays
+      ? window.zzDesktop.listMultiplayerReplays()
+      : Promise.resolve([]),
+    readMultiplayerReplay: (id) => window.zzDesktop && window.zzDesktop.readMultiplayerReplay
+      ? window.zzDesktop.readMultiplayerReplay(id)
+      : Promise.reject(new Error("desktop replay storage unavailable")),
     checkForUpdates: () => window.zzDesktop && window.zzDesktop.checkForUpdates
       ? window.zzDesktop.checkForUpdates()
       : Promise.resolve({ status: "unavailable" }),

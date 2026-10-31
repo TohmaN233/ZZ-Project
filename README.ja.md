@@ -14,9 +14,9 @@
 
 ## インストール
 
-v0.5.3 の Windows 版は、インストール先の `data/decks/` にデッキを保存します。初回起動時に従来の `%APPDATA%\zenonzard-clone\game-data\decks\` からデッキを移行し、元ファイルをバックアップとして残し、競合するデッキは上書きしません。聖の Force は条件を満たす自分のミニオンを保護し、加護によって相手のミニオンに付与された選択効果の対象にならないようにします。エンリコの効果では両プレイヤーが先に捨ててから引きます。オンライン対戦では切断後に最大 5 回自動再接続し、ルームコードを保持します。対戦中と結果画面のバトルログはページ分けして表示されます。両プレイヤーのクライアントとサーバーは同じバージョンが必要です。v0.5.3 クライアントには v0.5.3 サーバーを使用してください。以前のバージョンで追加した初手交換時の表示改善、起動診断、カードと Force の検索改善、および EX02C/SAO カードプールも引き続き含まれます。
+v0.5.4 の Windows 版は、インストール先の `data/decks/` にデッキを保存します。初回起動時に従来の `%APPDATA%\zenonzard-clone\game-data\decks\` からデッキを移行し、元ファイルをバックアップとして残し、競合するデッキは上書きしません。聖の Force は条件を満たす自分のミニオンを保護し、加護によって相手のミニオンに付与された選択効果の対象にならないようにします。エンリコの効果では両プレイヤーが先に捨ててから引きます。オンライン対戦では切断後に最大 5 回自動再接続し、ルームコードを保持します。対戦中と結果画面のバトルログはページ分けして表示されます。大きな再接続データは分割して送信します。オンラインリプレイはゲームディレクトリの `data/replays/` に保存され、「リプレイとトレーニング」で確認できます。補完できていないリプレイには未完了と表示されます。両プレイヤーのクライアントとサーバーは同じバージョンが必要です。v0.5.4 クライアントには v0.5.4 サーバーを使用してください。以前のバージョンで追加した初手交換時の表示改善、起動診断、カードと Force の検索改善、および EX02C/SAO カードプールも引き続き含まれます。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Project-v0.5.3-source.zip) · [対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/ZZ-Multiplayer-v0.5.3.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.3/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip) · [対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 

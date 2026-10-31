@@ -86,6 +86,8 @@ class ReleasePackagingContractTests(unittest.TestCase):
         self.assertIn(Path("zz/ex02.py"), multiplayer_files)
         self.assertIn(Path("zz/ex02c_cards/colorless_08_02_02c_00.py"), multiplayer_files)
         self.assertIn(Path("zz/ex02c_data.tsv"), multiplayer_files)
+        self.assertIn(Path("electron/multiplayer-replay.js"), linux_files)
+        self.assertFalse(any(path.parts[:2] == ("data", "replays") for path in linux_files))
         self.assertNotIn(selector.DEEP_SOURCE_RELATIVE, linux_files)
         self.assertEqual(selector.DEEP_RUNTIME_RELATIVE.name, "best_greedy.runtime.npz")
         self.assertIn(selector.NORMAL_MODEL_RELATIVE, linux_files)
@@ -154,7 +156,7 @@ class ReleasePackagingContractTests(unittest.TestCase):
         installer = (PROJECT_ROOT / "build" / "installer.nsh").read_text(encoding="utf-8")
         hook = installer.split("!macro customInstall\n", 1)[1].split("!macroend", 1)[0]
         create_at = hook.index('CreateDirectory "$INSTDIR\\data\\decks"')
-        for directory in ("$INSTDIR", "$INSTDIR\\data", "$INSTDIR\\data\\decks"):
+        for directory in ("$INSTDIR", "$INSTDIR\\data", "$INSTDIR\\data\\decks", "$INSTDIR\\data\\replays"):
             self.assertLess(
                 hook.index(f'!insertmacro requireDeckDirectoryNotReparsePoint "{directory}"'),
                 create_at,
@@ -166,8 +168,13 @@ class ReleasePackagingContractTests(unittest.TestCase):
         commands = re.findall(r"nsExec::ExecToStack '([^']+)'", hook)
         self.assertEqual(commands, [
             '"$SYSDIR\\icacls.exe" "$INSTDIR\\data\\decks" '
-            '/grant "*S-1-5-32-545:(OI)(CI)M" /L'
+            '/grant "*S-1-5-32-545:(OI)(CI)M" /L',
+            '"$SYSDIR\\icacls.exe" "$INSTDIR\\data\\replays" '
+            '/grant "*S-1-5-32-545:(OI)(CI)M" /L',
         ])
+        self.assertIn('CreateDirectory "$INSTDIR\\data\\replays"', hook)
+        self.assertIn('Abort "Cannot create replay storage."', hook)
+        self.assertIn('Abort "Replay storage permissions failed."', hook)
         self.assertIn('${If} $installMode == "all"', hook)
         self.assertIn("Pop $R0\n    Pop $R1", hook)
         self.assertIn("${If} $R0 != 0", hook)

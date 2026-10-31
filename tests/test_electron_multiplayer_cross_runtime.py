@@ -133,6 +133,95 @@ const waitFor = async (predicate, label) => {
     assert result["winner"] == "Bob"
 
 
+def test_large_reconnect_recovers_logs_and_missed_private_replay_frames(tmp_path: Path) -> None:
+    from test_multiplayer_reconnect import TimerFactory, _connected_server, _send, _start_match, _submit_keep
+    from zz.enums import AreaType
+
+    core, messages = _connected_server(TimerFactory())
+    tokens = _start_match(core, messages)
+    match = core.match_for_room("ABC123")
+    initial = match.get_view_for("player_1")
+    _submit_keep(core, messages, "a")
+    core.disconnect("a")
+    prompt = match.get_view_for("player_2")["prompt"]
+    _send(core, "b", "SUBMIT_ACTION", {
+        "matchId": match.match_id, "playerId": "player_2", "clientActionId": "keep-player-2",
+        "expectedRevision": match.revision, "action": {"kind": "CHOOSE_PROMPT_OPTION",
+            "promptId": prompt["id"], "optionId": "keep", "payload": {}},
+    })
+    assert match.revision == 2
+    for _ in range(95):
+        match.session._log_event("private diagnostic text", {"type": "optional_effect", "actorSide": "P1", "used": True})
+    latest = match.session._codeman_trace_events[-1]["eventIndex"]
+    card = match.session.engine.state.players[0].hand[0]
+    match.session._animation_events.clear()
+    for _ in range(400):
+        match.session._queue_zone_move_animation_event(card, AreaType.HAND, AreaType.TRASH)
+    match._animation_events = tuple(match.session._animation_events)
+    match.session._animation_events.clear()
+    (tmp_path / "initial.json").write_text(json.dumps(initial, ensure_ascii=False), encoding="utf-8")
+    script = r"""
+const fs = require("node:fs");
+const assert = require("node:assert/strict");
+const { MultiplayerDesktopClient } = require(process.env.ZZ_CLIENT_MODULE);
+const { MultiplayerReplayArchive, MultiplayerReplayRecorder } = require(process.env.ZZ_REPLAY_MODULE);
+const waitFor = async (predicate, label) => {
+  const deadline = Date.now() + 15000;
+  while (Date.now() < deadline) {
+    if (await predicate()) return;
+    await new Promise(resolve => setTimeout(resolve, 20));
+  }
+  throw new Error(`timeout: ${label}`);
+};
+(async () => {
+  const client = new MultiplayerDesktopClient();
+  const archive = new MultiplayerReplayArchive(process.env.ZZ_REPLAY_ROOT);
+  const identity = { serverUrl: process.env.ZZ_TEST_URL, matchId: "match-1", playerId: "player_1" };
+  const initial = JSON.parse(fs.readFileSync(process.env.ZZ_INITIAL_VIEW, "utf8"));
+  const saved = await archive.recordView({ ...identity, view: initial });
+  const errors = [];
+  const recorder = new MultiplayerReplayRecorder({ archive, client, onError: error => errors.push(error.message) });
+  client.onEvent(event => recorder.handleEvent(event));
+  try {
+    client.restoreRecoverySession({ url: identity.serverUrl, roomCode: "ABC123", playerId: identity.playerId,
+      reconnectToken: process.env.ZZ_TEST_TOKEN, matchId: identity.matchId, pendingAction: null });
+    client.reconnect();
+    await waitFor(() => client.state === "IN_MATCH" || errors.length > 0, "large reconnect");
+    assert.deepEqual(errors, []);
+    assert.equal(client.view.revision, 2);
+    assert.equal(client.view.animationEvents.length, 400);
+    await waitFor(async () => {
+      const [summary] = await archive.list();
+      return summary && summary.missingLogEvents === 0 && summary.missingRevisions === 0 && summary.frameCount === 3;
+    }, "replay recovery");
+    const replay = await archive.read(saved.id);
+    assert.equal(replay.trace.logEvents.length, Number(process.env.ZZ_LATEST_EVENT) + 1,
+      JSON.stringify({ metadata: replay.metadata, latest: replay.trace.stateSnapshots.map(frame => frame.state.logHistory) }));
+    assert.deepEqual(replay.trace.stateSnapshots.map(frame => frame.state.revision), [0, 1, 2]);
+    assert.ok(replay.trace.stateSnapshots.every(frame => frame.state.players.opponent.hand.every(card => card.faceDown && !card.cardId)));
+    const file = fs.readFileSync(`${process.env.ZZ_REPLAY_ROOT}/${saved.id}.jsonl`, "utf8");
+    assert.equal(file.includes(process.env.ZZ_TEST_TOKEN), false);
+    assert.equal(file.includes("private diagnostic text"), false);
+    assert.deepEqual(errors, []);
+    process.stdout.write(JSON.stringify({ frames: replay.metadata.frameCount, events: replay.metadata.eventCount }));
+  } finally {
+    client.disconnect();
+    await recorder.flush();
+  }
+})().catch(error => { console.error(error.stack || error); process.exitCode = 1; });
+"""
+    env = {**os.environ, "ZZ_CLIENT_MODULE": str(ROOT / "electron" / "multiplayer-client.js"),
+           "ZZ_REPLAY_MODULE": str(ROOT / "electron" / "multiplayer-replay.js"),
+           "ZZ_REPLAY_ROOT": str(tmp_path / "replays"), "ZZ_INITIAL_VIEW": str(tmp_path / "initial.json"),
+           "ZZ_TEST_TOKEN": tokens["player_1"], "ZZ_LATEST_EVENT": str(latest)}
+    with _gateway(core) as url:
+        env["ZZ_TEST_URL"] = url
+        completed = subprocess.run(["node", "-e", script], cwd=ROOT, env=env, capture_output=True,
+                                   text=True, timeout=25, check=False)
+    assert completed.returncode == 0, completed.stderr
+    assert json.loads(completed.stdout) == {"frames": 3, "events": latest + 1}
+
+
 def test_real_64k_gateway_restores_complete_desktop_history_and_isolates_the_next_match() -> None:
     from test_multiplayer_reconnect import TimerFactory, _connected_server, _start_match
 

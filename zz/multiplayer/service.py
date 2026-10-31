@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
 import math
 import secrets
 import time
+import zlib
 from collections.abc import Callable, Mapping
 from copy import deepcopy
 from dataclasses import dataclass
@@ -144,7 +146,9 @@ class MultiplayerServer:
         self._rooms: dict[str, Room] = {}
         self._room_ids_by_code: dict[str, str] = {}
         self._matches: dict[str, AuthoritativeMatch] = {}
+        self._match_replay_frames: dict[str, tuple[str, dict[str, dict[int, bytes]]]] = {}
         self._finished_match_logs: dict[str, tuple[str, dict[str, list[dict[str, Any]]]]] = {}
+        self._finished_match_frames: dict[str, tuple[str, dict[str, dict[int, bytes]]]] = {}
         self._registry_lock = RLock()
         self._room_locks: dict[str, RLock] = {}
         self._disconnect_timers: dict[tuple[str, str], Any] = {}
@@ -300,6 +304,7 @@ class MultiplayerServer:
             "SUBMIT_ACTION": self._submit_action,
             "REQUEST_SYNC": self._request_sync,
             "REQUEST_LOG_HISTORY": self._request_log_history,
+            "REQUEST_REPLAY_FRAME": self._request_replay_frame,
             "LEAVE_ROOM": self._leave_room,
         }
         handlers[message_type](connection, payload)
@@ -344,6 +349,7 @@ class MultiplayerServer:
         # Archived private projections belong to the exact participants of the
         # finished duel. A newly joined occupant must never inherit a seat's log.
         self._finished_match_logs.pop(room.room_id, None)
+        self._finished_match_frames.pop(room.room_id, None)
         self._cancel_room_idle_timer(room.room_id)
         connection.room_id = room.room_id
         self._broadcast_room(room)
@@ -464,14 +470,20 @@ class MultiplayerServer:
             },
         ), asset_root=self._asset_root)
         self._matches[room.room_id] = match
+        self._match_replay_frames[room.room_id] = (match.match_id, {
+            player.player_id: {} for player in room.players
+        })
         self._finished_match_logs.pop(room.room_id, None)
+        self._finished_match_frames.pop(room.room_id, None)
         room.mark_running()
         self._broadcast_room(room)
         for player in room.players:
+            view = match.get_view_for(player.player_id)
+            self._remember_replay_view(room, match, player.player_id, view)
             self._emit(player.connection_id, "MATCH_STARTED", {
                 "matchId": match.match_id,
                 "playerId": player.player_id,
-                "view": match.get_view_for(player.player_id),
+                "view": view,
             }, match_id=match.match_id)
         self._observe(
             "match_started",
@@ -501,10 +513,12 @@ class MultiplayerServer:
             )
         else:
             result = match.submit_action(submitted)
+        view = match.get_view_for(player.player_id)
+        self._remember_replay_view(room, match, player.player_id, view)
         result_payload = {
             "clientActionId": submitted.client_action_id,
             "result": result.to_dict(),
-            "view": match.get_view_for(player.player_id),
+            "view": view,
         }
         self._emit(
             connection.connection_id,
@@ -551,6 +565,7 @@ class MultiplayerServer:
                 player.player_id: build_player_log_archive(match.session, player_id=player.player_id)
                 for player in room.players
             })
+            self._finished_match_frames[room.room_id] = self._match_replay_frames.pop(room.room_id)
             self._matches.pop(room.room_id, None)
             room.prepare_rematch()
             self._broadcast_room(room)
@@ -586,6 +601,24 @@ class MultiplayerServer:
         self._observe("log_history_served", connectionId=connection.connection_id,
                       playerId=player.player_id, roomId=room.room_id, matchId=match_id,
                       messageType="REQUEST_LOG_HISTORY")
+
+    def _request_replay_frame(self, connection: _Connection, payload: dict[str, Any]) -> None:
+        room = self._room_for_connection(connection)
+        player = room.player_for_connection(connection.connection_id)
+        match_id, revision = payload["matchId"], payload["revision"]
+        archived = self._match_replay_frames.get(room.room_id)
+        if archived is None or archived[0] != match_id:
+            archived = self._finished_match_frames.get(room.room_id)
+        if archived is None or archived[0] != match_id:
+            raise RoomError("MATCH_NOT_FOUND", "replay history is not available for this match")
+        encoded = archived[1][player.player_id].get(revision)
+        if encoded is None:
+            raise RoomError("REPLAY_FRAME_NOT_FOUND", "requested replay frame is not available")
+        view = json.loads(zlib.decompress(encoded).decode("utf-8"))
+        self._emit(connection.connection_id, "REPLAY_FRAME", {"matchId": match_id, "view": view}, match_id=match_id)
+        self._observe("replay_frame_served", connectionId=connection.connection_id,
+                      playerId=player.player_id, roomId=room.room_id, matchId=match_id,
+                      revision=revision, messageType="REQUEST_REPLAY_FRAME")
 
     def _leave_room(self, connection: _Connection, _payload: dict[str, Any]) -> None:
         room = self._room_for_connection(connection)
@@ -625,16 +658,18 @@ class MultiplayerServer:
             payload["matchId"] = match.match_id
         return payload
 
-    @staticmethod
     def _snapshot_payload(
+        self,
         room: Room,
         match: AuthoritativeMatch,
         player_id: str,
     ) -> dict[str, Any]:
+        view = match.get_view_for(player_id)
+        self._remember_replay_view(room, match, player_id, view)
         return {
             "matchId": match.match_id,
             "playerId": player_id,
-            "view": match.get_view_for(player_id),
+            "view": view,
             "connectionStatus": {
                 player.player_id: {
                     "connected": player.connected,
@@ -643,6 +678,21 @@ class MultiplayerServer:
                 for player in room.players
             },
         }
+
+    def _remember_replay_view(self, room: Room, match: AuthoritativeMatch, player_id: str,
+                              view: dict[str, Any]) -> None:
+        archive = self._match_replay_frames.get(room.room_id)
+        if archive is None or archive[0] != match.match_id or player_id not in archive[1] or view.get("revision") != match.revision:
+            raise ValueError("replay view does not match the active room, player and revision")
+        frames = archive[1][player_id]
+        if match.revision in frames:
+            return
+        # Keep player-specific views only. Structured logs are paged separately.
+        projected = deepcopy(view)
+        projected["logEvents"] = []
+        projected["log"] = []
+        data = json.dumps(projected, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8")
+        frames[match.revision] = zlib.compress(data, level=1)
 
     def _emit(
         self,
@@ -970,6 +1020,8 @@ class MultiplayerServer:
 
     def _close_room_locked(self, room: Room) -> None:
         self._finished_match_logs.pop(room.room_id, None)
+        self._finished_match_frames.pop(room.room_id, None)
+        self._match_replay_frames.pop(room.room_id, None)
         room.close()
         self._cancel_room_timers(room.room_id)
         for player in room.players:

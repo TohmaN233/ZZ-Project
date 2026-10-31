@@ -100,6 +100,16 @@ test("direct remains eligible even when the system proxy is configured", async (
   assert.equal(proxy.closeCalls, 1);
 });
 
+test("client feature headers reach both direct and proxy WebSocket handshakes", async () => {
+  const { AdaptiveWebSocket } = makeAdaptive();
+  const headers = { "X-ZZ-Client-Features": "replay-fragments-v1" };
+  const socket = new AdaptiveWebSocket("wss://zz.example/multiplayer", { headers });
+  await settleStartup();
+  assert.equal(FakeSocket.instances.length, 2);
+  assert.ok(FakeSocket.instances.every((attempt) => attempt.options.headers === headers));
+  socket.close();
+});
+
 test("LAN ws connections stay direct and do not query the system proxy", async () => {
   const { AdaptiveWebSocket, resolveCalls, selected } = makeAdaptive();
   const socket = new AdaptiveWebSocket("ws://192.168.1.10:32145");
