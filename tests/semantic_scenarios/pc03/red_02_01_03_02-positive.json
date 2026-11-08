@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_02_01_03_02_positive",
+  "card_id": "red_02_01_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【自分のターン終了時】\\n「S・ゴレイム・トークン」1体を出す。\\n進化：手札から「ゴレイム」が召喚されたとき\\n「「火蜘蛛の召喚士」ロック」と「「ロックの召喚獣」レッドスパイダー」をLv3にする。\\nEN: [At the End of Your Turn] One Token Golem S enters your field.\\nEvolve: Summon a Minion from the Golem class from your hand. Roque - Conjurer of Fiery Spiders Lv.2 and Flaming Arachnid - Of Roque Lv.2 become Lv.3.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_02_01_03_02",
+        "zone": "field",
+        "seed": 3124328222,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_01_03_02",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_01_03_02",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_01_03_02",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_01_03_02",
+        "side": "P1",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_01",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_01",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_01",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_01",
+        "side": "P1",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_02_00_01",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "golem": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_00_03_03",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_00_03_03",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "ray_rider_one": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "ray_rider_two": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_00_03_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon a Golem from hand",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$golem"
+      }
+    },
+    {
+      "name": "Summon first Ray Rider and draw the evolved Red Spider Deck copy",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$ray_rider_one"
+      }
+    },
+    {
+      "name": "Summon second Ray Rider and draw the evolved Roque Deck copy",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$ray_rider_two"
+      }
+    },
+    {
+      "name": "End your turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Red Spider advances to Lv3 on the qualifying hand summon",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_01_03_03"
+      }
+    },
+    {
+      "name": "Base copy advances to Lv3",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_01_03_03"
+      }
+    },
+    {
+      "name": "Hand copy and drawn Deck copy are both Lv3",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_02_01_03_03"
+      }
+    },
+    {
+      "name": "The evolved Deck copy is visible in Hand at Lv3 after drawing",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_02_01_03_03"
+      }
+    },
+    {
+      "name": "Trash copy advances to Lv3",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_02_01_03_03"
+      }
+    },
+    {
+      "name": "Roque in Base advances to Lv3 with the summon-beast family",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_02"
+      }
+    },
+    {
+      "name": "Roque hand copy and drawn Deck copy are both Lv3",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_00_00_03_02"
+      }
+    },
+    {
+      "name": "The evolved Roque Deck copy is visible in Hand at Lv3 after drawing",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_00_00_03_02"
+      }
+    },
+    {
+      "name": "Roque in Trash advances to Lv3",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_02"
+      }
+    },
+    {
+      "name": "Lv3 creates one S Golem at the end of its controller's turn",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "s_golem_token"
+      }
+    }
+  ]
+}

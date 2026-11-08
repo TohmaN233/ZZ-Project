@@ -17,6 +17,7 @@ class EffectTiming(Enum):
     ON_SUMMON = "on_summon"
     ON_REST = "on_rest"
     ON_RETURN_TO_HAND = "on_return_to_hand"
+    ON_RETURN_TO_DECK = "on_return_to_deck"
     ON_PLACE_BASE = "on_place_base"
     ON_CAST_MAGIC = "on_cast_magic"
     ON_ATTACK = "on_attack"
@@ -61,10 +62,10 @@ class EffectSpec:
 
 EFFECT_TARGET_FILTER_PARAMS = frozenset({
     "card_id", "card_ids", "exclude_card_id", "race", "races_any",
-    "card_type", "color", "exclude_color", "max_cost", "min_cost",
+    "card_type", "card_types", "color", "colors_any", "exclude_color", "max_cost", "min_cost",
     "max_bp", "min_bp", "max_dp", "min_dp", "bp_below_original",
     "requires_blessing", "requires_boost", "only_rested", "only_active",
-    "exclude_tokens", "required_keyword", "explicitly_equivalent_to",
+    "exclude_tokens", "requires_token", "required_keyword", "explicitly_equivalent_to",
 })
 
 
@@ -113,6 +114,9 @@ def effect_target_filter(eng: Any, effect: EffectSpec, *, source: Any = None):
             return False
         if max_dp is not None and eng.effective_dp(target) > max_dp:
             return False
+        if effect.target_kind == "enemy_minion_or_force" and getattr(target, "force", None) is not None:
+            force_params = {key: value for key, value in params.items() if key != "max_cost"}
+            return _target_filter(eng, **force_params)(target) if force_params else True
         return matcher(target)
 
     return matches
@@ -144,6 +148,7 @@ TIMING_LABELS = {
     EffectTiming.ON_SUMMON: "召喚時",
     EffectTiming.ON_REST: "レスト時",
     EffectTiming.ON_RETURN_TO_HAND: "手札に戻る時",
+    EffectTiming.ON_RETURN_TO_DECK: "デッキに戻る時",
     EffectTiming.ON_PLACE_BASE: "配置時",
     EffectTiming.ON_CAST_MAGIC: "メイン/フラッシュ",
     EffectTiming.ON_ATTACK: "アタック時",
@@ -245,7 +250,7 @@ EFFECT_TEMPLATES: dict[str, EffectTemplate] = {
     "return_from_trash_to_hand": EffectTemplate(
         "return_from_trash_to_hand",
         "Return from trash to hand",
-        target_kinds=("trash_magic_cost_at_most_4",),
+        target_kinds=("trash_magic_cost_at_most_4", "trash_magic"),
     ),
     "discard_target_draw": EffectTemplate(
         "discard_target_draw",
@@ -266,6 +271,7 @@ EFFECT_TEMPLATES: dict[str, EffectTemplate] = {
             "enemy_minion_cost_at_most_4",
             "enemy_minion_or_force",
             "any_minion_or_force",
+            "any_force",
             "enemy_force",
         ),
     ),
@@ -283,7 +289,7 @@ EFFECT_TEMPLATES: dict[str, EffectTemplate] = {
     "heal_targets": EffectTemplate(
         "heal_targets",
         "Heal targets",
-        target_kinds=("owner_player", "owner_player_or_force", "owner_player_and_forces", "owner_forces", "ally_force"),
+        target_kinds=("owner_player", "owner_player_or_force", "owner_player_and_forces", "owner_forces", "ally_force", "any_force"),
     ),
     "search_deck_to_hand": EffectTemplate(
         "search_deck_to_hand",
@@ -893,7 +899,8 @@ def _destroy_targets(
                 color=color,
             )
         else:
-            filter_fn = _target_filter(eng, max_cost=max_cost, min_cost=min_cost, max_bp=max_bp, max_dp=max_dp, color=color)
+            matcher = _target_filter(eng, max_cost=max_cost, min_cost=min_cost, max_bp=max_bp, max_dp=max_dp, color=color)
+            filter_fn = lambda target: (target_kind == "enemy_minion_or_force" and getattr(target, "force", None) is not None and min_cost is None and max_bp is None and max_dp is None and color is None) or matcher(target)
             targets = eng.select_target(ci.owner, target_kind, max_targets, max_targets, filter_fn=filter_fn, source=ci)
         for target in list(targets[:max_targets] if not all_targets else targets):
             eng.destroy_target(target, source=ci)
@@ -1131,6 +1138,7 @@ def _place_base_from_deck(
     max_targets: int = 1,
     rested: bool = True,
     optional: bool = True,
+    activate_placed_effect: bool = False,
     **_: Any,
 ) -> EffectFn:
     def fn(ci: Any, state: Any, ctx: Any) -> None:
@@ -1155,6 +1163,11 @@ def _place_base_from_deck(
             replace_iid = eng.select_base_replacement_iid(ci.owner, ci)
             eng.place_from_deck_to_base(ci.owner, candidate, rested=rested, replace_base_iid=replace_iid)
         eng.rng.shuffle(ci.owner.deck)
+        if activate_placed_effect:
+            from zz.model import Context
+            for candidate in chosen[:max_targets]:
+                if candidate.area is AreaType.BASE and candidate in ci.owner.base:
+                    eng.triggers.emit(EffectTiming.ON_PLACE_BASE, Context(controller=candidate.owner, source=candidate))
     return fn
 
 
@@ -1237,12 +1250,15 @@ def _force_block(
                 source=ci,
             ):
                 return
-            targets = eng.select_target(ci.owner, target_kind, 0, 1, filter_fn=filter_fn, source=ci)
+            targets = eng.select_target(ci.owner, target_kind, 1 if only_active else 0, 1, filter_fn=filter_fn, source=ci)
             if not targets:
                 return
             target = targets[0]
-            eng.refresh_target(target)
-            ci.flags.add(f"force_block_iid:{target.iid}")
+            if only_active:
+                target.flags.add("turn:must_block")
+            else:
+                eng.refresh_target(target)
+                ci.flags.add(f"force_block_iid:{target.iid}")
             return
         ci.flags.add("must_be_blocked")
     return fn
@@ -1293,6 +1309,7 @@ def _target_filter(
     min_dp: int | None = None,
     bp_below_original: bool = False,
     color: Color | str | None = None,
+    colors_any: tuple[Color | str, ...] | list[Color | str] | None = None,
     exclude_color: Color | str | None = None,
     card_id: str | None = None,
     explicitly_equivalent_to: str | None = None,
@@ -1301,16 +1318,20 @@ def _target_filter(
     race: str | None = None,
     races_any: tuple[str, ...] | list[str] | str | None = None,
     card_type: CardType | str | None = None,
+    card_types: tuple[CardType | str, ...] | list[CardType | str] | None = None,
     requires_blessing: bool = False,
     requires_boost: bool = False,
     only_rested: bool = False,
     only_active: bool = False,
     exclude_tokens: bool = False,
+    requires_token: bool = False,
     required_keyword: Keyword | str | None = None,
 ):
     wanted_color = _color_from_value(color)
     excluded_color = _color_from_value(exclude_color)
     wanted_type = _card_type_from_value(card_type)
+    wanted_types = {_card_type_from_value(value) for value in (card_types or ())}
+    wanted_colors = {_color_from_value(value) for value in (colors_any or ())}
     wanted_card_ids = set(card_ids or ())
     wanted_races = (races_any,) if isinstance(races_any, str) else tuple(races_any or ())
 
@@ -1324,11 +1345,11 @@ def _target_filter(
             return bool(only_rested or only_active) and not any((
                 max_cost is not None, min_cost is not None, max_bp is not None,
                 min_bp is not None, max_dp is not None, min_dp is not None,
-                bp_below_original, wanted_color, excluded_color, card_id,
+                bp_below_original, wanted_color, wanted_colors, excluded_color, card_id,
                 explicitly_equivalent_to, wanted_card_ids, exclude_card_id,
                 race, wanted_races,
-                wanted_type, requires_blessing, requires_boost,
-                exclude_tokens, required_keyword,
+                wanted_type, wanted_types, requires_blessing, requires_boost,
+                exclude_tokens, requires_token, required_keyword,
             ))
         if card_id is not None and card.id != card_id:
             return False
@@ -1346,7 +1367,11 @@ def _target_filter(
             return False
         if wanted_type is not None and card.type is not wanted_type:
             return False
+        if wanted_types and card.type not in wanted_types:
+            return False
         if exclude_tokens and card.is_token:
+            return False
+        if requires_token and not card.is_token:
             return False
         if required_keyword is not None and not eng.has_keyword(target, _keyword_from_value(required_keyword)):
             return False
@@ -1379,6 +1404,8 @@ def _target_filter(
             return False
         if wanted_color is not None and _card_color(card) is not wanted_color:
             return False
+        if wanted_colors and _card_color(card) not in wanted_colors:
+            return False
         if excluded_color is not None and _card_color(card) is excluded_color:
             return False
         return True
@@ -1395,15 +1422,7 @@ def _matching_targets(
     eng = getattr(state, "engine", None)
     if eng is None:
         return []
-    opponent = state.players[1 - state.players.index(owner)]
-    if target_kind == "enemy_minion":
-        pool = list(opponent.field)
-    elif target_kind == "ally_minion":
-        pool = list(owner.field)
-    elif target_kind == "any_minion":
-        pool = [ci for player in state.players for ci in player.field]
-    else:
-        pool = eng.select_target(owner, target_kind, 0, 99)
+    pool = eng._eligible_targets(owner, target_kind)
     matcher = _target_filter(eng, **filters)
     return [target for target in pool if matcher(target)]
 

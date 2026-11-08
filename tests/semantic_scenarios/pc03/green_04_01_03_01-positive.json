@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_04_01_03_01_positive",
+  "card_id": "green_04_01_03_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【変形時】\n緑マナ2つをレスト状態でベースに置く。相手のレスト状態である、コスト3以下のミニオン１体を破壊する。\nEN: [When Transformed] Place two Green Mana into your base in the Rest State. Destroy one of your opponent's rested Minions with a cost of 3 or lower.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_04_01_03_00",
+        "zone": "field",
+        "seed": 3972320252,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_04_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "destroy_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "green_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "replace_token": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "replace_token_2": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Give Pion Green Bless to transform",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$green_bless",
+        "target_iid": "$primary"
+      }
+    },
+    {
+      "name": "Replace a Base token for the first Green Mana",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$replace_token"
+      }
+    },
+    {
+      "name": "Replace another Base token for the second Green Mana",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$replace_token_2"
+      }
+    },
+    {
+      "name": "Destroy the rested Minion of cost 3 or lower",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$destroy_target"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Fixture transforms the source into Rainbow Sorceress",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_04_01_03_01"
+      }
+    },
+    {
+      "name": "Transformation places two Green Mana rested",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "mana_token",
+        "manaColor": "GREEN",
+        "rested": true
+      }
+    },
+    {
+      "name": "The eligible rested Minion is destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_01_03_00"
+      }
+    },
+    {
+      "name": "Base remains at ten after the second placement replaces one token",
+      "path": "state.players.human.base",
+      "op": "length_eq",
+      "value": 10
+    }
+  ]
+}

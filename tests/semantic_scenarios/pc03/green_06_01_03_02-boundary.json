@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_06_01_03_02_boundary",
+  "card_id": "green_06_01_03_02",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\n相手のミニオン1体をレストする。そのミニオンは次の相手のスタンバイフェイズ終了時までアクティブにならない。\\n【常時】\\n自分の種族「エルフ」を持つミニオン全てをBP+100/DP+1する。\\n【自分のターン終了時】\\n相手のレスト状態であるミニオンの中で、最もコストの低いミニオン全てを破壊する。 EN: [When Summoned]\\nPut one of your opponent's minions in the Rest State. That\\nminion cannot return to the Active State until your\\nopponent's next Standby Phase.\\n[Passive]\\nAll your minions belonging to the Elf class gain +100BP/\\n+1DP.\\n[At the End of Your Turn]\\nDestroy all of your opponent's lowest cost minions that are\\nin the Rest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_06_01_03_02",
+        "zone": "field",
+        "seed": 1613561536,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_06_01_03_02"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_00_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_00_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_01_02_00_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "End the Ove player's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "All tied lowest-cost rested Minions are destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "colorless_01_02_00_00"
+      }
+    },
+    {
+      "name": "The active same-cost Minion is not destroyed",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_01_02_00_00",
+        "rested": false
+      }
+    }
+  ]
+}

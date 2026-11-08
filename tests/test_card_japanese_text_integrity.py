@@ -55,6 +55,40 @@ def test_pc02r_original_face_conditions_and_numbers():
     assert "加護：黄＋コスト6以上" in rows["yellow_00_01_02r_01"]["ability_jp"]
 
 
+@pytest.mark.parametrize(("card_id", "conjured", "next_level"), [
+    ("colorless_00_00_03_00", "「ラスの召喚獣・人」サムライ", "Lv2"),
+    ("colorless_00_00_03_01", "「ラスの召喚獣・地」リュウジン", "Lv3"),
+    ("colorless_00_00_03_02", "「ラスの召喚獣・天」シンリュウ", None),
+])
+def test_pc03_lahrs_face_preserves_conjured_identity_and_level_change(card_id, conjured, next_level):
+    text = by_id(SOURCE)[card_id]["ability_jp"]
+    assert f"「{conjured}」1枚を手札に加える。" in text
+    assert "このマナは移動できない。" in text
+    if next_level is None:
+        assert "その後" not in text
+    else:
+        assert f"その後、「「大召喚士」ラス」を{next_level}にする。" in text
+
+
+@pytest.mark.parametrize(("card_id", "summoner", "conjured"), [
+    ("green_03_01_03_02", "「観測の召喚士」ラバー", "「ラバーの召喚獣」ユグシル"),
+    ("green_06_01_03_00", "「深森の召喚士」オーブ", "「オーブの召喚獣」ムーンクイーン"),
+])
+def test_pc03_conjured_face_preserves_evolution_targets(card_id, summoner, conjured):
+    text = by_id(SOURCE)[card_id]["ability_jp"]
+    assert f"「{summoner}」と「{conjured}」をLv2にする。" in text
+
+
+def test_pc03_evolution_effects_name_both_upgrade_targets():
+    cards = [row for row in by_id(SOURCE).values() if row["pack_jp"] == "PC:03 EVOLVE"]
+    evolving = [row for row in cards if "進化：" in row["ability_jp"]]
+    assert evolving
+    for row in evolving:
+        ability = row["ability_jp"]
+        assert "召喚士」" in ability and "召喚獣」" in ability, row["image_id"]
+        assert "をLv2にする。" in ability or "をLv3にする。" in ability, row["image_id"]
+
+
 def test_catalog_uses_the_same_complete_japanese_source_and_preserves_chinese():
     catalog = {row["id"]: row for row in catalog_dto(AssetIndex(None))["cards"]}
     source = by_id(SOURCE)

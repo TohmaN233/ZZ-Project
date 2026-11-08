@@ -11,7 +11,7 @@ from zz.web.serialize import serialize_state
 
 
 PLAYER_SIDE_BY_ID = {"player_1": "P1", "player_2": "P2"}
-PRIVATE_AREAS = {"deck", "hand"}
+PRIVATE_AREAS = {"deck", "hand", "outside"}
 _CARD_AREAS = {area.value for area in AreaType}
 # Logs are a reconnectable window, not the diagnostic replay archive. Leave
 # room for the board, prompts, animation batch and the largest wire envelope.

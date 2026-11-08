@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_04_01_03_00_positive",
+  "card_id": "yellow_04_01_03_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 襲撃 EN: Charge",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_04_01_03_00",
+        "zone": "hand",
+        "seed": 2125406827,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Flying Elephant",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_04_01_03_00"
+      }
+    },
+    {
+      "name": "Attack in the turn Flying Elephant was summoned",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_04_01_03_00"
+      }
+    },
+    {
+      "name": "Attack P2 as a player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass P2's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass P1's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The newly summoned Elephant can attack and is rested after attacking",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "yellow_04_01_03_00",
+        "rested": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_05_01_03_00_positive",
+  "card_id": "white_05_01_03_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 飛来 EN: Swoop",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_05_01_03_00",
+        "zone": "hand",
+        "seed": 3973326172,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "white_05_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_04_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "P2 attacks P1",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$attacker"
+      }
+    },
+    {
+      "name": "Choose P1 Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "Summon White Falcon during Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_05_01_03_00"
+      }
+    },
+    {
+      "name": "Pass P2 Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "White Falcon enters the Field from the Flash window",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_05_01_03_00"
+      }
+    },
+    {
+      "name": "White Falcon retains Swoop",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "white_05_01_03_00",
+        "keywords": {
+          "contains": [
+            "FLYING"
+          ]
+        }
+      }
+    }
+  ]
+}

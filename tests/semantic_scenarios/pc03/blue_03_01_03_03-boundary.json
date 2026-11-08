@@ -1,0 +1,208 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_03_01_03_03_boundary",
+  "card_id": "blue_03_01_03_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【破壊時】\\n自分のミニオンカードであるマナ1つを、フィールドにアクティブ状態で移動させることができる。 EN: [When Destroyed]\\nYou can move one of your minions from\\nyour base to the field and put it in the\\nActive State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_03_01_03_03",
+        "zone": "field",
+        "seed": 1908163514,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_03_01_03_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_02_02r_00",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "base_mana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_01_03_03",
+        "side": "P1",
+        "zone": "field"
+      },
+      "capture": {
+        "other_fairy": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack the Fairy with Gold Sunfish",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "blue_04_02_02r_00"
+      }
+    },
+    {
+      "name": "Attack the controller force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "Pass the opponent Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the active player's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Block with Rainbow Fairy",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$primary"
+      }
+    },
+    {
+      "name": "Skip the optional destruction effect",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target_skip"
+      }
+    },
+    {
+      "name": "End the attacker turn after skipping the optional effect",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Rainbow Fairy is destroyed",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_03_01_03_03"
+      }
+    },
+    {
+      "name": "Declining leaves Blue base Minion in Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00",
+        "rested": false
+      }
+    },
+    {
+      "name": "The non-destroyed Rainbow Fairy copy remains in Field",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "blue_03_01_03_03",
+        "iid": "$other_fairy"
+      }
+    },
+    {
+      "name": "Skipping leaves the only eligible Blue Base Minion in Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00"
+      }
+    }
+  ]
+}

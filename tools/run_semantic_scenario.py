@@ -563,6 +563,8 @@ class ScenarioRunner:
                 "opponentProfile": payload.get("opponentProfile"),
             }
             self.session = app.new_session(new_payload)
+            if payload.get("normalHandCap", False):
+                self.session.engine.ignore_hand_cap = False
             debug = setup_debug_lab(
                 self.session,
                 str(payload.get("cardId") or ""),

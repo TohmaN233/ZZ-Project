@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_07_01_03_02_boundary",
+  "card_id": "white_07_01_03_02",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n最もライフが多い自分のフォースのライフ1毎に、相手のミニオン全てにBP-100を付与する。\n【常時】\n自分の種族「アンドロイド」を持つミニオンがいる場合、このミニオンは相手の効果で選択できない。\n【自分のターン】\n自分の種族「アンドロイド」を持つミニオン全てはBPに関係なくバトルに勝利する。\nEN: [When Summoned] For every point your Force with the highest point value has, deal -100BP to all your opponent's minions.\n[Passive] If you have a minion belonging to the Android class on your field, this minion cannot be selected as a target for your opponent's effects.\n[On Your Turn] Your minions belonging to the Android class will win in battle against other minions regardless of BP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_07_01_03_02",
+        "zone": "field",
+        "seed": 1354151785,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_01r_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_07_01_03_02",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "blocker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack with a non-Android Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "green_02_02_01r_00"
+      }
+    },
+    {
+      "name": "Choose the opponent player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the defender Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the attacker Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Block with the higher-BP Minion",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$blocker"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The non-Android Minion follows normal BP battle rules",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_02_02_01r_00"
+      }
+    },
+    {
+      "name": "The higher-BP opponent Minion remains",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_07_01_03_02"
+      }
+    }
+  ]
+}

@@ -9,6 +9,7 @@ from zz.engine import BASE_CAP, LIFE_CAP
 from zz.enums import AreaType, CardType, Color, Phase, Side, Step
 from zz.forces import ALL_FORCES
 from zz.model import Card, CardInstance, ForceInstance
+from zz.transformations import is_transformed_card_id
 
 
 DEBUG_MODE = "debug-card-lab"
@@ -307,7 +308,7 @@ def add_debug_card_to_zone(
     else:
         if not is_catalog_card_id(card_id):
             raise ValueError(f"unknown debug card id: {card_id}")
-        if not CARD_REGISTRY[card_id].deck_buildable:
+        if is_transformed_card_id(card_id):
             raise ValueError(f"transformation-only card cannot be created directly: {card_id}")
         ci = _new_instance(session, card_id, player, area, rested=rested)
     _validate_card_area(ci, area)
@@ -475,6 +476,8 @@ def setup_debug_fixed_board(
             player.movement_right_count = 1
             player.movement_right_total = 1
             player.colorless_only_streak = 0
+            player.pc03_evolution_turns.clear()
+            player.pc03_upgrades.clear()
             player.flags.clear()
             player.base.extend(
                 _new_instance(session, _base_card_for_color(color), player, AreaType.BASE)
@@ -550,7 +553,7 @@ def setup_debug_lab(
     if not is_catalog_card_id(card_id):
         raise ValueError(f"unknown debug card id: {card_id}")
     selected = CARD_REGISTRY[card_id]
-    if not selected.deck_buildable:
+    if is_transformed_card_id(card_id):
         raise ValueError(f"transformation-only card cannot be created directly: {card_id}")
     area = _area_for_zone(zone)
     if area not in (AreaType.HAND, AreaType.FIELD, AreaType.BASE):
@@ -585,6 +588,8 @@ def setup_debug_lab(
         player.movement_right_count = 1
         player.movement_right_total = 1
         player.colorless_only_streak = 0
+        player.pc03_evolution_turns.clear()
+        player.pc03_upgrades.clear()
         player.flags.clear()
 
     test_card = _new_instance(session, card_id, p1, AreaType.HAND)

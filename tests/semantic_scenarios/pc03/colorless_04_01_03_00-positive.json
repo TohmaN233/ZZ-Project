@@ -1,0 +1,274 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_01_03_00_positive",
+  "card_id": "colorless_04_01_03_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n自分はデッキの中から種族「エヴォーカー」を持つベース・ミニオンカード1枚を公開して手札に加えることができる。その後、自分のデッキをシャッフルする。\n【自分のターン】\n自分の手札にある種族「アルカナ」を持つミニオンカードのフリーコストを1減らす。 EN: [When Summoned]\nYou can search your deck for one <Base>\nMinion belonging to the Evoker class, reveal it to\nyour opponent, and add it to your hand.\nThen, shuffle your deck.\n[On Your Turn]\nReduce the basic cost of minions belonging\nto the Arcana class in your hand by 1.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_01_03_00",
+        "zone": "hand",
+        "seed": 1381166081,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_00_03_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_01_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_02_01_02",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_01_03_02",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_01_03_01",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_01",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Gryphon of Lofty Treasures",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_04_01_03_00"
+      }
+    },
+    {
+      "name": "Reveal and take one Evoker Base Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardId": "red_00_00_03_00"
+      }
+    },
+    {
+      "name": "Summon the discounted Arcana Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_04_01_03_02"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The revealed Evoker Base Minion is added to hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_00"
+      }
+    },
+    {
+      "name": "Gryphon remains in the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_01_03_00"
+      }
+    },
+    {
+      "name": "Gryphon remains on the Field",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_01_03_00"
+      }
+    },
+    {
+      "name": "The selected Evoker is in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_00"
+      }
+    },
+    {
+      "name": "Arcana Minion is payable after its free cost is reduced by one",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_01_03_02"
+      }
+    },
+    {
+      "name": "Non-Arcana Minion remains in hand because the three remaining Mana cannot pay its four-point cost",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_01_03_01"
+      }
+    },
+    {
+      "name": "Roque Lv1 remains rested after payment",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "Roque Lv2 remains rested after payment",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "All four non-minion Mana are spent",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 4,
+      "where": {
+        "type": "mana_token",
+        "rested": true
+      }
+    },
+    {
+      "name": "All three Evoker Base Minions are used to pay the discounted Arcana cost",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 3,
+      "where": {
+        "type": "b_minion",
+        "rested": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_00_00_03_04_positive",
+  "card_id": "purple_00_00_03_04",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 《ベース》\n【配置時】\n「「ヤミの召喚獣」アンドロスLv2」1枚を手札に加える。\n《ベース》\nこのマナは移動できない。\nEN: <Base> [When Placed]\nAdd one \"Andoros - Of Yahmy Lv.2\" to your hand.\n<Base>\nThis minion cannot move.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_00_00_03_04",
+        "zone": "hand",
+        "seed": 1761217145,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Place the Base Minion through the MANA step",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "cardId": "purple_00_00_03_04"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The placed Base Minion remains in Base with movement forbidden",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_00_00_03_04",
+        "flags": {
+          "contains": [
+            "cannot_move"
+          ]
+        }
+      }
+    },
+    {
+      "name": "The exact outside summon beast level is added to the owner hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_05_01_03_03"
+      }
+    },
+    {
+      "name": "The summon beast is not added to the opponent hand",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "purple_05_01_03_03"
+      }
+    }
+  ]
+}

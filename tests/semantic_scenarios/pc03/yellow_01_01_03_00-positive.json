@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_01_01_03_00_positive",
+  "card_id": "yellow_01_01_03_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】自分の種族「エヴォーカー」を持つ、黄または無色のマナがある場合、自分のデッキを上から1枚見る。黄のミニオンカードの場合、公開して手札に加える。それ以外の場合、デッキの下に戻す。【常時】このミニオンはベースに移動するとき、レスト状態で移動する。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_01_01_03_00",
+        "zone": "hand",
+        "seed": 2301,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "yellow_01_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_00_03_04",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "yellow_evoker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_01_01_03_00",
+        "side": "P1",
+        "zone": "deck"
+      },
+      "capture": {
+        "top_yellow": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Crane",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_01_01_03_00"
+      }
+    },
+    {
+      "name": "Select the Yellow top Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$top_yellow"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The matching Yellow Minion is revealed and added",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_01_01_03_00"
+      }
+    },
+    {
+      "name": "Crane reveals the qualifying card publicly",
+      "path": "state.publicReveals",
+      "op": "any_where",
+      "where": {
+        "reason": "deck_search",
+        "card": {
+          "cardId": "yellow_01_01_03_00"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_05_01_03_00_boundary",
+  "card_id": "purple_05_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\\n相手のトラッシュにミニオンカードが3枚以上ある場合、このミニオンをBP+400する。 EN: Charge\\n[Passive]\\nIf there are three or more minion cards in\\nyour opponent's trash, this minion gains\\n+400BP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_05_01_03_00",
+        "zone": "field",
+        "seed": 1976631349,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_03_01_03_00",
+        "side": "P2",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_01r_00",
+        "side": "P2",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_04_02_03_00",
+        "side": "P2",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "End the active turn after checking the passive",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Two opponent Trash Minions do not grant the BP aura",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_05_01_03_00",
+        "effectiveBp": 300
+      }
+    },
+    {
+      "name": "Magic does not count as a Trash Minion",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_04_02_03_00"
+      }
+    },
+    {
+      "name": "Skeletal Giant retains Rush at the threshold boundary",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_05_01_03_00",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    }
+  ]
+}

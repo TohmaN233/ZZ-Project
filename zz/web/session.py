@@ -21,7 +21,7 @@ from zz.engine import BASE_CAP, FIELD_CAP, Engine, GameOver, IllegalActionError,
 from zz.effects import EffectSpec, EffectTiming, TIMING_LABELS, effect_target_filter
 from zz.enums import AreaType, AttackTargetKind, CardType, Color, Keyword, Side, Step, TriggerTiming
 from zz.forces import ALL_FORCES, Force
-from zz.model import Action, AttackTarget, CardInstance, Context, ForceInstance, GameState, Player
+from zz.model import Action, AttackTarget, Card, CardInstance, Context, ForceInstance, GameState, Player
 from zz.web.assets import AssetIndex
 from zz.web.profiles import normalize_profile, profile_dto
 from zz.web.settings_store import normalize_ai_difficulty
@@ -2730,6 +2730,14 @@ class GameSession:
             self._prompt_optional_effect(player, source, effect)
             return True
         if not self._effect_needs_target_choice(effect):
+            if effect.params.get("choose_mana_color"):
+                self._pending_effect = {
+                    "mode": "trigger_deferred", "stage": "mana_color_choice",
+                    "first_targets": [], "player": player, "source": source,
+                    "effect": effect, "context": pending.context,
+                }
+                self._prompt_mana_color_choice(player, source, effect)
+                return True
             replacement_count = self._field_replacements_needed_for_effect(player, {"effect": effect}, [])
             replacement_kind = "ally_minion"
             replacement_stage = "field_replacement"
@@ -2867,7 +2875,8 @@ class GameSession:
             self._prompted_source_effect_resolution = None
             return False
         player = source.owner
-        if not self._is_user_controlled(player):
+        chooser = self._other_player(player) if effect.params.get("target_chooser") == "opponent" else player
+        if not self._is_user_controlled(chooser):
             return False
         self.engine._announce_effect_event(source, effect, ctx)
         sequence = self._custom_source_effect_sequence(source, effect, ctx)
@@ -2896,6 +2905,14 @@ class GameSession:
             self._prompt_optional_effect(player, source, effect)
             return True
         if not self._effect_needs_target_choice(effect):
+            if effect.params.get("choose_mana_color"):
+                self._pending_effect = {
+                    "mode": "source_deferred", "stage": "mana_color_choice",
+                    "first_targets": [], "player": player, "source": source,
+                    "effect": effect, "context": ctx,
+                }
+                self._prompt_mana_color_choice(player, source, effect)
+                return True
             replacement_count = self._field_replacements_needed_for_effect(player, {"effect": effect}, [])
             replacement_player = self._field_replacement_player(
                 player,
@@ -2940,7 +2957,7 @@ class GameSession:
             effect,
             ctx,
         )
-        eligible = self._eligible_targets(player, kind, None, effect, source_ci=source) if kind else []
+        eligible = self._eligible_targets(chooser, kind, None, effect, source_ci=source) if kind else []
         look_window = self._revealed_cards_for_effect(player, kind) if kind else []
         if not eligible and not look_window:
             followup_kind = effect.params.get("followup_target_kind")
@@ -2980,8 +2997,9 @@ class GameSession:
             "source": source,
             "effect": effect,
             "context": ctx,
+            "target_chooser": chooser,
         }
-        self._prompt_effect_target(player, kind, None, target_count, effect=effect, source_ci=source)
+        self._prompt_effect_target(chooser, kind, None, target_count, effect=effect, source_ci=source)
         return True
 
     def _resolve_pre_prompted_trigger(self, pending: dict[str, Any]) -> None:
@@ -3232,6 +3250,8 @@ class GameSession:
                 raise ValueError(f"invalid field_entry_count on effect: {field_entry_count!r}")
             else:
                 amount = field_entry_count
+        elif effect.params.get("source_enters_field"):
+            amount = 1
         elif effect.target_kind == "ally_minion_base":
             amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
         elif effect.params.get("puts_targets_on_field"):
@@ -3413,7 +3433,7 @@ class GameSession:
                     return
             policy_batches.append((policy, list(targets)))
 
-        add_policy_targets(player, queued_targets)
+        add_policy_targets(pending.get("target_chooser", player), queued_targets)
         for owner in self.engine.state.players:
             owner_field_replacements = [
                 target for target in field_replacement_targets
@@ -3494,7 +3514,7 @@ class GameSession:
                 self._attack.priority = self._other_player(player)
                 self._continue_attack_flow()
         log_targets = [
-            self._effect_target_log_payload(target)
+            self._effect_target_log_payload(target, owner=player)
             for target in queued_targets
             if target is not None
         ]
@@ -3516,7 +3536,7 @@ class GameSession:
         for target in targets:
             if target is None:
                 continue
-            meta = self._effect_target_log_payload(target)
+            meta = self._effect_target_log_payload(target, owner=source.owner)
             target_kind = meta.get("targetKind")
             if target_kind not in {"card", "force", "player"}:
                 continue
@@ -4420,6 +4440,8 @@ class GameSession:
             ]
 
     def _effect_target_label(self, target: CardInstance | ForceInstance | Force | Player) -> str:
+        if isinstance(target, Card):
+            return target.name_jp
         if isinstance(target, Player):
             return target.name
         if isinstance(target, ForceInstance):
@@ -4457,6 +4479,14 @@ class GameSession:
         return f"{target.owner.side.name} {zone_name}{suffix}"
 
     def _effect_target_meta(self, target: CardInstance | ForceInstance | Force | Player) -> dict[str, Any]:
+        if isinstance(target, Card):
+            pending = self._pending_effect
+            if not pending or not isinstance(pending.get("player"), Player):
+                raise IllegalActionError("outside-card choice has no controller")
+            preview = CardInstance(card=target, owner=pending["player"], iid=0, area=AreaType.OUTSIDE)
+            payload = serialize_card(self.engine, preview, self.asset_index)
+            payload.update({"kind": "effect_target", "targetKind": "card", "targetLabel": "OUTSIDE"})
+            return payload
         if isinstance(target, Player):
             return {
                 "kind": "effect_target",
@@ -4499,7 +4529,13 @@ class GameSession:
         })
         return payload
 
-    def _effect_target_log_payload(self, target: Any) -> dict[str, Any]:
+    def _effect_target_log_payload(self, target: Any, *, owner: Player | None = None) -> dict[str, Any]:
+        if isinstance(target, Card):
+            if owner is None:
+                raise IllegalActionError("outside-card log has no controller")
+            return {"kind": "effect_target", "targetKind": "card", "cardId": target.id,
+                    "nameJp": target.name_jp, "type": target.type.value, "targetLabel": "OUTSIDE",
+                    "ownerSide": owner.side.name, "area": AreaType.OUTSIDE.value}
         if isinstance(target, Color):
             return {
                 "kind": "effect_target",
@@ -4509,7 +4545,7 @@ class GameSession:
                 "nameJp": target.name,
                 "targetLabel": target.name,
             }
-        if isinstance(target, (CardInstance, ForceInstance, Force, Player)):
+        if isinstance(target, (Card, CardInstance, ForceInstance, Force, Player)):
             return self._effect_target_meta(target)
         return {
             "kind": "effect_target",
@@ -4652,8 +4688,16 @@ class GameSession:
                 source_ci=source_ci,
                 effect=effect,
             ), effect)
+        if kind == "any_force":
+            return self._filter_targets_for_effect(self._filter_effect_targets(
+                player,
+                [force for owner in (player, opponent) for force in owner.forces if not force.destroyed],
+                action, source_ci=source_ci, effect=effect,
+            ), effect)
         if kind == "owner_player_or_force":
             return [player] + [force for force in player.forces if not force.destroyed]
+        if kind == "any_player":
+            return list(self.engine.state.players)
         if kind == "ally_green_base_hand":
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.hand
@@ -4668,6 +4712,8 @@ class GameSession:
             return self._filter_card_targets_for_effect(player, list(player.hand), action, effect, source_ci)
         if kind == "deck_card":
             return self._filter_card_targets_for_effect(player, list(player.deck), action, effect, source_ci)
+        if kind == "outside_card":
+            return self.engine.outside_card_choices(effect)
         if kind == "pc02_celica_dragon":
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.deck
@@ -4687,6 +4733,14 @@ class GameSession:
             return self._filter_card_targets_for_effect(player, [
                 target for target in player.trash
                 if target.card.type is CardType.MAGIC and sum(target.card.cost.values()) <= 4
+            ], action, effect, source_ci)
+        if kind == "trash_magic":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in player.trash if target.card.type is CardType.MAGIC
+            ], action, effect, source_ci)
+        if kind == "enemy_trash_field_minion":
+            return self._filter_card_targets_for_effect(player, [
+                target for target in opponent.trash if target.card.type is CardType.F_MINION
             ], action, effect, source_ci)
         if kind == "trash_field_minion":
             return self._filter_card_targets_for_effect(player, [

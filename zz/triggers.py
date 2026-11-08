@@ -113,6 +113,11 @@ class TriggerRegistry:
         if self._engine._terminal_game_over:
             return
         state = self._engine.state
+        if timing is EffectTiming.ON_SUMMON and ctx.summon_source_area is None:
+            movement = next((event for event in reversed(self._engine.zone_move_events)
+                             if event.get("card") is ctx.source), None)
+            if movement and movement.get("to") is AreaType.FIELD:
+                ctx.summon_source_area = movement.get("from")
         switch_contexts: dict[int, Any] = {}
         switch_races: set[str] = set()
         summoned = getattr(ctx, "source", None)
@@ -168,6 +173,8 @@ class TriggerRegistry:
                         )
                         if effect.timing is not timing and not is_switch:
                             continue
+                        if ci is summoned and self._engine.pc03_summon_effect_suppressed(ci, timing):
+                            continue
                         # A printed summon/Switch clause is a source effect,
                         # not a listener for every summon of the same timing.
                         # Other summons may replay it only through Switch's
@@ -198,6 +205,8 @@ class TriggerRegistry:
                             continue
                         if isinstance(effect, EffectSpec) and effect_once_per_turn_used(effect, ci):
                             continue
+                        if not self._engine.pc03_evolution_trigger_eligible(ci, effect, effect_context):
+                            continue
                         if effect.condition and not effect.condition(ci, state, effect_context):
                             continue
                         effect_context = self._engine.capture_effect_context(ci, effect, effect_context)
@@ -205,8 +214,17 @@ class TriggerRegistry:
                         should_duplicate = getattr(self._engine, "should_duplicate_summon_effect", lambda source: False)
                         if timing is EffectTiming.ON_SUMMON and ci is ctx.source and should_duplicate(ci):
                             self._queue.append(_Pending(timing, ci, effect, effect_context))
+                    if timing is EffectTiming.ON_ATTACK and ci is ctx.source and ci.area is AreaType.FIELD:
+                        for grant in self._engine._pc03_attack_grants:
+                            if (grant["owner"] is ci.owner and ci.card.type in grant["types"]
+                                    and (grant["color"] is None or self._engine._card_color(ci.card) is grant["color"])):
+                                effect = grant["effect"]
+                                self._queue.append(_Pending(timing, ci, effect,
+                                    self._engine.capture_effect_context(ci, effect, ctx)))
                     for trig in ci.card.triggers:
                         if trig.when is not timing:
+                            continue
+                        if ci is summoned and self._engine.pc03_summon_effect_suppressed(ci, timing):
                             continue
                         if not self._trigger_active_in_area(ci):
                             continue
@@ -255,6 +273,8 @@ class TriggerRegistry:
                 continue
             if isinstance(p.trigger, EffectSpec) and effect_once_per_turn_used(p.trigger, p.instance):
                 self._engine.complete_magic_source_effect(p.instance, p.trigger, p.context)
+                continue
+            if not self._engine.pc03_evolution_trigger_eligible(p.instance, p.trigger, p.context):
                 continue
             defer_choice = getattr(self._engine, "defer_trigger_choice", None)
             if defer_choice is not None:

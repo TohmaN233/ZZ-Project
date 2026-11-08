@@ -1,0 +1,572 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_03_01_03_00_positive",
+  "card_id": "white_03_01_03_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 進化：手札から「ハンター」が召喚されたとき\n「「氷晶の召喚士」アイシー」と「「アイシーの召喚獣」フリズリー」をLv2にする。\nEN: Evolve: When you summon a Hunter Minion from your hand, Hailee - Conjurer of Crystals Lv.1 and Brice - Of Hailee Lv.1 become Lv.2.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "zone": "field",
+        "seed": 4008073470,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "white_03_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$primary",
+        "rested": true,
+        "permanentBpModifier": 100,
+        "permanentDpModifier": 1
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P1",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P1",
+        "zone": "removed"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P1",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P1",
+        "zone": "removed"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "opponent_icy": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P2",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_00_03_03",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_06_01_03_00",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_01_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "hunter1": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_01_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "hunter2": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "elf": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_03_01_03_00",
+        "side": "P1",
+        "zone": "field"
+      },
+      "capture": {
+        "bless_target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "blessing": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_00_03_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attach White Blessing Mana to the active Icy Beast",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$blessing",
+        "target_iid": "$bless_target"
+      }
+    },
+    {
+      "name": "Summon the first Hunter from hand to evolve Icy",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$hunter1"
+      }
+    },
+    {
+      "name": "Summon another Hunter; the Icy family quota is already used",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$hunter2"
+      }
+    },
+    {
+      "name": "Summon an Elf so a different Beast family can evolve this turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$elf",
+        "replace_field_iid": "$hunter2"
+      }
+    },
+    {
+      "name": "End turn after both independent evolution triggers",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 places Mana on its next turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "P2 ends its turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 places Mana after drawing the first evolved deck card",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "P1 ends the next turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 places Mana on its second turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "P2 ends its second turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 places Mana after drawing the second evolved deck card",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "Attack the opponent Force with one evolved Icy Beast after the draw checks",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$primary"
+      }
+    },
+    {
+      "name": "Choose Force Sho",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "Opponent passes the first Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Attacker passes the second Flash priority",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Block with the opposing Lv1 Icy Beast",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$opponent_icy"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Icy Beast advances with its Conjurer and retains Rest",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_03_01_03_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "Both Icy Beast copies advance after one family trigger",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "white_03_01_03_01"
+      }
+    },
+    {
+      "name": "Icy Beast field stat modifiers survive evolution",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_03_01_03_01",
+        "permanentBpModifier": 100,
+        "permanentDpModifier": 1
+      }
+    },
+    {
+      "name": "Blessing stays attached to evolved Icy Beast",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "white_03_01_03_01",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "white_00_01_02_00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Icy Conjurer in base advances in the same evolution",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_00_00_03_01"
+      }
+    },
+    {
+      "name": "Icy Conjurer hand and deck copies are evolved and in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "white_00_00_03_01"
+      }
+    },
+    {
+      "name": "Icy Conjurer in trash advances in the same evolution",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_00_00_03_01"
+      }
+    },
+    {
+      "name": "Icy Beast in base advances in the same evolution",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_03_01_03_01"
+      }
+    },
+    {
+      "name": "Icy Beast hand and deck copies are evolved and in hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "white_03_01_03_01"
+      }
+    },
+    {
+      "name": "Icy Beast in trash advances in the same evolution",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_03_01_03_01"
+      }
+    },
+    {
+      "name": "Second Hunter does not consume a second Icy family quota",
+      "path": "state.players.human.field",
+      "op": "none_where",
+      "where": {
+        "cardId": "white_03_01_03_02"
+      }
+    },
+    {
+      "name": "A different Ove family advances during the same turn",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_06_01_03_01"
+      }
+    },
+    {
+      "name": "Ove Conjurer advances with its Beast",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_00_03_04"
+      }
+    },
+    {
+      "name": "Opponent Icy Beast stays Lv1",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_03_01_03_00"
+      }
+    },
+    {
+      "name": "Opponent Icy Conjurer stays Lv1",
+      "path": "state.players.opponent.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_00_00_03_00"
+      }
+    }
+  ]
+}

@@ -38,7 +38,7 @@ SOURCE_TOOLS = (
 SERVER_ZZ_MODULES = (
     "__init__", "ai", "basic", "cards", "codeman_memory", "deckcode0", "decks",
     "card_identity", "effects", "engine", "enums", "ex01", "ex02", "ex02c", "forces",
-    "house_rules", "keyword_rules", "model", "pc01", "pc01r", "pc02", "pc02r",
+    "house_rules", "keyword_rules", "model", "pc01", "pc01r", "pc02", "pc02r", "pc03",
     "transformations", "triggers",
 )
 SERVER_WEB_MODULES = (
@@ -90,6 +90,20 @@ def ex02c_module_names(root: Path) -> tuple[str, ...]:
     return modules
 
 
+def pc03_module_names(root: Path) -> tuple[str, ...]:
+    tree = ast.parse((root / "zz/pc03.py").read_text(encoding="utf-8"))
+    declaration = next(
+        node.value for node in tree.body if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "_MODULES" for target in node.targets)
+    )
+    modules = tuple(module.removeprefix("zz.pc03_cards.") for _, module in ast.literal_eval(declaration))
+    if len(modules) != 171 or len(modules) != len(set(modules)):
+        raise ValueError(f"Expected 171 distinct PC03 card modules, got {len(modules)}")
+    if any(not name.isidentifier() for name in modules):
+        raise ValueError("Invalid PC03 release module name")
+    return modules
+
+
 def release_files(root: Path, kind: str) -> list[Path]:
     if kind not in {"linux", "source", "multiplayer"}:
         raise ValueError(f"Unknown release package kind: {kind!r}")
@@ -100,10 +114,11 @@ def release_files(root: Path, kind: str) -> list[Path]:
     paths.update(Path("zz/multiplayer") / f"{name}.py" for name in MULTIPLAYER_MODULES)
     paths.update(Path("zz/pc02r_cards") / f"{name}.py" for name in ("__init__", *pc02r_module_names(root)))
     paths.update(Path("zz/ex02c_cards") / f"{name}.py" for name in ("__init__", *ex02c_module_names(root)))
+    paths.update(Path("zz/pc03_cards") / f"{name}.py" for name in ("__init__", *pc03_module_names(root)))
     paths.update(Path("zz/web/translations") / name for name in TRANSLATIONS)
     paths.update(Path("data") / name for name in PUBLIC_TSVS)
     paths.update(Path("docs/rules") / name for name in RULEBOOKS)
-    paths.update((Path("zz/pc02r_data.tsv"), Path("zz/ex02c_data.tsv"), Path("zz/multiplayer/compatibility.json")))
+    paths.update((Path("zz/pc02r_data.tsv"), Path("zz/ex02c_data.tsv"), Path("zz/pc03.py"), Path("zz/pc03_data.tsv"), Path("zz/multiplayer/compatibility.json")))
     if not server:
         paths.update(Path(name) for name in ("image.png", "launch-electron.sh", "launch-electron.cmd", "package.json", "package-lock.json", "docs/index.html"))
         paths.update(Path("electron") / name for name in ELECTRON_FILES)
@@ -119,6 +134,7 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.update(Path("tests") / name for name in (*FOCUSED_TESTS, "test_release_archive_inventory.py"))
         paths.add(Path("tests/test_ex02c_cards.py"))
         paths.add(Path("tests/test_ex02_cards.py"))
+        paths.update(Path("tests") / name for name in ("test_pc03_evolution_core.py", "test_pc03_shared_phase_rules.py", "test_pc03_final_integration.py", "test_pc03_outside_selection.py", "test_pc03_authoritative_hash.py", "test_pc03_cards.py"))
         paths.add(Path("tests/test_deck_root_migration.py"))
         paths.add(Path("tests/electron_deck_storage.test.js"))
         paths.update(Path("tests") / name for name in ("test_frontend_duel_dom.py", "test_frontend_fx.py", "test_frontend_fx_arrival.py"))
@@ -136,6 +152,7 @@ def release_files(root: Path, kind: str) -> list[Path]:
             "electron_reconnect_gateway_harness.js",
         ))
         paths.update(Path("tests/semantic_scenarios/pc02r") / f"{name}-{case}.json" for name in pc02r_module_names(root) for case in ("positive", "boundary"))
+        paths.update(Path("tests/semantic_scenarios/pc03") / f"{name}-{case}.json" for name in pc03_module_names(root) for case in ("positive", "boundary"))
         paths.update(Path("tests/semantic_scenarios/ex02c") / f"{name}-{case}.json" for name in ex02c_module_names(root) for case in ("positive", "boundary"))
         paths.add(Path("tests/semantic_scenarios/ex02c/green_08_02_02c_01-trash-boundary.json"))
         paths.add(DEEP_SOURCE_RELATIVE)

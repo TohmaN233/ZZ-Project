@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_04_01_03_03_boundary",
+  "card_id": "purple_04_01_03_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【自分のターン終了時】\\n自分のデッキを上から1枚破棄する。そのカードが紫のカードである場合、このミニオンにBP+100を付与する。\\n進化：手札から「デーモン」が召喚されたとき「「血陣の召喚士」リリアン」と「「リリアンの召喚獣」ヴィル」をLv3にする。 EN: Discard the top card of your deck. If it is\\na Purple Card, this minion receives\\n+100BP.\\nEvolve: Summon minion from the Demon class\\nLylian - Conjurer of Blood Bonds Lv.2\\nand Vill - Of Lylian Lv.2 become Lv.3",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_04_01_03_03",
+        "zone": "field",
+        "seed": 1650299520,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "purple_04_01_03_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_04_01_03_03",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_01r_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "End P2 turn with a non-Purple top card",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "P2 mills its non-Purple card without gaining BP",
+      "path": "state.players.opponent.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_04_01_03_03",
+        "effectiveBp": 500,
+        "permanentBpModifier": 0
+      }
+    },
+    {
+      "name": "Only active owner deck card is milled",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_02_02_01r_00"
+      }
+    },
+    {
+      "name": "Inactive P1 copy does not run the opponent end-turn effect",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_04_01_03_03",
+        "effectiveBp": 500,
+        "permanentBpModifier": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_10_01_03_01_boundary",
+  "card_id": "colorless_10_01_03_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n他のミニオン全てを破壊する。\nEN: [When Summoned]\nDestroy all other minions.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_10_01_03_01",
+        "zone": "hand",
+        "seed": 29173452,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Shin Ryu Aether without other Field Minions",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_10_01_03_01"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The source is excluded from all-other-Minion destruction",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_10_01_03_01"
+      }
+    },
+    {
+      "name": "The empty opponent field stays empty",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 0
+    }
+  ]
+}

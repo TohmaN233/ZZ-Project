@@ -262,13 +262,7 @@ def _copy_other_non_token(source: CardInstance, state: Any, ctx: Context) -> Non
     )
     if not targets:
         return
-    copied = CardInstance(
-        card=targets[0].card,
-        owner=source.owner,
-        iid=state.allocate_iid(),
-        area=AreaType.REMOVED,
-    )
-    eng.add_to_hand(source.owner, copied, from_area=AreaType.REMOVED)
+    eng.add_card_from_outside_to_hand(source.owner, targets[0].card.id)
 
 
 def _increase_opponent_magic_cost(source: CardInstance, state: Any, ctx: Context) -> None:

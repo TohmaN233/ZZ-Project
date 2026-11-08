@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_04_01_03_02_positive",
+  "card_id": "white_04_01_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n次の相手のターン終了時まで、自分のフォースに与えられるダメージを1軽減する。\n【常時】\nこのミニオンがアクティブ状態でなければ［加護］は付与されない。\n【加護時】\n白の加護である場合、加護しているマナを除外して、「「市民の警衛」フェイス」に変形する。 EN: [When Summoned]\nDamage dealt to your Forces is reduced by 1 until the end\nof your opponent's turn.\n[Passive]\nThis minion cannot receive a {Boost} when not in the\nActive State.\n[When Boosted]\nIf Boosted by a White Mana, banish that mana. This card\nTransforms into Faith - Protector of the Citizens\".",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_04_01_03_02",
+        "zone": "hand",
+        "seed": 2192814888,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "white_04_01_03_02"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true,
+        "life": 4
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "opponent_attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "blessing": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_00_01_02_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "life": 4
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Faith",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "white_04_01_03_02"
+      }
+    },
+    {
+      "name": "Bless Faith with White Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$blessing",
+        "target_iid": "$primary"
+      }
+    },
+    {
+      "name": "End P1 turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "Place P2 colorless Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "P2 attacks during the protected turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$opponent_attacker"
+      }
+    },
+    {
+      "name": "Choose the protected Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "Pass P1 Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass P2 Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Decline the optional block",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "no_block"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "White Bless transforms Faith into its Protector face",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "white_04_01_03_03"
+      }
+    },
+    {
+      "name": "The consumed White Bless Mana leaves Base while its copy remains",
+      "path": "state.players.human.base",
+      "op": "none_where",
+      "where": {
+        "iid": "$blessing"
+      }
+    },
+    {
+      "name": "Transformation recovery and one-point reduction leave Force Sho at four Life",
+      "path": "state.players.human.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "id": "force_sho",
+        "life": 4
+      }
+    }
+  ]
+}

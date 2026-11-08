@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_07_01_03_02_positive",
+  "card_id": "colorless_07_01_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n相手のフォース1つを破壊する。破壊するフォースがない場合、このミニオンにBP+100/DP+1を付与する。\nEN: [When Summoned]\nDestroy one of your opponent's Forces. If\nthere are no Forces to destroy, this\nminion receives +100BP/+1DP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_07_01_03_02",
+        "zone": "hand",
+        "seed": 14638982,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Ryu Jin Terra",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_07_01_03_02"
+      }
+    },
+    {
+      "name": "Choose one undestroyed opponent Force",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "forceId": "force_sho"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The chosen opponent Force is destroyed",
+      "path": "state.players.opponent.forces",
+      "op": "any_where",
+      "where": {
+        "id": "force_sho",
+        "destroyed": true
+      }
+    },
+    {
+      "name": "The other opponent Force remains undestroyed",
+      "path": "state.players.opponent.forces",
+      "op": "any_where",
+      "where": {
+        "id": "force_chi",
+        "destroyed": false
+      }
+    }
+  ]
+}

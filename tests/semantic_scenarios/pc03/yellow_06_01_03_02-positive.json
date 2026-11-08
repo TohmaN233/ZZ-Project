@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_06_01_03_02_positive",
+  "card_id": "yellow_06_01_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【アタック時】\\n相手のBP400以下のミニオン1体を手札に戻す。\\n【常時】\\n自分の効果で相手のミニオンが手札に戻るとき、代わりにデッキの下に戻す。\\n進化：手札から「アヴィアン」が召喚されたとき\\n「「光翼の召喚士」アケミ」と「「アケミの召喚獣」ゴッドバード」をLv3にする。 EN: Return one of your opponent's minions with 400BP or\\nlower to their hand.\\nWhen an opponent's minion is returned to their hand by\\none of your card effects, return it to the bottom of their deck\\ninstead.\\nEvolve: Summon minion from the Avian class\\n\"Acemy - Cor\\nurer of the Shining Wing Lv.2 and \"Ruler of\\nthe Azure - Of Acemy Lv.2\" become Lv.3.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_06_01_03_02",
+        "zone": "hand",
+        "seed": 2091662576,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_00_03_04",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_01_02_01_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_04_01_03_00",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Godbird Lv.2",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_06_01_03_02"
+      }
+    },
+    {
+      "name": "Summon an Avian to evolve Godbird",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_01_02_01_00"
+      }
+    },
+    {
+      "name": "End P1's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 completes its mandatory Mana step",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "P2 ends its turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 completes its mandatory Mana step",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "Attack P2 with Godbird Lv.3",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "yellow_06_01_03_03"
+      }
+    },
+    {
+      "name": "Target P2 as a player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Return the eligible opponent Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardId": "yellow_04_01_03_00"
+      }
+    },
+    {
+      "name": "Pass P2's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass P1's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Godbird Lv.2 evolves to Lv.3",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_06_01_03_03"
+      }
+    },
+    {
+      "name": "Akemi Lv.2 evolves together to Lv.3",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_00_00_03_05"
+      }
+    },
+    {
+      "name": "Opponent deck receives one card without exposing its identity",
+      "path": "state.players.opponent.deckCount",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "name": "Replacement keeps the Minion out of the opponent hand",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "yellow_04_01_03_00"
+      }
+    }
+  ]
+}

@@ -21,8 +21,11 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
     files = {path.as_posix() for path in release.release_files(ROOT, kind)}
     cards = {path for path in files if path.startswith("zz/pc02r_cards/") and path != "zz/pc02r_cards/__init__.py"}
     assert len(cards) == 106
+    pc03_cards = {path for path in files if path.startswith("zz/pc03_cards/") and path != "zz/pc03_cards/__init__.py"}
+    assert len(pc03_cards) == 171
     assert {"zz/pc02r_data.tsv", "data/card_transformations.tsv", "data/cards_bilingual_v4.tsv",
-            "data/official_cardlist.tsv", "zz/multiplayer/compatibility.json"} <= files
+            "data/official_cardlist.tsv", "zz/multiplayer/compatibility.json", "zz/pc03.py",
+            "zz/pc03_data.tsv"} <= files
     assert not any(release.FORBIDDEN_PARTS.intersection(Path(path).parts) for path in files)
     assert "新建 文本文档.txt" not in files
     assert "data/settings/settings.json" not in files
@@ -41,6 +44,8 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
         assert release.DEEP_SOURCE_RELATIVE.as_posix() in files
         assert len([path for path in files if path.startswith("tests/semantic_scenarios/pc02r/")]) == 212
         assert len([path for path in files if path.startswith("tests/semantic_scenarios/ex02c/")]) == 141
+        assert len([path for path in files if path.startswith("tests/semantic_scenarios/pc03/")]) == 342
+        assert {"tests/test_pc03_cards.py", "tests/test_pc03_outside_selection.py", "tests/test_pc03_authoritative_hash.py"} <= files
         assert {"tests/test_ex02c_cards.py", "tools/build_ex02c_correspondence.py"} <= files
         assert {
             "tests/test_ex02c_link_activation_combat.py", "tests/test_ex02c_standby_deadline.py",
@@ -61,7 +66,7 @@ def fixture_workspace(tmp_path: Path) -> Path:
     for relative in release.release_files(ROOT, "source"):
         target = root / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        if relative.as_posix() in {"zz/pc02r.py", "zz/ex02c.py"} or relative.as_posix().startswith("zz/web/static/fx/"):
+        if relative.as_posix() in {"zz/pc02r.py", "zz/ex02c.py", "zz/pc03.py"} or relative.as_posix().startswith("zz/web/static/fx/"):
             shutil.copyfile(ROOT / relative, target)
         else:
             target.write_text("fixture", encoding="utf-8")

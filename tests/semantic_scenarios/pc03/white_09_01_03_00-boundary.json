@@ -1,0 +1,214 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_09_01_03_00_boundary",
+  "card_id": "white_09_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n相手のプレイヤーに、相手のプレイヤーのライフの半分（端数切り上げ）に等しいダメージを与える。自分の「「粉砕」シュヴァルツティーガー」の効果はターンに1回だけ発揮する。\nEN: [When Summoned] Deal damage to your opponent's Life equal to half of their Life (round up to the nearest whole number). The effect of Schwarz Tiger - The Pulverizer can only be activated once per turn.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_09_01_03_00",
+        "zone": "hand",
+        "seed": 3715097160,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "tiger_one": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "white_09_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 8,
+        "side": "P2"
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 6,
+        "side": "P2",
+        "forceIndex": 0
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 4,
+        "side": "P2",
+        "forceIndex": 1
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_09_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "tiger_two": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_06_01_03_02",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_06_01_03_02",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon the first Schwarz Tiger",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$tiger_one"
+      }
+    },
+    {
+      "name": "End the first player's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "Advance the opponent through its Mana step",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "End the opponent's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "Place Mana for the next own turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "Summon the second Schwarz Tiger next turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$tiger_two"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The once-per-turn effect resets on the next own turn",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "name": "Both Tiger copies were summoned across the two turns",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "white_09_01_03_00"
+      }
+    },
+    {
+      "name": "Direct damage still leaves Force 0 Life unchanged",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "life": 6
+      }
+    },
+    {
+      "name": "Direct damage still leaves Force 1 Life unchanged",
+      "path": "state.players.opponent.forces",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "life": 4
+      }
+    }
+  ]
+}

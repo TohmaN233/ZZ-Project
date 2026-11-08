@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_03_02_03_00_boundary",
+  "card_id": "yellow_03_02_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】/【フラッシュ】\\n自分の種族「アルカナ」を持つミニオンがいる場合、相手のミニオン1体を手札に戻す。自分の種族「アルカナ」を持つミニオンがいない場合、代わりに、相手のコスト6以下のミニオン1体を手札に戻す。 EN: [Main]/[Flash]\\nIf you have a minion belonging to the Arcana class on the field, return one of your opponent's minions to their hand.\\nOtherwise, return one of your opponent's minions with a cost of 6 or lower to their hand.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_03_02_03_00",
+        "zone": "hand",
+        "seed": 4056426525,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "patrol_first": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "yellow_03_02_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_04_01_03_00",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_07_01_03_00",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_03_02_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "patrol_second": {
+          "path": "debug.added",
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_01_00_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_02_00",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Cast Patrol with no Arcana Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$patrol_first"
+      }
+    },
+    {
+      "name": "Return the cost-four Minion within the fallback limit",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardId": "yellow_04_01_03_00"
+      }
+    },
+    {
+      "name": "Cast the second Patrol with a legal and over-limit target present",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$patrol_second"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "First fallback target returns to its owner's hand",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_04_01_03_00"
+      }
+    },
+    {
+      "name": "Cost-seven target remains in the Field",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_07_01_03_00"
+      }
+    },
+    {
+      "name": "Second eligible cost-six target remains in the Field before selection",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_02_02_00"
+      }
+    },
+    {
+      "name": "Second Patrol opens an enemy-minion chooser",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "effect_target"
+    },
+    {
+      "name": "The cost-six target is offered",
+      "path": "state.prompt.options",
+      "op": "any_where",
+      "where": {
+        "cardId": "blue_02_02_02_00"
+      }
+    },
+    {
+      "name": "The cost-seven target is absent from the chooser",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "cardId": "red_07_01_03_00"
+      }
+    }
+  ]
+}

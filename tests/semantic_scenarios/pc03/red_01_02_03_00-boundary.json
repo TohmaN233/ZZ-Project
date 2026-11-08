@@ -1,0 +1,167 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_01_02_03_00_boundary",
+  "card_id": "red_01_02_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】/【フラッシュ】\\n相手のBP300以下のミニオン1体を破壊する。\\nEN: [Main]/[Flash]\\nDestroy one of your opponent’s minions with 300BP or lower.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_01_02_03_00",
+        "zone": "hand",
+        "seed": 2644598225,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "red_01_02_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_04_01_03_00",
+        "side": "P2",
+        "zone": "field"
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "P2 attacks P1 to open a Flash window",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$attacker"
+      }
+    },
+    {
+      "name": "Choose the P1 player as the attack target",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Cast Bomb Ball during Flash with only an over-limit target",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$primary"
+      }
+    },
+    {
+      "name": "Pass P1 remaining Flash options",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass P2 Flash options",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The 400 BP opponent minion is not destroyed by the no-target Flash cast",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_04_01_03_00"
+      }
+    },
+    {
+      "name": "The empty-target Flash cast completes into its owner Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_01_02_03_00"
+      }
+    },
+    {
+      "name": "The P1 player takes the attack after the Flash window resolves",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 9
+    }
+  ]
+}

@@ -498,6 +498,10 @@ def register_pc01_cards(path: Path = DEFAULT_CARD_TSV) -> list[str]:
         card_id = row["image_id"].strip()
         if card_id not in CARD_REGISTRY:
             register(_card_from_row(row))
+        else:
+            # Earlier handcrafted registrations supply behavior; the official row
+            # remains authoritative for printed race metadata.
+            CARD_REGISTRY[card_id].race_jp = _clean_text(row.get("race_jp"))
         registered_ids.append(card_id)
     return registered_ids
 

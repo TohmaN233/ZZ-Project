@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_05_01_03_01_boundary",
+  "card_id": "blue_05_01_03_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【アタック時】\n相手のコスト5以下のミニオン1体をレスト状態でベースに移動させる。\n【常時】\n自分が本来のコストが3以上のマジックを使用するたび、このミニオンをアクティブにする。\n進化：手札から「マーフォーク」が召喚されたとき「「魔人の召喚士」ブルーナ」と「「ブルーナの召喚獣」ジャイ」をLv3にする。 EN: [When Attacking] Move one of your opponent's minions with a cost of 5 or lower into their base in the Rest State.\n[Passive] Whenever you use a Magic card with an original cost of 3 or higher, this Minion enters the Active State.\nEvolve: When you summon a Merfolk Minion from your hand, Broona - Conjurer of the Magus and Juy - Of Broona become Lv.3.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_05_01_03_01",
+        "zone": "field",
+        "seed": 2028959143,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_05_01_03_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$primary",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_03_01_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Use original-cost-2 Magic",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_02_03_01_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Cost-2 Magic leaves Juy rested and unavailable to attack",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "blue_05_01_03_01",
+        "rested": true
+      }
+    },
+    {
+      "name": "No attack action is offered for rested Juy",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "attack",
+        "attacker_iid": "$primary"
+      }
+    }
+  ]
+}

@@ -7,6 +7,26 @@ from tests.test_public_base_rules import lab
 import pytest
 
 
+def test_field_to_deck_emits_return_event_only_after_real_move():
+    from zz.cards import CARD_REGISTRY
+    session, owner = lab('blue_01_03_02r_00')
+    listener = CardInstance(CARD_REGISTRY['yellow_03_01_03_03'], owner,
+                            iid=session.engine.state.allocate_iid(), area=AreaType.FIELD)
+    owner.field.append(listener)
+    listener.rested = True
+    opponent = session.engine.state.opponent
+    target = CardInstance(Card('return-target', 'target', 'target', CardType.F_MINION),
+                          opponent, iid=session.engine.state.allocate_iid(), area=AreaType.FIELD)
+    opponent.field.append(target)
+    session._clear_prompt()
+    assert session.engine.return_to_deck(target)
+    assert target in opponent.deck and target not in opponent.field
+    assert not listener.rested
+    listener.rested = True
+    assert not session.engine.return_to_deck(target)
+    assert listener.rested
+
+
 def test_destroyed_source_prompts_once_and_other_destroy_listener_still_fires():
     session, owner = lab('purple_02_02_02r_00', zone='field')
     source = next(c for c in owner.field if c.card.id == 'purple_02_02_02r_00')

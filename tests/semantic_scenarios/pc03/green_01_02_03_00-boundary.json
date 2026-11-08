@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_01_02_03_00_boundary",
+  "card_id": "green_01_02_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】/【フラッシュ】\\nこのターン中、自分のミニオン1体を、自分の緑マナ1つ毎にBP+100する。 EN: [Main]/[Flash]\\nSelect one of your minions. For each\\nGreen Mana in your base, that minion gains\\n+100BP for the duration of the turn.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_01_02_03_00",
+        "zone": "hand",
+        "seed": 3557515135,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_01_01_03_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "target": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_00_03_04",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_01_03_00",
+        "side": "P2",
+        "zone": "field"
+      },
+      "capture": {
+        "attacker": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "P2 attacks P1 Force to open defender Flash",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$attacker",
+        "cardId": "green_03_01_03_00"
+      }
+    },
+    {
+      "name": "Choose the attacked P1 Force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "P1 casts Magic Boost during defender Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_01_02_03_00"
+      }
+    },
+    {
+      "name": "Choose Raccoon",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$target"
+      }
+    },
+    {
+      "name": "P2 passes attacker Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Flash Magic Boost applies +100 BP for the one Green Mana",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "green_01_01_03_00",
+        "effectiveBp": 300,
+        "turnBpModifier": 100
+      }
+    },
+    {
+      "name": "The paid Green Mana is rested",
+      "path": "state.players.human.base",
+      "op": "any_where",
+      "where": {
+        "cardId": "green_00_00_03_04",
+        "rested": true
+      }
+    },
+    {
+      "name": "The Flash Magic has left P1 hand and entered Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_01_02_03_00"
+      }
+    }
+  ]
+}

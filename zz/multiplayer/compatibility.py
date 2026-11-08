@@ -32,6 +32,10 @@ _EX02C_CARD_MODULES = tuple(
     f"zz/ex02c_cards/{path.name}"
     for path in sorted((Path(__file__).resolve().parents[1] / "ex02c_cards").glob("*.py"))
 )
+_PC03_CARD_MODULES = tuple(
+    f"zz/pc03_cards/{path.name}"
+    for path in sorted((Path(__file__).resolve().parents[1] / "pc03_cards").glob("*.py"))
+)
 
 AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "data/card_transformations.tsv",
@@ -61,11 +65,14 @@ AUTHORITATIVE_DEFINITION_PATHS = tuple(sorted((
     "zz/pc01.py",
     "zz/pc02r.py",
     "zz/pc02r_data.tsv",
+    "zz/pc03.py",
+    "zz/pc03_data.tsv",
     "zz/triggers.py",
     "zz/transformations.py",
     "zz/web/session.py",
     *_PC02R_CARD_MODULES,
     *_EX02C_CARD_MODULES,
+    *_PC03_CARD_MODULES,
 )))
 
 

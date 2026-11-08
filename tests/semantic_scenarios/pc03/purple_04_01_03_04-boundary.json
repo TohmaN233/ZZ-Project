@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_04_01_03_04_boundary",
+  "card_id": "purple_04_01_03_04",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【自分のターン終了時】\\n自分のデッキを上から1枚破棄する。そのカードが紫のカードである場合、このミニオンにBP+100を付与する。\\n【アタック時】\\n自分のトラッシュにある、紫のミニオンカード1枚を手札に戻す。 EN: [At the End of Your Turn]\\nDiscard the top card of your deck. If it is\\na Purple Card, this minion receives\\n+100BP.\\n[When Attacking]\\nReturn one Purple Minion from your\\ntrash to your hand.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_04_01_03_04",
+        "zone": "field",
+        "seed": 487825119,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "purple_04_01_03_04"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_01r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_02_02_01r_00",
+        "side": "P1",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack the opponent Player with Vill Lv3",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_04_01_03_04"
+      }
+    },
+    {
+      "name": "Choose the opponent Player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the defender Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the attacker Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Vill Lv3 deals its printed 3 DP",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 7
+    },
+    {
+      "name": "Non-Purple top card remains unmillled before turn end",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "Non-Purple Trash Minion is not returned by the attack effect",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_02_02_01r_00"
+      }
+    },
+    {
+      "name": "Attack did not grant BP without a Purple turn-end mill",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_04_01_03_04",
+        "effectiveBp": 500,
+        "permanentBpModifier": 0
+      }
+    }
+  ]
+}

@@ -1,0 +1,392 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_05_01_03_01_positive",
+  "card_id": "red_05_01_03_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【アタック時】\n相手のミニオン2体にBP-200を付与する。\n進化：手札から「ドワーフ」が召喚されたとき\n「「炎石の召喚士」エミリー」と「「エミリーの召喚獣」フレイムリング」をLv2にする。\nEN: [When Attacking] Deal -200BP to two of your opponent's minions. Evolve: When a Dwarf is summoned from your hand, Emeli - Conjurer of the Burning Embers Lv.1 and Inferno Ring - Of Emeli Lv.1 become Lv.2.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_05_01_03_01",
+        "zone": "field",
+        "seed": 885237563,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "ring_iid": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_05_01_03_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_02",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P1",
+        "zone": "removed",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_01",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_01",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_01",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_01",
+        "side": "P1",
+        "zone": "removed",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_04",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_02",
+        "side": "P1",
+        "zone": "trash",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_03",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_01_03_01",
+        "side": "P2",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_02_01_00",
+        "side": "P1",
+        "zone": "hand",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_02_00_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_02_01_05",
+        "side": "P2",
+        "zone": "field",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon a Dwarf from hand",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "red_05_02_01_00"
+      }
+    },
+    {
+      "name": "Attack with evolved Ring",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$ring_iid"
+      }
+    },
+    {
+      "name": "Attack the player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Apply BP reduction to both enemies",
+      "prompt_kind": "effect_target",
+      "select_many": [
+        {
+          "cardId": "colorless_04_02_00_00"
+        },
+        {
+          "cardId": "colorless_03_02_01_05"
+        }
+      ]
+    },
+    {
+      "name": "Pass defender Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass attacker Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "P1 Level 1 and Level 2 sources share one family use",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_05_01_03_02"
+      }
+    },
+    {
+      "name": "No second same-family evolution reaches Level 3",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "red_05_01_03_03"
+      }
+    },
+    {
+      "name": "Emeli Lv1 in Base upgrades to Lv2 beside Flame Ring",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "red_00_00_03_04"
+      }
+    },
+    {
+      "name": "Emeli Hand copy upgrades",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_04"
+      }
+    },
+    {
+      "name": "Flame Ring Hand copy upgrades",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_05_01_03_02"
+      }
+    },
+    {
+      "name": "Opponent Emeli remains Lv1",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_03"
+      }
+    },
+    {
+      "name": "Opponent Flame Ring remains Lv1",
+      "path": "state.players.opponent.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_05_01_03_01"
+      }
+    },
+    {
+      "name": "The Dwarf receives Charge from the evolved Level 2 source",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "red_05_02_01_00",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "First enemy receives -200 BP",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_02_00_00",
+        "effectiveBp": 300
+      }
+    },
+    {
+      "name": "Second enemy receives -200 BP",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_03_02_01_05",
+        "effectiveBp": 100
+      }
+    }
+  ]
+}

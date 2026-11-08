@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_05_02_03_00_boundary",
+  "card_id": "green_05_02_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【メイン】\n自分はカードを2枚引く。自分のプレイヤーを1回復する。緑マナ１つをレスト状態でベースに置く。 EN: [Main]\nDraw two cards. Restore 1 Life point.\nPlace one Green Mana into your base in the\nRest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_05_02_03_00",
+        "zone": "hand",
+        "seed": 4277582134,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "green_05_02_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "replace_token": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/life",
+      "payload": {
+        "life": 10,
+        "side": "P1"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_01r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_01r_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Cast Gift at the Life cap",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_05_02_03_00"
+      }
+    },
+    {
+      "name": "Replace one Base Mana to finish placing Green Mana",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$replace_token"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Gift does not exceed the 10-Life cap",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 10
+    },
+    {
+      "name": "Both printed cards are drawn",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "blue_02_02_01r_00"
+      }
+    },
+    {
+      "name": "Green Mana is placed rested after replacement",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "mana_token",
+        "manaColor": "GREEN",
+        "rested": true
+      }
+    },
+    {
+      "name": "Base stays within its ten-Mana capacity",
+      "path": "state.players.human.base",
+      "op": "length_eq",
+      "value": 10
+    },
+    {
+      "name": "Magic enters Trash after resolving its effects",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_05_02_03_00"
+      }
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_02_01_03_03_boundary",
+  "card_id": "blue_02_01_03_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【自分のターン】\\n自分の種族「シーワーム」を持つミニオン全てはブロックされない。\\n【自分のターン】\\n自分のミニオンがダメージを与えるたび、自分はカードを1枚引く。この効果は重複しない。 EN: [On Your Turn]\\nYour minions belonging to the Seawyrm\\nclass cannot be blocked.\\n[On Your Turn]\\nWhenever one of your minions deals\\ndamage, draw one card. This effect cannot\\nstack.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_02_01_03_03",
+        "zone": "hand",
+        "seed": 890254139,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_01_03_02",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_02_00",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_01_03_03",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_03_00_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_01_03_03",
+        "side": "P1",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Play Seadra with duplicate draw listeners present",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_02_01_03_03"
+      }
+    },
+    {
+      "name": "Attack the force with Seawyrm",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "blue_02_02_02_00"
+      }
+    },
+    {
+      "name": "Resolve the force attack",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "Pass the opponent Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the active player's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Two Seadra listeners draw only once",
+      "path": "state.players.human.handCount",
+      "op": "eq",
+      "value": 1
+    },
+    {
+      "name": "Non-Seawyrm Fairy does not gain Unblockable",
+      "path": "state.players.human.field",
+      "op": "none_where",
+      "where": {
+        "cardId": "blue_03_01_03_03",
+        "keywords": {
+          "contains": [
+            "UNBLOCKABLE"
+          ]
+        }
+      }
+    }
+  ]
+}

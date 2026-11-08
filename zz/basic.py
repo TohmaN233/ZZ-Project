@@ -4,7 +4,7 @@ import csv
 from pathlib import Path
 
 from zz.cards import CARD_REGISTRY, register
-from zz.pc01 import DEFAULT_CARD_TSV, _card_from_row
+from zz.pc01 import DEFAULT_CARD_TSV, _card_from_row, _clean_text
 
 
 BASIC_PACK_JP = "ベーシック"
@@ -30,6 +30,9 @@ def register_basic_cards(path: Path = DEFAULT_CARD_TSV) -> list[str]:
         card_id = row["image_id"].strip()
         if card_id not in CARD_REGISTRY:
             register(_card_from_row(row))
+        else:
+            # Preserve hand-authored effects while using the official printed race.
+            CARD_REGISTRY[card_id].race_jp = _clean_text(row.get("race_jp"))
         registered_ids.append(card_id)
     return registered_ids
 

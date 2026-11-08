@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_06_01_03_02_boundary",
+  "card_id": "white_06_01_03_02",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 貫通\n【アタック時】\n相手は必ずブロックする。\nEN: Pierce\n[When Attacking]\nYour opponent must block.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_06_01_03_02",
+        "zone": "field",
+        "seed": 2533319883,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack when the opponent has no legal blocker",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_06_01_03_02"
+      }
+    },
+    {
+      "name": "Choose the opponent player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the defender Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the attacker Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The attack resolves when no legal blocker exists",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 8
+    },
+    {
+      "name": "No blocker card is fabricated",
+      "path": "state.players.opponent.field",
+      "op": "length_eq",
+      "value": 0
+    }
+  ]
+}

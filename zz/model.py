@@ -58,6 +58,7 @@ class Card:
     life_damage_reducer: Optional[Callable[["CardInstance", "Player", int, Any, str, "GameState"], int]] = None
     # Deck/catalog metadata; transformed faces remain available for card details.
     deck_buildable: bool = True
+    cannot_move: bool = False
     transformation_ids: tuple[str, ...] = ()
 
 
@@ -71,6 +72,7 @@ class Context:
     attack_target: Optional["AttackTarget"] = None
     # Host whose marked EX02C Switch effect is being replayed.
     switch_source: Optional["CardInstance"] = None
+    summon_source_area: Optional["AreaType"] = None
     # The two Minions involved in a battle destruction; None otherwise.
     battle_participants: Optional[tuple["CardInstance", "CardInstance"]] = None
     # One captured effect's rules source; the callback may still use its Mana carrier.
@@ -172,6 +174,7 @@ class ForceInstance:
     life: int
     destroyed: bool = False
     rested: bool = False
+    flags: set[str] = field(default_factory=set)
 
     def __deepcopy__(self, memo: dict[int, Any]) -> "ForceInstance":
         import copy
@@ -206,6 +209,8 @@ class Player:
     profile: dict[str, Any] = field(default_factory=dict)
     # House-rule HR2 tracker
     colorless_only_streak: int = 0
+    pc03_evolution_turns: dict[str, int] = field(default_factory=dict)
+    pc03_upgrades: dict[str, str] = field(default_factory=dict)
     flags: set[str] = field(default_factory=set)
     # NOTE: `field` attr declared LAST to avoid shadowing dataclasses.field within the class body.
     field: list[CardInstance] = field(default_factory=list)

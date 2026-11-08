@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_04_01_03_00_boundary",
+  "card_id": "colorless_04_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n自分はデッキの中から種族「エヴォーカー」を持つベース・ミニオンカード1枚を公開して手札に加えることができる。その後、自分のデッキをシャッフルする。\n【自分のターン】\n自分の手札にある種族「アルカナ」を持つミニオンカードのフリーコストを1減らす。 EN: [When Summoned]\nYou can search your deck for one <Base>\nMinion belonging to the Evoker class, reveal it to\nyour opponent, and add it to your hand.\nThen, shuffle your deck.\n[On Your Turn]\nReduce the basic cost of minions belonging\nto the Arcana class in your hand by 1.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_04_01_03_00",
+        "zone": "hand",
+        "seed": 2950867458,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_02_01_02",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_01_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Gryphon without an Evoker Base Minion in the deck",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "colorless_04_01_03_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "A non-Evoker card is not added to hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "colorless_04_02_01_02"
+      }
+    },
+    {
+      "name": "Both non-Evoker cards remain in the deck without a legal Evoker target",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 2
+    }
+  ]
+}

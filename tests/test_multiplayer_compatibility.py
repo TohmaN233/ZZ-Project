@@ -42,6 +42,8 @@ def test_checksum_scope_covers_the_authoritative_card_and_rules_sources() -> Non
         "zz/forces.py",
         "zz/multiplayer/match.py",
         "zz/pc01.py",
+        "zz/pc03.py",
+        "zz/pc03_data.tsv",
         "zz/web/session.py",
     }
 
@@ -52,6 +54,12 @@ def test_checksum_scope_covers_the_authoritative_card_and_rules_sources() -> Non
     }
     assert len(ex02c_modules) == 71
     assert ex02c_modules <= set(AUTHORITATIVE_DEFINITION_PATHS)
+    pc03_modules = {
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "zz/pc03_cards").glob("*.py")
+    }
+    assert len(pc03_modules) == 172
+    assert pc03_modules <= set(AUTHORITATIVE_DEFINITION_PATHS)
     assert all((ROOT / path).is_file() for path in AUTHORITATIVE_DEFINITION_PATHS)
 
 

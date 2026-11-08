@@ -1,0 +1,130 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_04_01_03_00_boundary",
+  "card_id": "green_04_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n相手のコスト3以下のミニオン1体か相手のフォース1つをレストする。それは次の相手のスタンバイフェイズ終了時までアクティブにならない。\n【常時】\nこのミニオンがアクティブ状態でなければ[加護]は付与されない。\n【加護時】\n緑の加護である場合、加護しているマナを除外して、「「虹の魔術師」ピオン」に変形する。 EN: [When Summoned]\nPut one of your opponent's minions or one of their Forces in the\nRest State. The minion must be cost 3 or lower. The target cannot\nreturn to the Active State until your opponent's next Standby Phase\n[Passive]\nThis minion cannot receive a {Boost} when notin the Active State\n[When Boosted]\nIf Boosted by a Green Mana, banish that mana. This card\nTransforms into \"Pion\nThe Rainbow Sorceress\"",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_04_01_03_00",
+        "zone": "field",
+        "seed": 2080167859,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "green_04_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_00_01_02_01",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "blue_bless": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Give Pion a non-Green unconditional Bless",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "bless",
+        "iid": "$blue_bless",
+        "target_iid": "$primary"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Pion remains the original face with a non-Green Bless attached",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "green_04_01_03_00",
+        "blessings": {
+          "contains": [
+            {
+              "cardId": "colorless_00_01_02_01"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "A non-Green Bless does not transform Pion",
+      "path": "state.players.human.field",
+      "op": "none_where",
+      "where": {
+        "cardId": "green_04_01_03_01"
+      }
+    }
+  ]
+}

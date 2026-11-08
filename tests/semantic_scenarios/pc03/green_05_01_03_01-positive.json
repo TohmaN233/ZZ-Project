@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_05_01_03_01_positive",
+  "card_id": "green_05_01_03_01",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【召喚時】\n自分はデッキの中から種族「エヴォーカー」を持つ緑または無色のベース・ミニオンカード1枚を、レスト状態でべースに置くことができる。その後、自分のデッキをシャッフルし、置かれたマナの【配置時】効果を発揮させる。 EN: [When Summoned]\nYou can search your deck for one Green\nor Neutral Base Minion belonging to the\nEvoker class and place it into your base in\nthe Rest State. Then, shuffle your deck.\n[When Placed] abilities of the placed mana\nwill activate.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_05_01_03_01",
+        "zone": "hand",
+        "seed": 96649482,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "green_05_01_03_01"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_00_03_03",
+        "side": "P1",
+        "zone": "deck"
+      },
+      "capture": {
+        "eligible": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_00_03_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "replace_token": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Sakura Tsook",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_05_01_03_01"
+      }
+    },
+    {
+      "name": "Place the eligible Green Evoker Base Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$eligible"
+      }
+    },
+    {
+      "name": "Replace Base Mana for the Green Evoker",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$replace_token"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The chosen Green Evoker enters Base rested",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "green_00_00_03_03",
+        "rested": true
+      }
+    },
+    {
+      "name": "The explicitly requested ON_PLACE_BASE ability adds Moon Queen Lv1 to hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "where": {
+        "cardId": "green_06_01_03_00"
+      },
+      "value": 1
+    },
+    {
+      "name": "The Blue Evoker remains in the deck",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_00_03_00"
+      }
+    },
+    {
+      "name": "Base remains at ten after the replacement choice",
+      "path": "state.players.human.base",
+      "op": "length_eq",
+      "value": 10
+    }
+  ]
+}

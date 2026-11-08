@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "scenario_id": "red_05_01_03_03_positive",
+  "card_id": "red_05_01_03_03",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【アタック時】\n相手のミニオン2体にBP-200を付与する。\n【自分のターン】\n自分の種族「ドワーフ」を持つミニオン全てに［襲撃］を与える。\n【自分のターン】\n自分の赤のミニオン全ては、本来よりBPが低いミニオンにはブロックされない。\nEN: [When Attacking] Deal -200BP to two of your opponent's minions. [On Your Turn] All your Dwarf Minions gain Charge. [On Your Turn] None of your Red Minions can be blocked by Minions with BP lower than their original value.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "red_05_01_03_03",
+        "zone": "field",
+        "seed": 349855515,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "attacker_iid": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_05_01_03_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_05_02_01_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "red_attacker_iid": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "red_05_02_01_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_04_02_00_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "weak_blocker_iid": {
+          "path": "state.players.opponent.field",
+          "where": {
+            "cardId": "colorless_04_02_00_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/card-state",
+      "payload": {
+        "iid": "$weak_blocker_iid",
+        "permanentBpModifier": -100
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack with another Red Minion under Flame Ring Lv3",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$red_attacker_iid"
+      }
+    },
+    {
+      "name": "Attack the opponent player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass defender Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass attacker Flash",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Weakened blocker is excluded from legal blocker options",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "blocker",
+        "cardIid": "$weak_blocker_iid"
+      }
+    },
+    {
+      "name": "Dwarf receives Charge",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "red_05_02_01_00",
+        "keywords": {
+          "contains": [
+            "RUSH"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Weaker-BP blocker cannot stop another Red Minion",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 8
+    },
+    {
+      "name": "Weakened blocker remains available after the unblocked attack",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_04_02_00_00",
+        "effectiveBp": 400,
+        "rested": false
+      }
+    }
+  ]
+}

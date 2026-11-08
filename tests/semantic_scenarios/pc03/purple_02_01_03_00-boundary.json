@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_02_01_03_00_boundary",
+  "card_id": "purple_02_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【破壊時】\n自分はカードを1枚引く。\nEN: [When Destroyed]\nDraw one card.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_02_01_03_00",
+        "zone": "field",
+        "seed": 2819496269,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true,
+        "rested": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "purple_02_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_01_01_03_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "deck",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_05_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": true,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack the opponent Player with White Falcon",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "white_05_01_03_00"
+      }
+    },
+    {
+      "name": "Choose the opposing Player as the attack target",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the first Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the second Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Choose no blocker and let the attack resolve",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "no_block"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The Minion survives the unblocked attack",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_02_01_03_00"
+      }
+    },
+    {
+      "name": "Without destruction, its draw effect does not enter Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "purple_02_01_03_00"
+      }
+    },
+    {
+      "name": "Without destruction, the controller Deck remains intact",
+      "path": "state.players.human.deckCount",
+      "op": "eq",
+      "value": 2
+    },
+    {
+      "name": "Without destruction, no deck card is drawn",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "green_01_01_03_00"
+      }
+    },
+    {
+      "name": "The unblocked attack resolves against Life",
+      "path": "state.players.human.life",
+      "op": "eq",
+      "value": 8
+    }
+  ]
+}

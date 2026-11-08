@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_05_01_03_02_positive",
+  "card_id": "blue_05_01_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【アタック時】\n相手のコスト5以下のミニオン1体をレスト状態でベースに移動させる。\n【常時】\n自分が本来のコストが3以上のマジックを使用するたび、このミニオンをアクティブにする。\n【常時】\n自分の手札にあるマジックカードのフリーコストを、自分の種族「マーフォーク」を持つミニオン1体毎に1減らす。 EN: [When Attacking] Move one of your opponent's minions with a cost of 5 or lower into their base in the Rest State.\n[Passive] Whenever you use a Magic card with an original cost of 3 or higher, this Minion enters the Active State.\n[Passive] Reduce the Free Cost of each Magic card in your hand by 1 for each of your Minions belonging to the Merfolk class.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_05_01_03_02",
+        "zone": "field",
+        "seed": 1919890001,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_05_01_03_02"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_01_03_00",
+        "side": "P1",
+        "zone": "field"
+      },
+      "capture": {
+        "merfolk": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_03_00_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_02_03_01_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "red_magic": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_05_02_01r_00",
+        "side": "P2",
+        "zone": "field"
+      },
+      "capture": {
+        "enemy": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack with Juy Lv3",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$primary"
+      }
+    },
+    {
+      "name": "Choose the opponent force",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "force",
+        "forceId": "force_sho"
+      }
+    },
+    {
+      "name": "Move a cost-5 opponent Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$enemy"
+      }
+    },
+    {
+      "name": "Pass the opponent Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the active player's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Cast Eureka after the attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_03_03_00_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Cost-5 target is moved into Base",
+      "path": "state.players.opponent.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_05_02_01r_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "One Merfolk reduces hand Magic free cost by one",
+      "path": "state.prompt.options",
+      "op": "any_where",
+      "where": {
+        "kind": "play_card",
+        "paymentCost": {
+          "RED": 1
+        },
+        "iid": "$red_magic"
+      }
+    },
+    {
+      "name": "Red Magic option has no remaining colorless cost",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "play_card",
+        "paymentCost": {
+          "COLORLESS": 1
+        },
+        "iid": "$red_magic"
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_03_01_03_01_boundary",
+  "card_id": "purple_03_01_03_01",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【自分のターン】\\nこのミニオンがフォースにアタックした場合、そのフォースに1ダメージを与える。 EN: [On Your Turn]\\nIf attacking a Force, deal 1 damage to\\nthat Force.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_03_01_03_01",
+        "zone": "field",
+        "seed": 2617496473,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Attack the opponent Player",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "purple_03_01_03_01"
+      }
+    },
+    {
+      "name": "Choose the opponent Player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the defender Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the attacker Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Player attack deals its printed 1 DP",
+      "path": "state.players.opponent.life",
+      "op": "eq",
+      "value": 9
+    },
+    {
+      "name": "Player attack leaves Sho Force untouched",
+      "path": "state.players.opponent.forces",
+      "op": "any_where",
+      "where": {
+        "id": "force_sho",
+        "life": 3,
+        "destroyed": false
+      }
+    }
+  ]
+}

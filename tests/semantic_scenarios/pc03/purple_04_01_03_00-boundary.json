@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_04_01_03_00_boundary",
+  "card_id": "purple_04_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\\nお互いのデッキを上から3枚ずつ破棄する。\\n【常時】\\nこのミニオンがアクティブ状態でなければ[加護]は付与されない。\\n【加護時】\\n紫の加護である場合、加護しているマナを除外して、「「闇夜の狂人」ナイブス」に変形する。 EN: [When Summoned]\\nYou and your opponent discard the top three cards\\nof your deck.\\n[Passive]\\nThis minion cannot receive a {Boost} when not in the\\nActive State.\\n[When Boosted]\\nIf Boosted by a Purple Mana, banish that mana. This\\ncard Transforms into \"Dirk - Deranged in the Dusk\"",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_04_01_03_00",
+        "zone": "field",
+        "seed": 773035880,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "purple_04_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_04_01_03_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": true
+      },
+      "capture": {
+        "rested": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "blue": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "purple": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_02_02_01_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "demon": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon a Demon to inspect legal Bless actions",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$demon"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Blue Bless cannot transform the active Purple Dirk",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_04_01_03_00",
+        "iid": "$primary",
+        "blessings": []
+      }
+    },
+    {
+      "name": "Rested Dirk remains unblessed",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "purple_04_01_03_00",
+        "iid": "$rested",
+        "rested": true,
+        "blessings": []
+      }
+    },
+    {
+      "name": "Blue Mana is not offered for the active Purple Dirk",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "bless",
+        "mana_iid": "$blue",
+        "target_iid": "$primary"
+      }
+    },
+    {
+      "name": "Rested Dirk has no Bless action",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "bless",
+        "target_iid": "$rested"
+      }
+    },
+    {
+      "name": "Blue Bless does not create the transformed face",
+      "path": "state.players.human.field",
+      "op": "none_where",
+      "where": {
+        "cardId": "purple_04_01_03_01"
+      }
+    }
+  ]
+}

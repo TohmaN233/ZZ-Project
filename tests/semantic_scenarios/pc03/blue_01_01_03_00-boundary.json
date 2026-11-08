@@ -1,0 +1,244 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_01_01_03_00_boundary",
+  "card_id": "blue_01_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【破壊時】\n自分の種族「エヴォーカ」を持つ、青または無色のマナがある場合、自分のトラッシュにあるコスト4以下の青のマジックカード1枚を手札に戻す。\n【常時】\nこのミニオンはベースに移動するとき、レスト状態で移動する。\nEN: [When Destroyed]\nIf you have Blue or Neutral Mana belonging to the Evoker class in your Base, return one Blue Magic card with a cost of 4 or lower from your Trash to your hand.\n[Passive]\nThis minion enters the Rest State when it moves to your Base.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_01_01_03_00",
+        "zone": "field",
+        "seed": 1669896429,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_01_01_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_04_03_01_00",
+        "side": "P1",
+        "zone": "trash"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_02_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "red_00_00_03_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_01_01_03_00",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "second": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_03_00_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "P2 attacks P1",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "blue_02_02_02_00"
+      }
+    },
+    {
+      "name": "Attack the player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Pass the defender Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass the attacker Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Block with the second Jellygirl",
+      "prompt_kind": "blocker",
+      "select": {
+        "kind": "blocker",
+        "cardIid": "$second"
+      }
+    },
+    {
+      "name": "P2 ends its turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P1 places its turn mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "The remaining Jellygirl moves to Base",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "move_card",
+        "iid": "$primary",
+        "direction": "field_to_base"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Red Evoker Base Mana does not satisfy Jellygirl color condition",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "red_00_00_03_00"
+      }
+    },
+    {
+      "name": "Jellygirl moves to Base fatigued",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_01_01_03_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "The combat-destroyed Jellygirl reaches Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_01_01_03_00"
+      }
+    },
+    {
+      "name": "Without Blue or Neutral Evoker Base Mana, Magic stays in Trash",
+      "path": "state.players.human.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_04_03_01_00"
+      }
+    },
+    {
+      "name": "No Magic is returned without the Evoker condition",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "blue_04_03_01_00"
+      }
+    },
+    {
+      "name": "The combat resolution continues without an effect-target prompt",
+      "path": "state.prompt.kind",
+      "op": "eq",
+      "value": "main_action"
+    }
+  ]
+}

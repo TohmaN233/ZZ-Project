@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "scenario_id": "colorless_00_00_03_02_positive",
+  "card_id": "colorless_00_00_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 《ベース》\n【配置時】「「ラスの召喚獣・天」シンリュウ」1枚を手札に加える。\n《ベース》このマナは移動できない。\nEN: <Base> [When Placed] Add one Shin Ryu Aether - Of Lahrs to your hand.\n<Base> This Minion cannot move.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "colorless_00_00_03_02",
+        "zone": "hand",
+        "seed": 2768441557,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "lahrs_iid": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "colorless_00_00_03_02"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "mana"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Place Lahrs in Base",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_to_base",
+        "iid": "$lahrs_iid"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Lv3 Lahrs remains Lv3 with no further upgrade",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_00_00_03_02",
+        "flags": {
+          "contains": [
+            "cannot_move"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shinryu enters hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "colorless_10_01_03_01"
+      }
+    },
+    {
+      "name": "The same Lahrs instance is present in the correct level after placement",
+      "path": "state.players.human.base",
+      "op": "any_where",
+      "where": {
+        "cardId": "colorless_00_00_03_02",
+        "iid": "$lahrs_iid"
+      }
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_05_02_03_00_boundary",
+  "card_id": "blue_05_02_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: このカードは自分の種族「アルカナ」を持つミニオンがいないとき、フラッシュタイミングで使用できない。\n【メイン】／【フラッシュ】「マーフォーク・トークン」2体を出す。\nEN: You cannot use this card during Flash timing unless you have an Arcana Minion on your field.\n[Main] / [Flash] Summon two Token Merfolk.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_05_02_03_00",
+        "zone": "hand",
+        "seed": 2420380488,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_06_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "P2 declares an attack",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardId": "blue_06_01_03_00"
+      }
+    },
+    {
+      "name": "P2 attacks P1",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Pleasant Tone remains in hand without Arcana",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_05_02_03_00"
+      }
+    },
+    {
+      "name": "No Merman token is created",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "merfolk_token"
+      }
+    },
+    {
+      "name": "P1 owns the Flash prompt without Arcana",
+      "path": "state.prompt.playerSide",
+      "op": "eq",
+      "value": "P1"
+    },
+    {
+      "name": "Pleasant Tone is absent from the Flash options",
+      "path": "state.prompt.options",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "kind": "play_card"
+      }
+    }
+  ]
+}

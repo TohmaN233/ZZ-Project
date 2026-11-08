@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "scenario_id": "green_04_02_03_00_positive",
+  "card_id": "green_04_02_03_00",
+  "scenario_kind": "positive",
+  "official_rule": "JP: このカードは自分の種族「アルカナ」を持つミニオンがいないとき、フラッシュタイミングで使用できない。\n【メイン】／【フラッシュ】\n相手のレスト状態であるミニオン1体を破壊する。 EN: You cannot activate this card during the\nFlash Phase unless you have a minion belonging to the Arcana class on the field.\n[Main] / [Flash]\nDestroy one of your opponent's minions\nthat is in the Rest State.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "green_04_02_03_00",
+        "zone": "hand",
+        "seed": 3627018888,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "green_04_02_03_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_01_03_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "enemy": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "green_03_01_03_02",
+        "side": "P1",
+        "zone": "field"
+      },
+      "capture": {
+        "arcana": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P2",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "P2 attacks P1",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "cardIid": "$enemy"
+      }
+    },
+    {
+      "name": "P2 attacks the player",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Cast Shooting Practice during Flash with friendly Arcana",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "green_04_02_03_00"
+      }
+    },
+    {
+      "name": "Destroy the rested attacking Minion",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardIid": "$enemy"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "The Flash Magic is consumed from hand",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "green_04_02_03_00"
+      }
+    },
+    {
+      "name": "The rested attacking Minion is destroyed",
+      "path": "state.players.opponent.trash",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_02_01_03_00"
+      }
+    },
+    {
+      "name": "The friendly Arcana Minion remains on Field",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "green_03_01_03_02"
+      }
+    }
+  ]
+}

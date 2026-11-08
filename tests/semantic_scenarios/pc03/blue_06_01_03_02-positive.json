@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "scenario_id": "blue_06_01_03_02_positive",
+  "card_id": "blue_06_01_03_02",
+  "scenario_kind": "positive",
+  "official_rule": "JP: 【アタック時】自分のミニオンカードである青マナ1つを、フィールドにアクティブ状態で移動させることができる。\n【自分のターン】他の自分のミニオンカードであるマナがフィールドに移動するたび、このミニオンにBP+100/DP+1を付与する。\nEN: [When Attacking] You may move one of your Blue Minion cards from your Base to your Field in the Active State.\n[During Your Turn] Whenever another of your Minion cards moves from your Base to your Field, this Minion gets +100BP/+1DP.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "blue_06_01_03_02",
+        "zone": "field",
+        "seed": 3296026700,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": false
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.field",
+          "where": {
+            "cardId": "blue_06_01_03_02"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      },
+      "capture": {
+        "blue_mana": {
+          "path": "state.players.human.base",
+          "where": {
+            "cardId": "blue_00_01_02_00"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Espiral attacks P2",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "attack",
+        "iid": "$primary"
+      }
+    },
+    {
+      "name": "Choose P2 as the attack target",
+      "prompt_kind": "attack_target",
+      "select": {
+        "kind": "player"
+      }
+    },
+    {
+      "name": "Move Blue Minion Mana to Field",
+      "prompt_kind": "effect_target",
+      "select": {
+        "kind": "effect_target",
+        "cardId": "blue_00_01_02_00"
+      }
+    },
+    {
+      "name": "Pass P2's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    },
+    {
+      "name": "Pass P1's Flash window",
+      "prompt_kind": "flash_action",
+      "select": {
+        "kind": "flash_pass"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Espiral receives +100BP/+1DP",
+      "path": "state.players.human.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "blue_06_01_03_02",
+        "effectiveBp": 700,
+        "effectiveDp": 2
+      }
+    },
+    {
+      "name": "Blue Minion Mana enters Field active",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00",
+        "rested": false
+      }
+    },
+    {
+      "name": "Blue Mana leaves Base",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 0,
+      "where": {
+        "cardId": "blue_00_01_02_00"
+      }
+    }
+  ]
+}

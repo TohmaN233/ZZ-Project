@@ -89,6 +89,7 @@ def _runtime_value(value: Any) -> Any:
             "effectCarrier": _runtime_value(value.effect_carrier),
             "effectSource": _runtime_value(value.effect_source),
             "effectSourceArea": _runtime_value(value.effect_source_area),
+            "summonSourceArea": _runtime_value(value.summon_source_area),
             "blessingDestroyEffects": _runtime_value(value.blessing_destroy_effects),
             "preTargetEffectsApplied": _runtime_value(getattr(value, "_pre_target_effects_applied", [])),
         }
@@ -150,6 +151,7 @@ def _player_state(player: Player) -> dict[str, Any]:
                 "life": force.life,
                 "destroyed": force.destroyed,
                 "rested": force.rested,
+                "flags": sorted(force.flags),
             }
             for force in player.forces
         ],
@@ -158,6 +160,8 @@ def _player_state(player: Player) -> dict[str, Any]:
         "mulliganDone": player.mulligan_done,
         "colorlessOnlyStreak": player.colorless_only_streak,
         "flags": sorted(player.flags),
+        "pc03EvolutionTurns": _runtime_value(player.pc03_evolution_turns),
+        "pc03Upgrades": _runtime_value(player.pc03_upgrades),
     }
 
 
@@ -248,6 +252,7 @@ def canonical_authoritative_state(
             "resolvingStateBasedActions": engine._resolving_state_based_actions,
             "delayedTurnEndEffects": delayed_effects,
             "turnStatModifiers": _runtime_value(engine._turn_stat_modifiers),
+            "pc03AttackGrants": _runtime_value(engine._pc03_attack_grants),
             "observedActionProfiles": _runtime_value(engine.observed_action_profile_by_player_side),
             "flashContext": _runtime_value(getattr(engine, "_flash_ctx", None)),
         },

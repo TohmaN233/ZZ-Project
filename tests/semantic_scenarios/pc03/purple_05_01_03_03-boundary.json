@@ -1,0 +1,213 @@
+{
+  "schema_version": 1,
+  "scenario_id": "purple_05_01_03_03_boundary",
+  "card_id": "purple_05_01_03_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【召喚時】\n相手のコスト4以下のミニオン1体を破壊する。\n【常時】\n相手のミニオンが破壊されるたび、このミニオンにBP+100/DP+1を付与する。\n進化：手札から「スケルトン」が召喚されたとき「「常闇の召喚士」ヤミ」と「「ヤミの召喚獣」アンドロス」をLv3にする。\nEN: Destroy one of your opponent's minions with a cost\nof 4 or lower.\nWhenever one of your opponent's minions is\ndestroyed, this minion receives +100BP/+1DP.\nEvolve: Summon minion from the Skeleton class\n\"Yahmy - Conjurer of the Everlasting Night Lv.2\" and\n\"Andoros - Of Yahmy Lv.2\" become Lv.3.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "purple_05_01_03_03",
+        "zone": "hand",
+        "seed": 3640783854,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.hand",
+          "where": {
+            "cardId": "purple_05_01_03_03"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_05_02_01r_00",
+        "side": "P2",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "enemy": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_00_03_04",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_02_01_03_00",
+        "side": "P1",
+        "zone": "hand"
+      },
+      "capture": {
+        "skeleton": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "purple_00_01_01_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "mana_token",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon Andoros Lv2",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$primary"
+      }
+    },
+    {
+      "name": "Summon a Skeleton from hand",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "iid": "$skeleton"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Cost-5 opposing Minion is outside the destroy limit",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_05_02_01r_00"
+      }
+    },
+    {
+      "name": "No passive stat increase occurs without an opponent Minion being destroyed",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_05_01_03_04",
+        "effectiveBp": 900,
+        "effectiveDp": 2
+      }
+    },
+    {
+      "name": "The valid hand-Skeleton evolution still reaches Lv3",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "purple_00_00_03_05"
+      }
+    }
+  ]
+}

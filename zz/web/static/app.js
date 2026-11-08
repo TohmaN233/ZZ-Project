@@ -1608,7 +1608,7 @@ function settleHealVisualState(event) {
 function settleZoneMoveVisualState(event) {
   if (!state || !pendingVisualState || visualStateStaged || !event || event.type !== "zone_move") return false;
   const card = event.card || {};
-  if (card.iid == null && (card.faceDown !== true || ![event.fromArea, event.toArea].every((area) => ["hand", "deck"].includes(area)))) {
+  if (card.iid == null && (card.faceDown !== true || !([event.fromArea, event.toArea].every((area) => ["hand", "deck"].includes(area)) || (event.fromArea === "outside" && event.toArea === "hand")))) {
     throw new Error(`Visual zone transition missing card identity moving ${event.fromArea}:${event.toArea}.`);
   }
   const player = findPlayerBySide(event.side || card.ownerSide);
@@ -6235,6 +6235,7 @@ function renderEffectPromptModal() {
 function isRenderableEffectPromptTarget(option) {
   return Boolean(option && (
     option.cardIid ||
+    (option.targetKind === "card" && option.cardId && option.id) ||
     option.forceId ||
     option.targetKind === "player" ||
     option.targetKind === "mana_color"

@@ -19,6 +19,7 @@ class CardType(Enum):
 
 
 class AreaType(Enum):
+    OUTSIDE = "outside"  # A real card created from outside the game.
     DECK   = "deck"
     HAND   = "hand"
     BASE   = "base"

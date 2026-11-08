@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_08_01_03_00_boundary",
+  "card_id": "yellow_08_01_03_00",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【常時】\n他の自分の種族「キマイラ」を持つミニオンがフィールドに出るたび、相手のミニオン1体にBP-300を付与する。\n【自分のターン終了時】\n自分の黄マナ全てをアクティブにする。自分はカードを1枚引く。\nEN: [Passive]\nWhenever another minion belonging to\nthe Chimera class enters your field, deal\n-300BP to one of your opponent's minions\n[At the End of Your Turn]\nAll your Yellow Mana enter the Active\nState. Draw one card.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_08_01_03_00",
+        "zone": "field",
+        "seed": 1180996382,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_05_02_01r_00",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P1",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_00_03_00",
+        "side": "P1",
+        "zone": "base",
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_02_02_02_00",
+        "side": "P1",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_00_03_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_00_00_03_03",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_00_01_02_00",
+        "side": "P2",
+        "zone": "base"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "colorless_03_01_03_03",
+        "side": "P2",
+        "zone": "field"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_03_00_00",
+        "side": "P1",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "blue_03_03_00_00",
+        "side": "P2",
+        "zone": "deck"
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "yellow_05_01_03_00",
+        "side": "P2",
+        "zone": "hand"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Summon a friendly non-Chimera Minion",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "blue_02_02_02_00"
+      }
+    },
+    {
+      "name": "End P1's turn",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    },
+    {
+      "name": "P2 places its turn's colorless Mana",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "place_colorless_mana"
+      }
+    },
+    {
+      "name": "P2 summons its Chimera",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "play_card",
+        "cardId": "yellow_05_01_03_00"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Neither a non-Chimera ally entry nor an opponent Chimera entry reduces BP",
+      "path": "state.players.opponent.field",
+      "op": "any_where",
+      "where": {
+        "cardId": "blue_05_02_01r_00",
+        "effectiveBp": 500
+      }
+    },
+    {
+      "name": "The opponent Chimera entered its Field",
+      "path": "state.players.opponent.field",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_05_01_03_00"
+      }
+    },
+    {
+      "name": "P1's rested Yellow Mana remains rested under ZZ-17's off-Standby refresh restriction",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "yellow_00_00_03_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "P1's Blue Mana used to summon stays rested",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_00_01_02_00",
+        "rested": true
+      }
+    },
+    {
+      "name": "The turn-end draw still resolves despite the refresh restriction",
+      "path": "state.players.human.hand",
+      "op": "count_where",
+      "value": 1,
+      "where": {
+        "cardId": "blue_03_03_00_00"
+      }
+    },
+    {
+      "name": "No effect target choice remains for the wrong owner or race",
+      "path": "state.prompt.options",
+      "op": "none_where",
+      "where": {
+        "kind": "effect_target"
+      }
+    }
+  ]
+}

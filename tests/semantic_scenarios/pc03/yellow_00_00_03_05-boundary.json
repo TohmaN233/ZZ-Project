@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "scenario_id": "yellow_00_00_03_05_boundary",
+  "card_id": "yellow_00_00_03_05",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 《ベース》【配置時】「「アケミの召喚獣」ゴッドバード Lv3」1枚を手札に加える。《ベース》このマナは移動できない。",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "yellow_00_00_03_05",
+        "zone": "base",
+        "seed": 2015,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      },
+      "capture": {
+        "primary": {
+          "path": "state.players.human.base",
+          "where": {
+            "cardId": "yellow_00_00_03_05"
+          },
+          "field": "iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Resolve without replaying the placement effect",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "A Base Minion already in place does not replay its placement effect",
+      "path": "state.players.human.hand",
+      "op": "none_where",
+      "where": {
+        "cardId": "yellow_06_01_03_03"
+      }
+    }
+  ]
+}

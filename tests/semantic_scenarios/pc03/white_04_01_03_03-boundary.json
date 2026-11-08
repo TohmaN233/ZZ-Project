@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "scenario_id": "white_04_01_03_03_boundary",
+  "card_id": "white_04_01_03_03",
+  "scenario_kind": "boundary",
+  "official_rule": "JP: 【変形時】\n自分のフォース全てを1回復する。白マナ1つをレスト状態でベースに置く。\n【常時】\n自分の種族「アンドロイド」を持つミニオン全てをBP+100する。自分のフォースが1つ以上ある場合、代わりに、自分の種族「アンドロイド」を持つミニオン全てをBP+200する。この効果は重複しない。 EN: [When Transformed]\nRestore 1 point to all of your Forces. Place one\nWhite Mana into your base in the Rest State\n[Passive]\nAll your minions belonging to the Android class\ngain + 100BP. If you have one or more Forces\nthey gain +200BP instead. This effect cannot\nstack.",
+  "setup": [
+    {
+      "path": "/api/debug/setup",
+      "payload": {
+        "cardId": "white_04_01_03_02",
+        "zone": "hand",
+        "seed": 651316284,
+        "playerForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "opponentForces": [
+          "force_sho",
+          "force_chi"
+        ],
+        "compactBoard": true,
+        "nonMinionManaOnly": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 0,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P2",
+        "forceIndex": 1,
+        "destroyed": false,
+        "rested": true
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 0,
+        "destroyed": true,
+        "rested": true,
+        "life": 0
+      }
+    },
+    {
+      "path": "/api/debug/force-state",
+      "payload": {
+        "side": "P1",
+        "forceIndex": 1,
+        "destroyed": true,
+        "rested": true,
+        "life": 0
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_04_01_03_02",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "faith_source": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/api/debug/add-card",
+      "payload": {
+        "cardId": "white_04_01_03_02",
+        "side": "P1",
+        "zone": "field",
+        "rested": false
+      },
+      "capture": {
+        "android_ally": {
+          "path": "debug.added.iid"
+        }
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$faith_source",
+        "sourceId": "white_04_01_03_02",
+        "targetId": "white_04_01_03_03"
+      }
+    },
+    {
+      "path": "/fixture/transform-card",
+      "payload": {
+        "iid": "$android_ally",
+        "sourceId": "white_04_01_03_02",
+        "targetId": "white_04_01_03_03"
+      }
+    },
+    {
+      "path": "/api/debug/fixed-board",
+      "payload": {
+        "activeSide": "P1",
+        "controlBoth": true,
+        "preserveBoard": true,
+        "step": "main"
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "End P1 turn after both transformations",
+      "prompt_kind": "main_action",
+      "select": {
+        "kind": "end_turn"
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "name": "Destroyed Forces receive no healing",
+      "path": "state.players.human.forces",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "destroyed": true,
+        "life": 0
+      }
+    },
+    {
+      "name": "Both Android faces receive exactly one +100 aura with no live Forces",
+      "path": "state.players.human.field",
+      "op": "count_where",
+      "where": {
+        "cardId": "white_04_01_03_03",
+        "effectiveBp": 600
+      },
+      "value": 2
+    },
+    {
+      "name": "Both transforms place rested White Mana",
+      "path": "state.players.human.base",
+      "op": "count_where",
+      "value": 2,
+      "where": {
+        "cardId": "mana_token",
+        "manaColor": "WHITE",
+        "rested": true
+      }
+    }
+  ]
+}
