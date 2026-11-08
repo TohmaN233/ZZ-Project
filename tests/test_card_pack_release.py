@@ -11,6 +11,7 @@ from zz.ex01 import EX01_CARD_IDS
 from zz.pc01 import PC01_CARD_IDS
 from zz.pc01r import PC01R_CARD_IDS
 from zz.pc02 import PC02_CARD_IDS
+from zz.pc03 import PC03_CARD_IDS
 from zz.ex02c import EX02C_CARD_IDS
 from zz.ex02 import EX02_CARD_IDS
 from zz.web.assets import AssetIndex
@@ -44,6 +45,18 @@ def test_catalog_series_values_match_the_actual_dropdown_values(catalog) -> None
     for card in catalog["cards"]:
         assert len(card["filterValues"]["series"]) == 1
         assert set(card["filterValues"]["series"]) <= allowed, card["id"]
+
+
+def test_pc03_catalog_uses_its_pack_filter_and_respects_deck_restrictions(catalog) -> None:
+    cards = {card["id"]: card for card in catalog["cards"]}
+    series = next(group for group in catalog["filters"] if group["id"] == "series")
+    assert any(option["value"] == "PC:03 EVOLVE" for option in series["options"])
+    assert len(PC03_CARD_IDS) == 171
+    for card_id in PC03_CARD_IDS:
+        assert cards[card_id]["filterValues"]["series"] == ["PC:03 EVOLVE"]
+    assert cards["blue_00_00_03_00"]["deckBuildable"]
+    assert not cards["blue_00_00_03_01"]["deckBuildable"]
+    assert not cards["blue_02_01_03_01"]["deckBuildable"]
 
 
 def test_every_equivalent_face_is_registered_and_searchable_in_its_own_pack(catalog) -> None:
