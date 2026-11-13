@@ -135,6 +135,7 @@ def _area_can_be_rested(area: AreaType) -> bool:
 
 
 def _new_instance(session, card_id: str, owner, area: AreaType, *, rested: bool = False) -> CardInstance:
+    card_id = session.engine.pc03_current_card_id(owner, card_id)
     ci = CardInstance(
         card=CARD_REGISTRY[card_id],
         owner=owner,
@@ -387,6 +388,7 @@ def set_debug_card_state(
 
 def set_debug_control(session, control_both: bool) -> dict[str, Any]:
     session.debug_control_both = bool(control_both)
+    session._configure_mode_controls()
     session._clear_prompt()
     session._prompt_main_action()
     return {"controlBoth": session.debug_control_both}
@@ -459,6 +461,7 @@ def setup_debug_fixed_board(
         raise ValueError(f"unsupported debug step: {step}")
     state.summoned_this_turn.clear()
     session.debug_control_both = bool(control_both)
+    session._configure_mode_controls()
     session._attack = None
     session._pending_effect = None
     session._game_over = None

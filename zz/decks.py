@@ -16,6 +16,10 @@ from zz.deckcode0 import (
 )
 import zz.pc01  # noqa: F401 - registers PC:01 cards not already hand-authored
 import zz.basic  # noqa: F401 - registers Basic non-token cards not already hand-authored
+# Pack modules may have imported PC01/Basic before deckcode0 registered its
+# handcrafted cards. Reconcile their official race metadata after both loads.
+zz.pc01.register_pc01_cards()
+zz.basic.register_basic_cards()
 import zz.ex01  # noqa: F401 - registers EX:01 cards
 import zz.pc01r  # noqa: F401 - registers PC:01R cards
 import zz.pc02  # noqa: F401 - registers PC:02 cards

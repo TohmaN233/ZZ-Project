@@ -14,13 +14,15 @@ An unofficial, non-commercial desktop recreation of ZENONZARD and an AI experime
 
 ## Installation
 
-The v0.5.4 Windows build stores decks in `data/decks/` inside the installation directory. On first launch, it migrates decks from the legacy `%APPDATA%\zenonzard-clone\game-data\decks\` folder, keeps the original files as backups, and does not overwrite conflicting decks. The Holy Force protects eligible friendly minions from targeting effects granted to opposing minions by a Blessing. Enrico's effect makes both players discard before drawing. Online play retries a disconnected session up to five times and preserves the room code. Battle logs are paginated during a match and on the results page. Large reconnect messages are sent in fragments. Online replays are saved in `data/replays/` within the game directory and can be opened under Replay & Training; recordings with missing data are marked incomplete. Both players' clients and the server must use matching versions; a v0.5.4 client requires a v0.5.4 server. Earlier improvements to mulligan card visibility, startup diagnostics, card and Force search, and the EX02C/SAO card pool remain included.
+v0.6.0 updates the PC03 card pack. The Windows build stores decks in `data/decks/` inside the installation directory and migrates legacy per-user decks without overwriting existing files. Both online clients and the server must use matching versions.
 
-[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt)
+[Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe) · [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz) · [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip) · [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz) · [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt)
 
 Windows players should use the installer, Linux players the portable package, and macOS players and developers the source package. See the [installation guide](INSTALL.md) for complete steps.
 
-On first launch, if the complete `asserts/` directory is missing, the client asks whether to download `asserts.7z` from the [Google Drive resource folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ), then verifies and extracts it automatically. The resource archive is 1.53 GB and expands to 1.58 GB; reserve at least 3.2 GB of free space. Cancelling the download exits the game. If installed under Program Files, run as administrator for the first resource installation, or choose a writable installation directory.
+On first launch, if the complete `asserts/` directory is missing, the client asks whether to download `asserts.7z` from the [Google Drive resource folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ), then verifies and extracts it automatically. The resource archive is 1.54 GB and expands to 1.58 GB; reserve at least 3.2 GB of free space. Cancelling the download exits the game. If installed under Program Files, run as administrator for the first resource installation, or choose a writable installation directory.
+
+Existing players should download the latest asset pack for the PC03 token images. Close the game, rename the old `asserts/` folder as a backup, and restart to download the new pack; you can also extract it manually. Keep `data/`, which contains decks and replays.
 
 Before launching from source, install the dependencies from the project root:
 
@@ -53,7 +55,7 @@ Launch the Windows installer build from the Start menu or its desktop shortcut. 
 - **Codeman and local training**: recent match memories are stored locally; the source build supports experimental training with a GPU / CUDA environment.
 - **Replay and AI suggestions**: review recent matches and see Codeman's suggestion for the current action during a match.
 - **Online play**: supports LAN and public rooms. The client connects by default to `wss://zz.tgy233.top/multiplayer`; see the [online play guide](docs/ONLINE.md) to host your own server.
-- **Card pool and interface**: includes the basic cards, EX01, PC01, PC01R, PC02, and 106 PC02R DIVINE cards, plus 70 EX02C/SAO cards and their corresponding EX02 original faces; the interface supports Simplified Chinese, Japanese, and English.
+- **Card pool and interface**: includes the basic cards, EX01, PC01, PC01R, PC02, PC02R, EX02, EX02C/SAO, and PC03; the interface supports Simplified Chinese, Japanese, and English.
 - **Card display**: preview a transformed form in card details. Reprints with the same name count toward a shared deck limit of three copies.
 
 Story Mode has not been implemented. The long-term goal is to design a game where an Agent automatically interacts with players and to build a GAL-style frontend. The project also plans to learn from the SillyTavern community's experience with characters, World Info, and long-term interaction, creating a ZZ experience for players to share with their own Codeman.
@@ -62,7 +64,7 @@ Story Mode has not been implemented. The long-term goal is to design a game wher
 
 This project does not present its experimental models as strong AI. The author has a statistics degree but has not taken reinforcement-learning courses, and their research is unrelated to reinforcement learning. Training resources are also limited. The current models remain considerably weaker than the AI used during ZENONZARD's official operation, and the in-game suggestions are primarily an entertainment feature.
 
-The computer AI's training card pool currently covers PC01 only. PC01R, EX01, PC02, PC02R DIVINE, EX02, and EX02C/SAO were not included in the current training process, so do not expect the computer AI to understand these newer packs correctly. Implementing playable rules does not mean the AI has learned those cards.
+The computer AI's training card pool currently covers PC01 only. PC01R, EX01, PC02, PC02R, EX02, EX02C/SAO, and PC03 were not included in training, so do not expect the AI to understand these newer packs correctly.
 
 Codex assisted with the AI-related code, which also draws on the public methods and engineering structure of [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for details.
 

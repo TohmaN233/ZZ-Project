@@ -1215,6 +1215,11 @@ button:disabled {
   transform: scale(0.94);
 }
 
+.card.transforming-source {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 @keyframes playable-pulse {
   0% {
     box-shadow: 0 0 12px rgba(50, 213, 200, 0.2), 0 0 0 1px rgba(255, 223, 128, 0.18), 0 12px 26px rgba(0, 0, 0, 0.34);
@@ -3932,6 +3937,100 @@ button.end-turn-action {
   pointer-events: none;
   overflow: hidden;
 }
+
+.board-evolution {
+  --evolution-color: #d5e0ea;
+  position: absolute;
+  left: var(--anchor-x);
+  top: var(--anchor-y);
+  width: var(--evolution-width, clamp(54px, 5vw, 92px));
+  height: var(--evolution-height, auto);
+  aspect-ratio: 5 / 7;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.board-evolution.tone-red { --evolution-color: #ff6659; }
+.board-evolution.tone-blue { --evolution-color: #66c9ff; }
+.board-evolution.tone-green { --evolution-color: #8ff278; }
+.board-evolution.tone-yellow { --evolution-color: #ffd65c; }
+.board-evolution.tone-white { --evolution-color: #eef6ff; }
+.board-evolution.tone-purple { --evolution-color: #d48cff; }
+.board-evolution-face, .board-evolution-ring, .board-evolution-orbit, .board-evolution-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+}
+.board-evolution-face { overflow: hidden; box-shadow: 0 0 18px var(--evolution-color); }
+.board-evolution-face img, .board-evolution-face span { display: block; width: 100%; height: 100%; object-fit: cover; }
+.board-evolution-face.before { animation: evolution-before 1450ms ease-in-out both; }
+.board-evolution-face.after { animation: evolution-after 1450ms ease-in-out both; }
+.board-evolution-ring {
+  inset: -8%; border: 2px solid var(--evolution-color); border-radius: 50%;
+  box-shadow: 0 0 18px var(--evolution-color), inset 0 0 14px var(--evolution-color);
+  animation: evolution-ring 1450ms ease-out both;
+}
+.board-evolution-orbit {
+  inset: -15%; border: 1px solid var(--evolution-color); border-radius: 50%;
+  transform: rotate(-28deg) scaleY(.5); animation: evolution-orbit 1450ms ease-out both;
+}
+.board-evolution-flash {
+  background: radial-gradient(circle, #fff 0%, var(--evolution-color) 22%, transparent 68%);
+  mix-blend-mode: screen; animation: evolution-flash 1450ms ease-out both;
+}
+.board-evolution-label {
+  position: absolute; left: 50%; bottom: -20%; transform: translateX(-50%);
+  color: #fff; font-size: 12px; font-weight: 900; letter-spacing: .12em;
+  text-shadow: 0 0 8px var(--evolution-color), 0 2px 4px #000;
+  animation: evolution-label 1450ms ease-out both;
+}
+@keyframes evolution-before { 0%, 37% { opacity: 1; } 52%, 100% { opacity: 0; } }
+@keyframes evolution-after { 0%, 38% { opacity: 0; } 55%, 100% { opacity: 1; } }
+@keyframes evolution-ring { 0% { opacity: 0; transform: scale(.65); } 30%, 65% { opacity: .9; } 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes evolution-orbit { 0% { opacity: 0; transform: rotate(-28deg) scale(.6, .3); } 35%, 65% { opacity: .8; } 100% { opacity: 0; transform: rotate(150deg) scale(1.35, .65); } }
+@keyframes evolution-flash { 0%, 35%, 70%, 100% { opacity: 0; } 50% { opacity: .95; } }
+@keyframes evolution-label { 0%, 20% { opacity: 0; transform: translate(-50%, 8px); } 40%, 75% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -8px); } }
+.reduce-motion .board-evolution-ring, .reduce-motion .board-evolution-orbit, .reduce-motion .board-evolution-flash { display: none; }
+.reduce-motion .board-evolution-face, .reduce-motion .board-evolution-label { animation-duration: 1ms; }
+
+.board-transformation {
+  perspective: 700px;
+  transform: translate(-50%, -50%) rotate(var(--transformation-tilt, 0deg));
+}
+.board-transformation .board-evolution-face {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+}
+.board-transformation .board-evolution-face.before { animation: transformation-before 1300ms ease-in-out both; }
+.board-transformation .board-evolution-face.after { animation: transformation-after 1300ms ease-in-out both; }
+.board-transformation .board-evolution-ring,
+.board-transformation .board-evolution-orbit,
+.board-transformation .board-evolution-flash { animation-duration: 1300ms; }
+.board-transformation-rays {
+  position: absolute;
+  inset: -48%;
+  border-radius: 50%;
+  background: repeating-conic-gradient(from 4deg, rgba(255, 247, 210, .9) 0deg 2deg, transparent 3deg 16deg);
+  mask-image: radial-gradient(circle, transparent 8%, #000 30%, transparent 70%);
+  mix-blend-mode: screen;
+  animation: transformation-rays 1300ms ease-out both;
+}
+@keyframes transformation-before {
+  0%, 15% { opacity: 1; transform: rotateY(0); filter: brightness(1); }
+  48% { opacity: 1; transform: rotateY(90deg); filter: brightness(1.8); }
+  49%, 100% { opacity: 0; transform: rotateY(90deg); }
+}
+@keyframes transformation-after {
+  0%, 48% { opacity: 0; transform: rotateY(-90deg); }
+  49% { opacity: 1; transform: rotateY(-90deg); filter: brightness(1.8); }
+  82%, 100% { opacity: 1; transform: rotateY(0); filter: brightness(1); }
+}
+@keyframes transformation-rays {
+  0%, 26% { opacity: 0; transform: scale(.55) rotate(-12deg); }
+  49% { opacity: .85; transform: scale(1) rotate(0); }
+  100% { opacity: 0; transform: scale(1.35) rotate(18deg); }
+}
+.reduce-motion .board-transformation-rays { display: none; }
+.reduce-motion .board-transformation .board-evolution-face { animation-duration: 1ms; }
 
 .board-zone-move-card {
   position: absolute;

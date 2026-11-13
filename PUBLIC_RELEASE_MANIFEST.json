@@ -1,6 +1,6 @@
 {
   "kind": "zz_public_release_manifest_v2",
-  "releaseVersion": "0.5.4",
+  "releaseVersion": "0.6.0",
   "sourceWorkspace": "clean_runtime_release_v2",
   "currentCardPacks": [
     "basic",
@@ -10,7 +10,8 @@
     "PC02",
     "PC02R",
     "EX02",
-    "EX02C"
+    "EX02C",
+    "PC03"
   ],
   "includedSurfaces": [
     "Python rules engine and card content",
@@ -30,10 +31,10 @@
     }
   ],
   "windowsInstaller": {
-    "filename": "ZZ-Project-v0.5.4-Windows-Setup.exe",
+    "filename": "ZZ-Project-v0.6.0-Windows-Setup.exe",
     "contains": [
       "Electron desktop client",
-      "frozen Python web server with PC02R, EX02 and EX02C card content",
+      "frozen Python web server with PC02R, EX02, EX02C and PC03 card content",
       "first-launch asset downloader and bundled 7-Zip",
       "current PC01-trained runtime AI models"
     ],
@@ -41,12 +42,10 @@
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe",
-    "bytes": 151747357,
-    "sha256": "79C669D6029ADCA3D46B7D42E97F452CAB9A5409AC4AA9227EA847B7794539DB"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe"
   },
   "linuxBundle": {
-    "filename": "ZZ-Project-v0.5.4-Linux.tar.gz",
+    "filename": "ZZ-Project-v0.6.0-Linux.tar.gz",
     "contains": [
       "portable Linux source/runtime bundle",
       "launch-electron.sh with private runtime bootstrap"
@@ -54,18 +53,17 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz",
-    "bytes": 23407137,
-    "sha256": "7B58818964C357626647DA513F400B7030F30AE4F938EDAE4A9E0AF945E96C3B"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
-    "fileId": "1f7AAwFqaFRLyX1z7pPF68YJ7fE9r3DXs",
-    "bytes": 1534680950,
-    "expandedBytes": 1577092255,
+    "fileId": "1yjr4nADGQKb3i_ITasugAY_-GTF6ykJv",
+    "bytes": 1535230963,
+    "expandedBytes": 1577650106,
     "extractTo": "asserts",
     "distributionUrl": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ",
-    "installation": "startup consent, download, validate and extract automatically"
+    "installation": "startup consent, download, SHA-256 and CRC validation, and automatic extraction; existing users can move the old asserts folder aside to redownload",
+    "sha256": "c1dbe2780126536c20b52bb8f17a7bed7fd73bcd375d06947d2bf9e892cb0bfd"
   },
   "runtimeModels": [
     {
@@ -94,29 +92,25 @@
   ],
   "releaseStatus": "published",
   "sourcePackage": {
-    "filename": "ZZ-Project-v0.5.4-source.zip",
+    "filename": "ZZ-Project-v0.6.0-source.zip",
     "contains": [
       "current product source, build tools and deployment examples",
-      "focused tests and PC02R and EX02C semantic scenarios",
+      "focused tests and PC02R, EX02C and PC03 semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip",
-    "bytes": 39945345,
-    "sha256": "A10935642B0781AC8798C3414AD4DC259B9FAED4FAE9883A49BF85663BAC70D1"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip"
   },
   "multiplayerServer": {
-    "filename": "ZZ-Multiplayer-v0.5.4.tar.gz",
+    "filename": "ZZ-Multiplayer-v0.6.0.tar.gz",
     "contains": [
-      "authoritative multiplayer server with PC02R, EX02 and EX02C card content",
+      "authoritative multiplayer server with PC02R, EX02, EX02C and PC03 card content",
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz",
-    "bytes": 702396,
-    "sha256": "321B41112BE3F186BAC44CCC5DC6F25CFDFD541ECA9805E7E05B091F7869437D"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
-  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.4",
-  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt",
-  "releaseSummary": "Bound live logs and fragment large reconnect messages; save player-visible online replays locally with recovery of missed data."
+  "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.6.0",
+  "checksumUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt",
+  "releaseSummary": "PC03 card pack update."
 }

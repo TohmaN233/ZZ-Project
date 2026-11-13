@@ -14,7 +14,7 @@ LAN 不需要单独的服务器包。
 
 客户端默认连接项目维护者的个人服务器（加拿大）。这是个人维护的服务，不承诺持续在线。中国大陆通常需要代理。
 
-**0.5.4** 的默认入口为 `wss://zz.tgy233.top/multiplayer`。请双方更新客户端后再连接。
+**0.6.0** 的默认入口为 `wss://zz.tgy233.top/multiplayer`。请双方更新客户端后再连接。
 
 双方必须使用同一应用版本、同一协议版本和同一规则 checksum。版本不兼容时先更新客户端。
 
@@ -24,14 +24,14 @@ LAN 不需要单独的服务器包。
 
 ## 自建服务器
 
-下载 [ZZ-Multiplayer-v0.5.4.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz)，并使用
-[SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt) 校验文件。文件大小与校验值也记录在项目根目录的 `PUBLIC_RELEASE_MANIFEST.json`。
+下载 [ZZ-Multiplayer-v0.6.0.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz)，并使用
+[SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt) 校验文件。文件大小与校验值也记录在项目根目录的 `PUBLIC_RELEASE_MANIFEST.json`。
 
 需要 Linux、Python 3.10+，以及一个带 TLS 的 HTTPS 域名。游戏客户端按 `PUBLIC_ORIGIN` 校验来源，所以公网入口必须是 `https://你的域名`，不能带路径。
 
 ```bash
 mkdir zz-multiplayer
-tar -xzf ZZ-Multiplayer-v0.5.4.tar.gz --strip-components=1 -C zz-multiplayer
+tar -xzf ZZ-Multiplayer-v0.6.0.tar.gz --strip-components=1 -C zz-multiplayer
 cd zz-multiplayer
 python3 -m venv .venv
 .venv/bin/pip install --upgrade pip

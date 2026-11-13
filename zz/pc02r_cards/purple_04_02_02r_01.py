@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from zz.effects import EffectSpec, EffectTiming
-from zz.engine import FIELD_CAP
 from zz.enums import AreaType, Color, Keyword
 from zz.model import CardInstance, Context
 from zz.pc01 import _card_from_row
@@ -28,12 +27,7 @@ def _enter_field_from_trash(source: CardInstance, state: Any, _ctx: Context) -> 
     if return_marker in source.owner.flags:
         return
     engine = state.engine
-    replacement_iid = None
-    if len(source.owner.field) >= FIELD_CAP:
-        replacements = engine.select_target(source.owner, "ally_minion", 1, 1, source=source)
-        if len(replacements) != 1:
-            raise RuntimeError("Dorothy's Trash trigger needs one Field replacement")
-        replacement_iid = replacements[0].iid
+    replacement_iid = engine.select_field_replacement_iid(source.owner)
     source.owner.flags.add(return_marker)
     engine.summon_from_trash(source.owner, source, replace_field_iid=replacement_iid)
 
@@ -50,6 +44,7 @@ def build_card(row: dict[str, Any]):
             fn=_enter_field_from_trash,
             condition=_dragon_is_in_own_field,
             active_areas=(AreaType.TRASH,),
+            params={"source_enters_field": True},
             official_effect="自分の紫のドラゴンがいる場合、このカードをトラッシュからフィールドに出す",
             official_timing="自分のターン終了時",
         )

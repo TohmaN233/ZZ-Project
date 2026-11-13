@@ -44,6 +44,7 @@ CARD_IMAGE_NAMES: dict[str, list[str]] = {}
 
 TOKEN_IMAGE_NAMES = {
     "s_golem_token": ["red_01_04_00_00.png"],
+    "m_golem_token": ["red_04_00_03.png"],
     "merfolk_token": ["blue_02_04_00_00.png"],
     "slime_block_token": ["colorless_01_04_00_00.png"],
     "s_aryushinashion_token": ["purple_02_04_00_00.png"],

@@ -58,9 +58,10 @@ def _transform_with_white_bless(source: CardInstance, state: Any, ctx: Context) 
 
 def _discard_two_after_drawing(source: CardInstance, state: Any, _ctx: Context) -> None:
     engine = state.engine
+    required = min(2, len(source.owner.hand))
     targets = engine.select_target(source.owner, "hand_card", 2, 2, source=source)
-    if len(targets) != 2:
-        raise RuntimeError(f"{CARD_ID} requires exactly two cards to discard")
+    if len(targets) != required:
+        raise RuntimeError(f"{CARD_ID} requires {required} available cards to discard")
     for target in targets:
         engine.discard_from_hand(source.owner, target)
 

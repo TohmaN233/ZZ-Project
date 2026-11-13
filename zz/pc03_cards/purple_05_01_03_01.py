@@ -54,19 +54,10 @@ def _put_self_on_field(source: CardInstance, state: Any, _ctx: Context) -> None:
     if engine is None:
         raise RuntimeError(f"{CARD_ID} return effect requires an Engine")
     player = source.owner
-    from zz.engine import FIELD_CAP
-
-    replace_field_iid = None
-    if len(player.field) >= FIELD_CAP:
-        replacements = engine.select_target(player, "ally_minion", 1, 1, source=source)
-        if not replacements:
-            raise RuntimeError(f"{CARD_ID} requires a field replacement at capacity")
-        replace_field_iid = replacements[0].iid
     engine.put_field_minion_from_hand(
         player,
         source,
         rested=False,
-        replace_field_iid=replace_field_iid,
     )
 
 

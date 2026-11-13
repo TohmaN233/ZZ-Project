@@ -25,23 +25,14 @@ def _dwarf_charge_aura(source: CardInstance, target: CardInstance, state: Any) -
     return []
 
 
-def _self_attacked_with_two_enemies(source: CardInstance, state: Any, ctx: Any) -> bool:
-    if ctx.source is not source or source.area is not AreaType.FIELD or state.active is not source.owner:
-        return False
-    opponent = state.players[1 - state.players.index(source.owner)]
-    return sum(
-        target.area is AreaType.FIELD
-        and target.owner is opponent
-        and target.card.type is CardType.F_MINION
-        for target in opponent.field
-    ) >= 2
+def _self_attacked(source: CardInstance, state: Any, ctx: Any) -> bool:
+    return ctx.source is source and source.area is AreaType.FIELD and state.active is source.owner
 
 
 def _cannot_block_red_minion_with_weaker_bp(attacker: CardInstance, blocker: CardInstance, state: Any) -> bool:
     if (
         state.active is not attacker.owner
         or attacker.card.type not in (CardType.F_MINION, CardType.B_MINION)
-        or attacker.card.printed_color is not Color.RED
         or blocker.card.type not in (CardType.F_MINION, CardType.B_MINION)
     ):
         return False
@@ -56,7 +47,7 @@ def _cannot_block_red_minion_with_weaker_bp(attacker: CardInstance, blocker: Car
     engine = state.engine
     if engine is None:
         raise RuntimeError(f"{CARD_ID} blocker restriction requires an Engine")
-    return engine.effective_bp(blocker) < attacker.card.bp
+    return engine._card_color(attacker.card) is Color.RED and engine.effective_bp(blocker) < blocker.card.bp
 
 
 def build_card(row: dict[str, Any]):
@@ -69,7 +60,7 @@ def build_card(row: dict[str, Any]):
         build_effect(
             "stat_modifier",
             EffectTiming.ON_ATTACK,
-            condition=_self_attacked_with_two_enemies,
+            condition=_self_attacked,
             target_kind="enemy_minion",
             min_targets=2,
             max_targets=2,

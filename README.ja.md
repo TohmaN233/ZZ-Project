@@ -14,13 +14,15 @@
 
 ## インストール
 
-v0.5.4 の Windows 版は、インストール先の `data/decks/` にデッキを保存します。初回起動時に従来の `%APPDATA%\zenonzard-clone\game-data\decks\` からデッキを移行し、元ファイルをバックアップとして残し、競合するデッキは上書きしません。聖の Force は条件を満たす自分のミニオンを保護し、加護によって相手のミニオンに付与された選択効果の対象にならないようにします。エンリコの効果では両プレイヤーが先に捨ててから引きます。オンライン対戦では切断後に最大 5 回自動再接続し、ルームコードを保持します。対戦中と結果画面のバトルログはページ分けして表示されます。大きな再接続データは分割して送信します。オンラインリプレイはゲームディレクトリの `data/replays/` に保存され、「リプレイとトレーニング」で確認できます。補完できていないリプレイには未完了と表示されます。両プレイヤーのクライアントとサーバーは同じバージョンが必要です。v0.5.4 クライアントには v0.5.4 サーバーを使用してください。以前のバージョンで追加した初手交換時の表示改善、起動診断、カードと Force の検索改善、および EX02C/SAO カードプールも引き続き含まれます。
+v0.6.0 では PC03 カードパックを更新しました。Windows 版のデッキはインストール先の `data/decks/` に保存し、従来のユーザー別フォルダーから既存ファイルを上書きせずに移行します。オンライン対戦では両プレイヤーとサーバーを同じバージョンにしてください。
 
-[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip) · [対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt)
+[Windows インストーラー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe) · [Linux ポータブル版](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz) · [ソースパッケージ](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip) · [対戦サーバー](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz) · [SHA256 チェックサム](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt)
 
 Windows ではインストーラー、Linux ではポータブル版、macOS のプレイヤーと開発者はソースパッケージを使用してください。詳しい手順は[インストールガイド](INSTALL.md)を参照してください。
 
-初回起動時に完全な `asserts/` ディレクトリがない場合、クライアントは [Google Drive のリソースフォルダー](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)から `asserts.7z` をダウンロードするか確認し、自動で検証・展開します。リソースアーカイブは 1.53 GB、展開後は 1.58 GB です。3.2 GB 以上の空き容量を確保してください。ダウンロードをキャンセルするとゲームは終了します。Program Files にインストールした場合、初回のリソース導入は管理者として起動してください。または書き込み可能なインストール先を選んでください。
+初回起動時に完全な `asserts/` ディレクトリがない場合、クライアントは [Google Drive のリソースフォルダー](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)から `asserts.7z` をダウンロードするか確認し、自動で検証・展開します。リソースアーカイブは 1.54 GB、展開後は 1.58 GB です。3.2 GB 以上の空き容量を確保してください。ダウンロードをキャンセルするとゲームは終了します。Program Files にインストールした場合、初回のリソース導入は管理者として起動してください。または書き込み可能なインストール先を選んでください。
+
+旧アセットでは PC03 のトークン画像が不足している場合があるため、最新版の再ダウンロードを推奨します。ゲームを終了し、既存の `asserts/` を別名でバックアップして再起動すると、自動ダウンロードを選択できます。デッキとリプレイの `data/` は残してください。
 
 ソースから起動する前に、プロジェクトのルートで依存関係をインストールしてください。
 
@@ -53,7 +55,7 @@ Windows インストーラー版はスタートメニューまたはデスクト
 - **Codeman とローカル学習**：最近の対戦記憶をローカルに保存します。ソース版では GPU / CUDA 環境で実験的な学習を行えます。
 - **Replay と AI アドバイス**：最近の対戦を振り返り、対戦中に Codeman から現在の行動への提案を確認できます。
 - **オンライン対戦**：LAN と公開ルームに対応します。クライアントの接続先は既定で `wss://zz.tgy233.top/multiplayer` です。自分でサーバーを立てる場合は[オンライン対戦ガイド](docs/ONLINE.md)を参照してください。
-- **カードプールと画面**：基本カード、EX01、PC01、PC01R、PC02、PC02R DIVINE の 106 枚に加え、EX02C/SAO の 70 枚と対応する EX02 オリジナルカード面を収録しています。画面は簡体字中国語、日本語、英語に対応します。
+- **カードプールと画面**：基本カード、EX01、PC01、PC01R、PC02、PC02R、EX02、EX02C/SAO、PC03 を収録しています。画面は簡体字中国語、日本語、英語に対応します。
 - **カード表示**：カード詳細で変身後の形態を確認できます。同名カードの再録分は合算され、デッキには最大 3 枚まで入れられます。
 
 Story Mode は未実装です。長期的には、Agent がプレイヤーと自動で対話するゲームを設計し、GAL 形式のフロントエンドを実装することを目指しています。SillyTavern コミュニティのキャラクター、World Info、長期的な交流に関する経験も取り入れ、プレイヤーが自分の Codeman と共有できる ZZ 体験を作る計画です。
@@ -62,7 +64,7 @@ Story Mode は未実装です。長期的には、Agent がプレイヤーと自
 
 本プロジェクトは実験モデルを強力な AI として宣伝しません。作者は統計学の学位を持っていますが、強化学習の授業を履修しておらず、研究分野も強化学習とは異なります。個人プロジェクトのため学習規模も限られており、現在の AI は ZENONZARD 正式運営時に使用された AI より明確に弱いものです。AI アドバイスも主に娯楽機能です。
 
-コンピューター AI の学習カードプールは現在 PC01 のみです。PC01R、EX01、PC02、PC02R DIVINE、EX02、EX02C/SAO は現在の学習プロセスに含まれていないため、追加カードパックを AI が正しく理解するとは限りません。ルール上プレイできることと、AI がカードを学習していることは別です。
+コンピューター AI の学習カードプールは PC01 のみです。PC01R、EX01、PC02、PC02R、EX02、EX02C/SAO、PC03 は学習に含まれていないため、AI がこれらのカードを正しく理解するとは限りません。
 
 AI 関連コードは Codex の支援を受けています。また、[sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent) の公開手法と開発構成を参考にしています。詳しくは [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) を参照してください。
 

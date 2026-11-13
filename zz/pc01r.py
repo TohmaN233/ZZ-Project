@@ -186,15 +186,18 @@ def _set_next_red_rush(source: CardInstance, state: Any, ctx: Context) -> None:
     source.owner.flags.add("turn:pc01r_next_red_summon_rush")
 
 
-def _grant_next_red_rush(source: CardInstance, state: Any, ctx: Context) -> None:
+def _next_red_summon_gets_rush(source: CardInstance, state: Any, ctx: Context) -> bool:
     summoned = ctx.source
-    if not isinstance(summoned, CardInstance) or summoned.owner is not source.owner:
-        return
-    if _card_color(summoned.card) is not Color.RED:
-        return
     marker = "turn:pc01r_next_red_summon_rush"
-    if marker not in source.owner.flags:
+    return (isinstance(summoned, CardInstance) and summoned.owner is source.owner
+            and _card_color(summoned.card) is Color.RED and marker in source.owner.flags)
+
+
+def _grant_next_red_rush(source: CardInstance, state: Any, ctx: Context) -> None:
+    if not _next_red_summon_gets_rush(source, state, ctx):
         return
+    summoned = ctx.source
+    marker = "turn:pc01r_next_red_summon_rush"
     source.owner.flags.remove(marker)
     state.engine.add_keyword(summoned, Keyword.RUSH)
     summoned.summoning_sickness = False
@@ -649,13 +652,7 @@ def _put_cost_six_from_hand(source: CardInstance, state: Any, ctx: Context) -> N
     )
     if not targets:
         return
-    replace_iid = None
-    if len(source.owner.field) >= 5:
-        replacements = eng.select_target(source.owner, "ally_minion", 1, 1, source=source)
-        if not replacements:
-            return
-        replace_iid = replacements[0].iid
-    eng.put_field_minion_from_hand(source.owner, targets[0], replace_field_iid=replace_iid)
+    eng.put_field_minion_from_hand(source.owner, targets[0])
 
 
 def _gorgon_turn_end(source: CardInstance, state: Any, ctx: Context) -> None:
@@ -693,7 +690,7 @@ def _kirin_damage(source: CardInstance, state: Any, ctx: Context) -> None:
 _PC01R_EFFECTS_BY_ID: dict[str, tuple[EffectSpec, ...]] = {
     "red_00_01_01r_00": (
         _effect(EffectTiming.ON_PLACE_BASE, _set_next_red_rush, condition=_self_source, official_effect="次に召喚する赤のミニオンに襲撃", official_timing="配置時", active_areas=(AreaType.BASE,)),
-        _effect(EffectTiming.ON_SUMMON, _grant_next_red_rush, official_effect="次の赤ミニオンへ襲撃を付与", official_timing="召喚時", active_areas=(AreaType.BASE,)),
+        _effect(EffectTiming.ON_SUMMON, _grant_next_red_rush, condition=_next_red_summon_gets_rush, official_effect="次の赤ミニオンへ襲撃を付与", official_timing="召喚時", active_areas=(AreaType.BASE,)),
     ),
     "red_01_03_01r_00": (_effect(EffectTiming.ON_CAST_MAGIC, _buff_by_token_count, target_kind="ally_minion", params={"token_count_multiplier": 100}, official_effect="ミニオン・トークン1体毎にBP+100を付与", official_timing="メイン/フラッシュ"),),
     "red_02_02_01r_00": (_effect(EffectTiming.ON_ATTACK, _flame_karman_attack, condition=_attacks_player, official_effect="BP+100を付与", official_timing="アタック時", official_condition="プレイヤーにアタック"),),
@@ -732,14 +729,14 @@ _PC01R_EFFECTS_BY_ID: dict[str, tuple[EffectSpec, ...]] = {
     "purple_07_03_01r_00": (build_effect("summon_from_trash", EffectTiming.ON_CAST_MAGIC, target_kind="trash_field_minion"),),
     "green_00_01_01r_00": (_effect(EffectTiming.ON_PLACE_BASE, _buff_penetrate_minion, condition=_self_source, target_kind="ally_minion", params={"required_keyword": Keyword.PENETRATE.name}, official_effect="貫通を持つミニオンにBP+100/DP+1を付与", official_timing="配置時", active_areas=(AreaType.BASE,)),),
     "green_01_03_01r_00": (_effect(EffectTiming.ON_CAST_MAGIC, _destroy_rested_bp_400, target_kind="any_minion", params={"only_rested": True, "max_bp": 400}, official_effect="レスト状態のBP400以下を破壊", official_timing="メイン"),),
-    "green_02_02_01r_00": (_effect(EffectTiming.MOVE_TO_BASE, _refresh_green_mana(1), condition=_self_source, target_kind="ally_base", params={"color": Color.GREEN.name}, official_effect="緑マナ1つをアクティブ", official_timing="後退時", active_areas=(AreaType.BASE,)),),
+    "green_02_02_01r_00": (_effect(EffectTiming.MOVE_TO_BASE, _refresh_green_mana(1), condition=_self_source, target_kind="ally_base", params={"mana_color": Color.GREEN.name}, official_effect="緑マナ1つをアクティブ", official_timing="後退時", active_areas=(AreaType.BASE,)),),
     "green_02_03_01r_00": (_effect(EffectTiming.ON_CAST_MAGIC, _set_enemy_dp_zero, target_kind="enemy_minion", official_effect="DPを0にする", official_timing="フラッシュ"),),
     "green_03_02_01r_00": (build_effect("draw_cards", EffectTiming.ON_PLACE_BASE, condition=_scarel_trigger, amount=1, active_areas=(AreaType.FIELD,)),),
     "green_03_03_01r_00": (_effect(EffectTiming.ON_CAST_MAGIC, _rest_enemy_and_forces, target_kind="enemy_minion", official_effect="相手のミニオン1体とフォース全てをレスト", official_timing="メイン/フラッシュ"),),
     "green_05_02_01r_00": (build_effect("move_to_base_rested", EffectTiming.MOVE_TO_BASE, condition=_self_source),),
     "green_07_02_01r_00": (
         _effect(EffectTiming.ON_ATTACK, _rest_enemy_minion_or_force, condition=_self_source, target_kind="enemy_minion_or_force", official_effect="相手のミニオンかフォースをレスト", official_timing="アタック時"),
-        _effect(EffectTiming.MOVE_TO_BASE, _refresh_green_mana(2), condition=_self_source, target_kind="ally_base", min_targets=2, max_targets=2, params={"color": Color.GREEN.name}, official_effect="緑マナ2つをアクティブ", official_timing="後退時", active_areas=(AreaType.BASE,)),
+        _effect(EffectTiming.MOVE_TO_BASE, _refresh_green_mana(2), condition=_self_source, target_kind="ally_base", min_targets=2, max_targets=2, params={"mana_color": Color.GREEN.name}, official_effect="緑マナ2つをアクティブ", official_timing="後退時", active_areas=(AreaType.BASE,)),
     ),
     "blue_00_01_01r_00": (_effect(EffectTiming.ON_PLACE_BASE, _move_ally_to_base_preserving_rest, condition=_self_source, target_kind="ally_minion", min_targets=0, max_targets=1, optional=True, params={"moves_targets_to_base": True}, official_effect="自分のミニオンをベースに移動", official_timing="配置時", active_areas=(AreaType.BASE,)),),
     "blue_01_03_01r_00": (build_effect("look_top_to_hand", EffectTiming.ON_CAST_MAGIC, target_kind="top4_card", top_n=4, card_type=CardType.MAGIC),),

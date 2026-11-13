@@ -23,7 +23,8 @@ def _has_red_or_neutral_evoker_mana(source: CardInstance) -> bool:
 
 def _player_attack_with_evoker_mana(source: CardInstance, state: Any, ctx: Context) -> bool:
     return (
-        source.area is AreaType.FIELD
+        ctx.source is source
+        and source.area is AreaType.FIELD
         and source.owner is ctx.controller
         and state.active is source.owner
         and isinstance(ctx.target, Player)

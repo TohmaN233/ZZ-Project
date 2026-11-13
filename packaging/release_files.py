@@ -135,6 +135,7 @@ def release_files(root: Path, kind: str) -> list[Path]:
         paths.add(Path("tests/test_ex02c_cards.py"))
         paths.add(Path("tests/test_ex02_cards.py"))
         paths.update(Path("tests") / name for name in ("test_pc03_evolution_core.py", "test_pc03_shared_phase_rules.py", "test_pc03_final_integration.py", "test_pc03_outside_selection.py", "test_pc03_authoritative_hash.py", "test_pc03_cards.py"))
+        paths.update(Path("tests") / name for name in ("test_field_entry_capacity.py", "test_lahrs_placement.py", "test_pc03_live_regressions.py", "test_transform_visuals.py"))
         paths.add(Path("tests/test_deck_root_migration.py"))
         paths.add(Path("tests/electron_deck_storage.test.js"))
         paths.update(Path("tests") / name for name in ("test_frontend_duel_dom.py", "test_frontend_fx.py", "test_frontend_fx_arrival.py"))

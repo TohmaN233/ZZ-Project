@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from zz.effects import EffectSpec, EffectTiming
-from zz.engine import FIELD_CAP
 from zz.enums import CardType, Keyword
 from zz.model import CardInstance, Context
 from zz.pc01 import _card_from_row
@@ -61,17 +60,7 @@ def _retrieve_minions_after_attack(source: CardInstance, state: Any, _ctx: Conte
             f"Rekindled expected {retrieve_count} Trash targets, got {len(selected)}"
         )
     for card in selected:
-        replacement_iid = None
-        if len(source.owner.field) >= FIELD_CAP:
-            replacements = engine.select_target(source.owner, "ally_minion", 1, 1, source=source)
-            if len(replacements) != 1:
-                raise RuntimeError("Rekindled's attack needs one Field replacement")
-            replacement_iid = replacements[0].iid
-        engine.summon_from_trash(
-            source.owner,
-            card,
-            replace_field_iid=replacement_iid,
-        )
+        engine.summon_from_trash(source.owner, card)
 
 
 def build_card(row: dict[str, Any]):

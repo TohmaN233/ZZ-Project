@@ -14,13 +14,15 @@
 
 ## 安装
 
-v0.5.4 的 Windows 版继续将卡组保存在安装目录的 `data/decks/`。首次启动时会从旧的 `%APPDATA%\zenonzard-clone\game-data\decks\` 迁移卡组，保留原文件作为备份，且不会覆盖冲突卡组。圣之 Force 会保护符合条件的己方怪物，使其不会被通过加护赋予对手怪物的选择效果选中；恩里科效果为双方先弃牌、再抽牌。联机断线后最多自动重连 5 次，并保留房间码；对局中的战斗日志和结果页日志均支持分页查看。较大的重连数据会分段传输；联机回放保存在游戏目录的 `data/replays/`，可在“回放与训练”中查看，未补齐的回放会标记为不完整。联机双方客户端与服务器版本必须一致；v0.5.4 客户端需要连接 v0.5.4 服务器。此前版本的换手选牌显示和启动诊断、卡牌与 Force 搜索及 EX02C/SAO 卡池也继续包含在内。
+v0.6.0 更新 PC03 卡包。Windows 版将卡组保存在安装目录的 `data/decks/`，并从旧的每用户目录迁移卡组而不覆盖已有文件。联机双方客户端和服务器需使用相同版本。
 
-[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt)
+[Windows 安装包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe) · [Linux 便携包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz) · [源码包](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip) · [自建联机服务器](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz) · [SHA256 校验清单](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt)
 
 Windows 玩家使用安装包，Linux 玩家使用便携包；macOS 玩家和开发者使用源码包。完整步骤见[安装说明](INSTALL.md)。
 
-首次启动时，如果缺少完整的 `asserts/`，客户端会询问是否下载 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)中的 `asserts.7z`，并自动校验、解压。资源包为 1.53 GB，解压后为 1.58 GB，请预留至少 3.2 GB 空间；取消下载会退出游戏。若安装目录为 Program Files，首次安装资源需以管理员身份启动；也可选择可写的安装目录。
+首次启动时，如果缺少完整的 `asserts/`，客户端会询问是否下载 [Google Drive 资源文件夹](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)中的 `asserts.7z`，并自动校验、解压。资源包为 1.54 GB，解压后为 1.58 GB，请预留至少 3.2 GB 空间；取消下载会退出游戏。若安装目录为 Program Files，首次安装资源需以管理员身份启动；也可选择可写的安装目录。
+
+旧玩家建议重新下载最新版资源包，以获取 PC03 Token 卡图。先关闭游戏，将旧 `asserts/` 文件夹改名备份，再启动游戏并按提示下载；也可手动解压新版资源包。请保留存有卡组和回放的 `data/`。
 
 源码启动前，在项目根目录安装依赖：
 
@@ -53,7 +55,7 @@ Windows 安装版从开始菜单或桌面快捷方式启动。Linux 便携包首
 - **Codeman 与本地训练**：本机保存近期对局记忆；源码版可在 GPU / CUDA 环境中进行实验训练。
 - **Replay 与 AI 建议**：回看最近对局；对战中可查看 Codeman 对当前行动的建议。
 - **联机**：支持局域网与公网房间。公网客户端默认连接 `wss://zz.tgy233.top/multiplayer`；自建服务器说明见[联机说明](docs/ONLINE.md)。
-- **卡池与界面**：包含基本卡、EX01、PC01、PC01R、PC02、PC02R DIVINE 的 106 张卡，以及 EX02C/SAO 的 70 张卡与对应 EX02 原版卡面；支持简体中文、日语和英语界面。
+- **卡池与界面**：包含基本卡、EX01、PC01、PC01R、PC02、PC02R、EX02、EX02C/SAO 和 PC03；支持简体中文、日语和英语界面。
 - **卡牌呈现**：可在卡牌详情中预览变身形态；同名重印卡合并计算数量，套牌最多 3 张。
 
 Story Mode 尚未实现。长期目标是设计由 Agent 自动与玩家交互的游戏，并实现 GAL 风格前端；项目也计划吸收 SillyTavern 社群在角色、世界书和长期互动方面的经验，打造玩家与自己的 Codeman 共同经历的 ZZ 体验。
@@ -62,7 +64,7 @@ Story Mode 尚未实现。长期目标是设计由 Agent 自动与玩家交互�
 
 这个项目不会把实验模型包装成强 AI。作者有统计学学位，但没有修过强化学习课程，研究方向也与强化学习无关；个人项目的训练规模同样有限。当前模型与 ZENONZARD 正式运营时期万代使用的 AI 有明显差距，AI 建议也主要是娱乐功能。
 
-电脑 AI 的训练卡池目前只覆盖 PC01。PC01R、EX01、PC02、PC02R DIVINE、EX02 和 EX02C/SAO 没有进入当前训练流程，因此不要期待电脑 AI 能正确理解这些卡包；规则可玩不代表 AI 已经学会这些卡。
+电脑 AI 的训练卡池目前只覆盖 PC01。PC01R、EX01、PC02、PC02R、EX02、EX02C/SAO 和 PC03 没有进入当前训练流程，因此不要期待电脑 AI 能正确理解这些卡包；规则可玩不代表 AI 已经学会这些卡。
 
 AI 相关代码由 Codex 协助编写，并参考了 [sbl1996/ygo-agent](https://github.com/sbl1996/ygo-agent) 的公开方法与工程结构。更多说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 

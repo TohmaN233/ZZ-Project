@@ -29,6 +29,8 @@ def _apply_resurge(source: CardInstance, state: Any, ctx: Context) -> None:
         raise RuntimeError(f"{CARD_ID} Resurge requires an Engine")
     if not isinstance(entered, CardInstance):
         raise RuntimeError(f"{CARD_ID} Resurge event has no Minion source")
+    if entered.area is not AreaType.FIELD or entered not in entered.owner.field:
+        return
     engine.modify_stat(entered, bp_delta=-100, duration="turn")
 
 

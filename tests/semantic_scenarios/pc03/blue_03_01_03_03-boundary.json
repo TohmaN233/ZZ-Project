@@ -79,7 +79,7 @@
     {
       "path": "/api/debug/add-card",
       "payload": {
-        "cardId": "blue_00_01_02_00",
+        "cardId": "blue_00_01_00_00",
         "side": "P1",
         "zone": "base"
       },
@@ -182,7 +182,7 @@
       "op": "count_where",
       "value": 1,
       "where": {
-        "cardId": "blue_00_01_02_00",
+        "cardId": "blue_00_01_00_00",
         "rested": false
       }
     },
@@ -201,7 +201,7 @@
       "op": "count_where",
       "value": 1,
       "where": {
-        "cardId": "blue_00_01_02_00"
+        "cardId": "blue_00_01_00_00"
       }
     }
   ]

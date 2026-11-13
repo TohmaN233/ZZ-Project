@@ -127,17 +127,22 @@ def test_removal_events_distinguish_effect_self_and_rule_causes():
     effect_death = next(event for event in session.engine.visual_events if event["type"] == "destroy")
     assert effect_death.get("cause") == "effect"
     assert effect_death["sourceCard"]["iid"] == source.iid
-    for cause in ("replacement", "rule", "self"):
+    for cause in ("rule", "self"):
         card = _append_card(session, player, "yellow_02_02_00_01", AreaType.FIELD)
         session.engine.visual_events.clear()
-        if cause == "replacement":
-            session.engine._eject_field_card(player, card)
-        else:
-            session.engine._destroy(card, source=card if cause == "self" else None)
+        session.engine._destroy(card, source=card if cause == "self" else None)
         raw = next(event for event in session.engine.visual_events if event["type"] == "destroy")
         event = session._animation_event_from_engine_visual_event(raw)
         assert event.get("cause") == cause
         assert (event.get("sourceCard") or {}).get("iid") == (card.iid if cause == "self" else None)
+    card = _append_card(session, player, "yellow_02_02_00_01", AreaType.FIELD)
+    session.engine.visual_events.clear()
+    session.engine._eject_field_card(player, card)
+    assert not any(event["type"] == "destroy" for event in session.engine.visual_events)
+    raw = next(event for event in session.engine.visual_events if event["type"] == "zone_move")
+    event = session._animation_event_from_engine_visual_event(raw)
+    assert event["cause"] == "replacement"
+    assert event["fromArea"] == "field" and event["toArea"] == "trash"
 
 
 def test_destruction_attribution_never_discloses_a_private_source():
@@ -186,7 +191,7 @@ def test_fain_callias_force_option_keeps_prompt_id_and_heals() -> None:
     assert healed["prompt"] is None or healed["prompt"]["kind"] != "effect_target"
 
 
-def test_full_field_summon_destroys_ejected_card_before_new_card_enters() -> None:
+def test_full_field_summon_replaces_card_before_new_card_enters() -> None:
     session = GameSession(seed=502, mode="debug-card-lab")
     setup_debug_lab(
         session,
@@ -208,13 +213,16 @@ def test_full_field_summon_destroys_ejected_card_before_new_card_enters() -> Non
         (event["type"], event.get("fromArea"), event.get("toArea"), (event.get("card") or {}).get("iid"))
         for event in result["animationEvents"]
     ]
-    destroy_at = next(index for index, event in enumerate(events) if event[0] == "destroy" and event[3] == ejected.iid)
+    replacement_at = next(index for index, event in enumerate(events)
+                          if event == ("zone_move", "field", "trash", ejected.iid))
     enter_at = next(
         index
         for index, event in enumerate(events)
         if event[0] == "zone_move" and event[1] == "hand" and event[2] == "field"
     )
-    assert destroy_at < enter_at
+    assert replacement_at < enter_at
+    assert result["animationEvents"][replacement_at]["cause"] == "replacement"
+    assert not any(event[0] == "destroy" and event[3] == ejected.iid for event in events)
     assert ejected in player.trash
     assert ejected not in player.field
     assert len(player.field) == FIELD_CAP

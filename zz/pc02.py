@@ -312,10 +312,7 @@ def blessing_effects(host: CardInstance, timing: EffectTiming, ctx: Context) -> 
 
 
 def _replacement_iid(engine: Any, player: Player, source: CardInstance) -> int | None:
-    if len(player.field) < 5:
-        return None
-    selected = engine.select_target(player, "ally_minion", 1, 1, source=source)
-    return selected[0].iid if selected else None
+    return engine.select_field_replacement_iid(player)
 
 
 def _create_tokens(source: CardInstance, state: Any, specs: list[Card]) -> None:
@@ -1063,7 +1060,7 @@ def has_destroy_effect(card: Card) -> bool:
 
 _PC02_EFFECTS_BY_ID: dict[str, tuple[EffectSpec, ...]] = {
     "red_01_02_02_00": (_effect(EffectTiming.ON_SUMMON, _digger_summon, condition=_self_source, target_kind="ally_colorless_mana_token", min_targets=0, max_targets=1, optional=True, official_effect="無色の非ミニオンマナを破壊して1枚引く", official_timing="召喚時"),),
-    "red_03_03_02_00": (_effect(EffectTiming.ON_CAST_MAGIC, _shape_shift, target_kind="ally_minion", params={"color": "RED", "max_cost": 3}, official_effect="コスト3以下の赤のミニオンを複製して出す", official_timing="メイン"),),
+    "red_03_03_02_00": (_effect(EffectTiming.ON_CAST_MAGIC, _shape_shift, target_kind="ally_minion", params={"color": "RED", "max_cost": 3, "puts_targets_on_field": True}, official_effect="コスト3以下の赤のミニオンを複製して出す", official_timing="メイン"),),
     "red_03_03_02_01": (_effect(EffectTiming.ON_CAST_MAGIC, _breaching, target_kind="enemy_minion", official_effect="BP-300、ドラゴンならBP-600", official_timing="メイン/フラッシュ"),),
     "red_04_02_02_00": (_effect(EffectTiming.ON_SUMMON, _gran_rex_summon, condition=_self_source, target_kind="ally_colorless_mana_token", official_effect="無色の非ミニオンマナを破壊", official_timing="召喚時"),),
     "red_05_02_02_00": (
@@ -1084,7 +1081,7 @@ _PC02_EFFECTS_BY_ID: dict[str, tuple[EffectSpec, ...]] = {
         ),
     ),
     "red_06_02_02_01": (_effect(EffectTiming.ON_SUMMON, _margus_summon, condition=_self_source, target_kind="ally_colorless_mana_token", official_effect="無色マナを破壊し相手1体をブロック不可", official_timing="召喚時"),),
-    "red_08_03_02_00": (_effect(EffectTiming.ON_CAST_MAGIC, _fossil, target_kind="ally_colorless_mana_token", official_effect="無色マナを破壊し上3枚から赤/無色ドラゴンを出す", official_timing="メイン"),),
+    "red_08_03_02_00": (_effect(EffectTiming.ON_CAST_MAGIC, _fossil, target_kind="ally_colorless_mana_token", params={"puts_targets_on_field": True, "field_entry_source_area": "deck"}, official_effect="無色マナを破壊し上3枚から赤/無色ドラゴンを出す", official_timing="メイン"),),
     "red_09_02_02_00": (_effect(EffectTiming.ON_ATTACK, _magma_attack, condition=_self_source, target_kind="enemy_minion", template_id="create_tokens", params={"max_bp": 500, "amount": 1}, official_effect="BP500以下を破壊してドラゴン・トークンを出す", official_timing="アタック時"),),
     "yellow_01_02_02_00": (_effect(EffectTiming.ON_SUMMON, _otter_summon, condition=_self_source, target_kind="ally_minion", official_effect="自分のミニオンにBP+100", official_timing="召喚時"),),
     "yellow_02_03_02_00": (_effect(EffectTiming.ON_CAST_MAGIC, _air_raid, target_kind="enemy_minion", official_effect="BP-200、召喚済みならBP-400", official_timing="フラッシュ"),),

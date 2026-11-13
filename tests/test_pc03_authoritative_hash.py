@@ -102,6 +102,24 @@ def test_queued_summon_source_area_is_hashed():
     assert digest(session) != before
 
 
+def test_pending_summon_entry_gate_is_hashed_and_cloned():
+    session = GameSession(seed=1, mode='debug-card-lab')
+    setup_debug_lab(session, 'green_05_01_03_00', zone='hand', compact_board=True,
+                    player_forces=[], opponent_forces=[])
+    engine = session.engine
+    owner = engine.state.players[0]
+    summoned = owner.hand[0]
+    engine.summon_from_hand(owner, summoned, resolve_triggers=False)
+    pending = next(item for item in engine.triggers._queue if item.instance is summoned
+                   and item.timing is EffectTiming.ON_SUMMON)
+    gate = pending.summon_entry_gate
+    assert gate is not None and gate.source is summoned and gate.allowed is None
+    before = digest(session)
+    assert digest(cloned_session(session)) == before
+    gate.allowed = False
+    assert digest(session) != before
+
+
 
 def test_force_passives_are_bound_to_simulated_engine():
     session = GameSession(seed=1, mode='debug-card-lab')

@@ -11,6 +11,10 @@ from zz.pc01 import _card_from_row
 CARD_ID = "blue_06_01_03_02"
 
 
+def _self_attacked(source: CardInstance, _state: Any, ctx: Context) -> bool:
+    return ctx.source is source and source.area is AreaType.FIELD
+
+
 def _own_minion_mana_moved(source: CardInstance, state: Any, ctx: Context) -> bool:
     moved = ctx.source
     return bool(
@@ -39,7 +43,7 @@ def _move_blue_minion_mana_to_field(source: CardInstance, state: Any, _ctx: Cont
         filter_fn=lambda target: (
             target.owner is source.owner
             and target.card.type in (CardType.F_MINION, CardType.B_MINION)
-            and target.card.printed_color is Color.BLUE
+            and engine._mana_color_of(target) is Color.BLUE
         ),
         source=source,
     )
@@ -68,11 +72,12 @@ def build_card(row: dict[str, Any]):
             EffectSpec(
                 EffectTiming.ON_ATTACK,
                 _move_blue_minion_mana_to_field,
+                condition=_self_attacked,
                 target_kind="ally_minion_base",
                 min_targets=0,
                 max_targets=1,
                 optional=True,
-                params={"color": Color.BLUE},
+                params={"mana_color": Color.BLUE},
                 official_effect="自分のミニオンカードである青マナ1つを、フィールドにアクティブ状態で移動させることができる。",
                 official_timing="アタック時",
                 active_areas=(AreaType.FIELD,),

@@ -2,9 +2,9 @@
 
 [Chinese overview](README.md) | [日本語 overview](README.ja.md) | [English overview](README.en.md)
 
-## Current release: v0.5.2
+## Current release: v0.6.0
 
-The v0.5.2 package links below target its [GitHub Releases page](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.2).
+The v0.6.0 package links below target its [GitHub Releases page](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.6.0).
 See [PUBLIC_RELEASE_MANIFEST.json](PUBLIC_RELEASE_MANIFEST.json) for package
 sizes and SHA-256 values. The Windows build stores decks in
 `<installation directory>/data/decks/` and migrates decks from the legacy
@@ -34,8 +34,8 @@ The v0.4.0 desktop client checks for a complete `asserts/` directory before
 starting the game. If it is missing, it asks whether to download `asserts.7z`
 from the
 [ZZ resource folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ).
-The current archive is 1,534,680,950 bytes (1.53 GB / 1.43 GiB).
-Its files total 1,577,092,255 bytes (1.58 GB) after extraction, including
+The current archive is 1,535,230,963 bytes (1.54 GB / 1.43 GiB).
+Its files total 1,577,650,106 bytes (1.58 GB) after extraction, including
 `Eng-cards/`. Reserve at least 3.2 GB of free space during installation; this
 bundle includes the English card faces. Accepting displays download and
 extraction progress, checks the archive CRC, and installs `asserts/` beside
@@ -46,6 +46,9 @@ The destination must be writable and have enough space for both the compressed
 archive and its extracted files. Installation errors are shown with a retry
 option. Existing complete resources skip downloading; an incomplete existing
 directory is preserved and reported, so move it aside or complete it manually.
+For PC03 token images, existing players should close the game, rename their old
+`asserts/` directory as a backup, and restart to download the latest resource
+pack, or manually extract it. Keep `data/`, which contains decks and replays.
 `ZZ_ASSET_ROOT` or `ZENONZARD_ASSET_ROOT` can explicitly select another resource
 location. Changing the published archive requires updating
 `electron/asset-source.json` in a new client build.
@@ -54,14 +57,14 @@ location. Changing the published archive requires updating
 
 Download the package for your platform:
 
-- [ZZ-Project-v0.5.2-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Windows-Setup.exe)
-- [ZZ-Project-v0.5.2-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-Linux.tar.gz)
-- [ZZ-Project-v0.5.2-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Project-v0.5.2-source.zip)
-- [ZZ-Multiplayer-v0.5.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz)
-- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/SHA256SUMS-PC02.txt)
+- [ZZ-Project-v0.6.0-Windows-Setup.exe](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe)
+- [ZZ-Project-v0.6.0-Linux.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz)
+- [ZZ-Project-v0.6.0-source.zip](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip)
+- [ZZ-Multiplayer-v0.6.0.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz)
+- [SHA256SUMS-PC02.txt](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt)
 
 - **Windows players:** use the installable desktop package. It includes
-  Electron, the frozen Python server, the PC02R DIVINE rules runtime, the current
+  Electron, the frozen Python server, the PC02R and PC03 rules runtime, the current
   runtime models, and the desktop home background `image.png`.
 - **Linux players:** use the portable `tar.gz` bundle. It includes the source
   runtime, a Torch-free inference model, `image.png`, and an executable
@@ -83,7 +86,7 @@ Download the package for your platform:
 
 ## 3. Windows installer
 
-Run the v0.5.2 Windows installer. Python,
+Run the v0.6.0 Windows installer. Python,
 Node.js, and `npm install` are not required. Start the installed game from the
 Start menu or the desktop shortcut.
 
@@ -125,11 +128,11 @@ installation directory.
 
 ## 4. Linux portable bundle
 
-Extract the v0.5.2 Linux bundle and run:
+Extract the v0.6.0 Linux bundle and run:
 
 ```bash
-tar -xzf ZZ-Project-v0.5.2-Linux.tar.gz
-cd ZZ-Project-v0.5.2
+tar -xzf ZZ-Project-v0.6.0-Linux.tar.gz
+cd ZZ-Project-v0.6.0
 ./launch-electron.sh --check
 ./launch-electron.sh
 ```
@@ -145,7 +148,7 @@ needed for the first bootstrap unless those runtime files are already cached.
 
 ## 5. Source launch and macOS
 
-Use the v0.5.2 source ZIP or clone the repository. The source
+Use the v0.6.0 source ZIP or clone the repository. The source
 package contains the release snapshot, runtime models, tests, documentation,
 and `image.png`.
 
@@ -180,7 +183,7 @@ git lfs pull
 
 The v0.4.0 resource archive is `asserts.7z` in the [Google Drive asset
 folder](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ).
-It is 1,534,680,950 bytes (1.53 GB / 1.43 GiB), and expands to 1,577,092,255
+It is 1,535,230,963 bytes (1.54 GB / 1.43 GiB), and expands to 1,577,650,106
 bytes (1.58 GB). It includes `Eng-cards/`; there is no separate English faces
 archive for this bundle. Reserve at least 3.2 GB of free space while the
 archive is downloaded and extracted. The client validates the archive CRC
@@ -226,7 +229,7 @@ log.
 - **Internet:** the default personal server is in Canada. Cross-region
   stability has not been fully verified; users in mainland China may need a
   proxy.
-- **Self-hosted:** download [ZZ-Multiplayer-v0.5.2.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.2/ZZ-Multiplayer-v0.5.2.tar.gz)
+- **Self-hosted:** download [ZZ-Multiplayer-v0.6.0.tar.gz](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz)
   and follow [docs/ONLINE.md](docs/ONLINE.md).
 - **Client compatibility:** the online handshake requires the client and server
   `applicationVersion` values to match exactly. Both players' clients and the
@@ -251,8 +254,8 @@ GPU memory, time, and disk space.
 
 ### Resource installation reports `Redirect was cancelled`
 
-If resource installation reports this error, reinstall the v0.5.2 package from
-[GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.5.2)
+If resource installation reports this error, reinstall the v0.6.0 package from
+[GitHub Releases](https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.6.0)
 and retry resource setup. The in-game version checker does not offer replacement
 packages when the application version remains unchanged.
 

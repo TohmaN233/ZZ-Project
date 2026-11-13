@@ -1,7 +1,7 @@
 from __future__ import annotations
 import random
 from contextlib import contextmanager
-from copy import copy
+from copy import copy, deepcopy
 from typing import Optional, Callable, Iterable, Any
 
 from zz.enums import AreaType, CardType, Color, Keyword, Phase, Side, Step, TriggerTiming
@@ -89,6 +89,8 @@ class Engine:
         self._pending_standby_player: Player | None = None
         self._pending_standby_step: Step | None = None
         self._continuing_standby = False
+        self._pending_end_player: Player | None = None
+        self._pending_end_hooks_done = False
         self._turn_stat_modifiers: list[dict[str, Any]] = []
         self._pc03_attack_grants: list[dict[str, Any]] = []
         self.observed_action_profile_by_player_side: dict[str, dict[str, int]] = {}
@@ -380,13 +382,7 @@ class Engine:
     ) -> bool:
         source_area = from_area or ci.area
         if source_area is AreaType.TRASH and ci.card.id == "purple_04_02_01_00" and ci in player.trash:
-            replace_iid = None
-            if len(player.field) >= FIELD_CAP:
-                replacements = self.select_target(player, "ally_minion", 1, 1, source=ci)
-                if not replacements:
-                    return False
-                replace_iid = replacements[0].iid
-            self.summon_from_trash(player, ci, replace_field_iid=replace_iid)
+            self.summon_from_trash(player, ci)
             return True
         if source_area is AreaType.TRASH and ci in player.trash:
             player.trash.remove(ci)
@@ -418,17 +414,22 @@ class Engine:
             raise ValueError("outside-card selection requires distinct card IDs")
         return [CARD_REGISTRY[card_id] for card_id in ids]
 
-    def add_card_from_outside_to_hand(self, owner: Player, card_id: str) -> CardInstance:
-        from zz.cards import CARD_REGISTRY
-
+    def pc03_current_card_id(self, owner: Player, card_id: str) -> str:
+        """Resolve the owner's current face for any previously upgraded card."""
         if owner not in self.state.players:
-            raise IllegalActionError("outside card owner is not in this game")
+            raise IllegalActionError("PC03 card owner is not in this game")
         seen = set()
         while card_id in owner.pc03_upgrades:
             if card_id in seen:
                 raise RuntimeError("cycle in PC03 evolution mapping")
             seen.add(card_id)
             card_id = owner.pc03_upgrades[card_id]
+        return card_id
+
+    def add_card_from_outside_to_hand(self, owner: Player, card_id: str) -> CardInstance:
+        from zz.cards import CARD_REGISTRY
+
+        card_id = self.pc03_current_card_id(owner, card_id)
         card = CARD_REGISTRY[card_id]
         ci = CardInstance(card=card, owner=owner, iid=self.state.allocate_iid(), area=AreaType.OUTSIDE)
         self.add_to_hand(owner, ci, from_area=AreaType.OUTSIDE)
@@ -459,6 +460,7 @@ class Engine:
     def apply_pc03_evolution(self, *, source: CardInstance, context: Context,
                              upgrades: Iterable[tuple[str, str]], family_id: str | None = None) -> bool:
         from zz.cards import CARD_REGISTRY
+        from zz.pc03 import expand_pc03_evolution_pairs
 
         owner = source.owner
         if family_id is not None and not self.can_pc03_evolve(owner, family_id):
@@ -470,6 +472,11 @@ class Engine:
         for old, new in pairs.items():
             if old not in CARD_REGISTRY or new not in CARD_REGISTRY:
                 raise ValueError(f"unknown PC03 evolution pair {old} -> {new}")
+        targets = {old: self.pc03_current_card_id(owner, new) for old, new in pairs.items()}
+        for old, target in targets.items():
+            if target not in CARD_REGISTRY:
+                raise ValueError(f"unknown PC03 evolution target for {old}: {target}")
+        pairs = expand_pc03_evolution_pairs(targets)
         regions = (owner.deck, owner.hand, owner.base, owner.field, owner.trash,
                    owner.resolving, owner.removed)
         instances = []
@@ -485,11 +492,19 @@ class Engine:
         for region in regions:
             for ci in region:
                 visit(ci)
+        for _host, blessing in self.pending_blessing_returns:
+            visit(blessing)
+        public_changes = []
         for ci, new_card in instances:
+            before = copy(ci) if ci.area in (AreaType.FIELD, AreaType.BASE) else None
             ci.card = new_card
+            if before is not None:
+                public_changes.append({"before": before, "after": copy(ci), "area": ci.area.value})
         owner.pc03_upgrades.update(pairs)
         if family_id is not None:
             owner.pc03_evolution_turns[family_id] = self.state.turn
+        if public_changes:
+            self._record_visual_event({"type": "evolution", "side": owner.side.name, "cards": public_changes})
         return True
 
     def draw(
@@ -654,6 +669,10 @@ class Engine:
             self._resolve_state_based_actions()
 
     def _reset_card_modifiers(self, ci: CardInstance) -> None:
+        if ci.area is AreaType.FIELD and not any(card is ci for card in ci.owner.field):
+            # All normal field exits clear modifiers after removing the card.
+            # An unstarted summon remains invalid if that instance re-enters.
+            self.triggers.invalidate_unstarted_summon(ci)
         self._remove_granted_force_ability(ci)
         ci.bp_mod = 0
         ci.dp_mod = 0
@@ -1222,12 +1241,34 @@ class Engine:
         self._record_phase_visual_event("main", self.state.active)
 
     def end_turn(self) -> None:
+        if self._pending_end_player is not None:
+            raise IllegalActionError("turn end is already resolving")
         active = self.state.active
         self._set_step(Step.END)
+        self._pending_end_player = active
+        self._pending_end_hooks_done = False
         self.triggers.emit(EffectTiming.TURN_END, Context(controller=active))
         self.triggers.emit(TriggerTiming.TURN_END, Context(controller=active))
         self.triggers.resolve_all()
-        self._fire_turn_end_hooks()
+        self.continue_end_turn()
+
+    @property
+    def has_pending_end_turn(self) -> bool:
+        return self._pending_end_player is not None
+
+    def continue_end_turn(self) -> bool:
+        if not self.has_pending_end_turn:
+            return True
+        if self.triggers.has_pending() or self.standby_resolution_pending():
+            return False
+        active = self._pending_end_player
+        if active is not self.state.active:
+            raise RuntimeError("active player changed during pending turn end")
+        if not self._pending_end_hooks_done:
+            self._pending_end_hooks_done = True
+            self._fire_turn_end_hooks()
+            if self.triggers.has_pending() or self.standby_resolution_pending():
+                return False
         from zz.pc01r import clear_owner_turn_end_locks
         from zz.pc02 import clear_turn_state
 
@@ -1283,6 +1324,8 @@ class Engine:
         active.movement_right_count = 0
         active.movement_right_total = 0
         # Pass to next player
+        self._pending_end_player = None
+        self._pending_end_hooks_done = False
         self.state.active_idx = 1 - self.state.active_idx
         if self.state.active_idx == 0:
             self.state.turn += 1
@@ -1290,6 +1333,7 @@ class Engine:
         if self.state.turn > MAX_TURNS_SAFETY:
             raise GameOver(winner=None, reason=f"reached MAX_TURNS_SAFETY={MAX_TURNS_SAFETY}")
         self.begin_turn()
+        return True
 
     def _mana_color_of(self, ci: CardInstance) -> Color:
         """Color this base card produces. Mana-token is colorless. HR2 override consulted."""
@@ -1399,9 +1443,19 @@ class Engine:
         on_base_mana_removed(self, player, ci, reason=reason)
 
     def _eject_field_card(self, player: Player, ci: CardInstance) -> None:
-        if ci not in player.field:
+        if ci.area is not AreaType.FIELD or ci not in player.field:
             raise IllegalActionError("replacement card not in field")
-        self._destroy(ci, None, operation="replacement")
+        # Making room is a zone change, not a destruction event. It must still
+        # detach Blessings and clear field state just like other field exits.
+        if ci.card.type is CardType.MANA_TOKEN or ci.card.is_token:
+            self._remove_token_from_game(ci)
+        else:
+            player.field.remove(ci)
+            self._return_blessings_to_base(ci)
+            self._reset_card_zone_state(ci)
+            ci.area = AreaType.TRASH
+            player.trash.append(ci)
+        self._record_zone_move(ci, AreaType.FIELD, ci.area, cause="replacement")
 
     def _make_base_space(
             self,
@@ -1439,6 +1493,17 @@ class Engine:
         if replacement is not None:
             self._eject_field_card(player, replacement)
 
+    def select_field_replacement_iid(self, player: Player) -> int | None:
+        """Ask the Field owner to choose a capacity replacement, not an effect target."""
+        if len(player.field) < FIELD_CAP:
+            return None
+        if self.policy_for(player) is None:
+            raise IllegalActionError(f"field cap {FIELD_CAP} reached; the field owner must choose a replacement")
+        selected = self.select_target(player, "ally_minion", 1, 1)
+        if len(selected) != 1 or selected[0] not in player.field:
+            raise IllegalActionError(f"field cap {FIELD_CAP} reached; the field owner must choose a replacement")
+        return selected[0].iid
+
     def play_to_base(self, ci: CardInstance, replace_base_iid: int | None = None) -> None:
         """B-Minion only. Move from hand to base. Mana phase only."""
         active = self.state.active
@@ -1452,7 +1517,8 @@ class Engine:
         active.hand.remove(ci)
         ci.area = AreaType.BASE
         active.base.append(ci)
-        ci.rested = self._action_restricted(ci, "refresh") or self._minion_activation_locked(ci)
+        # Placement starts in the active state; it is not a refresh action.
+        ci.rested = False
         self._record_zone_move(ci, AreaType.HAND, AreaType.BASE)
         self._record_mana_placement(ci)
         self.triggers.emit(EffectTiming.ON_PLACE_BASE, Context(controller=active, source=ci))
@@ -1783,6 +1849,13 @@ class Engine:
         if ci.area is AreaType.FIELD and ci.card.type in (CardType.B_MINION, CardType.F_MINION):
             self.triggers.emit(EffectTiming.ON_ENTER_FIELD, Context(controller=player, source=ci))
 
+    def _emit_summon(self, player: Player, ci: CardInstance) -> None:
+        # Entry reactions resolve before the summoned card's own abilities.
+        # Capture the summon event now so independent listeners still see it.
+        self._emit_enter_field(player, ci)
+        self.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=player, source=ci),
+                           check_summon_entry=True)
+
     def payment_plan(
             self,
             player: Player,
@@ -1877,8 +1950,7 @@ class Engine:
             active.field.append(ci)
             self._record_zone_move(ci, AreaType.HAND, AreaType.FIELD)
             self._record_summon(ci)
-            self.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=active, source=ci))
-            self._emit_enter_field(active, ci)
+            self._emit_summon(active, ci)
             self.triggers.emit(TriggerTiming.ON_PLAY, Context(controller=active, source=ci))
             self.triggers.emit(EffectTiming.ON_CARD_USED, Context(controller=active, source=ci))
             if resolve_triggers:
@@ -1899,30 +1971,14 @@ class Engine:
         if direction == "base_to_field":
             if ci not in active.base:
                 raise IllegalActionError("card not in base")
-            if self._movement_locked(ci) or self._action_restricted(ci, "move"):
-                raise IllegalActionError("card cannot move while opponent has a force")
-            if ci.card.type is CardType.MANA_TOKEN:
-                raise IllegalActionError("mana tokens cannot move to field")
-            if self.has_keyword(ci, Keyword.KAGO) or self.has_keyword(ci, Keyword.BLESS):
-                raise IllegalActionError("Bless mana cannot move to field")
-            if ci.card.is_token:
-                raise IllegalActionError("token minions cannot move with movement right")
-            field_replacement = self._field_replacement(active, replace_field_iid)
-            if field_replacement is not None:
-                self._eject_field_card(active, field_replacement)
-            active.base.remove(ci)
-            from zz.pc02 import on_base_mana_removed
-
-            on_base_mana_removed(self, active, ci, reason="move_to_field")
-            ci.area = AreaType.FIELD
-            active.field.append(ci)
-            self._record_zone_move(ci, AreaType.BASE, AreaType.FIELD)
-            self._fire_siren_mana_hooks("minion_mana_moves_to_field", ci)
-            self.triggers.emit(EffectTiming.ON_MOVE_TO_FIELD,
-                               Context(controller=active, source=ci))
-            self.triggers.emit(TriggerTiming.ON_MOVE_TO_FIELD,
-                               Context(controller=active, source=ci))
-            self.triggers.resolve_all()
+            if not self.can_move_base_minion_to_field(active, ci):
+                raise IllegalActionError("card cannot move from base to field")
+            # Normal movement must carry the explicit Field replacement from
+            # its action; effect-driven movement can ask its policy instead.
+            self._field_replacement(active, replace_field_iid)
+            self.move_base_minion_to_field(
+                active, ci, rested=ci.rested, replace_field_iid=replace_field_iid,
+            )
         elif direction == "field_to_base":
             if ci not in active.field:
                 raise IllegalActionError("card not in field")
@@ -1993,12 +2049,22 @@ class Engine:
         if not isinstance(transformed, Card):
             raise TypeError("transformed card must be a Card")
 
-        source.card = transformed
+        self._replace_field_card_face(source, transformed)
         self.triggers.emit(
             EffectTiming.ON_TRANSFORM,
             Context(controller=source.owner, source=source, target=target),
         )
         self.triggers.resolve_all()
+
+    def _replace_field_card_face(self, source: CardInstance, transformed: Card) -> None:
+        before = deepcopy(source, {id(source.owner): source.owner})
+        source.card = transformed
+        self._record_visual_event({
+            "type": "transform",
+            "side": source.owner.side.name,
+            "cards": [{"area": AreaType.FIELD.value, "before": before,
+                       "after": deepcopy(source, {id(source.owner): source.owner})}],
+        })
 
     def bless(self, mana: CardInstance, target: CardInstance) -> None:
         if not self.can_bless(mana, target):
@@ -2137,6 +2203,7 @@ class Engine:
         )
         minion.summoning_sickness = not keyword_rules.enters_without_summoning_sickness(minion)
         player.field.append(minion)
+        self._record_zone_move(minion, AreaType.OUTSIDE, AreaType.FIELD)
         self._emit_enter_field(player, minion)
         return minion
 
@@ -2192,10 +2259,9 @@ class Engine:
                 "ally_minion",
                 minimum_replacements,
                 replacements_needed,
-                source=source,
             )
             if len(replacements) < replacements_needed and (not optional or explicit_count):
-                return []
+                raise IllegalActionError("the field owner must choose all required replacements")
             replacement_iids = [target.iid for target in replacements]
             if optional and not explicit_count:
                 open_slots = max(0, FIELD_CAP - len(player.field))
@@ -2217,6 +2283,19 @@ class Engine:
             )
         return created
 
+    def can_move_base_minion_to_field(self, player: Player, ci: CardInstance) -> bool:
+        """Shared legality for choosing and moving a Minion Mana to Field."""
+        return bool(
+            ci.owner is player
+            and ci.area is AreaType.BASE
+            and ci in player.base
+            and ci.card.type in (CardType.B_MINION, CardType.F_MINION)
+            and not ci.card.is_token
+            and not self.has_keyword(ci, Keyword.KAGO)
+            and not self.has_keyword(ci, Keyword.BLESS)
+            and not self._movement_locked(ci)
+        )
+
     def move_base_minion_to_field(
             self,
             player: Player,
@@ -2233,14 +2312,23 @@ class Engine:
             raise IllegalActionError("token minions cannot move to field")
         if ci.card.type not in (CardType.B_MINION, CardType.F_MINION):
             raise IllegalActionError("only minion mana can move to field")
+        if not self.can_move_base_minion_to_field(player, ci):
+            raise IllegalActionError("card cannot move from base to field")
+        if replace_field_iid is None:
+            replace_field_iid = self.select_field_replacement_iid(player)
         self._make_field_space(player, replace_field_iid)
         player.base.remove(ci)
+        from zz.pc02 import on_base_mana_removed
+
+        on_base_mana_removed(self, player, ci, reason="move_to_field")
         ci.area = AreaType.FIELD
         ci.rested = rested
         player.field.append(ci)
+        self._record_zone_move(ci, AreaType.BASE, AreaType.FIELD)
         self._fire_siren_mana_hooks("minion_mana_moves_to_field", ci)
         self.triggers.emit(EffectTiming.ON_MOVE_TO_FIELD, Context(controller=player, source=ci))
         self.triggers.emit(TriggerTiming.ON_MOVE_TO_FIELD, Context(controller=player, source=ci))
+        self._emit_enter_field(player, ci)
         self.triggers.resolve_all()
 
     def place_generated_colorless_mana(self, player: Player, replace_base_iid: int | None = None,
@@ -2274,6 +2362,8 @@ class Engine:
             raise IllegalActionError("card is not in hand")
         if ci.card.type is not CardType.F_MINION:
             raise IllegalActionError("only field minions can be put onto the field")
+        if replace_field_iid is None:
+            replace_field_iid = self.select_field_replacement_iid(player)
         self._make_field_space(player, replace_field_iid)
         player.hand.remove(ci)
         ci.area = AreaType.FIELD
@@ -2336,6 +2426,8 @@ class Engine:
             raise IllegalActionError("card is not in trash")
         if ci.card.type is not CardType.F_MINION:
             raise IllegalActionError("only field minions can be summoned from trash")
+        if replace_field_iid is None:
+            replace_field_iid = self.select_field_replacement_iid(player)
         self._make_field_space(player, replace_field_iid)
         player.trash.remove(ci)
         ci.area = AreaType.FIELD
@@ -2358,6 +2450,8 @@ class Engine:
             raise IllegalActionError("card is not in deck")
         if ci.card.type is not CardType.F_MINION:
             raise IllegalActionError("only field minions can be summoned from deck")
+        if replace_field_iid is None:
+            replace_field_iid = self.select_field_replacement_iid(player)
         self._make_field_space(player, replace_field_iid)
         player.deck.remove(ci)
         ci.area = AreaType.FIELD
@@ -2371,7 +2465,7 @@ class Engine:
     def morph_in_place(self, ci: CardInstance, new_card: Card) -> None:
         if ci.area is not AreaType.FIELD or ci not in ci.owner.field:
             raise IllegalActionError("only a field minion can transform")
-        ci.card = new_card
+        self._replace_field_card_face(ci, new_card)
         if Keyword.RUSH in new_card.keywords:
             ci.summoning_sickness = False
         self.triggers.emit(EffectTiming.ON_TRANSFORM, Context(controller=ci.owner, source=ci))
@@ -2389,6 +2483,8 @@ class Engine:
             raise IllegalActionError("card is not in hand")
         if ci.card.type is not CardType.F_MINION:
             raise IllegalActionError("only Field Minions can be summoned from hand")
+        if replace_field_iid is None:
+            replace_field_iid = self.select_field_replacement_iid(player)
         self._make_field_space(player, replace_field_iid)
         player.hand.remove(ci)
         ci.area = AreaType.FIELD
@@ -2397,8 +2493,7 @@ class Engine:
         player.field.append(ci)
         self._record_zone_move(ci, AreaType.HAND, AreaType.FIELD)
         self._record_summon(ci)
-        self.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=player, source=ci))
-        self._emit_enter_field(player, ci)
+        self._emit_summon(player, ci)
         self.triggers.emit(TriggerTiming.ON_PLAY, Context(controller=player, source=ci))
         self.triggers.emit(EffectTiming.ON_CARD_USED, Context(controller=player, source=ci))
         if resolve_triggers:
@@ -3064,6 +3159,8 @@ class Engine:
             battle_participants: tuple[CardInstance, CardInstance] | None = None,
             visual_source: dict[str, Any] | None = None,
     ) -> None:
+        if operation not in ("destroy", "battle"):
+            raise ValueError(f"invalid destruction operation: {operation!r}")
         if ci.area is AreaType.BASE and ci in ci.owner.base and ci.card.type not in (CardType.F_MINION, CardType.B_MINION):
             self._eject_base_card(ci.owner, ci, reason="destroy")
             return
@@ -3080,7 +3177,7 @@ class Engine:
         self._record_visual_event({
             "type": "destroy",
             "card": ci,
-            "cause": ("battle" if operation == "battle" else "replacement" if operation == "replacement" else "self" if source is ci
+            "cause": ("battle" if operation == "battle" else "self" if source is ci
                       else "rule" if source is None else "effect"),
             "sourceCard": visual_source if visual_source is not None else self._visual_source_card(source),
         })
@@ -3199,25 +3296,21 @@ class Engine:
                                 payload={"iid": mana.iid, "mana_iid": mana.iid, "target_iid": target.iid},
                             ))
                 for ci in active.base:
-                    if self._movement_locked(ci) or self._action_restricted(ci, "move"):
+                    if not self.can_move_base_minion_to_field(active, ci):
                         continue
-                    if self.has_keyword(ci, Keyword.KAGO) or self.has_keyword(ci, Keyword.BLESS):
-                        continue
-                    if (ci.card.type is not CardType.MANA_TOKEN
-                        and not ci.card.is_token):
-                        if len(active.field) < FIELD_CAP:
-                            out.append(Action(kind="move_card",
-                                              payload={"iid": ci.iid, "direction": "base_to_field"}))
-                        else:
-                            for field_ci in active.field:
-                                out.append(Action(
-                                    kind="move_card",
-                                    payload={
-                                        "iid": ci.iid,
-                                        "direction": "base_to_field",
-                                        "replace_field_iid": field_ci.iid,
-                                    },
-                                ))
+                    if len(active.field) < FIELD_CAP:
+                        out.append(Action(kind="move_card",
+                                          payload={"iid": ci.iid, "direction": "base_to_field"}))
+                    else:
+                        for field_ci in active.field:
+                            out.append(Action(
+                                kind="move_card",
+                                payload={
+                                    "iid": ci.iid,
+                                    "direction": "base_to_field",
+                                    "replace_field_iid": field_ci.iid,
+                                },
+                            ))
                 for ci in active.field:
                     if self._movement_locked(ci) or self._action_restricted(ci, "move"):
                         continue
@@ -3449,8 +3542,7 @@ class Engine:
                 player.field.append(ci)
                 self._record_zone_move(ci, AreaType.HAND, AreaType.FIELD)
                 self._record_summon(ci)
-                self.triggers.emit(EffectTiming.ON_SUMMON, Context(controller=player, source=ci))
-                self._emit_enter_field(player, ci)
+                self._emit_summon(player, ci)
                 self.triggers.emit(TriggerTiming.ON_PLAY, Context(controller=player, source=ci))
                 self.triggers.emit(EffectTiming.ON_CARD_USED, Context(controller=player, source=ci))
                 if resolve_triggers:
@@ -3541,7 +3633,7 @@ class Engine:
         elif kind == "ally_minion_base":
             eligible = [
                 ci for ci in player.base
-                if ci.card.type in (CardType.B_MINION, CardType.F_MINION)
+                if self.can_move_base_minion_to_field(player, ci)
             ]
         elif kind == "other_ally_minion":
             eligible = list(player.field)
@@ -3694,6 +3786,10 @@ class Engine:
             filter_fn=filter_fn,
             source=source,
         )
+        # Declared effect targets resolve as far as possible. Costs and capacity
+        # replacements use their own selection paths, not this effect contract.
+        if contract is not None and source is contract[0] and kind == contract[1].target_kind:
+            min_n = min(min_n, len(eligible))
         policy = self.policy_for(player)
         previous_context = getattr(self, "_target_selection_context", None)
         self._target_selection_context = {"source": source}

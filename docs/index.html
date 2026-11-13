@@ -8,7 +8,7 @@
   <title>ZENONZARD Offline Project</title>
   <link rel="icon" href="assets/zzicon.webp">
   <link rel="stylesheet" href="assets/site.css">
-  <script src="assets/site.js?v=0.5.4" defer></script>
+  <script src="assets/site.js?v=0.6.0" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main" data-i18n="skip">跳到正文</a>
@@ -53,17 +53,17 @@
     </section>
 
     <section class="release-strip" aria-label="Release status">
-      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡 + EX01 + PC01 + PC01R + PC02 + PC02R DIVINE（106 张）+ EX02C/SAO 与 EX02 对应卡面（70 组）</span></div>
+      <div><strong data-i18n="statusOneTitle">当前卡池</strong><span data-i18n="statusOneBody">基础卡、PC01、PC01R、PC02、PC02R、PC03、EX01、EX02 和 EX02C/SAO</span></div>
       <div><strong data-i18n="statusTwoTitle">对战方式</strong><span data-i18n="statusTwoBody">单机 / 局域网 / 在线</span></div>
       <div><strong data-i18n="statusThreeTitle">AI 档位</strong><span data-i18n="statusThreeBody">Greedy + 两档 RL</span></div>
-      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.5.4 · 当前版本</span></div>
+      <div><strong data-i18n="statusFourTitle">版本状态</strong><span data-i18n="statusFourBody">v0.6.0 · 当前版本</span></div>
     </section>
 
     <section class="section" id="features">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="featuresEyebrow">Game Lobby</p>
         <h2 data-i18n="featuresTitle">组卡到开局皆在游戏大厅</h2>
-        <p data-i18n="featuresLead">选择双方卡组、Codeman、卡垫与 AI 难度，然后进入你想要的对战方式。卡池包含 EX02C/SAO 的 70 张卡及对应 EX02 原版卡面；也可私下预览卡牌变身后的形态。</p>
+        <p data-i18n="featuresLead">选择双方卡组、Codeman、卡垫与 AI 难度，然后进入你想要的对战方式。卡池现已包含 PC03，也可私下预览卡牌变身后的形态。</p>
       </div>
 
       <div class="mode-showcase">
@@ -121,7 +121,7 @@
 
       <div class="truth-note">
         <strong data-i18n="truthTitle">关于 AI 水平的诚实说明</strong>
-        <p data-i18n="truthBody">作者拥有统计学学位，但没有修读强化学习课程，研究方向也与此无关；模型训练规模同样不大。电脑 AI 的训练数据和卡池目前只覆盖 PC01，PC01R、EX01、PC02、PC02R DIVINE、EX02、EX02C/SAO 没有进入训练流程。当前 AI 与 ZENONZARD 正式运营时期万代使用的 AI 仍有明显差距。相关实现由 Codex 协助编写，并参考了 ygo-agent 的公开方法与工程结构。</p>
+        <p data-i18n="truthBody">作者拥有统计学学位，但没有修读强化学习课程，研究方向也与此无关；模型训练规模同样不大。电脑 AI 的训练数据和卡池目前只覆盖 PC01，PC01R、EX01、PC02、PC02R DIVINE、EX02、EX02C/SAO、PC03 没有进入训练流程。当前 AI 与 ZENONZARD 正式运营时期万代使用的 AI 仍有明显差距。相关实现由 Codex 协助编写，并参考了 ygo-agent 的公开方法与工程结构。</p>
         <a href="https://github.com/sbl1996/ygo-agent" target="_blank" rel="noreferrer">ygo-agent ↗</a>
       </div>
 
@@ -142,7 +142,7 @@
     <section class="section screenshots" aria-labelledby="screens-title">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="screensEyebrow">Actual UI</p>
-        <h2 id="screens-title" data-i18n="screensTitle">完整 ZZ 体验：包含 106 张 PC02R DIVINE 卡牌与 70 组 EX02C/SAO—EX02 对应卡面</h2>
+        <h2 id="screens-title" data-i18n="screensTitle">完整 ZZ 体验：现已包含 PC03 卡池</h2>
       </div>
       <div class="screen-stage">
         <img src="assets/battle.webp" alt="ZENONZARD 对战画面" loading="lazy">
@@ -182,7 +182,7 @@
         <h2 data-i18n="contentTitle">当前内容边界</h2>
       </div>
       <div class="status-list">
-        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">当前包含基本卡、EX01、PC01、PC01R、PC02 与 PC02R DIVINE 的 106 张卡，以及 EX02C/SAO 的 70 张卡与对应 EX02 原版卡面。</p></div>
+        <div><strong data-i18n="poolTitle">卡池</strong><p data-i18n="poolBody">当前包含基本卡、EX01、PC01、PC01R、PC02、PC02R、EX02、EX02C/SAO 和 PC03。</p></div>
         <div><strong data-i18n="testingTitle">测试</strong><p data-i18n="testingBody">个人项目无法覆盖足够多的组合测试，当前版本可能仍有小型规则或界面问题。</p></div>
         <div><strong data-i18n="englishTitle">英文版</strong><p data-i18n="englishBody">asserts.7z 资源包包含英文卡图；未覆盖的图仍可能回退到官网 URL。</p></div>
         <div><strong data-i18n="musicTitle">BGM</strong><p data-i18n="musicBody">顶部栏或基础设置中可选择对战 BGM；完整资源包包含 ZZ 各角色歌曲。</p></div>
@@ -193,13 +193,13 @@
     <section class="section install" id="install">
       <div class="section-heading">
         <p class="eyebrow" data-i18n="installEyebrow">INSTALLATION</p>
-        <h2 data-i18n="installTitle">下载 v0.5.4；首次启动可自动获取资源</h2>
-        <p data-i18n="installLead">v0.5.4 的 Windows 版将卡组保存在安装目录 data/decks/；首次启动从旧的 %APPDATA%\zenonzard-clone\game-data\decks\ 迁移卡组，保留原文件备份且不覆盖冲突卡组。圣之 Force 会保护符合条件的己方怪物，使其不会被通过加护赋予对手怪物的选择效果选中；恩里科效果先令双方弃牌、再抽牌。联机断线后最多自动重连 5 次并保留房间码；当前对局和结果页的战斗日志支持分页。重连时较大的消息会分段传输；联机回放保存在游戏目录 data/replays/，未补齐时标记为不完整。联机双方客户端与服务器必须使用相同版本；v0.5.4 客户端需要连接 v0.5.4 服务器。Windows 安装包和 Linux 便携包包含可玩的游戏与默认模型。缺少完整 asserts/ 时，桌面客户端会询问是否下载并安装包含英文卡图的 asserts.7z。</p>
+        <h2 data-i18n="installTitle">下载 v0.6.0；首次启动可自动获取资源</h2>
+        <p data-i18n="installLead">v0.6.0 更新 PC03 卡包。Windows 版将卡组保存在安装目录 data/decks/；联机双方和服务器需使用相同版本。建议旧玩家重新下载资源包，以获取 PC03 Token 卡图。</p>
       </div>
       <div class="install-grid">
         <ol class="steps">
           <li><span>1</span><div><strong data-i18n="installStep1Title">选择平台发行包</strong><p data-i18n="installStep1Body">Windows 使用安装包，Linux 使用便携包；macOS 和开发者使用源码包。自建服务器使用独立联机服务器包。</p></div></li>
-          <li><span>2</span><div><strong data-i18n="installStep2Title">首次启动获取资源</strong><p data-i18n="installStep2Body">若缺少 asserts/，客户端会询问是否下载 asserts.7z，校验 CRC 后解压到程序目录；包为 1.53 GB，展开后 1.58 GB，请预留 3.2 GB。包含英文卡图；取消后不启动，失败可重试。</p></div></li>
+          <li><span>2</span><div><strong data-i18n="installStep2Title">首次启动获取资源</strong><p data-i18n="installStep2Body">若缺少 asserts/，客户端会询问是否下载并安装资源。旧玩家可关闭游戏，将旧 asserts/ 改名备份后重新启动；请保留存有卡组和回放的 data/。资源包约 1.54 GB，请预留至少 3.2 GB。</p></div></li>
           <li><span>3</span><div><strong data-i18n="installStep3Title">源码版本安装依赖</strong><p data-i18n="installStep3Body">Windows 安装包不需要 Python 或 Node.js；源码启动才需要 Python 3.10+、Node.js 20+ 与 npm install。</p></div></li>
           <li><span>4</span><div><strong data-i18n="installStep4Title">启动客户端</strong><p data-i18n="installStep4Body">Windows 安装包从开始菜单或桌面快捷方式启动；Linux bundle 解压后运行 ./launch-electron.sh；源码版本使用 .cmd、.sh 或 npm run electron:dev。</p></div></li>
         </ol>
@@ -212,14 +212,14 @@
             <div><dt data-i18n="reqGpu">显卡</dt><dd data-i18n="reqGpuBody">游玩不要求；本地训练需要 NVIDIA GPU / CUDA</dd></div>
           </dl>
           <div class="download-actions">
-            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Windows-Setup.exe" data-i18n="downloadCode">下载 Windows v0.5.4</a>
-            <a class="button secondary" data-linux-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-Linux.tar.gz" data-i18n="downloadLinux">下载 Linux v0.5.4</a>
-            <a class="button secondary" data-source-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Project-v0.5.4-source.zip" data-i18n="downloadSource">下载源码</a>
-            <a class="button secondary" data-server-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/ZZ-Multiplayer-v0.5.4.tar.gz" data-i18n="downloadServer">下载联机服务器</a>
-            <a class="button secondary" data-checksums-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.5.4/SHA256SUMS-PC02.txt" data-i18n="downloadChecksums">SHA256 校验清单</a>
+            <a class="button primary" data-repo-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe" data-i18n="downloadCode">下载 Windows v0.6.0</a>
+            <a class="button secondary" data-linux-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz" data-i18n="downloadLinux">下载 Linux v0.6.0</a>
+            <a class="button secondary" data-source-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip" data-i18n="downloadSource">下载源码</a>
+            <a class="button secondary" data-server-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz" data-i18n="downloadServer">下载联机服务器</a>
+            <a class="button secondary" data-checksums-link href="https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt" data-i18n="downloadChecksums">SHA256 校验清单</a>
             <a class="button secondary" data-asset-link href="https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ?usp=sharing" target="_blank" rel="noreferrer" data-i18n="downloadAssets">打开 asserts.7z 资源文件夹（含英文卡图）</a>
           </div>
-          <p class="hash-note"><code>asserts.7z · 1,534,680,950 bytes</code><br><span data-i18n="hashNote">asserts.7z 为 1,534,680,950 bytes，展开后为 1,577,092,255 bytes，需预留至少 3.2 GB。客户端捆绑 7-Zip 并校验 CRC；程序发行包的 SHA256 见校验清单。</span></p>
+          <p class="hash-note"><code>asserts.7z · 1,535,230,963 bytes</code><br><span data-i18n="hashNote">asserts.7z 为 1,535,230,963 bytes，展开后为 1,577,650,106 bytes，需预留至少 3.2 GB。客户端校验 SHA-256 和 7-Zip CRC。</span></p>
         </aside>
       </div>
     </section>

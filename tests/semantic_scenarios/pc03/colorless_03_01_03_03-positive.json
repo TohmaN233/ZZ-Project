@@ -260,13 +260,13 @@
   ],
   "assertions": [
     {
-      "name": "P2 Base Minion cannot enter Active outside Standby",
+      "name": "P2 Base Minion is placed Active outside Standby",
       "path": "state.players.opponent.base",
       "op": "count_where",
       "value": 1,
       "where": {
         "cardId": "colorless_00_01_01_01",
-        "rested": true
+        "rested": false
       }
     },
     {

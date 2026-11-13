@@ -734,15 +734,19 @@ def _schedule_refresh_all_base_at_turn_end(ci: CardInstance, state, ctx: Context
             eng.schedule_turn_end_effect(owner, refresh_base)
 
 
-def _barichalguo_refresh(ci: CardInstance, state, ctx: Context) -> None:
+def _barichalguo_trigger(ci: CardInstance, state, ctx: Context) -> bool:
     source = ctx.source
-    if (
+    return (
         ci.area is AreaType.FIELD
         and ctx.target is ci.owner
         and isinstance(source, CardInstance)
         and source.owner is not ci.owner
         and sum(source.card.cost.values()) <= 5
-    ):
+    )
+
+
+def _barichalguo_refresh(ci: CardInstance, state, ctx: Context) -> None:
+    if _barichalguo_trigger(ci, state, ctx):
         state.engine.refresh_target(ci)
 
 
@@ -1445,7 +1449,7 @@ _EXTRA_EFFECTS_BY_ID = {
         build_effect("prevent_player_damage", EffectTiming.ON_CAST_MAGIC, amount=1),
     ),
     "green_03_02_01_00": (
-        EffectSpec(EffectTiming.ON_ATTACK, _barichalguo_refresh),
+        EffectSpec(EffectTiming.ON_ATTACK, _barichalguo_refresh, condition=_barichalguo_trigger),
     ),
     "green_03_02_01_02": (
         EffectSpec(EffectTiming.ON_ENTER_FIELD, _brigitte_draw_on_green_cost5_enter),
@@ -1464,7 +1468,7 @@ _EXTRA_EFFECTS_BY_ID = {
     ),
     "purple_02_02_01_01": (
         _marker_effect(),
-        EffectSpec(EffectTiming.ON_ATTACK, _ashbringer_buff_force_attacker),
+        EffectSpec(EffectTiming.ON_ATTACK, _ashbringer_buff_force_attacker, condition=_other_own_minion_attacks_force),
     ),
     "purple_03_03_01_00": (
         build_effect(

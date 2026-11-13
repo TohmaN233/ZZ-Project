@@ -54,16 +54,8 @@ def _apply_evolution(source: CardInstance, state: Any, ctx: Context) -> None:
     )
 
 
-def _self_attacked_with_two_enemies(source: CardInstance, state: Any, ctx: Context) -> bool:
-    if ctx.source is not source or source.area is not AreaType.FIELD or state.active is not source.owner:
-        return False
-    opponent = state.players[1 - state.players.index(source.owner)]
-    return sum(
-        target.area is AreaType.FIELD
-        and target.owner is opponent
-        and target.card.type is CardType.F_MINION
-        for target in opponent.field
-    ) >= 2
+def _self_attacked(source: CardInstance, state: Any, ctx: Context) -> bool:
+    return ctx.source is source and source.area is AreaType.FIELD and state.active is source.owner
 
 
 def _dwarf_charge_aura(source: CardInstance, target: CardInstance, state: Any) -> list[Keyword]:
@@ -89,7 +81,7 @@ def build_card(row: dict[str, Any]):
             build_effect(
                 "stat_modifier",
                 EffectTiming.ON_ATTACK,
-                condition=_self_attacked_with_two_enemies,
+                condition=_self_attacked,
                 target_kind="enemy_minion",
                 min_targets=2,
                 max_targets=2,

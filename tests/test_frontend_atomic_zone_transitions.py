@@ -28,13 +28,14 @@ FUNCTIONS = [
     "playerAreaCards", "playerAreaCardsFromState", "pendingVisualCard", "refreshPlayerZoneCounts",
     "removeVisualCardFromArea", "addVisualCardToArea", "rememberDestroySource",
     "settleDestroyVisualState", "isRefreshVisualEvent", "settleRefreshVisualState",
-    "settleHealVisualState", "settleZoneMoveVisualState", "settleDrawVisualState",
+    "settleHealVisualState", "settleZoneMoveVisualState", "settleDrawVisualState", "settleCardFaceChangeVisualState",
     "settleFinishedAnimationEvent", "stagePendingVisualStateForEffect", "commitPendingVisualState",
     "stageDuelState", "api", "rawActivePrompt", "activePrompt", "players", "cardsFor",
     "findPlayerBySide", "findCardByIid", "enqueueAnimationEvents", "animationEventDuration",
-    "showNextAnimationEvent", "isActiveZoneMoveSourceCard", "renderHandFan", "renderBaseLane",
+    "showNextAnimationEvent", "isActiveZoneMoveSourceCard", "isActiveTransformSourceCard", "renderHandFan", "renderBaseLane",
     "boardAnchorKey", "boardAnchorCssName", "boardSideForEventSide", "boardAnchorForZone", "cardAreaAnchorFallback",
     "boardAnchorForCardInState", "boardAnchorForCard", "boardAnchorStyle", "renderBoardAnchoredZoneMove",
+    "renderBoardEventCard", "renderBoardAnchoredFaceChange",
 ]
 
 
@@ -132,6 +133,21 @@ assert.deepEqual(state.players.human.base.map(c => c.iid), [1]);
 """)
 
 
+def test_evolution_holds_old_face_then_replaces_it_and_uses_card_color():
+    _run(r"""
+const before = {...card(8, 'field'), cardId: 'lv1', manaColor: 'RED'};
+const after = {...before, cardId: 'lv2'};
+const event = {type: 'evolution', side: 'P1', cards: [{area: 'field', before, after}]};
+state = dto(player('P1', [], [], [before]));
+stageDuelState(dto(player('P1', [], [], [after]), [event]));
+assert.equal(state.players.human.field[0].cardId, 'lv1');
+assert.match(renderBoardAnchoredFaceChange(event), /tone-red/);
+assert.match(renderBoardAnchoredFaceChange(event), /EVOLVE/);
+drain();
+assert.equal(state.players.human.field[0].cardId, 'lv2');
+""")
+
+
 def test_new_response_waits_for_prior_animation_snapshot_boundary():
     _run(r"""
 const old = card(1), mana = card(1, 'base'), incoming = card(2);
@@ -180,6 +196,49 @@ tick(); assert.equal(activeAnimationEvent.type, 'draw'); assert.equal(activeProm
 assert.equal(state.players.human.hand.length, 0);
 tick(); assert.equal(activePrompt().id, 2);
 assert.deepEqual(state.players.human.hand.map(c => c.iid), [2, 3]);
+""")
+
+
+def test_summon_token_replacement_prompt_waits_for_real_effect_announcement():
+    from zz.cards import CARD_REGISTRY
+    from zz.enums import AreaType, CardType, Color, Step
+    from zz.model import Card, CardInstance
+    from zz.web.session import GameSession
+
+    session = GameSession(seed=19, mode="god")
+    session._clear_prompt()
+    engine = session.engine
+    owner = engine.state.players[0]
+    engine.state.step = Step.MAIN
+    for player in engine.state.players:
+        player.field.clear()
+        player.base.clear()
+        player.hand.clear()
+    def add(card, area):
+        instance = CardInstance(card, owner, iid=engine.state.allocate_iid(), area=area)
+        getattr(owner, area.value).append(instance)
+        return instance
+    source = add(CARD_REGISTRY["red_04_01_03_00"], AreaType.HAND)
+    for index in range(4):
+        add(Card(f"ally-{index}", "ally", "ally", CardType.F_MINION, bp=500), AreaType.FIELD)
+    for _ in range(5):
+        add(Card("red-mana", "red-mana", "red-mana", CardType.B_MINION, mana_color=Color.RED), AreaType.BASE)
+    session._prompt_main_action()
+    before = session.state_dto()
+    play = next(option for option in session.prompt["options"] if option.get("kind") == "play_card" and option.get("iid") == source.iid)
+    after = session.choose(session.prompt["id"], play["id"], {"paymentBaseIids": play["paymentDefaultIids"]})
+    assert after["prompt"]["choiceKind"] == "ally_minion"
+    _run("const packet = " + json.dumps([before, after], ensure_ascii=True) + r""";
+state = packet[0];
+stageDuelState(packet[1]);
+let sawEffect = false;
+while (activeAnimationEvent || animationEventQueue.length) {
+  assert.equal(activePrompt(), null, 'replacement cannot open during summon or effect announcement');
+  if (activeAnimationEvent?.type === 'effect') sawEffect = true;
+  tick();
+}
+assert.ok(sawEffect, 'summon effect was announced');
+assert.equal(activePrompt().id, packet[1].prompt.id);
 """)
 
 

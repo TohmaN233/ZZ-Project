@@ -39,7 +39,7 @@ test("refusing download never contacts the network or creates an installation wi
   assert.equal(result, null); assert.equal(context.windows.length, 0);
   assert.match(context.dialogs[0].detail, /asserts\.7z/);
   assert.match(context.dialogs[0].detail, /1\.43 GiB/);
-  assert.match(context.dialogs[0].detail, /1\.53 GB/);
+  assert.ok(context.dialogs[0].detail.includes(`${(source.sizeBytes / 1e9).toFixed(2)} GB`));
   assert.match(context.dialogs[0].detail, /3\.2 GB/);
   assert.ok(context.dialogs[0].detail.includes(context.destination));
 });

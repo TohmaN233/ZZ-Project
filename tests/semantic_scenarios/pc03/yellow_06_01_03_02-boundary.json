@@ -157,11 +157,11 @@
       }
     },
     {
-      "name": "Add a lower-level Godbird after the quota is spent",
+      "name": "Summon the Godbird that synchronized in hand",
       "prompt_kind": "main_action",
       "select": {
         "kind": "play_card",
-        "cardId": "yellow_06_01_03_01"
+        "cardId": "yellow_06_01_03_03"
       }
     },
     {
@@ -176,19 +176,19 @@
   ],
   "assertions": [
     {
-      "name": "The first family evolution reaches Godbird Lv.3",
+      "name": "The field and hand Godbirds both reach Lv.3",
       "path": "state.players.human.field",
       "op": "count_where",
-      "value": 1,
+      "value": 2,
       "where": {
         "cardId": "yellow_06_01_03_03"
       }
     },
     {
-      "name": "The later lower-level Godbird remains Lv.1",
+      "name": "No Godbird remains Lv.1",
       "path": "state.players.human.field",
       "op": "count_where",
-      "value": 1,
+      "value": 0,
       "where": {
         "cardId": "yellow_06_01_03_01"
       }

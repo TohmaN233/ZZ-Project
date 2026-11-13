@@ -19,12 +19,19 @@ class TriggerLoopError(RuntimeError):
 
 
 @dataclass
+class _SummonEntryGate:
+    source: "CardInstance"
+    allowed: bool | None = None
+
+
+@dataclass
 class _Pending:
     timing: TriggerTiming | EffectTiming
     instance: "CardInstance"
     trigger: Any
     context: "Context"
     evaluate_condition_on_resolution: bool = False
+    summon_entry_gate: _SummonEntryGate | None = None
 
 
 class TriggerRegistry:
@@ -50,6 +57,13 @@ class TriggerRegistry:
             and (trigger is None or pending.trigger is trigger)
             for pending in self._queue
         )
+
+    def invalidate_unstarted_summon(self, source: "CardInstance") -> None:
+        """Keep an unstarted summon invalid even if its source later returns."""
+        for pending in self._queue:
+            gate = pending.summon_entry_gate
+            if gate is not None and gate.source is source and gate.allowed is None:
+                gate.allowed = False
 
     def enqueue_source_effects(self, ci: "CardInstance", timing: EffectTiming,
                                ctx: "Context", effects: list[Any], *, after_pending: bool = False) -> None:
@@ -109,9 +123,13 @@ class TriggerRegistry:
         self._queue.extend(captured)
 
     def emit(self, timing: TriggerTiming | EffectTiming, ctx: "Context", *,
-             exclude_instance: "CardInstance" | None = None) -> None:
+             exclude_instance: "CardInstance" | None = None,
+             check_summon_entry: bool = False) -> None:
         if self._engine._terminal_game_over:
             return
+        if check_summon_entry and timing is not EffectTiming.ON_SUMMON:
+            raise ValueError("summon entry check requires an ON_SUMMON event")
+        summon_gate = _SummonEntryGate(ctx.source) if check_summon_entry else None
         state = self._engine.state
         if timing is EffectTiming.ON_SUMMON and ctx.summon_source_area is None:
             movement = next((event for event in reversed(self._engine.zone_move_events)
@@ -173,6 +191,12 @@ class TriggerRegistry:
                         )
                         if effect.timing is not timing and not is_switch:
                             continue
+                        # Source-timing templates declare their own event scope.
+                        # Explicit listeners, evolution and Switch keep their own contracts.
+                        if (timing in (EffectTiming.ON_SUMMON, EffectTiming.ON_ATTACK)
+                                and ci is not ctx.source and not is_switch
+                                and params.get("self_event_only")):
+                            continue
                         if ci is summoned and self._engine.pc03_summon_effect_suppressed(ci, timing):
                             continue
                         # A printed summon/Switch clause is a source effect,
@@ -199,7 +223,9 @@ class TriggerRegistry:
                             pending_timing = effect.timing
                         # A card's own destroy effect resolves from the destroyed source.
                         # Field/base destroy listeners must opt in with an explicit condition.
-                        if timing is EffectTiming.ON_DESTROY and effect.condition is None:
+                        if timing is EffectTiming.ON_DESTROY and (
+                            effect.condition is None or params.get("self_destroy_only")
+                        ):
                             continue
                         if not self._effect_active_in_area(effect, ci):
                             continue
@@ -210,10 +236,12 @@ class TriggerRegistry:
                         if effect.condition and not effect.condition(ci, state, effect_context):
                             continue
                         effect_context = self._engine.capture_effect_context(ci, effect, effect_context)
-                        self._queue.append(_Pending(pending_timing, ci, effect, effect_context))
+                        self._queue.append(_Pending(pending_timing, ci, effect, effect_context,
+                                                    summon_entry_gate=summon_gate))
                         should_duplicate = getattr(self._engine, "should_duplicate_summon_effect", lambda source: False)
                         if timing is EffectTiming.ON_SUMMON and ci is ctx.source and should_duplicate(ci):
-                            self._queue.append(_Pending(timing, ci, effect, effect_context))
+                            self._queue.append(_Pending(timing, ci, effect, effect_context,
+                                                        summon_entry_gate=summon_gate))
                     if timing is EffectTiming.ON_ATTACK and ci is ctx.source and ci.area is AreaType.FIELD:
                         for grant in self._engine._pc03_attack_grants:
                             if (grant["owner"] is ci.owner and ci.card.type in grant["types"]
@@ -230,7 +258,7 @@ class TriggerRegistry:
                             continue
                         if trig.condition and not trig.condition(ci, state, ctx):
                             continue
-                        self._queue.append(_Pending(timing, ci, trig, ctx))
+                        self._queue.append(_Pending(timing, ci, trig, ctx, summon_entry_gate=summon_gate))
                     if ci.area is AreaType.FIELD and ci.blessings:
                         from zz.pc02 import blessing_effects
 
@@ -240,7 +268,8 @@ class TriggerRegistry:
                             if effect.condition and not effect.condition(ci, state, ctx):
                                 continue
                             context = self._engine.capture_effect_context(ci, effect, ctx)
-                            self._queue.append(_Pending(timing, ci, effect, context))
+                            self._queue.append(_Pending(timing, ci, effect, context,
+                                                        summon_entry_gate=summon_gate))
 
     def resolve_all(self) -> None:
         if self._engine._terminal_game_over:
@@ -267,6 +296,27 @@ class TriggerRegistry:
                     f"trigger depth exceeded {MAX_TRIGGER_DEPTH}"
                 )
             p = self._queue.popleft()
+            gate = p.summon_entry_gate
+            if gate is not None:
+                if gate.allowed is None:
+                    source_in_field = gate.source.area is AreaType.FIELD and gate.source in gate.source.owner.field
+                    if source_in_field and self._engine.effective_bp(gate.source) <= 0:
+                        # A nested summon can reach this checkpoint while an
+                        # enclosing callback is still resolving. Run the usual
+                        # state-based destruction before any summon clauses.
+                        gate.allowed = False
+                        self._queue.appendleft(p)
+                        if self._engine._resolving_state_based_actions:
+                            self._engine._destroy(gate.source, source=None)
+                        else:
+                            self._engine._resolve_state_based_actions()
+                        continue
+                    gate.allowed = source_in_field
+                # Entry reactions have finished before this event starts. A
+                # minion already destroyed there cannot activate its own
+                # summon clauses; other listeners keep the actual summon event.
+                if not gate.allowed and p.instance is gate.source and p.timing is EffectTiming.ON_SUMMON:
+                    continue
             if (p.evaluate_condition_on_resolution and p.trigger.condition
                     and not p.trigger.condition(p.instance, self._engine.state, p.context)):
                 self._engine.complete_magic_source_effect(p.instance, p.trigger, p.context)

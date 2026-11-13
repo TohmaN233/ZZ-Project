@@ -46,6 +46,8 @@ def test_current_product_inventory_includes_untracked_pc02r_rules_and_public_sou
         assert len([path for path in files if path.startswith("tests/semantic_scenarios/ex02c/")]) == 141
         assert len([path for path in files if path.startswith("tests/semantic_scenarios/pc03/")]) == 342
         assert {"tests/test_pc03_cards.py", "tests/test_pc03_outside_selection.py", "tests/test_pc03_authoritative_hash.py"} <= files
+        assert {"tests/test_field_entry_capacity.py", "tests/test_lahrs_placement.py",
+                "tests/test_pc03_live_regressions.py", "tests/test_transform_visuals.py"} <= files
         assert {"tests/test_ex02c_cards.py", "tools/build_ex02c_correspondence.py"} <= files
         assert {
             "tests/test_ex02c_link_activation_combat.py", "tests/test_ex02c_standby_deadline.py",

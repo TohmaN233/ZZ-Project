@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any
 
 from zz.effects import EffectSpec, EffectTiming
-from zz.engine import FIELD_CAP
 from zz.enums import AreaType, CardType
 from zz.model import CardInstance, Context
 from zz.pc01 import _card_from_row
@@ -48,16 +47,7 @@ def _pay_life_and_return(source: CardInstance, state: Any, _ctx: Context) -> Non
     engine = state.engine
     owner = source.owner
     engine._damage_player(owner, 1, source=source)
-    replacement_iid = None
-    if len(owner.field) >= FIELD_CAP:
-        eligible = engine._eligible_targets(owner, "ally_minion", source=source)
-        if not eligible:
-            raise RuntimeError(f"{CARD_ID} cannot replace a full Field without an eligible Minion")
-        replacements = engine.select_target(owner, "ally_minion", 1, 1, source=source)
-        if len(replacements) != 1:
-            raise RuntimeError(f"{CARD_ID} expected one Field replacement, got {len(replacements)}")
-        replacement_iid = replacements[0].iid
-    engine.summon_from_trash(owner, source, replace_field_iid=replacement_iid)
+    engine.summon_from_trash(owner, source)
 
 
 def build_card(row: dict[str, Any]):

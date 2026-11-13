@@ -184,12 +184,16 @@ _MODULES = (
     ('yellow_08_01_03_00', 'zz.pc03_cards.yellow_08_01_03_00'),
 )
 PC03_CARD_IDS = tuple(card_id for card_id, _ in _MODULES)
+_PC03_LEVEL_PREDECESSORS: dict[str, str] = {}
 
 
 def register_pc03_cards():
     with _CARD_TSV.open(encoding="utf-8-sig", newline="") as handle:
         rows = {row["image_id"]: row for row in csv.DictReader(handle, delimiter="\t")}
     outside_ids = set()
+    known_ids = set(PC03_CARD_IDS)
+    predecessors: dict[str, str] = {}
+    successors: dict[str, str] = {}
     for card_id, module_name in _MODULES:
         if card_id not in rows:
             raise RuntimeError(f"missing PC03 source row: {card_id}")
@@ -202,7 +206,15 @@ def register_pc03_cards():
         if beast_id:
             outside_ids.add(beast_id)
         for attribute in ("EVOLUTION_PAIRS", "LAHRS_UPGRADES"):
-            outside_ids.update(target for _, target in getattr(module, attribute, ()))
+            for old, target in getattr(module, attribute, ()):
+                if old not in known_ids or target not in known_ids or old == target:
+                    raise RuntimeError(f"invalid PC03 level link {old!r} -> {target!r}")
+                if (predecessors.get(target, old) != old
+                        or successors.get(old, target) != target):
+                    raise RuntimeError(f"ambiguous PC03 level link {old!r} -> {target!r}")
+                predecessors[target] = old
+                successors[old] = target
+                outside_ids.add(target)
         card = module.build_card(rows[card_id])
         if beast_id:
             card.cannot_move = True
@@ -211,7 +223,34 @@ def register_pc03_cards():
         register(card)
     for card_id in outside_ids:
         CARD_REGISTRY[card_id].deck_buildable = False
+    for target in predecessors:
+        seen = set()
+        current = target
+        while current in predecessors:
+            if current in seen:
+                raise RuntimeError(f"cycle in PC03 level links at {current}")
+            seen.add(current)
+            current = predecessors[current]
+    _PC03_LEVEL_PREDECESSORS.update(predecessors)
     return list(PC03_CARD_IDS)
+
+
+def expand_pc03_evolution_pairs(upgrades: dict[str, str]) -> dict[str, str]:
+    """Map every lower face in each declared level chain to its target face."""
+    expanded: dict[str, str] = {}
+    for old, target in upgrades.items():
+        current = _PC03_LEVEL_PREDECESSORS.get(target)
+        ancestors = []
+        while current is not None:
+            ancestors.append(current)
+            current = _PC03_LEVEL_PREDECESSORS.get(current)
+        if old not in ancestors:
+            raise ValueError(f"invalid PC03 evolution pair {old} -> {target}")
+        for ancestor in ancestors:
+            existing = expanded.setdefault(ancestor, target)
+            if existing != target:
+                raise ValueError(f"conflicting PC03 evolution targets for {ancestor}")
+    return expanded
 
 
 register_pc03_cards()

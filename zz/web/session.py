@@ -90,11 +90,20 @@ class _QueuedHumanPolicy:
         return targets[0]
 
     def choose_target(self, engine: Engine, kind: str, min_n: int, max_n: int, eligible: list) -> list:
-        if not self._targets:
+        if not self._targets or max_n <= 0:
             return []
-        targets = [target for target in self._targets if target in eligible]
-        selected = targets[:max_n]
-        self._targets = [target for target in self._targets if target not in selected]
+        selected = []
+        for target in self._targets:
+            if target in eligible and not any(target is item for item in selected):
+                selected.append(target)
+                if len(selected) == max_n:
+                    break
+        # One card can be selected in two different steps, e.g. a Minion is
+        # copied and then chosen as the Field replacement. Consume one queued
+        # occurrence per choice rather than discarding both occurrences.
+        for target in selected:
+            index = next(i for i, queued in enumerate(self._targets) if queued is target)
+            del self._targets[index]
         return selected
 
     def choose_mulligan(self, engine: Engine, player) -> list[CardInstance]:
@@ -329,7 +338,9 @@ class GameSession:
 
     def _configure_mode_controls(self) -> None:
         self.engine.ignore_hand_cap = self.mode == "debug-card-lab"
-        if self.mode == "human-vs-ai":
+        if self.debug_control_both:
+            self.engine.set_policies(self.human_policy, self.human_policy)
+        elif self.mode == "human-vs-ai":
             if self.human_side == "P2":
                 self.engine.set_policies(self.ai_policies[1], self.human_policy)
             else:
@@ -1045,6 +1056,8 @@ class GameSession:
             ci: CardInstance,
             from_area: AreaType,
             to_area: AreaType,
+            *,
+            cause: str | None = None,
     ) -> None:
         if from_area is to_area:
             return
@@ -1055,6 +1068,8 @@ class GameSession:
             "toArea": to_area.value,
             "card": serialize_card(self.engine, ci, self.asset_index),
         }
+        if cause is not None:
+            event["cause"] = cause
         summon_fx = self._zone_move_summon_fx(from_area, to_area)
         if summon_fx is not None:
             event["summonFx"] = summon_fx
@@ -1258,6 +1273,19 @@ class GameSession:
 
     def _animation_event_from_engine_visual_event(self, event: dict[str, Any]) -> dict[str, Any] | None:
         event_type = event.get("type")
+        if event_type in ("evolution", "transform"):
+            return {
+                "type": event_type,
+                "side": event["side"],
+                "cards": [
+                    {
+                        "area": entry["area"],
+                        "before": serialize_card(self.engine, entry["before"], self.asset_index),
+                        "after": serialize_card(self.engine, entry["after"], self.asset_index),
+                    }
+                    for entry in event["cards"]
+                ],
+            }
         if event_type == "effect":
             ci = event["card"]
             fields = self._effect_text_fields(ci, event.get("effect"), event.get("ctx"))
@@ -1297,6 +1325,8 @@ class GameSession:
                 "toArea": to_area.value,
                 "card": serialize_card(self.engine, ci, self.asset_index),
             }
+            if event.get("cause") is not None:
+                animation_event["cause"] = event["cause"]
             summon_fx = self._zone_move_summon_fx(from_area, to_area)
             if summon_fx is not None:
                 animation_event["summonFx"] = summon_fx
@@ -1374,7 +1404,7 @@ class GameSession:
             ci = event["card"]
             from_area = event["from"]
             to_area = event["to"]
-            self._queue_zone_move_animation_event(ci, from_area, to_area)
+            self._queue_zone_move_animation_event(ci, from_area, to_area, cause=event.get("cause"))
 
     def _player_key(self, player: Player) -> str:
         return "human" if player is self.engine.state.players[0] else "opponent"
@@ -1997,6 +2027,16 @@ class GameSession:
                 return
             if self._drain_or_prompt_force_base_choices():
                 return
+            if self.engine.has_pending_end_turn:
+                before = self._visual_state_snapshot()
+                self.engine.triggers.resolve_all()
+                if self.prompt is None:
+                    self.engine.continue_end_turn()
+                self._record_visual_changes(before)
+                if self.prompt is not None:
+                    return
+                if self.engine.has_pending_end_turn:
+                    continue
             if self.engine.has_pending_standby:
                 before = self._visual_state_snapshot()
                 self.engine.triggers.resolve_all()
@@ -2021,6 +2061,7 @@ class GameSession:
                 self.prompt is None
                 and self._game_over is None
                 and self._attack is None
+                and not self.engine.has_pending_end_turn
                 and not self.engine.has_pending_standby
                 and self._is_user_controlled(self.engine.state.active)
             ):
@@ -2030,7 +2071,7 @@ class GameSession:
     def _phase_resolution_pending(self) -> bool:
         """Choices removed from the trigger queue still belong to their phase."""
         return bool(
-            self.prompt is not None
+            (self.prompt is not None and self.prompt.get("kind") != "main_action")
             or self._pending_effect is not None
             or self.engine.pending_blessing_returns
             or self.engine.pending_force_base_choices
@@ -3230,6 +3271,16 @@ class GameSession:
             return 0
         amount = 0
         replacement_player = player
+        entry_area = effect.params.get("field_entry_source_area")
+        if entry_area is not None:
+            try:
+                entry_area = AreaType(entry_area)
+            except (TypeError, ValueError) as exc:
+                raise ValueError(f"invalid field_entry_source_area on effect: {entry_area!r}") from exc
+        selected_field_entries = sum(
+            1 for target in targets_to_field
+            if isinstance(target, CardInstance) and (entry_area is None or target.area is entry_area)
+        )
         if effect.template_id in {"create_tokens", "create_field_minions"}:
             replacement_player = self._token_recipient_for_effect(
                 player,
@@ -3245,7 +3296,7 @@ class GameSession:
         elif effect.template_id == "summon_from_trash":
             field_entry_count = effect.params.get("field_entry_count")
             if field_entry_count is None:
-                amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
+                amount = selected_field_entries
             elif isinstance(field_entry_count, bool) or not isinstance(field_entry_count, int) or field_entry_count < 0:
                 raise ValueError(f"invalid field_entry_count on effect: {field_entry_count!r}")
             else:
@@ -3253,13 +3304,14 @@ class GameSession:
         elif effect.params.get("source_enters_field"):
             amount = 1
         elif effect.target_kind == "ally_minion_base":
-            amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
+            amount = selected_field_entries
         elif effect.params.get("puts_targets_on_field"):
-            amount = sum(1 for target in targets_to_field if isinstance(target, CardInstance))
-        amount += sum(
-            1 for target in targets_to_field
-            if isinstance(target, CardInstance) and target.card.id == "purple_04_02_01_00"
-        )
+            amount = selected_field_entries
+        if not amount:
+            amount = sum(
+                1 for target in targets_to_field
+                if isinstance(target, CardInstance) and target.card.id == "purple_04_02_01_00"
+            )
         if amount <= 0:
             return 0
         return max(0, len(replacement_player.field) + amount - FIELD_CAP)
@@ -3725,7 +3777,8 @@ class GameSession:
                 ci,
             )
             if (
-                effect.template_id in {"create_tokens", "create_field_minions"}
+                ci.card.type is CardType.MAGIC
+                and effect.template_id in {"create_tokens", "create_field_minions"}
                 and replacements_needed
                 and self._is_user_controlled(replacement_player)
             ):
@@ -3751,6 +3804,7 @@ class GameSession:
                 return
         if mode == "main":
             ci = self._play_action_card(player, action)
+            before = self._visual_state_snapshot()
             self.engine.play_card(
                 ci,
                 payment_base_iids=action.payload.get("payment_base_iids"),
@@ -3763,6 +3817,13 @@ class GameSession:
             self.engine.apply_flash_action(player, action, resolve_triggers=False)
             pending_mode = "flash_deferred"
         self._log_event(f"{player.name}: {label}", event)
+        if mode == "main" and ci.card.type is CardType.F_MINION:
+            # Resolve the actual summon queue after the Minion enters. The
+            # trigger path announces the clause before asking for Token space.
+            self.engine.triggers.resolve_all()
+            self._record_visual_changes(before)
+            self._log_public_reveals()
+            return
         if not self.engine.triggers.has_pending(instance=ci, trigger=effect):
             self._resolve_deferred_play_without_effect(player, mode)
             return
@@ -4668,10 +4729,9 @@ class GameSession:
                 and (Color.RED in target.card.cost or set(target.card.cost) <= {Color.COLORLESS})
             ], action, effect, source_ci)
         if kind == "ally_minion_base":
-            return self._filter_card_targets_for_effect(player, [
-                target for target in player.base
-                if target.card.type in (CardType.B_MINION, CardType.F_MINION)
-            ], action, effect, source_ci)
+            return self._filter_card_targets_for_effect(
+                player, self.engine._eligible_targets(player, kind), action, effect, source_ci,
+            )
         if kind == "enemy_force":
             return self._filter_targets_for_effect(self._filter_effect_targets(
                 player,

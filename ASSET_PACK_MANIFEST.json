@@ -1,22 +1,23 @@
 {
   "kind": "zz_external_asset_pack_v3",
-  "release": "v0.5.4",
+  "release": "v0.6.0",
   "archive": "asserts.7z",
-  "archiveBytes": 1534680950,
-  "expandedBytes": 1577092255,
-  "fileId": "1f7AAwFqaFRLyX1z7pPF68YJ7fE9r3DXs",
+  "archiveBytes": 1535230963,
+  "expandedBytes": 1577650106,
+  "sha256": "c1dbe2780126536c20b52bb8f17a7bed7fd73bcd375d06947d2bf9e892cb0bfd",
+  "fileId": "1yjr4nADGQKb3i_ITasugAY_-GTF6ykJv",
   "extractTo": "asserts",
-  "expectedRoot": "asserts",
+  "expectedRoot": ".",
   "topLevelContents": [
-    "asserts/Eng-cards",
-    "asserts/ZENONZARD_CARDLIST",
-    "asserts/audio",
-    "asserts/card_back",
-    "asserts/images",
-    "asserts/video"
+    "Eng-cards",
+    "ZENONZARD_CARDLIST",
+    "audio",
+    "card_back",
+    "images",
+    "video"
   ],
   "distribution": {
     "url": "https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ",
-    "note": "On first launch the desktop client asks before downloading this archive, validates its paths and 7-Zip CRC, and installs it into asserts/."
+    "note": "On first launch the desktop client asks before downloading this archive, validates its SHA-256, paths and 7-Zip CRC, and installs it into asserts/. Existing users can move their old asserts/ aside before restarting to download the updated PC03 token art."
   }
 }

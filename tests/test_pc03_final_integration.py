@@ -21,7 +21,7 @@ def add(e, owner, card, area=AreaType.FIELD):
     return ci
 
 
-def test_flame_ring_blocking_aura_uses_attacker_original_and_blocker_current_bp():
+def test_flame_ring_blocking_aura_uses_blocker_original_and_current_bp():
     e, owner, opp = setup()
     source = add(e, owner, CARD_REGISTRY['red_05_01_03_03'])
     attacker = add(e, owner, Card('red-attacker', '', '', CardType.F_MINION,
@@ -31,15 +31,17 @@ def test_flame_ring_blocking_aura_uses_attacker_original_and_blocker_current_bp(
     equal = add(e, opp, Card('equal', '', '', CardType.F_MINION, bp=500))
     boosted = add(e, opp, Card('boosted', '', '', CardType.F_MINION, bp=400))
     boosted.bp_mod = 100
-    assert weak not in e.legal_blockers(attacker)
+    assert weak in e.legal_blockers(attacker)
     assert equal in e.legal_blockers(attacker)
     assert boosted in e.legal_blockers(attacker)
+    equal.bp_mod = -100
+    assert equal not in e.legal_blockers(attacker)
 
     attacker.card.printed_color = Color.BLUE
-    assert weak in e.legal_blockers(attacker)
+    assert equal in e.legal_blockers(attacker)
     attacker.card.printed_color = Color.RED
     owner.field.remove(source)
-    assert weak in e.legal_blockers(attacker)
+    assert equal in e.legal_blockers(attacker)
 
 
 def test_minion_action_restrictions_do_not_break_force_refresh():

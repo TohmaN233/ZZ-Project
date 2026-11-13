@@ -94,6 +94,7 @@ def build_card(row: dict[str, Any]):
                 "card_type": CardType.F_MINION.value,
                 "color": Color.RED.name,
                 "race": "ドラゴン",
+                "puts_targets_on_field": True,
             },
             official_effect="手札の赤いドラゴン族Field Minion1枚を場に出し、移動不可と自分のターン終了時破壊を付与する",
             official_timing="召喚時",

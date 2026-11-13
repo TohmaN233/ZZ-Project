@@ -1377,11 +1377,11 @@ function pendingVisualEvents() {
 
 function animationEventNeedsHeldState(event) {
   if (!event) return false;
-  return ["attack", "block", "damage", "heal", "refresh", "destroy", "zone_move", "effect", "draw", "effect_target"].includes(event.type);
+  return ["attack", "block", "damage", "heal", "refresh", "destroy", "zone_move", "effect", "draw", "effect_target", "evolution", "transform"].includes(event.type);
 }
 
 function animationEventSettlesVisualState(event) {
-  return Boolean(event && ["zone_move", "draw", "destroy", "heal", "refresh"].includes(event.type));
+  return Boolean(event && ["zone_move", "draw", "destroy", "heal", "refresh", "evolution", "transform"].includes(event.type));
 }
 
 function zoneMoveSourceKey(iid, area) {
@@ -1637,10 +1637,28 @@ function settleDrawVisualState(event) {
   return count > 0;
 }
 
+function settleCardFaceChangeVisualState(event) {
+  if (!state || !pendingVisualState || visualStateStaged || !event || !["evolution", "transform"].includes(event.type)) return false;
+  const player = findPlayerBySide(event.side);
+  if (!player) return false;
+  let changed = false;
+  for (const entry of event.cards || []) {
+    if (!["field", "base"].includes(entry.area) || !entry.after || entry.after.iid == null) continue;
+    const cards = playerAreaCards(player, entry.area);
+    const index = cards.findIndex((card) => String(card.iid) === String(entry.after.iid));
+    if (index < 0) continue;
+    cards[index] = entry.after;
+    changed = true;
+  }
+  if (changed) syncUiStateFromCurrentState();
+  return changed;
+}
+
 function settleFinishedAnimationEvent(event) {
   if (!animationEventSettlesVisualState(event)) return false;
   if (event.type === "zone_move") return settleZoneMoveVisualState(event);
   if (event.type === "draw") return settleDrawVisualState(event);
+  if (["evolution", "transform"].includes(event.type)) return settleCardFaceChangeVisualState(event);
   if (event.type === "destroy") return settleDestroyVisualState(event);
   if (event.type === "heal") return settleHealVisualState(event);
   if (isRefreshVisualEvent(event)) return settleRefreshVisualState(event);
@@ -4681,6 +4699,8 @@ function animationEventDuration(event) {
   if (event.type === "dice_roll") return 3200;
   if (event.type === "rock_paper_scissors") return 3200;
   if (event.type === "effect") return 1200;
+  if (event.type === "evolution") return 1450;
+  if (event.type === "transform") return 1300;
   if (event.type === "destroy") return 920;
   if (event.type === "draw") return 820;
   if (event.type === "shuffle") return 520;
@@ -4760,6 +4780,8 @@ function animationEventLabel(event) {
   if (event.type === "damage") return `-${event.amount}`;
   if (event.type === "heal") return `+${event.amount}`;
   if (event.type === "effect") return cardTitle(event.card || {});
+  if (event.type === "evolution") return "EVOLVE";
+  if (event.type === "transform") return "TRANSFORM";
   if (event.type === "effect_target") return "Magic target";
   if (event.type === "destroy") return "Destroyed";
   if (event.type === "zone_move") return zoneMoveLabel(event);
@@ -4779,6 +4801,8 @@ function animationEventLayerMode(event) {
     event.type === "damage" ||
     event.type === "heal" ||
     event.type === "destroy" ||
+    event.type === "evolution" ||
+    event.type === "transform" ||
     event.type === "effect_target"
   ) {
     return "board";
@@ -4955,6 +4979,8 @@ function refreshBoardAnimationAnchors() {
       anchorPoints.set(key, { x, y });
       layer.style.setProperty(`--anchor-${varName}-x`, `${Math.round(x)}px`);
       layer.style.setProperty(`--anchor-${varName}-y`, `${Math.round(y)}px`);
+      layer.style.setProperty(`--anchor-${varName}-w`, `${Math.round(rect.width)}px`);
+      layer.style.setProperty(`--anchor-${varName}-h`, `${Math.round(rect.height)}px`);
     };
     const anchors = board.querySelectorAll("[data-board-anchor]");
     anchors.forEach((element) => {
@@ -5087,6 +5113,27 @@ function renderBoardEventCard(card, className) {
       ${art ? `<img src="${esc(art)}" alt="${esc(name)}">` : `<span>${esc(name.slice(0, 1) || "?")}</span>`}
     </div>
   `;
+}
+
+function renderBoardAnchoredFaceChange(event) {
+  return (event.cards || []).map((entry) => {
+    const before = entry.before || {};
+    const after = entry.after || {};
+    const area = ["field", "base"].includes(entry.area) ? entry.area : "field";
+    const anchor = boardAnchorForCard(after.iid, event.side, area);
+    const color = String(after.manaColor || "colorless").toLowerCase();
+    const tone = ["red", "blue", "green", "yellow", "white", "purple"].includes(color) ? color : "colorless";
+    const size = anchor.varName ? `--evolution-width:var(--anchor-${anchor.varName}-w, 74px); --evolution-height:var(--anchor-${anchor.varName}-h, 104px);` : "";
+    const transforming = event.type === "transform";
+    const tilt = transforming && before.rested ? "--transformation-tilt:8deg;" : "";
+    return `<div class="board-evolution ${transforming ? "board-transformation" : ""} tone-${esc(tone)}" style="${boardAnchorStyle(anchor)} ${size} ${tilt}">
+      <span class="board-evolution-ring"></span><span class="board-evolution-orbit"></span>
+      ${renderBoardEventCard(before, "board-evolution-face before")}
+      ${renderBoardEventCard(after, "board-evolution-face after")}
+      ${transforming ? '<span class="board-transformation-rays"></span>' : ''}
+      <span class="board-evolution-flash"></span>${transforming ? "" : '<span class="board-evolution-label">EVOLVE</span>'}
+    </div>`;
+  }).join("");
 }
 
 function renderBoardAnchoredDraw(event) {
@@ -5292,6 +5339,7 @@ function renderBoardAnimationLayer({ replay = false } = {}) {
   if (event && animationEventLayerMode(event) === "board") {
     if (event.type === "draw") body = renderBoardAnchoredDraw(event);
     if (event.type === "zone_move") body = renderBoardAnchoredZoneMove(event);
+    if (["evolution", "transform"].includes(event.type)) body = renderBoardAnchoredFaceChange(event);
     if (event.type === "attack") body = renderBoardAnchoredAttack(event);
     if (event.type === "block") body = renderBoardAnchoredBlock(event);
     if (event.type === "damage" || event.type === "heal") body = renderBoardAnchoredLifeChange(event);
@@ -5618,6 +5666,13 @@ function isActiveZoneMoveSourceCard(card) {
   return card.area === activeAnimationEvent.fromArea && String(eventCard.iid || "") === String(card.iid || "");
 }
 
+function isActiveTransformSourceCard(card) {
+  if (!card || card.iid == null || !activeAnimationEvent || activeAnimationEvent.type !== "transform") return false;
+  if (card.ownerSide !== activeAnimationEvent.side) return false;
+  return (activeAnimationEvent.cards || []).some((entry) =>
+    entry.area === card.area && entry.before && String(entry.before.iid) === String(card.iid));
+}
+
 function renderCard(card, size = "") {
   const interactive = MultiplayerCardPolicy.isCardInteractive(card, state && state.humanSide, isOnlineDuel());
   const actions = actionOptionsForCard(card);
@@ -5629,6 +5684,7 @@ function renderCard(card, size = "") {
   const playable = isPlayableCard(card) ? " playable" : "";
   const rested = cardCanBeRested(card) && card.rested ? " rested" : "";
   const movingSource = isActiveZoneMoveSourceCard(card) ? " zone-moving-source" : "";
+  const transformingSource = isActiveTransformSourceCard(card) ? " transforming-source" : "";
   const selected = Number(selectedCardIid) === Number(card.iid) ? " selected-card" : "";
   const mulliganSelectable = canMulliganSelect(card);
   const mulliganSelected = mulliganSelectable && mulliganSelectedIids.has(card.iid);
@@ -5662,7 +5718,7 @@ function renderCard(card, size = "") {
     `role="button" tabindex="0" data-card-iid="${esc(card.iid)}" title="${label}"`
     : `aria-hidden="true"`;
   return `
-    <div class="card${classes}${legal}${playable}${blessSource}${blessTarget}${rested}${selected}${mulliganClass}${movingSource}" ${cardAnchor}
+    <div class="card${classes}${legal}${playable}${blessSource}${blessTarget}${rested}${selected}${mulliganClass}${movingSource}${transformingSource}" ${cardAnchor}
          data-fx-face="${card.faceDown ? "down" : "up"}" data-rarity="${esc(card.faceDown ? "" : (cardById(card.cardId)?.rarity || ""))}"
          ${interactionAttrs} ${blessDragAttrs} ${blessTargetAttr}>
       ${art}

@@ -211,19 +211,19 @@
       }
     },
     {
-      "name": "The highest present Metallic Steed source advances once",
+      "name": "Both Metallic Steed levels synchronize to Lv3",
       "path": "state.players.human.field",
       "op": "count_where",
-      "value": 1,
+      "value": 2,
       "where": {
         "cardId": "white_07_01_03_02"
       }
     },
     {
-      "name": "The lower Metallic Steed source is not advanced in the same family step",
+      "name": "No lower Metallic Steed level remains after synchronization",
       "path": "state.players.human.field",
       "op": "count_where",
-      "value": 1,
+      "value": 0,
       "where": {
         "cardId": "white_07_01_03_00"
       }
@@ -238,12 +238,12 @@
       }
     },
     {
-      "name": "The Lv1 Conjurer remains unchanged when the family quota is consumed",
+      "name": "The Lv1 Conjurer in hand also synchronizes to Lv3",
       "path": "state.players.human.hand",
       "op": "count_where",
       "value": 1,
       "where": {
-        "cardId": "white_00_00_03_03"
+        "cardId": "white_00_00_03_05"
       }
     },
     {

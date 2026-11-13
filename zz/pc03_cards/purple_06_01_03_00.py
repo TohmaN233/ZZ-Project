@@ -43,7 +43,7 @@ def build_card(row: dict[str, Any]):
             target_kind="enemy_trash_field_minion",
             min_targets=1,
             max_targets=1,
-            params={"card_type": CardType.F_MINION, "exclude_card_id": CARD_ID},
+            params={"card_type": CardType.F_MINION, "exclude_card_id": CARD_ID, "puts_targets_on_field": True},
             official_effect="相手のトラッシュにある、「「タナトスの屍司祭」プリースト」以外のフィールド・ミニオンカード1枚と同じミニオン1体を、自分のフィールドに出す。",
             official_timing="破壊時",
         )

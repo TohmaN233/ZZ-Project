@@ -29,6 +29,7 @@ def build_card(row: dict[str, Any]):
                 "return_from_trash_to_hand",
                 EffectTiming.ON_DESTROY,
                 condition=_has_blue_or_colorless_evoker_mana,
+                self_destroy_only=True,
                 target_kind="trash_magic_cost_at_most_4",
                 min_targets=1,
                 max_targets=1,

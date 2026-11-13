@@ -28,8 +28,15 @@ class ReleasePackagingContractTests(unittest.TestCase):
         self.assertEqual(manifest["archive"], source["fileName"])
         self.assertEqual(manifest["archiveBytes"], source["sizeBytes"])
         self.assertEqual(manifest["expandedBytes"], source["expandedBytes"])
+        self.assertEqual(manifest["sha256"], source["sha256"])
         self.assertEqual(manifest["fileId"], source["fileId"])
         self.assertEqual(manifest["distribution"]["url"], source["folderUrl"])
+
+    def test_python_package_includes_pc03_card_data(self) -> None:
+        import ast
+        pyproject = (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        package_line = next(line for line in pyproject.splitlines() if line.startswith('"zz" = '))
+        self.assertIn("pc03_data.tsv", ast.literal_eval(package_line.split("=", 1)[1].strip()))
 
     def test_home_background_is_present_and_packaged(self) -> None:
         home_image = PROJECT_ROOT / "image.png"

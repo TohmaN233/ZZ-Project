@@ -1,3 +1,31 @@
+# v0.6.0 - PC03
+
+## 简体中文
+
+- 更新 PC03 卡包。
+- 建议旧玩家重新下载 [最新资源包](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)，旧包可能缺少 PC03 Token 卡图。关闭游戏后，把安装目录的 `asserts` 文件夹改名备份，再启动游戏即可按提示下载；也可手动解压新版资源包。卡组与回放保存在 `data/`，请保留该目录。
+- 联机双方和服务器需要使用 v0.6.0。
+
+## 日本語
+
+- PC03 カードパックを更新しました。
+- 以前のアセットには PC03 のトークン画像が不足している場合があります。[最新版のアセット](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ)を再ダウンロードしてください。ゲームを終了し、インストール先の `asserts` フォルダーを別名でバックアップしてから再起動すると、ダウンロードを選択できます。デッキとリプレイが入った `data/` は残してください。
+- オンライン対戦では両プレイヤーとサーバーを v0.6.0 に更新してください。
+
+## English
+
+- Updated the PC03 card pack.
+- Older assets may be missing PC03 token images. Download the [latest asset pack](https://drive.google.com/drive/folders/1R8NwBsR2QBvDHUwynZqLooZYI8TlX8TZ); alternatively, close the game, rename the existing `asserts` folder as a backup, and restart to download it automatically. Keep `data/`, which contains your decks and replays.
+- Both online clients and the server need v0.6.0.
+
+## Downloads
+
+- [Windows installer](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe)
+- [Linux portable bundle](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz)
+- [Source package](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip)
+- [Self-hosted multiplayer server](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz)
+- [SHA256 checksums](https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/SHA256SUMS-PC02.txt)
+
 # v0.5.4 - Online Reconnect and Replays
 
 [简体中文](README.md) | [日本語](README.ja.md) | [English](README.en.md)

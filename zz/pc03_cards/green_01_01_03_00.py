@@ -45,6 +45,7 @@ def build_card(row: dict[str, Any]):
                 "place_colorless_mana",
                 EffectTiming.ON_DESTROY,
                 condition=_has_evoker_green_or_colorless_mana,
+                self_destroy_only=True,
                 mana_color=Color.GREEN,
                 rested=True,
                 official_effect="自分の種族「エヴォーカー」を持つ、緑または無色のマナがある場合、緑マナ1つをレスト状態でベースに置く。",

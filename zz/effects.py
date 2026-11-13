@@ -62,7 +62,7 @@ class EffectSpec:
 
 EFFECT_TARGET_FILTER_PARAMS = frozenset({
     "card_id", "card_ids", "exclude_card_id", "race", "races_any",
-    "card_type", "card_types", "color", "colors_any", "exclude_color", "max_cost", "min_cost",
+    "card_type", "card_types", "color", "colors_any", "exclude_color", "mana_color", "max_cost", "min_cost",
     "max_bp", "min_bp", "max_dp", "min_dp", "bp_below_original",
     "requires_blessing", "requires_boost", "only_rested", "only_active",
     "exclude_tokens", "requires_token", "required_keyword", "explicitly_equivalent_to",
@@ -382,6 +382,8 @@ def build_effect(
         key: _param_value(value)
         for key, value in params.items()
     }
+    if timing in (EffectTiming.ON_SUMMON, EffectTiming.ON_ATTACK) and condition is None:
+        stored_params.setdefault("self_event_only", True)
     if template_id == "stat_modifier_all":
         stored_params["all_targets"] = True
     if active_areas is None and timing in (EffectTiming.ON_PLACE_BASE, EffectTiming.MOVE_TO_BASE):
@@ -746,6 +748,7 @@ def _create_tokens(
             name_en=name_jp,
             type=CardType.F_MINION,
             cost=token_cost,
+            printed_color=token_color,
             bp=bp,
             dp=dp,
             race_jp=race_jp,
@@ -1197,13 +1200,7 @@ def _summon_from_trash(
         targets = eng.select_target(ci.owner, target_kind, 0 if optional else 1, 1, filter_fn=filter_fn, source=ci)
         if not targets:
             return
-        replace_iid = None
-        if len(ci.owner.field) >= 5:
-            replacements = eng.select_target(ci.owner, "ally_minion", 1, 1, source=ci)
-            if not replacements:
-                return
-            replace_iid = replacements[0].iid
-        eng.summon_from_trash(ci.owner, targets[0], rested=rested, replace_field_iid=replace_iid)
+        eng.summon_from_trash(ci.owner, targets[0], rested=rested)
     return fn
 
 
@@ -1309,6 +1306,7 @@ def _target_filter(
     min_dp: int | None = None,
     bp_below_original: bool = False,
     color: Color | str | None = None,
+    mana_color: Color | str | None = None,
     colors_any: tuple[Color | str, ...] | list[Color | str] | None = None,
     exclude_color: Color | str | None = None,
     card_id: str | None = None,
@@ -1328,6 +1326,7 @@ def _target_filter(
     required_keyword: Keyword | str | None = None,
 ):
     wanted_color = _color_from_value(color)
+    wanted_mana_color = _color_from_value(mana_color)
     excluded_color = _color_from_value(exclude_color)
     wanted_type = _card_type_from_value(card_type)
     wanted_types = {_card_type_from_value(value) for value in (card_types or ())}
@@ -1345,7 +1344,7 @@ def _target_filter(
             return bool(only_rested or only_active) and not any((
                 max_cost is not None, min_cost is not None, max_bp is not None,
                 min_bp is not None, max_dp is not None, min_dp is not None,
-                bp_below_original, wanted_color, wanted_colors, excluded_color, card_id,
+                bp_below_original, wanted_color, wanted_mana_color, wanted_colors, excluded_color, card_id,
                 explicitly_equivalent_to, wanted_card_ids, exclude_card_id,
                 race, wanted_races,
                 wanted_type, wanted_types, requires_blessing, requires_boost,
@@ -1403,6 +1402,8 @@ def _target_filter(
         if bp_below_original and eng.effective_bp(target) >= card.bp:
             return False
         if wanted_color is not None and _card_color(card) is not wanted_color:
+            return False
+        if wanted_mana_color is not None and eng._mana_color_of(target) is not wanted_mana_color:
             return False
         if wanted_colors and _card_color(card) not in wanted_colors:
             return False

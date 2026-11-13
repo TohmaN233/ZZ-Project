@@ -13,7 +13,8 @@ CARD_ID = 'purple_03_01_03_01'
 
 def _attacked_force(source: CardInstance, state: Any, ctx: Context) -> bool:
     return (
-        source.area is AreaType.FIELD
+        ctx.source is source
+        and source.area is AreaType.FIELD
         and source.owner is ctx.controller
         and state.active is source.owner
         and isinstance(ctx.target, ForceInstance)

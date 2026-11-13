@@ -431,6 +431,7 @@ class ScenarioRunner:
         self._validate_spec_header()
         self.captures: dict[str, Any] = {}
         self.session: Any | None = None
+        self.normal_hand_cap = False
         self.state: dict[str, Any] | None = None
         self.setup_records: list[dict[str, Any]] = []
         self.action_records: list[dict[str, Any]] = []
@@ -563,8 +564,7 @@ class ScenarioRunner:
                 "opponentProfile": payload.get("opponentProfile"),
             }
             self.session = app.new_session(new_payload)
-            if payload.get("normalHandCap", False):
-                self.session.engine.ignore_hand_cap = False
+            self.normal_hand_cap = bool(payload.get("normalHandCap", False))
             debug = setup_debug_lab(
                 self.session,
                 str(payload.get("cardId") or ""),
@@ -635,6 +635,10 @@ class ScenarioRunner:
                 debug = self._return_fixture_to_hand(payload)
             else:
                 raise ScenarioError(f"unsupported semantic setup path {path!r}")
+        # Debug control/fixed-board setup reconfigures the engine. Preserve an
+        # explicitly requested normal hand limit across all fixture steps.
+        if self.normal_hand_cap:
+            self.session.engine.ignore_hand_cap = False
         response = self._state_response(debug)
         self.state = response["state"]
         return response

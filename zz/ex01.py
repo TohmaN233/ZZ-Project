@@ -91,16 +91,9 @@ def _put_low_cost_minion_from_hand(source: CardInstance, state: Any, ctx: Contex
     )
     if not chosen:
         return
-    replace_iid = None
-    if len(source.owner.field) >= 5:
-        replacements = eng.select_target(source.owner, "ally_minion", 1, 1, source=source)
-        if not replacements:
-            return
-        replace_iid = replacements[0].iid
     eng.put_field_minion_from_hand(
         source.owner,
         chosen[0],
-        replace_field_iid=replace_iid,
     )
 
 

@@ -198,10 +198,10 @@
       }
     },
     {
-      "name": "Amora Lv2 in Base evolves to Lv3",
+      "name": "Amora Lv1 and Lv2 in Base both evolve to Lv3",
       "path": "state.players.human.base",
       "op": "count_where",
-      "value": 1,
+      "value": 2,
       "where": {
         "cardId": "green_00_00_03_02"
       }

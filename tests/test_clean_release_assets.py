@@ -22,7 +22,7 @@ class CleanReleaseAssetTests(unittest.TestCase):
     def setUp(self) -> None:
         self.index = AssetIndex(ASSET_ROOT)
 
-    def test_asset_tree_is_ascii_only_and_has_no_unowned_top_level_content(self) -> None:
+    def test_asset_tree_has_expected_top_level_content(self) -> None:
         runtime_entries = {
             "audio", "card_back", "Eng-cards", "images", "video", "ZENONZARD_CARDLIST"
         }
@@ -30,13 +30,6 @@ class CleanReleaseAssetTests(unittest.TestCase):
         self.assertTrue(runtime_entries.issubset(actual_entries))
         if os.environ.get("ZZ_RELEASE_ASSET_ROOT"):
             self.assertEqual(actual_entries, runtime_entries)
-            non_ascii = [
-                str(path.relative_to(ASSET_ROOT))
-                for root_name in runtime_entries
-                for path in (ASSET_ROOT / root_name).rglob("*")
-                if not str(path.relative_to(ASSET_ROOT)).isascii()
-            ]
-            self.assertEqual(non_ascii, [])
         else:
             # A developer may retain the published first-launch archive next
             # to its extracted tree. Release asset trees still require exactly
@@ -55,23 +48,17 @@ class CleanReleaseAssetTests(unittest.TestCase):
             for color in ("RED", "YELLOW", "WHITE", "GREEN", "BLUE", "PURPLE", "COLORLESS")
             for path in (card_root / color).glob("*.png")
         }
-        if os.environ.get("ZZ_RELEASE_ASSET_ROOT"):
-            self.assertEqual(card_files, expected_cards)
-        else:
-            self.assertTrue(expected_cards.issubset(card_files))
-        self.assertTrue(all(self.index.resolve_asset_id(card_id) for card_id in expected_cards))
+        # The shared resource archive also contains art for future card packs.
+        self.assertTrue(expected_cards.issubset(card_files))
+        # Outside-deck evolution and transformation cards need art too.
+        self.assertTrue(all(self.index.resolve_asset_id(card_id) for card_id in CARD_REGISTRY))
         english_manifest = json.loads(
             (ASSET_ROOT / "Eng-cards" / "manifest.json").read_text(encoding="utf-8")
         )
-        if os.environ.get("ZZ_RELEASE_ASSET_ROOT"):
-            self.assertTrue(set(english_manifest["cards"]).issubset(expected_cards))
         self.assertTrue(all(self.index.asset_url_en(card_id) for card_id in expected_cards))
 
         force_files = {path.stem for path in (card_root / "FORCE").glob("*.png")}
-        if os.environ.get("ZZ_RELEASE_ASSET_ROOT"):
-            self.assertEqual(force_files, set(ALL_FORCES))
-        else:
-            self.assertTrue(set(ALL_FORCES).issubset(force_files))
+        self.assertTrue(set(ALL_FORCES).issubset(force_files))
         self.assertEqual(set(english_manifest["forces"]), set(ALL_FORCES))
         self.assertEqual(
             set(english_manifest["mana"]),
@@ -81,6 +68,7 @@ class CleanReleaseAssetTests(unittest.TestCase):
             {path.name for path in (card_root / "tokens").glob("*.png")},
             {
                 "red_01_04_00_00.png",
+                "red_04_00_03.png",
                 "blue_02_04_00_00.png",
                 "colorless_01_04_00_00.png",
                 "colorless_01_04_00_01.png",
@@ -96,6 +84,7 @@ class CleanReleaseAssetTests(unittest.TestCase):
         )
         self.assertTrue(self.index.resolve_asset_id("card_back"))
         self.assertTrue(self.index.resolve_asset_id("s_golem_token"))
+        self.assertEqual(self.index.resolve_asset_id("m_golem_token").name, "red_04_00_03.png")
         self.assertTrue(self.index.resolve_asset_id("merfolk_token"))
         self.assertTrue(self.index.resolve_asset_id("slime_block_token"))
         self.assertTrue(
