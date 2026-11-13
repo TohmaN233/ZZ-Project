@@ -42,7 +42,9 @@
     "privateData": "data/codeman_ai, ai_challenges, training traces, and local training actors are excluded",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
     "asserts": "external sibling directory next to ZZ-Project.exe",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Windows-Setup.exe",
+    "bytes": 160603676,
+    "sha256": "8C942E76487BD6B7C03116F9D9DA42570E4E3CDE914739D7F255D70BB8A75FBB"
   },
   "linuxBundle": {
     "filename": "ZZ-Project-v0.6.0-Linux.tar.gz",
@@ -53,7 +55,9 @@
     "firstLaunch": "extract and run ./launch-electron.sh; Node.js, Electron and Python runtime are prepared in the user cache",
     "asserts": "external asserts directory at the bundle root",
     "training": "source package only; optional CUDA/PyTorch training dependencies are not bundled",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-Linux.tar.gz",
+    "bytes": 23478502,
+    "sha256": "7CF926F9C8E35EE35620C196ACC551F20EEA5DBC8E5E2E127313062EC689A421"
   },
   "externalAssetPack": {
     "archive": "asserts.7z",
@@ -98,7 +102,9 @@
       "focused tests and PC02R, EX02C and PC03 semantic scenarios",
       "public runtime models and public Windows rebuild checkpoint"
     ],
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Project-v0.6.0-source.zip",
+    "bytes": 40633938,
+    "sha256": "477DBDCF3C0FFE720937563DACBE4BFFBAE899798D7AB130D30029537BC880BD"
   },
   "multiplayerServer": {
     "filename": "ZZ-Multiplayer-v0.6.0.tar.gz",
@@ -107,7 +113,9 @@
       "public card data, translations, rules and deployment examples"
     ],
     "excluded": "desktop UI, media assets, AI model files and private training data",
-    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz"
+    "downloadUrl": "https://github.com/TohmaN233/ZZ-Project/releases/download/v0.6.0/ZZ-Multiplayer-v0.6.0.tar.gz",
+    "bytes": 779362,
+    "sha256": "61ACF0E3B1AE97B9BFAAC7A34D1BCBE45FC0AF70555E3D24588F6FB6273AAE6D"
   },
   "artifactIntegrity": "SHA256SUMS-PC02.txt distributed beside the release artifacts",
   "releasePage": "https://github.com/TohmaN233/ZZ-Project/releases/tag/v0.6.0",
