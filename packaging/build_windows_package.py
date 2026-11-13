@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import shutil
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -17,9 +18,9 @@ WINDOWS_DIST = ROOT / "dist" / "windows" / f"v{VERSION}"
 RELEASE_DIST = ROOT / "dist" / "releases" / f"v{VERSION}"
 
 
-def run(command: list[str]) -> None:
+def run(command: list[str], *, env: dict[str, str] | None = None) -> None:
     print("+", " ".join(command), flush=True)
-    subprocess.run(command, cwd=ROOT, check=True)
+    subprocess.run(command, cwd=ROOT, check=True, env=env)
 
 
 def add_data(source: str, destination: str) -> str:
@@ -131,6 +132,11 @@ def main() -> None:
     server_executable = SERVER_DIST / "zz-server.exe"
     if not server_executable.is_file():
         raise FileNotFoundError(server_executable)
+    # Electron Builder's newer 7-Zip can auto-select an ARM64 filter that the
+    # NSIS 7-Zip 19 plugin cannot decode, even in an x64 installer. Force the
+    # compatible BCJ filter for the installer archive.
+    builder_env = os.environ.copy()
+    builder_env["ELECTRON_BUILDER_7Z_FILTER"] = "BCJ"
     run([
         "npx.cmd" if __import__("os").name == "nt" else "npx",
         "electron-builder",
@@ -140,7 +146,7 @@ def main() -> None:
         "--publish",
         "never",
         f"--config.directories.output={WINDOWS_DIST}",
-    ])
+    ], env=builder_env)
     installers = sorted(WINDOWS_DIST.glob("*.exe"))
     if not installers:
         raise FileNotFoundError(f"No Windows installer found in {WINDOWS_DIST}")
