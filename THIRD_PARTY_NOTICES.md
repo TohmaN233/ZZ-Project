@@ -21,16 +21,4 @@ Copyright (c) 2011 Effekseer Project. The complete MIT license is included in
 `zz/web/static/fx/effekseer-LICENSE.txt`. File hashes are pinned in the FX manifest.
 This runtime license does not license the particle artwork loaded by it.
 
-## User-supplied Battle Spirits Crossover effects
-
-The selected `.efkefc` files and PNG textures in `zz/web/static/fx/` come from
-the user's local `特效包`, whose README identifies Battle Spirits Crossover
-StreamingAssets as the source. The original effect binaries are unchanged;
-the manifest records original relative paths, dependency mappings and SHA-256
-hashes. Duplicate textures are stored once by content hash.
-
-The supplied export contains no media redistribution license. These assets
-remain the property of their respective rights holders and are **not** covered
-by Effekseer's MIT license or relicensed by this project. Local integration is
-not a grant of permission to redistribute the source game's media.
 
